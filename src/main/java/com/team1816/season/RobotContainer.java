@@ -3,6 +3,7 @@ package com.team1816.season;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.Singleton;
+import com.team1816.season.subsystems.Climber;
 import com.team1816.season.subsystems.Elevator;
 import com.team1816.season.subsystems.Superstructure;
 
@@ -14,6 +15,7 @@ public class RobotContainer extends BaseRobotContainer {
         initializeLibSubSystems();
 
         Singleton.CreateSubSystem(Elevator.class);
+        Singleton.CreateSubSystem(Climber.class);
 
         superstructure = new Superstructure(swerve);
 
