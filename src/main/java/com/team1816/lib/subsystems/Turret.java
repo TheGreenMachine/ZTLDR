@@ -17,7 +17,6 @@ public class Turret extends SubsystemBase implements ITestableSubsystem {
     private double wantedAngle = 0.0;
 
     private final IMotor turret = (IMotor) factory.getDevice(NAME, "turretMotor");
-    private VoltageOut voltageControl = new VoltageOut(0);
     private PositionVoltage positionControl = new PositionVoltage(0);
     private TURRET_STATE wantedState = TURRET_STATE.TURRET_IDLE;
 
@@ -28,8 +27,6 @@ public class Turret extends SubsystemBase implements ITestableSubsystem {
         TURRET_TO_0,
         TURRET_TO_180,
         TURRET_TO_ANGLE,
-        TURRET_ROTATE_LEFT,
-        TURRET_ROTATE_RIGHT,
         TURRET_IDLE
     }
 
@@ -64,25 +61,10 @@ public class Turret extends SubsystemBase implements ITestableSubsystem {
             case TURRET_TO_ANGLE:
                 setTurretAngle(wantedAngle);
                 break;
-            case TURRET_ROTATE_LEFT:
-                setTurretSpeed(1);
-                break;
-            case TURRET_ROTATE_RIGHT:
-                setTurretSpeed(-1);
-                break;
             case TURRET_IDLE:
             default:
-                setTurretSpeed(0);
                 break;
         }
-    }
-
-    public void setTurretSpeed(double wantedSpeed) {
-        double output = MathUtil.clamp(wantedSpeed, -12.0, 12.0);
-
-        SmartDashboard.putNumber("Turret Voltage", output);
-
-        turret.setControl(voltageControl.withOutput(output));
     }
 
     public void setTurretAngle(double wantedAngle) {

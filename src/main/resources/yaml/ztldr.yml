@@ -20,9 +20,29 @@ subsystems:
                 kD: 0.240234
         constants: # TODO: all of these
             intakeChannel: 7
-    elevator:
+    climber:
         devices:
-            elevatorMotor:
+            climberMotor:
+                deviceType: TalonFX
+                id: 16
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+    indexer:
+        devices:
+            indexerMotor:
+                deviceType: TalonFX
+                id: 16
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+    shooter:
+        devices:
+            shooterMotor:
                 deviceType: TalonFX
                 id: 16
                 motorRotation: Clockwise_Positive
