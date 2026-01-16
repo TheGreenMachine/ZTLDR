@@ -5,6 +5,7 @@ import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.Singleton;
 import com.team1816.season.subsystems.Climber;
 import com.team1816.season.subsystems.Elevator;
+import com.team1816.season.subsystems.Shooter;
 import com.team1816.season.subsystems.Superstructure;
 
 public class RobotContainer extends BaseRobotContainer {
@@ -16,6 +17,7 @@ public class RobotContainer extends BaseRobotContainer {
 
         Singleton.CreateSubSystem(Elevator.class);
         Singleton.CreateSubSystem(Climber.class);
+        Singleton.CreateSubSystem(Shooter.class);
 
         superstructure = new Superstructure(swerve);
 
