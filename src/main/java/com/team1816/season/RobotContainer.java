@@ -3,7 +3,7 @@ package com.team1816.season;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.Singleton;
-import com.team1816.season.subsystems.Elevator;
+import com.team1816.season.subsystems.Indexer;
 import com.team1816.season.subsystems.Superstructure;
 
 public class RobotContainer extends BaseRobotContainer {
@@ -13,7 +13,7 @@ public class RobotContainer extends BaseRobotContainer {
         // i.e. subsystems that always exist like the drivetrain and path planner
         initializeLibSubSystems();
 
-        Singleton.CreateSubSystem(Elevator.class);
+        Singleton.CreateSubSystem(Indexer.class);
 
         superstructure = new Superstructure(swerve);
 

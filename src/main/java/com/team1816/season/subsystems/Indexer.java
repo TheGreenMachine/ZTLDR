@@ -7,13 +7,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.team1816.lib.Singleton.factory;
 
-public class Elevator extends SubsystemBase implements ITestableSubsystem {
+public class Indexer extends SubsystemBase implements ITestableSubsystem {
 
-    public static final String NAME = "elevator";
-    private final IMotor elevatorMotor = (IMotor)factory.getDevice(NAME, "elevatorMotor");
+    public static final String NAME = "indexer";
+    private final IMotor indexerMotor = (IMotor)factory.getDevice(NAME, "indexerMotor");
     private double curPosition;
-    private ELEVATOR_STATE wantedState = ELEVATOR_STATE.FEEDER;
-    VelocityVoltage elevReq = new VelocityVoltage(0);
+    private INDEXER_STATE wantedState = INDEXER_STATE.FEEDER;
+    VelocityVoltage indexReq = new VelocityVoltage(0);
 
     @Override
     public void periodic() {
@@ -23,16 +23,16 @@ public class Elevator extends SubsystemBase implements ITestableSubsystem {
 
     @Override
     public void readFromHardware() {
-        curPosition = elevatorMotor.getMotorPosition();
+        curPosition = indexerMotor.getMotorPosition();
     }
 
     private void applyState() {
         switch (wantedState) {
-            case L4 -> elevatorMotor.setControl(elevReq.withVelocity(1));
+            case L4 -> indexerMotor.setControl(indexReq.withVelocity(1));
         }
     }
 
-    public enum ELEVATOR_STATE {
+    public enum INDEXER_STATE {
         FEEDER,
         L2_CORAL,
         L3_CORAL,
@@ -41,7 +41,7 @@ public class Elevator extends SubsystemBase implements ITestableSubsystem {
         L3_ALGAE
     }
 
-    public void setWantedState(ELEVATOR_STATE state) {
+    public void setWantedState(INDEXER_STATE state) {
         wantedState = state;
     }
 }

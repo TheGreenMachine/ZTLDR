@@ -1,5 +1,6 @@
 package com.team1816.lib.hardware.components.led;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.CANdleConfiguration;
 import com.ctre.phoenix6.configs.ParentConfiguration;
@@ -14,7 +15,7 @@ public class CANdleImpl extends CANdle implements IPhoenix6 {
 
     private CANdleSimState simState;
 
-    public CANdleImpl(Integer canID, String canBusName) {
+    public CANdleImpl(Integer canID, CANBus canBusName) {
 
         super(canID, canBusName);
         if(Robot.isSimulation()){
