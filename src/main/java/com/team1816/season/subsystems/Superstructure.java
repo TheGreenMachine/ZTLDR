@@ -1,6 +1,7 @@
 package com.team1816.season.subsystems;
 
 import com.team1816.lib.Singleton;
+import com.team1816.lib.subsystems.Intake;
 import com.team1816.lib.subsystems.Turret;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -11,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class Superstructure extends SubsystemBase {
     private final Swerve swerve;
     private final Turret turret;
+    private final Intake intake;
     protected CommandXboxController controller;
 
     public enum WantedSuperState {
@@ -18,9 +20,10 @@ public class Superstructure extends SubsystemBase {
         TELEOP_DRIVE,
         TURRET_TO_0,
         TURRET_TO_180,
-        TURRET_ROTATE_LEFT,
-        TURRET_ROTATE_RIGHT,
-        TURRET_IDLE
+        TURRET_IDLE,
+        INTAKE_IN,
+        INTAKE_OUT,
+        INTAKE_IDLE,
     }
 
     public enum CurrentSuperState {
@@ -28,9 +31,10 @@ public class Superstructure extends SubsystemBase {
         TELEOP_DRIVE,
         TURRET_TO_0,
         TURRET_TO_180,
-        TURRET_ROTATE_LEFT,
-        TURRET_ROTATE_RIGHT,
-        TURRET_IDLE
+        TURRET_IDLE,
+        INTAKE_IN,
+        INTAKE_OUT,
+        INTAKE_IDLE,
     }
 
     protected WantedSuperState wantedSuperState = WantedSuperState.TELEOP_IDLE;
@@ -40,6 +44,7 @@ public class Superstructure extends SubsystemBase {
     public Superstructure(Swerve swerve) {
         this.swerve = swerve;
         this.turret = Singleton.get(Turret.class);
+        this.intake = Singleton.get(Intake.class);
     }
 
     @Override
@@ -74,11 +79,14 @@ public class Superstructure extends SubsystemBase {
             case TURRET_IDLE:
                 currentSuperState = CurrentSuperState.TURRET_IDLE;
                 break;
-            case TURRET_ROTATE_LEFT:
-                currentSuperState = CurrentSuperState.TURRET_ROTATE_LEFT;
+            case INTAKE_IN:
+                currentSuperState = CurrentSuperState.INTAKE_IN;
                 break;
-            case TURRET_ROTATE_RIGHT:
-                currentSuperState = CurrentSuperState.TURRET_ROTATE_RIGHT;
+            case INTAKE_OUT:
+                currentSuperState = CurrentSuperState.INTAKE_OUT;
+                break;
+            case INTAKE_IDLE:
+                currentSuperState = CurrentSuperState.INTAKE_IDLE;
                 break;
             case TELEOP_DRIVE:
                 currentSuperState = CurrentSuperState.TELEOP_DRIVE;
@@ -101,12 +109,16 @@ public class Superstructure extends SubsystemBase {
                 turret.setWantedState(Turret.TURRET_STATE.TURRET_TO_180);
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
                 break;
-            case TURRET_ROTATE_LEFT:
-                turret.setWantedState(Turret.TURRET_STATE.TURRET_ROTATE_LEFT);
+            case INTAKE_IN:
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
                 break;
-            case TURRET_ROTATE_RIGHT:
-                turret.setWantedState(Turret.TURRET_STATE.TURRET_ROTATE_RIGHT);
+            case INTAKE_OUT:
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
+                swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
+                break;
+            case INTAKE_IDLE:
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IDLE);
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
                 break;
             case TURRET_IDLE:
