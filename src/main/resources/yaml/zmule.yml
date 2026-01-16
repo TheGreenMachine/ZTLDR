@@ -1,0 +1,162 @@
+defaultAuto: "Simple S"
+subsystems:
+    intake:
+        devices:
+            intakeMotor:
+                id: 2
+                deviceType: TalonFXS
+                motorType: Brushed_DC
+                neutralMode: Brake
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 20
+                remoteSensor: PulseWidth
+                remoteOffest: .484
+                forwardSoftLimit: .33
+                reversSoftLimit: -.33
+        pidConfig:
+            slot0:
+                kP: 48.046920
+                kI: 0
+                kD: 0.240234
+        constants: # TODO: all of these
+            intakeChannel: 7
+    elevator:
+        devices:
+            elevatorMotor:
+                deviceType: TalonFX
+                id: 16
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+    turret:
+        devices:
+            turretMotor:
+                id: 0
+                deviceType: TalonFXS
+                motorType: Minion_JST
+                neutralMode: Brake
+                motorRotation: Clockwise_Positive
+                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
+                remoteSensorId: 1
+            turretCoder:
+                id: 1
+                deviceType: CANcoder
+        pidConfig:
+            slot0:
+                kP: 48.046920
+                kI: 0
+                kD: 0.240234
+    ledManager:
+        devices:
+            argb:
+                id: 12
+                deviceType: CANifier
+            drgb:
+                id: 10
+                deviceType: CANdle
+        constants:
+            maxLevel: 96
+            ledCount: 66
+    drivetrain:
+        devices:
+            flDr:
+                id: 35
+                deviceType: TalonFX
+                neutralMode: Brake
+            flAz:
+                id: 30
+                deviceType: TalonFX
+                neutralMode: Brake
+                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
+                remoteSensorId: 41
+                remoteOffest: 0.284668
+            flCoder:
+                id: 41
+                deviceType: CANcoder
+            frDr:
+                id: 34
+                deviceType: TalonFX
+                neutralMode: Brake
+                motorRotation: Clockwise_Positive
+            frAz:
+                id: 31
+                deviceType: TalonFX
+                neutralMode: Brake
+                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
+                remoteSensorId: 43
+                remoteOffest: 0.173096
+            frCoder:
+                id: 43
+                deviceType: CANcoder
+            blDr:
+                id: 37
+                deviceType: TalonFX
+                neutralMode: Brake
+            blAz:
+                id: 33
+                deviceType: TalonFX
+                neutralMode: Brake
+                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
+                remoteSensorId: 42
+                remoteOffest: 0.177490 # -Absolute Position No Offset CanCoder
+            blCoder:
+                id: 42
+                deviceType: CANcoder
+            brDr:
+                id: 36
+                deviceType: TalonFX
+                neutralMode: Brake
+                motorRotation: Clockwise_Positive
+            brAz:
+                id: 32
+                deviceType: TalonFX
+                neutralMode: Brake
+                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
+                remoteSensorId: 40
+                remoteOffest: -0.291016
+            brCoder:
+                id: 40
+                deviceType: CANcoder
+            gyro:
+                deviceType: Pigeon2
+                id: 5
+        modules:
+            fl:
+                drive: flDr
+                azimuth: flAz
+            fr:
+                drive: frDr
+                azimuth: frAz
+            bl:
+                drive: blDr
+                azimuth: blAz
+            br:
+                drive: brDr
+                azimuth: brAz
+        drivePID:
+            slot0:
+                kP: 0.4
+                kI: 0
+                kD: 0.0008
+                kV: 0.115
+        azimuthPID:
+            slot0:
+                kP: 75
+                kD: 0.5
+                kV: 2.66
+                kS: 0.1
+        kinematics:
+            driveGearing: 6.03
+            steerGearing: 26.0909
+            wheelbaseLength: .60325 # meters
+            wheelbaseWidth: .60325 # meters
+            robotMass: 74.088 # kg
+            wheelRadius: .04935 # meters
+            maxDriveRPS: 90 # measured motor max speed rps
+            maxAngularRate: .75 # rad/sec
+            wheelCOF: 1.7
+        constants:
+            translationKp: 3
+            rotationKp: 3

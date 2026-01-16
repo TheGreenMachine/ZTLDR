@@ -1,0 +1,126 @@
+{
+  "HALProvider": {
+    "Other Devices": {
+      "Talon FX (v6)[4]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[4]/Rotor Sensor": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[6]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[6]/Rotor Sensor": {
+        "header": {
+          "open": true
+        }
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Field": "Field2d",
+      "/SmartDashboard/Auto Mode": "String Chooser",
+      "/SmartDashboard/PathPlanner": "Alerts"
+    },
+    "windows": {
+      "/Field": {
+        "bottom": 1638,
+        "height": 8.051901817321777,
+        "left": 534,
+        "right": 3466,
+        "top": 291,
+        "width": 17.54825210571289,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Auto Mode": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
+    "SmartDashboard": {
+      "Field": {
+        "open": true
+      },
+      "open": true
+    },
+    "retained": {
+      "SmartDashboard": {
+        "Auto Mode": {
+          "open": true
+        },
+        "open": true
+      }
+    },
+    "transitory": {
+      "Elastic": {
+        "open": true
+      },
+      "Field": {
+        "Pose2d##v_/Field/Robot": {
+          "open": true
+        },
+        "open": true
+      },
+      "GreenLogger": {
+        "open": true
+      },
+      "Shuffleboard": {
+        "open": true
+      },
+      "SmartDashboard": {
+        "open": true
+      },
+      "drivetrain": {
+        "blDr": {
+          "open": true
+        }
+      },
+      "intake": {
+        "intakeMotor": {
+          "open": true
+        },
+        "open": true
+      },
+      "odometry": {
+        "open": true
+      },
+      "turret": {
+        "open": true,
+        "spiny": {
+          "open": true
+        }
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "Clients": {
+      "open": true
+    },
+    "Server": {
+      "Publishers": {
+        "open": true
+      },
+      "Subscribers": {
+        "open": true
+      },
+      "open": true
+    },
+    "visible": true
+  }
+}

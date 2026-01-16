@@ -1,0 +1,50 @@
+{
+    "type": "object",
+    "title": "Kinematics Config",
+    "properties": {
+        "driveGearing": {
+            "type" : "number",
+            "default": null,
+            "description": "drive motor gearing reduction"
+        },
+        "steerGearing": {
+            "type" : "number",
+            "default": null,
+            "description": "steer motor gearing reduction"
+        },
+        "wheelbaseLength": {
+            "type" : "number",
+            "default": null,
+            "description": "wheelbase length meters"
+        },
+        "robotMass": {
+            "type" : "number",
+            "default": null,
+            "description": "mass of robot in kg"
+        },
+        "wheelRadius": {
+            "type" : "number",
+            "default": null,
+            "description": "wheel radius in meters"
+        },
+        "maxDriveRPS": {
+            "type" : "number",
+            "default": null,
+            "description": "measured rps at 100% output"
+        },
+        "wheelCOF": {
+            "type" : "number",
+            "default": null
+        },
+        "wheelbaseWidth": {
+            "type" : "number",
+            "default": null,
+            "description": "wheelbase width meters"
+        },
+        "maxAngularRate": {
+            "type" : "number",
+            "default": null,
+            "description": "maximum angular rate in radians/sec"
+        }
+    }
+}

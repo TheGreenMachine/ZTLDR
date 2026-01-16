@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "title": "Module Configuration",
+    "properties": {
+        "drive": {
+            "type": "string"
+        },
+        "azimuth": {
+            "type": "string"
+        }
+    }
+}
