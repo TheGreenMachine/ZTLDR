@@ -1,24 +1,43 @@
 package com.team1816.lib.subsystems.drivetrain;
 
+import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.SubsystemDataProcessor;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-
 public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDataRefresher, ITestableSubsystem {
-    private IDrivetrain drivetrain;
 
-    private CommandXboxController controller;
+    private final IDrivetrain drivetrain;
+    private final CommandXboxController controller;
     private final SlewRateLimiter xLimiter = new SlewRateLimiter(3);    // forward/back
     private final SlewRateLimiter yLimiter = new SlewRateLimiter(3);    // strafe
     private final SlewRateLimiter rotLimiter = new SlewRateLimiter(6);  // rotation
     private static double maxAngularRate = 0;
+    private SwerveDrivetrain.SwerveDriveState swerveDriveState;
+
+    /* Robot swerve drive state */
+    private static StructPublisher<Pose2d> drivePose;
+    private static StructPublisher<ChassisSpeeds> driveSpeeds;
+    private static StructArrayPublisher<SwerveModuleState> driveModuleStates;
+    private static StructArrayPublisher<SwerveModuleState> driveModuleTargets;
+    private static StructArrayPublisher<SwerveModulePosition> driveModulePositions;
+    private static DoublePublisher driveTimestamp;
+    private static DoublePublisher driveOdometryFrequency;
+    private static DoubleArrayPublisher fieldPub;
+    private static StringPublisher fieldTypePub;
+    private static final double[] poseArray = new double[3];
 
     private SWERVE_STATE wantedState = SWERVE_STATE.SWERVE_IDLE;
 
@@ -32,6 +51,18 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
         maxAngularRate = RotationsPerSecond.of(kinematics.maxAngularRate).in(RadiansPerSecond);
 
         SubsystemDataProcessor.createAndStartSubsystemDataProcessor(this);
+
+        NetworkTable netTable;
+        netTable = NetworkTableInstance.getDefault().getTable("");
+        driveSpeeds = netTable.getStructTopic(IDrivetrain.NAME + "/Speeds", ChassisSpeeds.struct).publish();
+        driveModuleStates = netTable.getStructArrayTopic(IDrivetrain.NAME + "/ModuleStates", SwerveModuleState.struct).publish();
+        driveModuleTargets = netTable.getStructArrayTopic(IDrivetrain.NAME + "/ModuleTargets", SwerveModuleState.struct).publish();
+        driveModulePositions = netTable.getStructArrayTopic(IDrivetrain.NAME + "/ModulePositions", SwerveModulePosition.struct).publish();
+        driveTimestamp = netTable.getDoubleTopic(IDrivetrain.NAME + "/Timestamp").publish();
+        driveOdometryFrequency = netTable.getDoubleTopic(IDrivetrain.NAME + "/OdometryFrequency").publish();
+        // name must be Robot for elastic to show as robot in UI
+        fieldPub = netTable.getDoubleArrayTopic("Field/Robot").publish();
+        fieldTypePub = netTable.getStringTopic("Field/.type").publish();
     }
 
     public enum SWERVE_STATE {
@@ -41,11 +72,18 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
 
     @Override
     public void periodic() {
+        readFromHardware();
         applyStates();
     }
 
     @Override
-    public void readFromHardware() {}
+    public void readFromHardware() {
+        // Get state to use locally
+        swerveDriveState = drivetrain.getState();
+        // Publish the state to the base robot state
+        BaseRobotState.swerveDriveState = swerveDriveState;
+        processSwerveState();
+    }
 
     private SwerveRequest GetSwerverCommand(SwerveRequest.FieldCentric drive) {
 
@@ -97,5 +135,26 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
 
     public void setWantedState(SWERVE_STATE state) {
         this.wantedState = state;
+    }
+
+    private void processSwerveState() {
+        driveSpeeds.set(swerveDriveState.Speeds);
+        if(swerveDriveState.ModuleStates != null) {
+            driveModuleStates.set(swerveDriveState.ModuleStates);
+            driveModuleTargets.set(swerveDriveState.ModuleTargets);
+            driveModulePositions.set(swerveDriveState.ModulePositions);
+        }
+        driveTimestamp.set(swerveDriveState.Timestamp);
+        driveOdometryFrequency.set(1.0 / swerveDriveState.OdometryPeriod);
+        processPose2d(swerveDriveState.Pose);
+    }
+
+    public static void processPose2d(Pose2d pose) {
+        // update Field NOTE: this format is deprecated for advantage scope but no support in simulator yet
+        poseArray[0] = pose.getX();
+        poseArray[1] = pose.getY();
+        poseArray[2] = pose.getRotation().getDegrees();
+        fieldTypePub.set("Field2d");
+        fieldPub.set(poseArray);
     }
 }
