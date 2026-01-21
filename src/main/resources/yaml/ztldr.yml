@@ -24,6 +24,7 @@ subsystems:
         devices:
             climberMotor:
                 deviceType: TalonFX
+                # TODO: Change ID
                 id: 16
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
@@ -34,6 +35,7 @@ subsystems:
         devices:
             indexerMotor:
                 deviceType: TalonFX
+                # TODO: Change everything
                 id: 16
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
@@ -42,14 +44,39 @@ subsystems:
                     expoKA: 0.04
     shooter:
         devices:
-            shooterMotor:
+            shooterMotorBottom:
+                # TODO: Change numbers if necessary
                 deviceType: TalonFX
+                # KEEP THIS ID
                 id: 16
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+
+                shooterMotorTop:
+                    # TODO: Change numbers if necessary
+                    deviceType: TalonFX
+                    # KEEP THIS ID
+                    id: 15
+                    motorRotation: Clockwise_Positive
+                    statorCurrentLimit: 60
+                    motionMagic:
+                        expoKV: 0.05
+                        expoKA: 0.04
+
+                gatekeeperMotor:
+                    # TODO: Change numbers if necessary
+                    deviceType: TalonFX
+                    # KEEP THIS ID
+                    id: 14
+                    motorRotation: Clockwise_Positive
+                    statorCurrentLimit: 60
+                    motionMagic:
+                        expoKV: 0.05
+                        expoKA: 0.04
+
     turret:
         devices:
             turretMotor:
