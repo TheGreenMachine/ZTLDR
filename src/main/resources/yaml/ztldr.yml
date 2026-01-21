@@ -55,7 +55,7 @@ subsystems:
                     expoKV: 0.05
                     expoKA: 0.04
 
-                shooterMotorTop:
+            shooterMotorTop:
                     # TODO: Change numbers if necessary
                     deviceType: TalonFX
                     # KEEP THIS ID
@@ -66,7 +66,7 @@ subsystems:
                         expoKV: 0.05
                         expoKA: 0.04
 
-                gatekeeperMotor:
+            gatekeeperMotor:
                     # TODO: Change numbers if necessary
                     deviceType: TalonFX
                     # KEEP THIS ID
@@ -77,10 +77,9 @@ subsystems:
                         expoKV: 0.05
                         expoKA: 0.04
 
-    turret:
-        devices:
-            turretMotor:
-                id: 0
+            turret:
+                # TODO: Change numbers if necessary
+                id: 14
                 deviceType: TalonFXS
                 motorType: Minion_JST
                 neutralMode: Brake
