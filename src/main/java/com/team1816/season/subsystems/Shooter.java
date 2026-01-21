@@ -10,6 +10,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.team1816.lib.Singleton.factory;
 public class Shooter extends SubsystemBase implements ITestableSubsystem {
+    /*TODO: 1. create "findAngle" method
+    2. Code in blind spot
+    3. create "findIncline" method
+    4. set up state machine "gatekeeper" motor (set up, idle, stop) *system state might be needed
+    5. Write in the 2 "shooter" motors
+    6. Mech 2d implementation
+    7. Servo implementation
+    8. Beam break implementation
+    9. 17.5:1 rot:cycle
+    10. 1:22.5  rot: degree
+    */
     String NAME = "shooter";
 
     private double GEAR_RATIO = 1.0;
