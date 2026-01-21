@@ -44,7 +44,7 @@ subsystems:
                     expoKA: 0.04
     shooter:
         devices:
-            shooterMotorBottom:
+            shooterMotorFollower:
                 # TODO: Change numbers if necessary
                 deviceType: TalonFX
                 # KEEP THIS ID
@@ -55,7 +55,7 @@ subsystems:
                     expoKV: 0.05
                     expoKA: 0.04
 
-            shooterMotorTop:
+            shooterMotorLeader:
                     # TODO: Change numbers if necessary
                     deviceType: TalonFX
                     # KEEP THIS ID

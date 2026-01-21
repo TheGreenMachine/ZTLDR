@@ -108,11 +108,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         }
     }
-    public double findAngle () {
+    public double getWantedAngle () {
 
         return wantedAngle;
     }
-    public double findIncline () {
+    public double findWantedIncline () {
 
         return wantedIncline;
     }
