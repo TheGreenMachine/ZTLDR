@@ -27,7 +27,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     String NAME = "shooter";
 
     private double GEAR_RATIO = 1.0;
-
     private double wantedAngle = 0.0;
     private double wantedIncline = 0;
 
@@ -43,24 +42,24 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private VoltageOut voltageControl = new VoltageOut(0);
     private PositionVoltage positionControl = new PositionVoltage(0);
     private SHOOTER_STATE wantedState = SHOOTER_STATE.SHOOTER_IDLE;
-
     public double currentVoltage = 0;
     public double currentPosition = 0;
 
 
     public enum SHOOTER_STATE {
-        SHOOTER_TO_0,
-        SHOOTER_TO_180,
-        SHOOTER_TO_ANGLE,
-        SHOOTER_ROTATE_LEFT,
+        SCORING,
+        SHOOTER_TO_ANGLE_2D,
+        SHOOTER_TO_INCLINE_3D,
+        SHOOTER_ROTATE_180,
         SHOOTER_ROTATE_RIGHT,
-        SHOOTER_IDLE
+        SHOOTER_IDLE,
+        TEST_TURRET_180
     }
-    public enum INCLINE_STATE {
-        LOW,
-        MID,
-        HIGH
-    }
+//    public enum INCLINE_STATE {
+//        LOW,
+//        MID,
+//        HIGH
+//    }
 
     public void periodic() {
         readFromHardware();
@@ -86,30 +85,36 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         switch (wantedState) {
-            case SHOOTER_TO_0:
-                setTurretAngle(0);
-                break;
-            case SHOOTER_TO_180:
-                setTurretAngle(180);
-                break;
-            case SHOOTER_TO_ANGLE:
+            case SHOOTER_TO_ANGLE_2D:
                 setTurretAngle(wantedAngle);
                 break;
-            case SHOOTER_ROTATE_LEFT:
-                setTurretSpeed(1);
+            case SHOOTER_TO_INCLINE_3D:
+                setTurretAngle(wantedIncline);
                 break;
-            case SHOOTER_ROTATE_RIGHT:
-                setTurretSpeed(-1);
-                break;
+//            case SHOOTER_TO_ANGLE:
+//                setTurretAngle(wantedAngle);
+//                break;
+//            case SHOOTER_ROTATE_LEFT:
+//                setTurretSpeed(1);
+//                break;
+//            case SHOOTER_ROTATE_RIGHT:
+//                setTurretSpeed(-1);
+//                break;
             case SHOOTER_IDLE:
             default:
                 setTurretSpeed(0);
                 break;
-
+            case TEST_TURRET_180:
+                setTurretAngle(180);
+                break;
         }
     }
-    public double getWantedAngle () {
-
+    public double getWantedAngleBlueHub () {
+        wantedAngle = Math.acos(RobotPositionValues.getBlueRatios());
+        return wantedAngle;
+    }
+    public double getWantedAngleRedHub () {
+        wantedAngle = Math.acos(RobotPositionValues.getRedRatios());
         return wantedAngle;
     }
     public double findWantedIncline () {
