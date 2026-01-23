@@ -8,7 +8,8 @@ public interface ICTREDevice extends IPhoenix6 {
         CANdle,
         CANifier,
         CANrange,
-        CANcoder
+        CANcoder,
+        RevServoHub
     }
     double getDeviceReference();
     double getDeviceError();

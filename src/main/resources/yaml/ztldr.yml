@@ -76,7 +76,9 @@ subsystems:
                     motionMagic:
                         expoKV: 0.05
                         expoKA: 0.04
-
+            servoHub:
+                id: 38
+                canBusName: "rio"
             turret:
                 # TODO: Change numbers if necessary
                 id: 14
@@ -107,6 +109,7 @@ subsystems:
             ledCount: 66
     drivetrain:
         devices:
+            # flDR if used for the canBus name for swerve drive for all the motors
             flDr:
                 id: 35
                 deviceType: TalonFX
