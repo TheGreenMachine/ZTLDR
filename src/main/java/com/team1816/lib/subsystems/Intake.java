@@ -2,13 +2,9 @@ package com.team1816.lib.subsystems;
 
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.team1816.lib.hardware.components.motor.IMotor;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import javax.swing.text.Position;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -22,11 +18,10 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     private final IMotor intake = (IMotor) factory.getDevice(NAME, "intakeMotor");
     private final IMotor flipper = (IMotor) factory.getDevice(NAME, "flipperMotor");
-    //private VoltageOut voltageControl = new VoltageOut(0);
+
     private VelocityVoltage velocityControl = new VelocityVoltage(0);
     private PositionVoltage positionControl = new PositionVoltage(0);
-    private INTAKE_WANTED_STATE wantedState = INTAKE_WANTED_STATE.INTAKE_IDLE;
-    private INTAKE_SYSTEM_STATE systemState = INTAKE_SYSTEM_STATE.INTAKE_IDLE;
+    private INTAKE_STATE wantedState = INTAKE_STATE.INTAKE_IDLE;
 
     public double currentVoltage = 0;
     public double currentPosition = 0;
@@ -34,27 +29,19 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public double currentFlipperAngle = 67;
     Instant descentStart;
 
-    public enum INTAKE_WANTED_STATE {
+    public enum INTAKE_STATE {
         INTAKE_IN,
         INTAKE_OUT,
         INTAKE_IDLE
-
     }
 
-    public enum INTAKE_SYSTEM_STATE {
-        INTAKE_IN,
-        INTAKE_TRANSITIONING,
-        INTAKE_OUT,
-        INTAKE_IDLE,
-    }
     public void periodic() {
         readFromHardware();
-        systemState = progressTransition();
         applyState();
     }
 
-    public void setWantedState(INTAKE_WANTED_STATE state) {
-        if(systemState == INTAKE_SYSTEM_STATE.INTAKE_IDLE) {
+    public void setWantedState(INTAKE_STATE state) {
+        if((state == INTAKE_STATE.INTAKE_IN || state == INTAKE_STATE.INTAKE_OUT) && wantedState == INTAKE_STATE.INTAKE_IDLE) {
             descentStart = Instant.now();
         }
 
@@ -68,39 +55,29 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         currentVoltage = 0;
     }
 
-    private INTAKE_SYSTEM_STATE progressTransition() {
-        switch (wantedState) {
-            case INTAKE_OUT:
-            case INTAKE_IN:
-                final double threshold = 6;
-                final double targetAngle = 225;
+    private boolean canSuck() {
+        final double targetAngle = 225;
+        final double threshold = 6;
 
-                final long timeOverride = 4;
-                final Instant currentTime = Instant.now();
+        final long timeOverride = 4;
+        final Instant currentTime = Instant.now();
 
-                final INTAKE_SYSTEM_STATE out = wantedState == INTAKE_WANTED_STATE.INTAKE_IN ?
-                    INTAKE_SYSTEM_STATE.INTAKE_IN : INTAKE_SYSTEM_STATE.INTAKE_OUT;
-
-                if((currentFlipperAngle > targetAngle - threshold && currentFlipperAngle < targetAngle + threshold)
-                    || Duration.between(currentTime, descentStart).toSeconds() <= timeOverride) {
-                    return out;
-                }
-
-                return INTAKE_SYSTEM_STATE.INTAKE_TRANSITIONING;
-            case INTAKE_IDLE:
-            default:
-                return INTAKE_SYSTEM_STATE.INTAKE_IDLE;
-        }
+        return ((currentFlipperAngle > targetAngle - threshold && currentFlipperAngle < targetAngle + threshold)
+            || Duration.between(currentTime, descentStart).toSeconds() <= timeOverride) ;
     }
 
 
     private void applyState() {
-        switch (systemState) {
+        double intakeSpeed = -10;
+        switch (wantedState) {
             case INTAKE_IN:
+                intakeSpeed = 10;
             case INTAKE_OUT:
-                final double speed = 10 * (systemState == INTAKE_SYSTEM_STATE.INTAKE_IN ? 1 : -1);
-                setTurretSpeed(speed);
-            case INTAKE_TRANSITIONING:
+                if(!canSuck()) {
+                    intakeSpeed = 0;
+                }
+
+                setTurretSpeed(intakeSpeed);
                 setFlipperAngle(225);
             break;
 
