@@ -31,12 +31,12 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private double wantedIncline = 0;
 
     private final IMotor turretMotor = (IMotor) factory.getDevice(NAME, "turretMotor");
+    private final IMotor inclineMotor = (IMotor) factory.getDevice(NAME, "inclineMotor");
     private final IMotor shooterMotorLeader = (IMotor) factory.getDevice(NAME, "shooterMotorTop");
     private final IMotor shooterMotorFollower = (IMotor) factory.getDevice(NAME, "shooterMotorBottom");
     private final IMotor gatekeeperMotor = (IMotor) factory.getDevice(NAME, "gatekeeperMotor");
 
-    private final Servo servoLeader = (Servo) factory.getDevice(NAME, "servoLeader");
-    private final Servo servoFollower = (Servo) factory.getDevice(NAME, "servoFollower");
+
 
 
     private VoltageOut voltageControl = new VoltageOut(0);
@@ -48,7 +48,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public enum SHOOTER_STATE {
         SCORING,
-        SHOOTER_TO_ANGLE_2D,
+        SHOOTER_TO_ANGLE_RED_2D,
+        SHOOTER_TO_ANGLE_BLUE_2D,
         SHOOTER_TO_INCLINE_3D,
         SHOOTER_ROTATE_180,
         SHOOTER_ROTATE_RIGHT,
@@ -85,9 +86,12 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         switch (wantedState) {
-            case SHOOTER_TO_ANGLE_2D:
-                setTurretAngle(wantedAngle);
+            case SHOOTER_TO_ANGLE_RED_2D:
+                setTurretAngle(getWantedAngleRedHub());
                 break;
+            case SHOOTER_TO_ANGLE_BLUE_2D:
+                setTurretAngle(getWantedAngleBlueHub());
+            break;
             case SHOOTER_TO_INCLINE_3D:
                 setTurretAngle(wantedIncline);
                 break;

@@ -44,6 +44,16 @@ subsystems:
                     expoKA: 0.04
     shooter:
         devices:
+            inclineMotor:
+                # TODO: Change numbers if necessary
+                deviceType: TalonFX
+                # KEEP THIS ID
+                id: 64
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
             shooterMotorFollower:
                 # TODO: Change numbers if necessary
                 deviceType: TalonFX
