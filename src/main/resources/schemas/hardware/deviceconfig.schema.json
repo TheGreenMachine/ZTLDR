@@ -71,9 +71,9 @@
             "type": "enum",
             "existingJavaType": "com.ctre.phoenix6.signals.NeutralModeValue"
         },
-        "motionMagic" :  {
+        "motionMagicExpo" :  {
             "default": null,
-            "$ref": "motionmagicconfig.schema.json"
+            "$ref": "motionmagicexpoconfig.schema.json"
         }
     }
 }
