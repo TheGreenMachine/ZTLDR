@@ -110,15 +110,15 @@ public class Superstructure extends SubsystemBase {
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
                 break;
             case INTAKE_IN:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
+                intake.setWantedState(Intake.INTAKE_WANTED_STATE.INTAKE_IN);
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
                 break;
             case INTAKE_OUT:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
+                intake.setWantedState(Intake.INTAKE_WANTED_STATE.INTAKE_OUT);
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
                 break;
             case INTAKE_IDLE:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IDLE);
+                intake.setWantedState(Intake.INTAKE_WANTED_STATE.INTAKE_IDLE);
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
                 break;
             case TURRET_IDLE:
