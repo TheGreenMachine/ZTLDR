@@ -2,10 +2,6 @@
     "type": "object",
     "title": "Device Configuration",
     "properties": {
-        "canBusName": {
-            "default": "highspeed",
-            "type": "string"
-        },
         "deviceType": {
             "type" : "enum",
             "default": "0",

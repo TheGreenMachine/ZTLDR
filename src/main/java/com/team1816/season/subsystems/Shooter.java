@@ -2,8 +2,6 @@ package com.team1816.season.subsystems;
 
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.revrobotics.servohub.ServoChannel;
-import com.revrobotics.servohub.ServoHub;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import edu.wpi.first.math.MathUtil;
@@ -14,21 +12,19 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static com.team1816.lib.Singleton.factory;
 
 public class Shooter extends SubsystemBase implements ITestableSubsystem {
-
-
     /*TODO: 1. create "findAngle" method
-        2. Code in blind spot
-        3. create "findIncline" method
-        4. set up state machine "gatekeeper" motor (set up, idle, stop) *system state might be needed
-        5. Write in the 2 "shooter" motors
-        6. Mech 2d implementation
-        7. Servo implementation
-        8. Beam break implementation
-        9. 17.5:1 rot:cycle
-        10. 1:22.5  rot: degree
-        11. Added subsystem to yaml ✓(for now)
-        */
-    public String NAME = "shooter";
+    2. Code in blind spot
+    3. create "findIncline" method
+    4. set up state machine "gatekeeper" motor (set up, idle, stop) *system state might be needed
+    5. Write in the 2 "shooter" motors
+    6. Mech 2d implementation
+    7. Servo implementation
+    8. Beam break implementation
+    9. 17.5:1 rot:cycle
+    10. 1:22.5  rot: degree
+    11. Added subsystem to yaml ✓(for now)
+    */
+    String NAME = "shooter";
 
     private double GEAR_RATIO = 1.0;
     private double wantedAngle = 0.0;
@@ -38,11 +34,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final IMotor shooterMotorLeader = (IMotor) factory.getDevice(NAME, "shooterMotorTop");
     private final IMotor shooterMotorFollower = (IMotor) factory.getDevice(NAME, "shooterMotorBottom");
     private final IMotor gatekeeperMotor = (IMotor) factory.getDevice(NAME, "gatekeeperMotor");
-    private final ServoHub hub = (ServoHub) factory.getDevice(NAME, "servoHub");
-    // Channels are subject to change
-    private final ServoChannel servoLeader =  hub.getServoChannel(ServoChannel.ChannelId.kChannelId0);
-    private final ServoChannel servoFollower = hub.getServoChannel(ServoChannel.ChannelId.kChannelId1);
 
+    private final Servo servoLeader = (Servo) factory.getDevice(NAME, "servoLeader");
+    private final Servo servoFollower = (Servo) factory.getDevice(NAME, "servoFollower");
 
 
     private VoltageOut voltageControl = new VoltageOut(0);
@@ -51,19 +45,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public double currentVoltage = 0;
     public double currentPosition = 0;
 
-    public Shooter() {
-    servoFollower.setEnabled(true);
-    servoLeader.setEnabled(true);
-    servoFollower.setPowered(true);
-    servoLeader.setPowered(true);
-    }
-
 
     public enum SHOOTER_STATE {
         SCORING,
-        SHOOTER_TO_ANGLE_RED_2D,
-        SHOOTER_TO_ANGLE_BLUE_2D,
-
+        SHOOTER_TO_ANGLE_2D,
         SHOOTER_TO_INCLINE_3D,
         SHOOTER_ROTATE_180,
         SHOOTER_ROTATE_RIGHT,
@@ -100,14 +85,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         switch (wantedState) {
-            case SHOOTER_TO_ANGLE_RED_2D:
-                setTurretAngle(getWantedAngleRedHub());
+            case SHOOTER_TO_ANGLE_2D:
+                setTurretAngle(wantedAngle);
                 break;
             case SHOOTER_TO_INCLINE_3D:
-                servoLeader.setPulseWidth(1500);
-                break;
-            case SHOOTER_TO_ANGLE_BLUE_2D:
-                setTurretAngle(getWantedAngleBlueHub());
+                setTurretAngle(wantedIncline);
                 break;
 //            case SHOOTER_TO_ANGLE:
 //                setTurretAngle(wantedAngle);
@@ -150,10 +132,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public void setTurretAngle(double wantedAngle) {
         double rotations = (wantedAngle / 360.0) * GEAR_RATIO;
+
         turretMotor.setControl(positionControl.withPosition(rotations));
-    }
-    public void setServoIncline(double wantedIncline) {
-       double incline = wantedIncline;
     }
     public void setShooterIncline(double wantedIncline){
         double incline = wantedIncline;

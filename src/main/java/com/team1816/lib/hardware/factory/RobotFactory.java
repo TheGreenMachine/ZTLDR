@@ -8,7 +8,6 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
 import com.team1816.lib.hardware.*;
 import com.team1816.lib.hardware.components.IPhoenix6;
-import com.team1816.lib.hardware.components.Servo.RevServoHubImpl;
 import com.team1816.lib.hardware.components.gyro.Pigeon2Impl;
 import com.team1816.lib.hardware.components.led.CANdleImpl;
 import com.team1816.lib.hardware.components.led.CANifierImpl;
@@ -154,7 +153,7 @@ public class RobotFactory {
     // Instantiates device based on the type and applies the configuration
     private IPhoenix6 getDevInst(DeviceConfiguration deviceConfig, SubsystemConfig subsystemConfig, boolean logDetails) {
         IPhoenix6 devInst = null;
-        var bus = deviceConfig.canBusName;
+        var bus = subsystemConfig.canBusName;
         if (!subsystemConfig.implemented || deviceConfig.id > StartingGhostId) {
             GreenLogger.log("Device " +  deviceConfig.name + " not implemented ghosting");
             bus = "ghost";
@@ -194,9 +193,6 @@ public class RobotFactory {
             }
             case CANcoder -> {
                 if (devInst == null) devInst = new CANCoderImpl(deviceConfig.id, canbus);
-            }
-            case RevServoHub -> {
-                if (devInst == null) devInst = new RevServoHubImpl(deviceConfig.id, canbus);
             }
             default -> {
                 GreenLogger.log("Device type " + deviceConfig.deviceType + " not implemented");
@@ -447,7 +443,7 @@ public class RobotFactory {
     public SwerveDrivetrainConstants getSwerveDrivetrainConstant(String subsystemName) {
         var config = getSubsystemConfig(subsystemName);
         var constants = new SwerveDrivetrainConstants();
-        constants.CANBusName = config.devices.get("flDr").canBusName;
+        constants.CANBusName = config.canBusName;
         constants.Pigeon2Id = config.devices.get("gyro").id;
         return constants;
     }

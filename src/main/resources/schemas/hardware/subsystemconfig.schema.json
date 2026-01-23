@@ -7,7 +7,10 @@
             "default": true,
             "type": "boolean"
         },
-
+        "canBusName": {
+            "default": "highspeed",
+            "type": "string"
+        },
         "devices": {
             "default": null,
             "type": "object",
