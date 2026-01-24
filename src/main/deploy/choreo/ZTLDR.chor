@@ -4,7 +4,22 @@
  "type":"Swerve",
  "variables":{
   "expressions":{},
-  "poses":{}
+  "poses":{
+   "Top Trench":{
+    "x":{
+     "exp":"3.6253833770751953 m",
+     "val":3.6253833770751953
+    },
+    "y":{
+     "exp":"7.418280601501465 m",
+     "val":7.418280601501465
+    },
+    "heading":{
+     "exp":"0 deg",
+     "val":0.0
+    }
+   }
+  }
  },
  "config":{
   "frontLeft":{
