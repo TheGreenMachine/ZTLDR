@@ -11,19 +11,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.team1816.lib.Singleton.factory;
 
+
+/* TODO: 1. Add in Mech2d
+ *   2. Add in shooter code
+ *   3. Organize code layout
+ *   4. Code in Incline an Turret Restrictions
+ *   5. Set up offset code to find positions */
+
 public class Shooter extends SubsystemBase implements ITestableSubsystem {
-    /*TODO: 1. create "findAngle" method
-    2. Code in blind spot
-    3. create "findIncline" method
-    4. set up state machine "gatekeeper" motor (set up, idle, stop) *system state might be needed
-    5. Write in the 2 "shooter" motors
-    6. Mech 2d implementation
-    7. Servo implementation
-    8. Beam break implementation
-    9. 17.5:1 rot:cycle
-    10. 1:22.5  rot: degree
-    11. Added subsystem to yaml ✓(for now)
-    */
     String NAME = "shooter";
 // TODO: Chnage Values
     private double GEAR_RATIO_TURRET = 1.0;
@@ -41,16 +36,22 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private double gatekeeperRemovalSpeed = -.2;
     private double gatekeeperIdleSpeed = 0;
 
+    private double shooterIdleSpeed = 0;
+    private double shooterShootSpeed = 2;
+
     private VoltageOut voltageControl = new VoltageOut(0);
     private PositionVoltage positionControl = new PositionVoltage(0);
     private VelocityVoltage velocityControl = new VelocityVoltage(0);
 
     private AIM_STATE wantedAimState = AIM_STATE.SHOOTER_IDLE;
     private GATEKEEPER_STATE wantedGatekeeperState = GATEKEEPER_STATE.IDLE;
+    private SHOOTER_STATE wantedShooterState = SHOOTER_STATE.IDLE;
     public double currentVoltage = 0;
 
     public double currentTurretPosition = 0;
     public double curretGateKeeperSpeed = 0;
+    public double currentInclinePosition = 0;
+    double currentShooterVelocity = 0;
 
 
     public enum AIM_STATE {
@@ -64,10 +65,14 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         TEST_TURRET_180,
         SHOOT
     }
-    public enum GATEKEEPER_STATE{
+    public enum GATEKEEPER_STATE {
         IDLE,
         SET_UP,
         REMOVAL
+    }
+    public enum SHOOTER_STATE {
+        IDLE,
+        SHOOT //May need another shoot speed if max height in close ranges is too high
     }
 
     public void periodic() {
@@ -92,6 +97,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public void readFromHardware() {
         currentTurretPosition = turretMotor.getMotorPosition();
         curretGateKeeperSpeed = gatekeeperMotor.getMotorVelocity();
+        currentInclinePosition = inclineMotor.getMotorPosition();
+        currentShooterVelocity = shooterMotorLeader.getMotorVelocity();
 
         currentVoltage = 0;
     }
@@ -126,10 +133,24 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 break;
             case SET_UP:
                 setGatekeeperSpeed(gatekeeperSetUpSpeed);
+                break;
             case REMOVAL:
                 setGatekeeperSpeed(gatekeeperRemovalSpeed);
+                break;
             default:
                 setGatekeeperSpeed(0);
+                break;
+        }
+
+        switch (wantedShooterState) {
+            case IDLE:
+                setShooterSpeed(shooterIdleSpeed);
+                break;
+            case SHOOT:
+                setShooterSpeed(shooterShootSpeed);
+                break;
+            default:
+                setShooterSpeed(0);
                 break;
         }
     }
@@ -173,5 +194,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         SmartDashboard.putNumber("Gatekeeper Velocity Voltage", wantedSpeed);
 
         gatekeeperMotor.setControl(velocityControl.withVelocity(wantedSpeed));
+    }
+    public void setShooterSpeed(double wantedSpeed) {
+        SmartDashboard.putNumber("Shooter Velocity Voltage", wantedSpeed);
+
+        shooterMotorLeader.setControl(velocityControl.withVelocity(wantedSpeed));
     }
 }
