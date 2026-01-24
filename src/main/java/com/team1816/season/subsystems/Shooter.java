@@ -5,7 +5,6 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -25,10 +24,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     11. Added subsystem to yaml ✓(for now)
     */
     String NAME = "shooter";
-
-    private double GEAR_RATIO = 1.0;
-    private double wantedAngle = 0.0;
-    private double wantedIncline = 0;
+// TODO: Chnage Values
+    private double GEAR_RATIO_TURRET = 1.0;
+    private double GEAR_RATIO_INCLINE = 1.0;
+    // todo: change give answers in m/s
+    private double ExitVelocity = 0.0;
 
     private final IMotor turretMotor = (IMotor) factory.getDevice(NAME, "turretMotor");
     private final IMotor inclineMotor = (IMotor) factory.getDevice(NAME, "inclineMotor");
@@ -48,13 +48,14 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public enum SHOOTER_STATE {
         SCORING,
-        SHOOTER_TO_ANGLE_RED_2D,
-        SHOOTER_TO_ANGLE_BLUE_2D,
+        SHOOT_RED,
+        SHOOT_BLUE,
         SHOOTER_TO_INCLINE_3D,
         SHOOTER_ROTATE_180,
         SHOOTER_ROTATE_RIGHT,
         SHOOTER_IDLE,
-        TEST_TURRET_180
+        TEST_TURRET_180,
+        SHOOT
     }
 //    public enum INCLINE_STATE {
 //        LOW,
@@ -73,8 +74,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public void setWantedState(SHOOTER_STATE state, double angle, double incline) {
         this.wantedState = state;
-        this.wantedAngle = angle;
-        this.wantedIncline = incline;
 
     }
 
@@ -86,14 +85,16 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         switch (wantedState) {
-            case SHOOTER_TO_ANGLE_RED_2D:
-                setTurretAngle(getWantedAngleRedHub());
+            case SHOOT_RED:
+                setTurretIncline(getWantedAngleRedHub());
+                setLaunchAngle(RobotPositionValues.getRedHypotonuse(),1.8288, ExitVelocity,9.8);
                 break;
-            case SHOOTER_TO_ANGLE_BLUE_2D:
-                setTurretAngle(getWantedAngleBlueHub());
+            case SHOOT_BLUE:
+                setTurretIncline(getWantedAngleBlueHub());
+                setLaunchAngle(RobotPositionValues.getBlueHypotonuse(),1.8288, ExitVelocity,9.8);
             break;
             case SHOOTER_TO_INCLINE_3D:
-                setTurretAngle(wantedIncline);
+
                 break;
 //            case SHOOTER_TO_ANGLE:
 //                setTurretAngle(wantedAngle);
@@ -106,24 +107,22 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 //                break;
             case SHOOTER_IDLE:
             default:
+                // TODO: Change These
                 setTurretSpeed(0);
+                setIncleSpeed(0);
                 break;
             case TEST_TURRET_180:
-                setTurretAngle(180);
+                setTurretIncline(180);
                 break;
         }
     }
     public double getWantedAngleBlueHub () {
-        wantedAngle = Math.acos(RobotPositionValues.getBlueRatios());
+        double wantedAngle = Math.acos(RobotPositionValues.getBlueRatios(RobotPositionValues.getBlueHypotonuse()));
         return wantedAngle;
     }
     public double getWantedAngleRedHub () {
-        wantedAngle = Math.acos(RobotPositionValues.getRedRatios());
+        double wantedAngle = Math.acos(RobotPositionValues.getRedRatios(RobotPositionValues.getRedHypotonuse()));
         return wantedAngle;
-    }
-    public double findWantedIncline () {
-
-        return wantedIncline;
     }
 
     public void setTurretSpeed(double wantedSpeed) {
@@ -134,13 +133,22 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         turretMotor.setControl(voltageControl.withOutput(output));
     }
 
-    public void setTurretAngle(double wantedAngle) {
-        double rotations = (wantedAngle / 360.0) * GEAR_RATIO;
+    public void setTurretIncline(double angle) {
+        double rotations = (angle / 360.0) * GEAR_RATIO_TURRET;
 
         turretMotor.setControl(positionControl.withPosition(rotations));
     }
-    public void setShooterIncline(double wantedIncline){
-        double incline = wantedIncline;
-    }
+    public void setIncleSpeed(double wantedSpeed) {
+        // TODO: Change Values
+        double output = MathUtil.clamp(wantedSpeed, -12.0, 12.0);
 
+        SmartDashboard.putNumber("Shooter Voltage", output);
+
+        inclineMotor.setControl(voltageControl.withOutput(output));
+    }
+    public void setLaunchAngle (double Hypotonuse, double Alt, double Velocity, double Gravity){
+        double angle = Math.atan(Math.pow(Velocity,2)+ Math.sqrt(Math.pow(Velocity,4)-Gravity * (Gravity * Math.pow(Hypotonuse,2) + 2 * (Alt - Velocity) * Math.pow(Velocity,2)))/(Gravity * Hypotonuse));
+        double rotations = (angle / 360.0) * GEAR_RATIO_INCLINE;
+        inclineMotor.setControl(positionControl.withPosition(rotations));
+    }
 }
