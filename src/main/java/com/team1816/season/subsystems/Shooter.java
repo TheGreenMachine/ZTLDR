@@ -86,11 +86,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private void applyState() {
         switch (wantedState) {
             case SHOOT_RED:
-                setTurretIncline(getWantedAngleRedHub());
+                setTurretAngle(getWantedAngleRedHub());
                 setLaunchAngle(RobotPositionValues.getRedHypotonuse(),1.8288, ExitVelocity,9.8);
                 break;
             case SHOOT_BLUE:
-                setTurretIncline(getWantedAngleBlueHub());
+                setTurretAngle(getWantedAngleBlueHub());
                 setLaunchAngle(RobotPositionValues.getBlueHypotonuse(),1.8288, ExitVelocity,9.8);
             break;
             case SHOOTER_TO_INCLINE_3D:
@@ -112,7 +112,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 setIncleSpeed(0);
                 break;
             case TEST_TURRET_180:
-                setTurretIncline(180);
+                setTurretAngle(180);
                 break;
         }
     }
@@ -133,8 +133,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         turretMotor.setControl(voltageControl.withOutput(output));
     }
 
-    public void setTurretIncline(double angle) {
-        double rotations = (angle / 360.0) * GEAR_RATIO_TURRET;
+    public void setTurretAngle(double angle) {
+        double rotations = (Math.toDegrees(angle) / 360.0) * GEAR_RATIO_TURRET;
 
         turretMotor.setControl(positionControl.withPosition(rotations));
     }
@@ -148,7 +148,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
     public void setLaunchAngle (double Hypotonuse, double Alt, double Velocity, double Gravity){
         double angle = Math.atan(Math.pow(Velocity,2)+ Math.sqrt(Math.pow(Velocity,4)-Gravity * (Gravity * Math.pow(Hypotonuse,2) + 2 * (Alt - Velocity) * Math.pow(Velocity,2)))/(Gravity * Hypotonuse));
-        double rotations = (angle / 360.0) * GEAR_RATIO_INCLINE;
+        double rotations = (Math.toDegrees(angle)/  360) * GEAR_RATIO_INCLINE;
         inclineMotor.setControl(positionControl.withPosition(rotations));
     }
 }
