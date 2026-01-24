@@ -27,7 +27,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public double currentPosition = 0;
 
     public double currentFlipperAngle = 67;
-    Instant descentStart;
+    private Instant descentStart;
 
     public enum INTAKE_STATE {
         INTAKE_IN,
@@ -51,11 +51,11 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     @Override
     public void readFromHardware() {
         currentPosition = intake.getMotorPosition();
-        currentFlipperAngle = (flipper.getMotorPosition() / GEAR_RATIO) * 360; // maybe
+        currentFlipperAngle = (flipper.getMotorPosition() / GEAR_RATIO) * 360;
         currentVoltage = 0;
     }
 
-    private boolean canSuck() {
+    private boolean canSuckOrBlow() {
         final double targetAngle = 225;
         final double threshold = 6;
 
@@ -73,7 +73,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
             case INTAKE_IN:
                 intakeSpeed = 10;
             case INTAKE_OUT:
-                if(!canSuck()) {
+                if(!canSuckOrBlow()) {
                     intakeSpeed = 0;
                 }
 
