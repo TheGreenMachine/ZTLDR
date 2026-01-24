@@ -1,6 +1,7 @@
 package com.team1816.season.subsystems;
 
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
@@ -36,17 +37,23 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final IMotor shooterMotorFollower = (IMotor) factory.getDevice(NAME, "shooterMotorBottom");
     private final IMotor gatekeeperMotor = (IMotor) factory.getDevice(NAME, "gatekeeperMotor");
 
-
-
+    private double gatekeeperSetUpSpeed = 0.7; //NUMBERS ARE TO CHANGE!!! + Unit is RPS
+    private double gatekeeperRemovalSpeed = -.2;
+    private double gatekeeperIdleSpeed = 0;
 
     private VoltageOut voltageControl = new VoltageOut(0);
     private PositionVoltage positionControl = new PositionVoltage(0);
-    private SHOOTER_STATE wantedState = SHOOTER_STATE.SHOOTER_IDLE;
+    private VelocityVoltage velocityControl = new VelocityVoltage(0);
+
+    private AIM_STATE wantedAimState = AIM_STATE.SHOOTER_IDLE;
+    private GATEKEEPER_STATE wantedGatekeeperState = GATEKEEPER_STATE.IDLE;
     public double currentVoltage = 0;
-    public double currentPosition = 0;
+
+    public double currentTurretPosition = 0;
+    public double curretGateKeeperSpeed = 0;
 
 
-    public enum SHOOTER_STATE {
+    public enum AIM_STATE {
         SCORING,
         SHOOT_RED,
         SHOOT_BLUE,
@@ -57,34 +64,40 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         TEST_TURRET_180,
         SHOOT
     }
-//    public enum INCLINE_STATE {
-//        LOW,
-//        MID,
-//        HIGH
-//    }
+    public enum GATEKEEPER_STATE{
+        IDLE,
+        SET_UP,
+        REMOVAL
+    }
 
     public void periodic() {
         readFromHardware();
         applyState();
     }
 
-    public void setWantedState(SHOOTER_STATE state) {
-        this.wantedState = state;
+    public void setWantedAimState(AIM_STATE state) {
+        this.wantedAimState = state;
     }
 
-    public void setWantedState(SHOOTER_STATE state, double angle, double incline) {
-        this.wantedState = state;
+    public void setWantedState(AIM_STATE state, double angle, double incline) {
+        this.wantedAimState = state;
 
+    }
+
+    public void setWantedGatekeeperState(GATEKEEPER_STATE state) {
+        this.wantedGatekeeperState = state;
     }
 
     @Override
     public void readFromHardware() {
-        currentPosition = turretMotor.getMotorPosition();
+        currentTurretPosition = turretMotor.getMotorPosition();
+        curretGateKeeperSpeed = gatekeeperMotor.getMotorVelocity();
+
         currentVoltage = 0;
     }
 
     private void applyState() {
-        switch (wantedState) {
+        switch (wantedAimState) {
             case SHOOT_RED:
                 setTurretAngle(getWantedAngleRedHub());
                 setLaunchAngle(RobotPositionValues.getRedHypotonuse(),1.8288, ExitVelocity,9.8);
@@ -96,15 +109,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             case SHOOTER_TO_INCLINE_3D:
 
                 break;
-//            case SHOOTER_TO_ANGLE:
-//                setTurretAngle(wantedAngle);
-//                break;
-//            case SHOOTER_ROTATE_LEFT:
-//                setTurretSpeed(1);
-//                break;
-//            case SHOOTER_ROTATE_RIGHT:
-//                setTurretSpeed(-1);
-//                break;
             case SHOOTER_IDLE:
             default:
                 // TODO: Change These
@@ -113,6 +117,19 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 break;
             case TEST_TURRET_180:
                 setTurretAngle(180);
+                break;
+        }
+
+        switch (wantedGatekeeperState){
+            case IDLE:
+                setGatekeeperSpeed(gatekeeperIdleSpeed);
+                break;
+            case SET_UP:
+                setGatekeeperSpeed(gatekeeperSetUpSpeed);
+            case REMOVAL:
+                setGatekeeperSpeed(gatekeeperRemovalSpeed);
+            default:
+                setGatekeeperSpeed(0);
                 break;
         }
     }
@@ -150,5 +167,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double angle = Math.atan(Math.pow(Velocity,2)+ Math.sqrt(Math.pow(Velocity,4)-Gravity * (Gravity * Math.pow(Hypotonuse,2) + 2 * (Alt - Velocity) * Math.pow(Velocity,2)))/(Gravity * Hypotonuse));
         double rotations = (Math.toDegrees(angle)/  360) * GEAR_RATIO_INCLINE;
         inclineMotor.setControl(positionControl.withPosition(rotations));
+    }
+
+    public void setGatekeeperSpeed(double wantedSpeed) {
+        SmartDashboard.putNumber("Gatekeeper Velocity Voltage", wantedSpeed);
+
+        gatekeeperMotor.setControl(velocityControl.withVelocity(wantedSpeed));
     }
 }
