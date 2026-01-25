@@ -180,3 +180,16 @@ subsystems:
         constants:
             translationKp: 3
             rotationKp: 3
+    vision:
+        cameras:
+            exampleCamera:
+                photonVisionUIName: UI Name
+                robotToCamera:
+                    xInches: 0
+                    yInches: 0
+                    zInches: 24
+                    rollDegrees: 0
+                    pitchDegrees: 0
+                    yawDegrees: 0
+                detectionType: APRIL_TAG
+                simCameraProperties: # TODO: split this into the actual values needed for simulating the camera

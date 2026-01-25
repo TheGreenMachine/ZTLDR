@@ -5,6 +5,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.FlippingUtil;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import com.team1816.lib.subsystems.LedManager;
+import com.team1816.lib.subsystems.Vision;
 import com.team1816.lib.subsystems.drivetrain.IDrivetrain;
 import com.team1816.lib.subsystems.drivetrain.Drivetrain;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
@@ -25,6 +26,7 @@ public class BaseRobotContainer {
 
     public SendableChooser<Command> autoChooser;
     public static Swerve swerve;
+    public static Vision vision;
     private boolean poseInitialized;
 
     public void initializeLibSubSystems() {
@@ -32,6 +34,7 @@ public class BaseRobotContainer {
         drivetrain = Singleton.CreateSubSystem(Drivetrain.class);
 
         swerve = new Swerve(drivetrain, controller);
+        vision = new Vision();
     }
 
     public void initializeAutonomous() {

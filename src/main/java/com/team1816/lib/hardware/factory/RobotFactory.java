@@ -14,12 +14,21 @@ import com.team1816.lib.hardware.components.led.CANifierImpl;
 import com.team1816.lib.hardware.components.motor.TalonFXImpl;
 import com.team1816.lib.hardware.components.motor.TalonFXSImpl;
 import com.team1816.lib.hardware.components.sensor.CANCoderImpl;
+import com.team1816.lib.hardware.components.sensor.Camera;
 import com.team1816.lib.hardware.components.sensor.CanRangeImpl;
 import com.team1816.lib.util.GreenLogger;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import org.photonvision.simulation.SimCameraProperties;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.team1816.lib.Singleton.factory;
@@ -134,6 +143,72 @@ public class RobotFactory {
             throw new IllegalArgumentException("deviceType missing in yml");
         }
         return getDevInst(deviceConfig, subsystem, true);
+    }
+
+    /**
+     * Gets all cameras from the YAML configuration for the provided subsystem.
+     *
+     * @param subsystemName The name of the subsystem in the YAML configuration file.
+     * @return The cameras for the provided subsystem.
+     */
+    public List<Camera> getCameras(String subsystemName) {
+        if (config == null) {
+            throw new NullPointerException("config is null");
+        }
+        var subsystem = getSubsystemConfig(subsystemName);
+
+        // if subsystem is not implemented we don't need anything from it
+        if (!subsystem.implemented) return new ArrayList<>();
+
+        var cameraProp = new SimCameraProperties();
+        cameraProp.setCalibration(960, 720, Rotation2d.fromDegrees(90));
+        cameraProp.setCalibError(0.35, 0.10);
+        cameraProp.setFPS(15);
+        cameraProp.setAvgLatencyMs(50);
+        cameraProp.setLatencyStdDevMs(15);
+
+        List<Camera> cameras = new ArrayList<>();
+        for (Map.Entry<String, CameraConfiguration> entry : subsystem.cameras.entrySet()) {
+            String cameraName = entry.getKey();
+            CameraConfiguration cameraConfig = entry.getValue();
+            if (cameraConfig != null) {
+                RobotToCamera robotToCam = cameraConfig.robotToCamera;
+                if (robotToCam != null) {
+                    GreenLogger.log("Creating camera " + cameraName);
+                    GreenLogger.log("  photonVisionUIName: " + cameraConfig.photonVisionUIName);
+                    GreenLogger.log(
+                        "  robotToCamera: xInches=" + robotToCam.xInches +
+                            ", yInches=" + robotToCam.yInches +
+                            ", zInches=" + robotToCam.zInches +
+                            ", rollDegrees=" + robotToCam.rollDegrees +
+                            ", pitchDegrees=" + robotToCam.pitchDegrees +
+                            ", yawDegrees=" + robotToCam.yawDegrees
+                    );
+                    GreenLogger.log("  detectionType: " + cameraConfig.detectionType);
+                    GreenLogger.log("  simCameraProperties: " + cameraConfig.simCameraProperties);
+                    cameras.add(new Camera(
+                        cameraName,
+                        cameraConfig.photonVisionUIName,
+                        new Transform3d(
+                            new Translation3d(
+                                Units.inchesToMeters(robotToCam.xInches),
+                                Units.inchesToMeters(robotToCam.yInches),
+                                Units.inchesToMeters(robotToCam.zInches)
+                            ),
+                            new Rotation3d(
+                                Units.degreesToRadians(robotToCam.rollDegrees),
+                                Units.degreesToRadians(robotToCam.pitchDegrees),
+                                Units.degreesToRadians(robotToCam.yawDegrees)
+                            )
+                        ),
+                        cameraConfig.detectionType,
+                        cameraProp
+                    ));
+                }
+            }
+        }
+
+        return cameras;
     }
 
     // Used to get devices by there id  Used by CTRE swerve

@@ -16,6 +16,11 @@
             "type": "object",
             "existingJavaType": "java.util.Map<String,DeviceConfiguration>"
         },
+        "cameras": {
+            "default": null,
+            "type": "object",
+            "existingJavaType": "java.util.Map<String,CameraConfiguration>"
+        },
         "kinematics": {
             "default": null,
             "$ref": "kinematics.schema.json"

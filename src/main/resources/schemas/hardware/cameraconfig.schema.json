@@ -1,0 +1,49 @@
+{
+    "type": "object",
+    "title": "Camera Configuration",
+    "properties": {
+        "photonVisionUIName": {
+            "default": null,
+            "type" : "string"
+        },
+        "robotToCamera": {
+            "default": null,
+            "type" : "object",
+            "properties": {
+                "xInches": {
+                    "default": 0,
+                    "type": "number"
+                },
+                "yInches": {
+                    "default": 0,
+                    "type": "number"
+                },
+                "zInches": {
+                    "default": 0,
+                    "type": "number"
+                },
+                "rollDegrees": {
+                    "default": 0,
+                    "type": "number"
+                },
+                "pitchDegrees": {
+                    "default": 0,
+                    "type": "number"
+                },
+                "yawDegrees": {
+                    "default": 0,
+                    "type": "number"
+                }
+            }
+        },
+        "detectionType": {
+            "type": "enum",
+            "default": null,
+            "existingJavaType": "com.team1816.lib.hardware.components.sensor.Camera.DetectionType"
+        },
+        "simCameraProperties": {
+            "default": null,
+            "type" : "string"
+        }
+    }
+}
