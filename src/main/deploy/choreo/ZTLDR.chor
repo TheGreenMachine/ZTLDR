@@ -4,47 +4,32 @@
  "type":"Swerve",
  "variables":{
   "expressions":{},
-  "poses":{
-   "Top Trench":{
-    "x":{
-     "exp":"3.6253833770751953 m",
-     "val":3.6253833770751953
-    },
-    "y":{
-     "exp":"7.418280601501465 m",
-     "val":7.418280601501465
-    },
-    "heading":{
-     "exp":"0 deg",
-     "val":0.0
-    }
-   }
-  }
+  "poses":{}
  },
  "config":{
   "frontLeft":{
    "x":{
-    "exp":"7.375 in",
-    "val":0.187325
+    "exp":"11 in",
+    "val":0.2794
    },
    "y":{
-    "exp":"7.375 in",
-    "val":0.187325
+    "exp":"11 in",
+    "val":0.2794
    }
   },
   "backLeft":{
    "x":{
-    "exp":"-7.375 in",
-    "val":-0.187325
+    "exp":"-11 in",
+    "val":-0.2794
    },
    "y":{
-    "exp":"7.375 in",
-    "val":0.187325
+    "exp":"11 in",
+    "val":0.2794
    }
   },
   "mass":{
-   "exp":"40 lbs",
-   "val":18.1436948
+   "exp":"150 lbs",
+   "val":68.0388555
   },
   "inertia":{
    "exp":"6 kg m ^ 2",
@@ -72,16 +57,16 @@
   },
   "bumper":{
    "front":{
-    "exp":"11.375 in",
-    "val":0.288925
+    "exp":"16 in",
+    "val":0.4064
    },
    "side":{
-    "exp":"11.375 in",
-    "val":0.288925
+    "exp":"16 in",
+    "val":0.4064
    },
    "back":{
-    "exp":"11.375 in",
-    "val":0.288925
+    "exp":"16 in",
+    "val":0.4064
    }
   },
   "differentialTrackWidth":{
