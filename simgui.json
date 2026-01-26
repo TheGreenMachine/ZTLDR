@@ -28,6 +28,7 @@
       "/FMSInfo": "FMSInfo",
       "/Field": "Field2d",
       "/SmartDashboard/Auto Mode": "String Chooser",
+      "/SmartDashboard/Mech2d": "Mechanism2d",
       "/SmartDashboard/PathPlanner": "Alerts"
     },
     "windows": {
@@ -43,6 +44,11 @@
         }
       },
       "/SmartDashboard/Auto Mode": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Mech2d": {
         "window": {
           "visible": true
         }

@@ -6,7 +6,12 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.team1816.lib.Singleton.factory;
@@ -53,6 +58,25 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public double currentInclinePosition = 0;
     double currentShooterVelocity = 0;
 
+    public double inclineAngle;
+
+    private static Mechanism2d inclineMech2d = new Mechanism2d (3, 3);
+    private static MechanismRoot2d inclineRoot2d = inclineMech2d.getRoot("inclineHood", 2, 0);
+    static MechanismLigament2d m_inclineRoot;
+    static MechanismLigament2d m_inclineHood;
+
+
+
+
+    static {
+        m_inclineRoot = inclineRoot2d.append(new MechanismLigament2d("inclineRoot", 2, 90));
+        m_inclineHood =
+            m_inclineRoot.append(
+                new MechanismLigament2d("inclineHood", 1, 25, 6, new Color8Bit(Color.kPurple)));
+
+        SmartDashboard.putData("Mech2d", inclineMech2d);
+    }
+
 
     public enum AIM_STATE {
         SCORING,
@@ -78,6 +102,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public void periodic() {
         readFromHardware();
         applyState();
+
+        m_inclineRoot.setLength(3);
+        m_inclineHood.setAngle(getLaunchAngle());
     }
 
     public void setWantedAimState(AIM_STATE state) {
@@ -185,9 +212,13 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         inclineMotor.setControl(voltageControl.withOutput(output));
     }
     public void setLaunchAngle (double Hypotonuse, double Alt, double Velocity, double Gravity){
-        double angle = Math.atan(Math.pow(Velocity,2)+ Math.sqrt(Math.pow(Velocity,4)-Gravity * (Gravity * Math.pow(Hypotonuse,2) + 2 * (Alt - Velocity) * Math.pow(Velocity,2)))/(Gravity * Hypotonuse));
-        double rotations = (Math.toDegrees(angle)/  360) * GEAR_RATIO_INCLINE;
+        inclineAngle = Math.atan(Math.pow(Velocity,2)+ Math.sqrt(Math.pow(Velocity,4)-Gravity * (Gravity * Math.pow(Hypotonuse,2) + 2 * (Alt - Velocity) * Math.pow(Velocity,2)))/(Gravity * Hypotonuse));
+        double rotations = (Math.toDegrees(inclineAngle)/  360) * GEAR_RATIO_INCLINE;
         inclineMotor.setControl(positionControl.withPosition(rotations));
+    }
+
+    public double getLaunchAngle () {
+        return inclineAngle;
     }
 
     public void setGatekeeperSpeed(double wantedSpeed) {

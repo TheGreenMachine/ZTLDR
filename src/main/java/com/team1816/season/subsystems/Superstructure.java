@@ -13,6 +13,7 @@ public class Superstructure extends SubsystemBase {
     private final Swerve swerve;
     private final Turret turret;
     private final Intake intake;
+    private final Shooter shooter;
     protected CommandXboxController controller;
 
     public enum WantedSuperState {
@@ -45,6 +46,7 @@ public class Superstructure extends SubsystemBase {
         this.swerve = swerve;
         this.turret = Singleton.get(Turret.class);
         this.intake = Singleton.get(Intake.class);
+        this.shooter = Singleton.get(Shooter.class);
     }
 
     @Override
