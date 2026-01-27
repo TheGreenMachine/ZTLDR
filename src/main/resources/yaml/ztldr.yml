@@ -89,7 +89,7 @@ subsystems:
 
             turret:
                 # TODO: Change numbers if necessary
-                id: 14
+                id: 13
                 deviceType: TalonFXS
                 motorType: Minion_JST
                 neutralMode: Brake

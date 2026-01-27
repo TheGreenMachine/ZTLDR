@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class Superstructure extends SubsystemBase {
     private final Swerve swerve;
-    private final Turret turret;
     private final Intake intake;
     private final Shooter shooter;
     protected CommandXboxController controller;
@@ -44,7 +43,6 @@ public class Superstructure extends SubsystemBase {
 
     public Superstructure(Swerve swerve) {
         this.swerve = swerve;
-        this.turret = Singleton.get(Turret.class);
         this.intake = Singleton.get(Intake.class);
         this.shooter = Singleton.get(Shooter.class);
     }
@@ -104,11 +102,9 @@ public class Superstructure extends SubsystemBase {
     protected void applyStates() {
         switch (currentSuperState) {
             case TURRET_TO_0:
-                turret.setWantedState(Turret.TURRET_STATE.TURRET_TO_0);
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
                 break;
             case TURRET_TO_180:
-                turret.setWantedState(Turret.TURRET_STATE.TURRET_TO_180);
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
                 break;
             case INTAKE_IN:
@@ -124,16 +120,13 @@ public class Superstructure extends SubsystemBase {
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
                 break;
             case TURRET_IDLE:
-                turret.setWantedState(Turret.TURRET_STATE.TURRET_IDLE);
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
                 break;
             case TELEOP_DRIVE:
-                turret.setWantedState(Turret.TURRET_STATE.TURRET_IDLE);
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
                 break;
             case TELEOP_IDLE:
             default:
-                turret.setWantedState(Turret.TURRET_STATE.TURRET_IDLE);
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_IDLE);
                 break;
         }

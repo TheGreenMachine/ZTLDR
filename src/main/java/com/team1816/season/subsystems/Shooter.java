@@ -1,10 +1,13 @@
 package com.team1816.season.subsystems;
 
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import com.team1816.season.RobotContainer;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -15,13 +18,15 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.team1816.lib.Singleton.factory;
+import static com.team1816.season.RobotContainer.m_inclineHood;
 
 
 /* TODO: 1. Add in Mech2d
  *   2. Add in shooter code
  *   3. Organize code layout
- *   4. Code in Incline an Turret Restrictions
- *   5. Set up offset code to find positions */
+ *   4. Code in Incline and Turret Restrictions
+ *   5. Set up offset code to find positions
+ *   6. Zero in Code */
 
 public class Shooter extends SubsystemBase implements ITestableSubsystem {
     String NAME = "shooter";
@@ -59,22 +64,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     double currentShooterVelocity = 0;
 
     public double inclineAngle;
+    double inclineRestriction;
 
-    private static Mechanism2d inclineMech2d = new Mechanism2d (3, 3);
-    private static MechanismRoot2d inclineRoot2d = inclineMech2d.getRoot("inclineHood", 2, 0);
-    static MechanismLigament2d m_inclineRoot;
-    static MechanismLigament2d m_inclineHood;
-
-
-
-
-    static {
-        m_inclineRoot = inclineRoot2d.append(new MechanismLigament2d("inclineRoot", 2, 90));
-        m_inclineHood =
-            m_inclineRoot.append(
-                new MechanismLigament2d("inclineHood", 1, 25, 6, new Color8Bit(Color.kPurple)));
-
-        SmartDashboard.putData("Mech2d", inclineMech2d);
+    public Shooter(){
+//        shooterMotorFollower.setControl(new Follower(shooterMotorLeader.getDeviceID(), MotorAlignmentValue.Aligned));
     }
 
 
@@ -103,7 +96,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         readFromHardware();
         applyState();
 
-        m_inclineRoot.setLength(3);
+        RobotContainer.m_inclineRoot.setLength(3);
         m_inclineHood.setAngle(getLaunchAngle());
     }
 
@@ -122,12 +115,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     @Override
     public void readFromHardware() {
-        currentTurretPosition = turretMotor.getMotorPosition();
+//        currentTurretPosition = turretMotor.getMotorPosition();
         curretGateKeeperSpeed = gatekeeperMotor.getMotorVelocity();
         currentInclinePosition = inclineMotor.getMotorPosition();
         currentShooterVelocity = shooterMotorLeader.getMotorVelocity();
-
-        currentVoltage = 0;
     }
 
     private void applyState() {
@@ -193,9 +184,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public void setTurretSpeed(double wantedSpeed) {
         double output = MathUtil.clamp(wantedSpeed, -12.0, 12.0);
 
-        SmartDashboard.putNumber("Shooter Voltage", output);
+        SmartDashboard.putNumber("Shooter Velocity", wantedSpeed);
 
-        turretMotor.setControl(voltageControl.withOutput(output));
+        turretMotor.setControl(velocityControl.withVelocity(wantedSpeed));
     }
 
     public void setTurretAngle(double angle) {
@@ -207,27 +198,28 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         // TODO: Change Values
         double output = MathUtil.clamp(wantedSpeed, -12.0, 12.0);
 
-        SmartDashboard.putNumber("Shooter Voltage", output);
+        SmartDashboard.putNumber("Shooter Velocity", wantedSpeed);
 
-        inclineMotor.setControl(voltageControl.withOutput(output));
+        inclineMotor.setControl(velocityControl.withVelocity(wantedSpeed));
     }
     public void setLaunchAngle (double Hypotonuse, double Alt, double Velocity, double Gravity){
-        inclineAngle = Math.atan(Math.pow(Velocity,2)+ Math.sqrt(Math.pow(Velocity,4)-Gravity * (Gravity * Math.pow(Hypotonuse,2) + 2 * (Alt - Velocity) * Math.pow(Velocity,2)))/(Gravity * Hypotonuse));
-        double rotations = (Math.toDegrees(inclineAngle)/  360) * GEAR_RATIO_INCLINE;
+            inclineAngle = 90 - Math.toDegrees((Math.atan(Math.pow(Velocity, 2) + Math.sqrt(Math.pow(Velocity, 4) - Gravity * (Gravity * Math.pow(Hypotonuse, 2) + 2 * (Alt - Velocity) * Math.pow(Velocity, 2))) / (Gravity * Hypotonuse))));
+         inclineRestriction = MathUtil.clamp(inclineAngle, 80.0, 45.0);
+        double rotations = (inclineRestriction/  360) * GEAR_RATIO_INCLINE;
         inclineMotor.setControl(positionControl.withPosition(rotations));
     }
 
     public double getLaunchAngle () {
-        return inclineAngle;
+        return inclineRestriction;
     }
 
     public void setGatekeeperSpeed(double wantedSpeed) {
-        SmartDashboard.putNumber("Gatekeeper Velocity Voltage", wantedSpeed);
+        SmartDashboard.putNumber("Gatekeeper Velocity", wantedSpeed);
 
         gatekeeperMotor.setControl(velocityControl.withVelocity(wantedSpeed));
     }
     public void setShooterSpeed(double wantedSpeed) {
-        SmartDashboard.putNumber("Shooter Velocity Voltage", wantedSpeed);
+        SmartDashboard.putNumber("Shooter Velocity", wantedSpeed);
 
         shooterMotorLeader.setControl(velocityControl.withVelocity(wantedSpeed));
     }

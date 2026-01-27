@@ -4,18 +4,39 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.Singleton;
 import com.team1816.season.subsystems.Indexer;
+import com.team1816.season.subsystems.Shooter;
 import com.team1816.season.subsystems.Superstructure;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 
 public class RobotContainer extends BaseRobotContainer {
+    public static Mechanism2d inclineMech2d = new Mechanism2d (3, 3);
+    public static MechanismRoot2d inclineRoot2d = inclineMech2d.getRoot("inclineHood", 2, 0);
+    public static MechanismLigament2d m_inclineRoot;
+    public static MechanismLigament2d m_inclineHood;
+
     public RobotContainer() {
+
         NamedCommands.registerCommand("InTheZone", new InTheZoneCommand());
         // call the base to initialize library objects
         // i.e. subsystems that always exist like the drivetrain and path planner
         initializeLibSubSystems();
 
         Singleton.CreateSubSystem(Indexer.class);
+        Singleton.CreateSubSystem(Shooter.class);
 
         superstructure = new Superstructure(swerve);
+
+        m_inclineRoot = inclineRoot2d.append(new MechanismLigament2d("inclineRoot", 2, 90));
+        m_inclineHood =
+            m_inclineRoot.append(
+                new MechanismLigament2d("inclineHood", 1, 7, 6, new Color8Bit(Color.kPurple)));
+
+        SmartDashboard.putData("Mech2d", inclineMech2d);
 
         initializeAutonomous();
 
