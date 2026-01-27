@@ -210,11 +210,13 @@ task runZTLDR(type: JavaExec) {
     String jniDir = "${project.buildDir}/jni/release"
     environment "PATH", jniDir
     String hal = fileTree(dir: "${project.buildDir}/jni/release", include: '*halsim_*.*').asPath
-    if (!DefaultNativePlatform.currentOperatingSystem.isWindows()) {
+    if (DefaultNativePlatform.currentOperatingSystem.isMacOsX()) {
         environment "LD_LIBRARY_PATH", jniDir
         environment "DYLD_FALLBACK_LIBRARY_PATH", jniDir
         environment "DYLD_LIBRARY_PATH", jniDir
-        jvmArgs "-XstartOnFirstThread"
+        if (DefaultNativePlatform.currentOperatingSystem.isMacOsX()) {
+            jvmArgs "-XstartOnFirstThread"
+        }
     }
     environment "HALSIM_EXTENSIONS", hal
     environment "ROBOT_NAME", "ztldr"
