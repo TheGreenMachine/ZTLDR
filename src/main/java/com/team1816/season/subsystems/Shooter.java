@@ -38,8 +38,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private final IMotor turretMotor = (IMotor) factory.getDevice(NAME, "turretMotor");
     private final IMotor inclineMotor = (IMotor) factory.getDevice(NAME, "inclineMotor");
-    private final IMotor shooterMotorLeader = (IMotor) factory.getDevice(NAME, "shooterMotorTop");
-    private final IMotor shooterMotorFollower = (IMotor) factory.getDevice(NAME, "shooterMotorBottom");
+    private final IMotor shooterMotorLeader = (IMotor) factory.getDevice(NAME, "shooterMotorLeader");
+    private final IMotor shooterMotorFollower = (IMotor) factory.getDevice(NAME, "shooterMotorFollower");
     private final IMotor gatekeeperMotor = (IMotor) factory.getDevice(NAME, "gatekeeperMotor");
 
     private double gatekeeperSetUpSpeed = 0.7; //NUMBERS ARE TO CHANGE!!! + Unit is RPS
