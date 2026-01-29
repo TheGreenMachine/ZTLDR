@@ -33,7 +33,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private double GEAR_RATIO_TURRET = 1.0;
     private double GEAR_RATIO_INCLINE = 1.0;
     // todo: change give answers in m/s
-    private double ExitVelocity = 50;
+    private double ExitVelocity = 34;
 
     private final IMotor turretMotor = (IMotor) factory.getDevice(NAME, "turretMotor");
 
@@ -189,7 +189,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         return wantedAngle;
     }
     public double getWantedAngleRedHub () {
-        double wantedAngle = Math.acos(RobotPositionValues.getRedRatios(RobotPositionValues.getRedHypotonuse()));
+        double wantedAngle = Math.acos(RobotPositionValues.getRedRatios());
         return wantedAngle;
     }
 
