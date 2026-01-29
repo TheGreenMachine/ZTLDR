@@ -1,13 +1,10 @@
 package com.team1816.season.subsystems;
 
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
-import com.team1816.season.RobotContainer;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -74,7 +71,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         m_inclineRoot = inclineRoot2d.append(new MechanismLigament2d("inclineRoot", 2, 90));
         m_inclineHood =
             m_inclineRoot.append(
-                new MechanismLigament2d("inclineHood", 1, getLaunchAngleUpdated(RobotPositionValues.getRedHypotonuse(),1.8288, 5,9.8), 6, new Color8Bit(Color.kPurple)));
+                new MechanismLigament2d("inclineHood", 1, setLaunchAngle(RobotPositionValues.getRedHypotonuse(),1.8288, 5,9.8), 6, new Color8Bit(Color.kPurple)));
 
         SmartDashboard.putData("Mech2d", inclineMech2d);
 //        shooterMotorFollower.setControl(new Follower(shooterMotorLeader.getDeviceID(), MotorAlignmentValue.Aligned));
@@ -128,7 +125,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         curretGateKeeperSpeed = gatekeeperMotor.getMotorVelocity();
         currentInclinePosition = inclineMotor.getMotorPosition();
         currentShooterVelocity = shooterMotorLeader.getMotorVelocity();
-        desiredInclineAngle = getLaunchAngleUpdated(RobotPositionValues.getRedHypotonuse(),1.8288, ExitVelocity,9.8);
+        desiredInclineAngle = setLaunchAngle(RobotPositionValues.getRedHypotonuse(),1.8288, ExitVelocity,9.8);
     }
 
 
@@ -219,15 +216,16 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         inclineMotor.setControl(velocityControl.withVelocity(wantedSpeed));
     }
-    public void setLaunchAngle (double Hypotonuse, double Alt, double Velocity, double Gravity){
-            inclineAngle = 90 - Math.toDegrees((Math.atan(Math.pow(Velocity, 2) + Math.sqrt(Math.pow(Velocity, 4) - Gravity * (Gravity * Math.pow(Hypotonuse, 2) + 2 * (Alt - Velocity) * Math.pow(Velocity, 2))) / (Gravity * Hypotonuse))));
-         inclineRestriction = MathUtil.clamp(inclineAngle, 80.0, 45.0);
-        double rotations = (inclineRestriction/  360) * GEAR_RATIO_INCLINE;
-        inclineMotor.setControl(positionControl.withPosition(rotations));
-    }
-    public  double getLaunchAngleUpdated (double Hypotonuse, double Alt, double Velocity, double Gravity){
-        inclineAngle = 90 - Math.toDegrees((Math.atan(Math.pow(Velocity, 2) + Math.sqrt(Math.pow(Velocity, 4) - Gravity * (Gravity * Math.pow(Hypotonuse, 2) + 2 * (Alt - Velocity) * Math.pow(Velocity, 2))) / (Gravity * Hypotonuse))));
-        inclineRestriction = MathUtil.clamp(inclineAngle, 80.0, 45.0);
+//    public void setLaunchAngle (double Hypotonuse, double Alt, double Velocity, double Gravity){
+//        inclineAngle = 90 - (Math.toDegrees((Math.atan(Math.pow(Velocity, 2) + Math.sqrt(Math.pow(Velocity, 4) - Gravity * (Gravity * Math.pow(Hypotonuse, 2) + 2 * (Alt - Velocity) * Math.pow(Velocity, 2))) / (Gravity * Hypotonuse)))));
+//         inclineRestriction = MathUtil.clamp(inclineAngle, 80.0, 45.0);
+//        double rotations = (inclineRestriction/  360) * GEAR_RATIO_INCLINE;
+//        inclineMotor.setControl(positionControl.withPosition(rotations));
+//    }
+    public  double setLaunchAngle(double Hypotonuse, double Alt, double Velocity, double Gravity){
+//        inclineAngle = 90 - Math.toDegrees((Math.atan(Math.pow(Velocity, 2) + Math.sqrt(Math.pow(Velocity, 4) - Gravity * (Gravity * Math.pow(Hypotonuse, 2) + 2 * (Alt - Velocity) * Math.pow(Velocity, 2))) / (Gravity * Hypotonuse))));
+        inclineAngle = 90-Math.toDegrees(Math.abs(Math.atan( (Hypotonuse-Math.sqrt(Math.pow(Hypotonuse, 2)-((2*Gravity*Math.pow(Hypotonuse, 2))/(Math.pow(Velocity, 2)))*((2*Alt)+((Gravity*Math.pow(Hypotonuse, 2))/(Math.pow(Velocity, 2))))))/(((Gravity*Math.pow(Hypotonuse, 2))/(Math.pow(Velocity, 2)))))));
+        inclineRestriction = MathUtil.clamp(inclineAngle, 0, 100.0);
        return inclineAngle;
     }
 
