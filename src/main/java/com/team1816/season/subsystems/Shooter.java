@@ -222,11 +222,12 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 //        double rotations = (inclineRestriction/  360) * GEAR_RATIO_INCLINE;
 //        inclineMotor.setControl(positionControl.withPosition(rotations));
 //    }
-    public  double setLaunchAngle(double Hypotonuse, double Alt, double Velocity, double Gravity){
+   void setLaunchAngle(double Hypotonuse, double Alt, double Velocity, double Gravity){
 //        inclineAngle = 90 - Math.toDegrees((Math.atan(Math.pow(Velocity, 2) + Math.sqrt(Math.pow(Velocity, 4) - Gravity * (Gravity * Math.pow(Hypotonuse, 2) + 2 * (Alt - Velocity) * Math.pow(Velocity, 2))) / (Gravity * Hypotonuse))));
         inclineAngle = 90-Math.toDegrees(Math.abs(Math.atan( (Hypotonuse-Math.sqrt(Math.pow(Hypotonuse, 2)-((2*Gravity*Math.pow(Hypotonuse, 2))/(Math.pow(Velocity, 2)))*((2*Alt)+((Gravity*Math.pow(Hypotonuse, 2))/(Math.pow(Velocity, 2))))))/(((Gravity*Math.pow(Hypotonuse, 2))/(Math.pow(Velocity, 2)))))));
         inclineRestriction = MathUtil.clamp(inclineAngle, 0, 100.0);
-       return inclineAngle;
+        // TODO: Get gearing ratios
+       inclineMotor.setControl(positionControl.withPosition(inclineRestriction));
     }
 
     public double getLaunchAngle () {
