@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.team1816.lib.Singleton.factory;
-import static com.team1816.season.RobotContainer.m_inclineHood;
 
 
 /* TODO: 1. Add in Mech2d
@@ -34,9 +33,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private double GEAR_RATIO_TURRET = 1.0;
     private double GEAR_RATIO_INCLINE = 1.0;
     // todo: change give answers in m/s
-    private double ExitVelocity = 0.0;
+    private double ExitVelocity = 50;
 
     private final IMotor turretMotor = (IMotor) factory.getDevice(NAME, "turretMotor");
+
     private final IMotor inclineMotor = (IMotor) factory.getDevice(NAME, "inclineMotor");
     private final IMotor shooterMotorLeader = (IMotor) factory.getDevice(NAME, "shooterMotorLeader");
     private final IMotor shooterMotorFollower = (IMotor) factory.getDevice(NAME, "shooterMotorFollower");
@@ -65,10 +65,21 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public double inclineAngle;
     double inclineRestriction;
-
+    public double desiredInclineAngle;
+    public Mechanism2d inclineMech2d = new Mechanism2d (3, 3);
+    public MechanismRoot2d inclineRoot2d = inclineMech2d.getRoot("inclineHood", 2, 0);
+    public MechanismLigament2d m_inclineRoot;
+    public MechanismLigament2d m_inclineHood;
     public Shooter(){
+        m_inclineRoot = inclineRoot2d.append(new MechanismLigament2d("inclineRoot", 2, 90));
+        m_inclineHood =
+            m_inclineRoot.append(
+                new MechanismLigament2d("inclineHood", 1, getLaunchAngleUpdated(RobotPositionValues.getRedHypotonuse(),1.8288, 5,9.8), 6, new Color8Bit(Color.kPurple)));
+
+        SmartDashboard.putData("Mech2d", inclineMech2d);
 //        shooterMotorFollower.setControl(new Follower(shooterMotorLeader.getDeviceID(), MotorAlignmentValue.Aligned));
     }
+
 
 
     public enum AIM_STATE {
@@ -95,8 +106,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public void periodic() {
         readFromHardware();
         applyState();
-
-        RobotContainer.m_inclineRoot.setLength(3);
         m_inclineHood.setAngle(getLaunchAngle());
     }
 
@@ -119,9 +128,12 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         curretGateKeeperSpeed = gatekeeperMotor.getMotorVelocity();
         currentInclinePosition = inclineMotor.getMotorPosition();
         currentShooterVelocity = shooterMotorLeader.getMotorVelocity();
+        desiredInclineAngle = getLaunchAngleUpdated(RobotPositionValues.getRedHypotonuse(),1.8288, ExitVelocity,9.8);
     }
 
+
     private void applyState() {
+        setInclineAngle(desiredInclineAngle);
         switch (wantedAimState) {
             case SHOOT_RED:
                 setTurretAngle(getWantedAngleRedHub());
@@ -189,10 +201,15 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         turretMotor.setControl(velocityControl.withVelocity(wantedSpeed));
     }
 
+
     public void setTurretAngle(double angle) {
         double rotations = (Math.toDegrees(angle) / 360.0) * GEAR_RATIO_TURRET;
 
         turretMotor.setControl(positionControl.withPosition(rotations));
+    }
+    public void setInclineAngle(double angle) {
+        // TODO: calculate angle to rotations
+        inclineMotor.setControl(positionControl.withPosition(angle));
     }
     public void setIncleSpeed(double wantedSpeed) {
         // TODO: Change Values
@@ -207,6 +224,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
          inclineRestriction = MathUtil.clamp(inclineAngle, 80.0, 45.0);
         double rotations = (inclineRestriction/  360) * GEAR_RATIO_INCLINE;
         inclineMotor.setControl(positionControl.withPosition(rotations));
+    }
+    public  double getLaunchAngleUpdated (double Hypotonuse, double Alt, double Velocity, double Gravity){
+        inclineAngle = 90 - Math.toDegrees((Math.atan(Math.pow(Velocity, 2) + Math.sqrt(Math.pow(Velocity, 4) - Gravity * (Gravity * Math.pow(Hypotonuse, 2) + 2 * (Alt - Velocity) * Math.pow(Velocity, 2))) / (Gravity * Hypotonuse))));
+        inclineRestriction = MathUtil.clamp(inclineAngle, 80.0, 45.0);
+       return inclineAngle;
     }
 
     public double getLaunchAngle () {

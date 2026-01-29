@@ -48,7 +48,7 @@ subsystems:
                 # TODO: Change numbers if necessary
                 deviceType: TalonFX
                 # KEEP THIS ID
-                id: 64
+                id: 39
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
                 motionMagic:
@@ -66,28 +66,28 @@ subsystems:
                     expoKA: 0.04
 
             shooterMotorLeader:
-                    # TODO: Change numbers if necessary
-                    deviceType: TalonFX
-                    # KEEP THIS ID
-                    id: 15
-                    motorRotation: Clockwise_Positive
-                    statorCurrentLimit: 60
-                    motionMagic:
-                        expoKV: 0.05
-                        expoKA: 0.04
+                # TODO: Change numbers if necessary
+                deviceType: TalonFX
+                # KEEP THIS ID
+                id: 15
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
 
             gatekeeperMotor:
-                    # TODO: Change numbers if necessary
-                    deviceType: TalonFX
-                    # KEEP THIS ID
-                    id: 14
-                    motorRotation: Clockwise_Positive
-                    statorCurrentLimit: 60
-                    motionMagic:
-                        expoKV: 0.05
-                        expoKA: 0.04
+                # TODO: Change numbers if necessary
+                deviceType: TalonFX
+                # KEEP THIS ID
+                id: 14
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
 
-            turret:
+            turretMotor:
                 # TODO: Change numbers if necessary
                 id: 13
                 deviceType: TalonFXS
