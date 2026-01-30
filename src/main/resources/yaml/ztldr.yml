@@ -31,72 +31,32 @@ subsystems:
                     expoKV: 0.05
                     expoKA: 0.04
             stowerMotor:
-                id: 2
+                id: 3
                 deviceType: TalonFX
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
-                forwardSoftLimit: 10
-                reverseSoftLimit: -10
                 motionMagicExpo:
                     expoKV: 0.05
                     expoKA: 0.04
         constants:
             climbPositionStow: 0
-            climbPositionUnstow: 1
+            climbPositionUnstow: 3
             climbPositionL1: 5
             climbPositionL2: 7
             climbPositionL3: 10
-            stowerPositionStow: 0
-            stowerPositionUnstow: 1
-    indexer:
-        devices:
-            indexerMotor:
-                deviceType: TalonFX
-                id: 16
-                motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
-    shooter:
-        devices:
-            shooterMotor:
-                deviceType: TalonFX
-                id: 16
-                motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
-    turret:
-        devices:
-            turretMotor:
-                id: 0
-                deviceType: TalonFXS
-                motorType: Minion_JST
-                neutralMode: Brake
-                motorRotation: Clockwise_Positive
-                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 1
-            turretCoder:
-                id: 1
-                deviceType: CANcoder
-        pidConfig:
-            slot0:
-                kP: 48.046920
-                kI: 0
-                kD: 0.240234
-    ledManager:
-        devices:
-            argb:
-                id: 12
-                deviceType: CANifier
-            drgb:
-                id: 10
-                deviceType: CANdle
-        constants:
-            maxLevel: 96
-            ledCount: 66
+            stowerPositionStow: 1
+            stowerPositionUnstow: 100
+        ledManager:
+            devices:
+                argb:
+                    id: 12
+                    deviceType: CANifier
+                drgb:
+                    id: 10
+                    deviceType: CANdle
+            constants:
+                maxLevel: 96
+                ledCount: 66
     drivetrain:
         devices:
             flDr:
