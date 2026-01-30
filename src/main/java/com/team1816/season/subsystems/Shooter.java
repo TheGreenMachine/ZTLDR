@@ -3,9 +3,13 @@ package com.team1816.season.subsystems;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -67,6 +71,12 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public MechanismRoot2d inclineRoot2d = inclineMech2d.getRoot("inclineHood", 2, 0);
     public MechanismLigament2d m_inclineRoot;
     public MechanismLigament2d m_inclineHood;
+
+    private final NetworkTable networkTable;
+    private DoubleArrayPublisher fieldHub;
+    private final double[] poseArray = new double[3];
+
+
     public Shooter(){
         m_inclineRoot = inclineRoot2d.append(new MechanismLigament2d("inclineRoot", 2, 90));
         m_inclineHood =
@@ -74,6 +84,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 new MechanismLigament2d("inclineHood", 1, setLaunchAngle(RobotPositionValues.getRedHypotonuse(),1.8288, 5,9.8), 6, new Color8Bit(Color.kPurple)));
 
         SmartDashboard.putData("Mech2d", inclineMech2d);
+
+        networkTable = NetworkTableInstance.getDefault().getTable("");
+        fieldHub = networkTable.getDoubleArrayTopic("Field/Turret").publish();
 //        shooterMotorFollower.setControl(new Follower(shooterMotorLeader.getDeviceID(), MotorAlignmentValue.Aligned));
     }
 
@@ -121,11 +134,19 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     @Override
     public void readFromHardware() {
+        //Put into the network
+
 //        currentTurretPosition = turretMotor.getMotorPosition();
         curretGateKeeperSpeed = gatekeeperMotor.getMotorVelocity();
         currentInclinePosition = inclineMotor.getMotorPosition();
         currentShooterVelocity = shooterMotorLeader.getMotorVelocity();
         desiredInclineAngle = setLaunchAngle(RobotPositionValues.getBlueHypotonuse(),1.8288, ExitVelocity,9.8);
+
+        var robotPose = BaseRobotState.swerveDriveState.Pose;
+        poseArray[0] = robotPose.getX();
+        poseArray[1] = robotPose.getY();
+        poseArray[2] = getWantedAngleRedHub();
+        fieldHub.set(poseArray);
     }
 
 
@@ -185,11 +206,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         }
     }
     public double getWantedAngleBlueHub () {
-        double wantedAngle = Math.acos(RobotPositionValues.getBlueRatios());
+        double wantedAngle = Math.toDegrees(Math.acos(RobotPositionValues.getBlueRatios()));
         return wantedAngle;
     }
     public double getWantedAngleRedHub () {
-        double wantedAngle = Math.acos(RobotPositionValues.getRedRatios());
+        double wantedAngle = Math.toDegrees(Math.acos(RobotPositionValues.getRedRatios()));
         return wantedAngle;
     }
 
