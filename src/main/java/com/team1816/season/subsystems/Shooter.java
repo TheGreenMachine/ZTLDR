@@ -125,7 +125,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         curretGateKeeperSpeed = gatekeeperMotor.getMotorVelocity();
         currentInclinePosition = inclineMotor.getMotorPosition();
         currentShooterVelocity = shooterMotorLeader.getMotorVelocity();
-        desiredInclineAngle = setLaunchAngle(RobotPositionValues.getRedHypotonuse(),1.8288, ExitVelocity,9.8);
+        desiredInclineAngle = setLaunchAngle(RobotPositionValues.getBlueHypotonuse(),1.8288, ExitVelocity,9.8);
     }
 
 
@@ -134,11 +134,14 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         switch (wantedAimState) {
             case SHOOT_RED:
                 setTurretAngle(getWantedAngleRedHub());
-                setLaunchAngle(RobotPositionValues.getRedHypotonuse(),1.8288, ExitVelocity,9.8);
+                var angle = setLaunchAngle(RobotPositionValues.getRedHypotonuse(),1.8288, ExitVelocity,9.8);
+                setInclineAngle(angle);
                 break;
             case SHOOT_BLUE:
                 setTurretAngle(getWantedAngleBlueHub());
-                setLaunchAngle(RobotPositionValues.getBlueHypotonuse(),1.8288, ExitVelocity,9.8);
+                var angle2 = setLaunchAngle(RobotPositionValues.getBlueHypotonuse(),1.8288, ExitVelocity,9.8);
+                inclineMotor.setControl(positionControl.withPosition(angle2));
+                setInclineAngle(angle2);
             break;
             case SHOOTER_TO_INCLINE_3D:
 
@@ -182,7 +185,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         }
     }
     public double getWantedAngleBlueHub () {
-        double wantedAngle = Math.acos(RobotPositionValues.getBlueRatios(RobotPositionValues.getBlueHypotonuse()));
+        double wantedAngle = Math.acos(RobotPositionValues.getBlueRatios());
         return wantedAngle;
     }
     public double getWantedAngleRedHub () {
