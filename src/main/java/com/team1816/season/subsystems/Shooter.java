@@ -81,7 +81,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         m_inclineRoot = inclineRoot2d.append(new MechanismLigament2d("inclineRoot", 2, 90));
         m_inclineHood =
             m_inclineRoot.append(
-                new MechanismLigament2d("inclineHood", 1, setLaunchAngle(RobotPositionValues.getRedHypotonuse(),1.8288, 5,9.8), 6, new Color8Bit(Color.kPurple)));
+                new MechanismLigament2d("inclineHood", 1, setLaunchAngle(RobotPositionValues.getHypotonuse(),1.8288, 5,9.8), 6, new Color8Bit(Color.kPurple)));
 
         SmartDashboard.putData("Mech2d", inclineMech2d);
 
@@ -140,7 +140,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         curretGateKeeperSpeed = gatekeeperMotor.getMotorVelocity();
         currentInclinePosition = inclineMotor.getMotorPosition();
         currentShooterVelocity = shooterMotorLeader.getMotorVelocity();
-        desiredInclineAngle = setLaunchAngle(RobotPositionValues.getBlueHypotonuse(),1.8288, ExitVelocity,9.8);
+        desiredInclineAngle = setLaunchAngle(RobotPositionValues.getHypotonuse(),1.8288, ExitVelocity,9.8);
 
         var robotPose = BaseRobotState.swerveDriveState.Pose;
         poseArray[0] = robotPose.getX();
@@ -155,12 +155,12 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         switch (wantedAimState) {
             case SHOOT_RED:
                 setTurretAngle(getWantedAngleRedHub());
-                var angle = setLaunchAngle(RobotPositionValues.getRedHypotonuse(),1.8288, ExitVelocity,9.8);
+                var angle = setLaunchAngle(RobotPositionValues.getHypotonuse(),1.8288, ExitVelocity,9.8);
                 setInclineAngle(angle);
                 break;
             case SHOOT_BLUE:
                 setTurretAngle(getWantedAngleBlueHub());
-                var angle2 = setLaunchAngle(RobotPositionValues.getBlueHypotonuse(),1.8288, ExitVelocity,9.8);
+                var angle2 = setLaunchAngle(RobotPositionValues.getHypotonuse(),1.8288, ExitVelocity,9.8);
                 inclineMotor.setControl(positionControl.withPosition(angle2));
                 setInclineAngle(angle2);
             break;
