@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class RobotPositionValues {
     public static Translation2d getDistance() {
-        if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+        if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
             var transform = new Transform2d(RobotState.swerveDriveState.Pose, new Pose2d(4.6228, 3.8608, Rotation2d.kZero));
             var BlueDistance = transform.getTranslation();
             return BlueDistance;
@@ -22,16 +22,8 @@ public class RobotPositionValues {
     }
 
     public static double getHypotonuse() {
-        if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
             var Hypotonuse = getDistance().getNorm();
             return Hypotonuse;
-        } else {
-            var transform = new Transform2d(RobotState.swerveDriveState.Pose, new Pose2d(11.915394, 3.8608, Rotation2d.kZero));
-            var RED_TRANSFORM = transform.getTranslation();
-            var Hypotonuse = RED_TRANSFORM.getNorm();
-            return Hypotonuse;
-        }
-
     }
 
     public static double getBlueRatios() {
