@@ -4,6 +4,7 @@ import com.team1816.lib.util.ballisticCalc.src.main.java.com.ballistic.BallPrope
 import com.team1816.lib.util.ballisticCalc.src.main.java.com.ballistic.BallisticCalculator;
 import com.team1816.lib.util.ballisticCalc.src.main.java.com.ballistic.LaunchSolution;
 import com.team1816.lib.util.ballisticCalc.src.main.java.com.ballistic.LauncherConstraints;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Pose3d;
 
@@ -31,8 +32,8 @@ public class BallisticCalculatorTest {
         BallProperties ball = BallProperties.fromInches(6, 0.5);
         BallisticCalculator calc = new BallisticCalculator(ball);
 
-        Pose3d launcherPose = new Pose3d(0, 1, 0, 0, 0, 0);  // 1m off ground
-        Translation3d vehicleVelocity = Translation3d.ZERO;  // Stationary
+        Pose3d launcherPose = new Pose3d(0, 0, 1, new Rotation3d());  // 1m off ground
+        Translation3d vehicleVelocity = new Translation3d();  // Stationary
         Translation3d target = new Translation3d(5, 1, 0);   // 5m forward, same height
 
         LaunchSolution solution = calc.calculate(launcherPose, vehicleVelocity, target, 45);
@@ -49,7 +50,7 @@ public class BallisticCalculatorTest {
         BallProperties ball = BallProperties.fromInches(6, 0.5);
         BallisticCalculator calc = new BallisticCalculator(ball);
 
-        Pose3d launcherPose = new Pose3d(0, 1, 0, 0, 0, 0);
+        Pose3d launcherPose = new Pose3d(0, 0, 1, new Rotation3d());
         Translation3d vehicleVelocity = new Translation3d(5, 0, 0);  // 5 m/s forward
         Translation3d target = new Translation3d(8, 0.5, 0);         // 8m forward, slightly lower
 
@@ -67,7 +68,7 @@ public class BallisticCalculatorTest {
         BallProperties ball = BallProperties.fromInches(6, 0.5);
         BallisticCalculator calc = new BallisticCalculator(ball);
 
-        Pose3d launcherPose = new Pose3d(0, 1, 0, 0, 0, 0);
+        Pose3d launcherPose = new Pose3d(0, 0, 1, new Rotation3d());
         Translation3d vehicleVelocity = new Translation3d(2, 0, 3);  // Moving forward and right
         Translation3d target = new Translation3d(6, 0.5, 0);         // Target is straight ahead
 
@@ -86,7 +87,7 @@ public class BallisticCalculatorTest {
         BallProperties ball = BallProperties.fromInches(6, 0.5);
         BallisticCalculator calc = new BallisticCalculator(ball);
 
-        Pose3d launcherPose = new Pose3d(0, 1, 0, 0, 0, 0);
+        Pose3d launcherPose = new Pose3d(0, 1, 0, new Rotation3d());
         Translation3d vehicleVelocity = new Translation3d(3, 0, 0);
         Translation3d target = new Translation3d(10, 0.5, 0);
 
@@ -94,7 +95,7 @@ public class BallisticCalculatorTest {
 
         if (solution.isSolutionFound()) {
             Translation3d[] trajectory = calc.simulateTrajectory(
-                launcherPose.getPosition(), vehicleVelocity, solution, 0.1);
+                launcherPose.getTranslation(), vehicleVelocity, solution, 0.1);
 
             System.out.println("  Trajectory points (every 0.1s):");
             for (int i = 0; i < trajectory.length; i++) {
@@ -112,8 +113,8 @@ public class BallisticCalculatorTest {
         BallProperties ball = BallProperties.fromInches(6, 0.5);
         BallisticCalculator calc = new BallisticCalculator(ball);
 
-        Pose3d launcherPose = new Pose3d(0, 1, 0, 0, 0, 0);
-        Translation3d vehicleVelocity = Translation3d.ZERO;
+        Pose3d launcherPose = new Pose3d(0, 0, 1, new Rotation3d());
+        Translation3d vehicleVelocity = new Translation3d();
         Translation3d target = new Translation3d(7, 0.5, 2);  // 7m forward, 2m right
 
         LaunchSolution solution = calc.findMinimumVelocitySolution(
@@ -131,8 +132,8 @@ public class BallisticCalculatorTest {
         LauncherConstraints constraints = new LauncherConstraints(1, 15, -10, 80, -180, 180);
         BallisticCalculator calc = new BallisticCalculator(ball, constraints);
 
-        Pose3d launcherPose = new Pose3d(0, 1, 0, 0, 0, 0);
-        Translation3d vehicleVelocity = Translation3d.ZERO;
+        Pose3d launcherPose = new Pose3d(0, 1, 0, new Rotation3d());
+        Translation3d vehicleVelocity = new Translation3d();
 
         // Target too far for max velocity
         Translation3d farTarget = new Translation3d(50, 0, 0);
