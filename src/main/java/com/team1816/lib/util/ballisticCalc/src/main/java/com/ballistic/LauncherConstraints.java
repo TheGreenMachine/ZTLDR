@@ -1,4 +1,4 @@
-package com.ballistic;
+package com.team1816.lib.util.ballisticCalc.src.main.java.com.ballistic;
 
 /**
  * Defines the physical constraints of the launcher mechanism.

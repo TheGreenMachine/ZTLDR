@@ -1,4 +1,6 @@
-package com.ballistic;
+package com.team1816.lib.util.ballisticCalc.src.main.java.com.ballistic;
+
+import edu.wpi.first.math.geometry.Translation3d;
 
 /**
  * Represents a complete solution for launching a projectile to hit a target.
@@ -9,14 +11,14 @@ public class LaunchSolution {
     private final double pitchAngle;            // radians (elevation angle)
     private final double yawAngle;              // radians (horizontal angle, world frame)
     private final double flightTime;            // seconds
-    private final Vector3d launchVelocityVector; // Complete velocity vector (world frame)
-    private final Vector3d predictedLandingPosition;
+    private final Translation3d launchVelocityVector; // Complete velocity vector (world frame)
+    private final Translation3d predictedLandingPosition;
     private final double landingAngle;          // radians (angle of descent)
     private final String failureReason;
 
     private LaunchSolution(boolean solutionFound, double launchVelocity, double pitchAngle,
-                           double yawAngle, double flightTime, Vector3d launchVelocityVector,
-                           Vector3d predictedLandingPosition, double landingAngle, String failureReason) {
+                           double yawAngle, double flightTime, Translation3d launchVelocityVector,
+                           Translation3d predictedLandingPosition, double landingAngle, String failureReason) {
         this.solutionFound = solutionFound;
         this.launchVelocity = launchVelocity;
         this.pitchAngle = pitchAngle;
@@ -32,8 +34,8 @@ public class LaunchSolution {
      * Creates a successful solution.
      */
     public static LaunchSolution success(double launchVelocity, double pitchAngle, double yawAngle,
-                                         double flightTime, Vector3d launchVelocityVector,
-                                         Vector3d predictedLandingPosition, double landingAngle) {
+                                         double flightTime, Translation3d launchVelocityVector,
+                                         Translation3d predictedLandingPosition, double landingAngle) {
         return new LaunchSolution(true, launchVelocity, pitchAngle, yawAngle, flightTime,
                                   launchVelocityVector, predictedLandingPosition, landingAngle, null);
     }
@@ -42,7 +44,7 @@ public class LaunchSolution {
      * Creates a failed solution with a reason.
      */
     public static LaunchSolution failure(String reason) {
-        return new LaunchSolution(false, 0, 0, 0, 0, Vector3d.ZERO, Vector3d.ZERO, 0, reason);
+        return new LaunchSolution(false, 0, 0, 0, 0, Translation3d.ZERO, Translation3d.ZERO, 0, reason);
     }
 
     public boolean isSolutionFound() {
@@ -94,14 +96,14 @@ public class LaunchSolution {
     /**
      * @return The complete launch velocity vector in world coordinates
      */
-    public Vector3d getLaunchVelocityVector() {
+    public Translation3d getLaunchVelocityVector() {
         return launchVelocityVector;
     }
 
     /**
      * @return Predicted landing position
      */
-    public Vector3d getPredictedLandingPosition() {
+    public Translation3d getPredictedLandingPosition() {
         return predictedLandingPosition;
     }
 
