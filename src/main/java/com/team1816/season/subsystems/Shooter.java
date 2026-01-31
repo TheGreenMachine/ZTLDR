@@ -6,10 +6,15 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import com.team1816.season.RobotState;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -266,5 +271,16 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         SmartDashboard.putNumber("Shooter Velocity", wantedSpeed);
 
         shooterMotorLeader.setControl(velocityControl.withVelocity(wantedSpeed));
+    }
+    private void computeStuff() {
+        var xPose = 4.6228;
+        if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+            xPose = 11.915394;
+        }
+        var transform =  RobotState.swerveDriveState.Pose.minus(new Pose2d(xPose, 3.8608, Rotation2d.kZero));
+        var distance = transform.getTranslation().getNorm();
+        var angleXY = Math.toDegrees(Math.atan2(transform.getY(),transform.getX()));
+        double wantedAngle = Math.toDegrees(Math.acos(RobotPositionValues.getBlueRatios()));
+
     }
 }

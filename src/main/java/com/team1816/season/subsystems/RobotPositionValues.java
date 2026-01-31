@@ -22,21 +22,21 @@ public class RobotPositionValues {
     }
 
     public static double getHypotonuse() {
-            var Hypotonuse = getDistance().getNorm();
-            return Hypotonuse;
+            var Hypotenuse = getDistance().getNorm();
+            return Hypotenuse;
     }
 
     public static double getBlueRatios() {
-        var Hypotonuse = getHypotonuse();
+        var Hypotenuse = getHypotonuse();
         var xDistance = getDistance().getX();
-        double BlueRatio = (xDistance / Hypotonuse);
+        double BlueRatio = (xDistance / Hypotenuse);
         return BlueRatio;
     }
 
     public static double getRedRatios() {
-        var Hypotonuse = getHypotonuse();
+        var Hypotenuse = getHypotonuse();
         var xDistance = getDistance().getX();
-        double RedRatio = (xDistance / Hypotonuse);
+        double RedRatio = (xDistance / Hypotenuse);
         return RedRatio;
     }
 }
