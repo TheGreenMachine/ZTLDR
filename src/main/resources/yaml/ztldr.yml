@@ -59,6 +59,7 @@ subsystems:
                 deviceType: TalonFX
                 # KEEP THIS ID
                 id: 16
+                followId: 15
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
                 motionMagic:
