@@ -44,7 +44,7 @@ public class LaunchSolution {
      * Creates a failed solution with a reason.
      */
     public static LaunchSolution failure(String reason) {
-        return new LaunchSolution(false, 0, 0, 0, 0, Translation3d.ZERO, Translation3d.ZERO, 0, reason);
+        return new LaunchSolution(false, 0, 0, 0, 0, Translation3d.kZero, Translation3d.kZero, 0, reason);
     }
 
     public boolean isSolutionFound() {
