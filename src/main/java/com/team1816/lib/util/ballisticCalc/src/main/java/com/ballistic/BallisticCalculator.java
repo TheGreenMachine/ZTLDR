@@ -60,13 +60,13 @@ public class BallisticCalculator {
         double desiredLandingAngle = Math.toRadians(desiredLandingAngleDegrees);
 
         // Calculate relative position to target
-        Translation3d launcherPos = launcherPose.getPosition();
-        Translation3d relativeTarget = targetPosition.subtract(launcherPos);
+        Translation3d launcherPos = launcherPose.getTranslation();
+        Translation3d relativeTarget = targetPosition.minus(launcherPos);
 
         // Horizontal distance and direction to target
         double horizontalDistance = Math.sqrt(
-            relativeTarget.x * relativeTarget.x +
-            relativeTarget.z * relativeTarget.z
+            relativeTarget.getX() * relativeTarget.getX() +
+            relativeTarget.getY() * relativeTarget.getY()
         );
 
         if (horizontalDistance < EPSILON) {
@@ -74,20 +74,20 @@ public class BallisticCalculator {
         }
 
         // Vertical displacement (positive = target is higher)
-        double verticalDisplacement = relativeTarget.y;
+        double verticalDisplacement = relativeTarget.getZ();
 
         // Calculate yaw angle to target (world frame)
-        double yawToTarget = Math.atan2(relativeTarget.z, relativeTarget.x);
+        double yawToTarget = Math.atan2(relativeTarget.getY(), relativeTarget.getX());
 
         // Project vehicle velocity onto the horizontal plane toward target
         // This is the component of vehicle velocity in the direction of the target
-        double vehicleHorizontalSpeed = vehicleVelocity.x * Math.cos(yawToTarget) +
-                                        vehicleVelocity.z * Math.sin(yawToTarget);
-        double vehicleVerticalSpeed = vehicleVelocity.y;
+        double vehicleHorizontalSpeed = vehicleVelocity.getX() * Math.cos(yawToTarget) +
+                                        vehicleVelocity.getY() * Math.sin(yawToTarget);
+        double vehicleVerticalSpeed = vehicleVelocity.getZ();
 
         // Perpendicular component of vehicle velocity (for yaw compensation)
-        double vehicleLateralSpeed = -vehicleVelocity.x * Math.sin(yawToTarget) +
-                                      vehicleVelocity.z * Math.cos(yawToTarget);
+        double vehicleLateralSpeed = -vehicleVelocity.getX() * Math.sin(yawToTarget) +
+                                      vehicleVelocity.getY() * Math.cos(yawToTarget);
 
         // Now solve for launch velocity that achieves desired landing angle
         // At landing: tan(landingAngle) = -vy_final / vh_final
@@ -274,14 +274,14 @@ public class BallisticCalculator {
         Translation3d[] trajectory = new Translation3d[numSteps];
 
         // Total initial velocity = launch velocity (relative) + vehicle velocity
-        Translation3d totalVelocity = solution.getLaunchVelocityVector().add(vehicleVelocity);
+        Translation3d totalVelocity = solution.getLaunchVelocityVector().plus(vehicleVelocity);
 
         for (int i = 0; i < numSteps; i++) {
             double t = Math.min(i * timeStep, solution.getFlightTime());
 
-            double x = launcherPosition.x + totalVelocity.x * t;
-            double y = launcherPosition.y + totalVelocity.y * t - 0.5 * GRAVITY * t * t;
-            double z = launcherPosition.z + totalVelocity.z * t;
+            double x = launcherPosition.getX() + totalVelocity.getX() * t;
+            double y = launcherPosition.getX() + totalVelocity.getX() * t - 0.5 * GRAVITY * t * t;
+            double z = launcherPosition.getY() + totalVelocity.getY() * t;
 
             trajectory[i] = new Translation3d(x, y, z);
         }
