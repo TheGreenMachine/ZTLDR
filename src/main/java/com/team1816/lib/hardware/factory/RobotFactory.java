@@ -186,7 +186,9 @@ public class RobotFactory {
                     );
                     GreenLogger.log("  detectionType: " + cameraConfig.detectionType);
                     GreenLogger.log("  simCameraProperties: " + cameraConfig.simCameraProperties);
-                    cameras.add(new Camera(
+                    GreenLogger.log("  simulateWithPhysicalCamera: " + cameraConfig.simulateWithPhysicalCamera);
+
+                    Camera camera = new Camera(
                         cameraName,
                         cameraConfig.photonVisionUIName,
                         new Transform3d(
@@ -202,8 +204,14 @@ public class RobotFactory {
                             )
                         ),
                         cameraConfig.detectionType,
-                        cameraProp
-                    ));
+                        cameraProp,
+                        cameraConfig.simulateWithPhysicalCamera
+                    );
+
+                    cameras.add(camera);
+
+                    String logPath = subsystemName + "/" + cameraName + "/";
+                    camera.setUpPeriodicLogging(logPath);
                 }
             }
         }

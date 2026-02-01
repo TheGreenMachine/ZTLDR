@@ -242,10 +242,14 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
     @Override
     public void simulationPeriodic() {
         visionSim.update(new Pose2d(0.5, 4, Rotation2d.kZero)); //TODO: make this use the raw odometry pose/"actual" sim pose
+        for (Camera camera : cameras) {
+            camera.updateCameraOnSimField(visionSim);
+        }
     }
 
     @Override
     public void periodic() {
+        //TODO: make this called from a thread that will then send the results to the drivetrain
         getVisionEstimatedPosesWithStdDevs();
     }
 }

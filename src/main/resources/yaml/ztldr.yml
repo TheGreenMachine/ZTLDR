@@ -193,3 +193,10 @@ subsystems:
                     yawDegrees: 0
                 detectionType: APRIL_TAG
                 simCameraProperties: # TODO: split this into the actual values needed for simulating the camera
+            physicalCameraUsedWithSim:
+                photonVisionUIName: HD_Pro_Webcam_C920
+                robotToCamera:
+                    zInches: 24
+                detectionType: APRIL_TAG
+                simCameraProperties: # See above camera
+                simulateWithPhysicalCamera: true

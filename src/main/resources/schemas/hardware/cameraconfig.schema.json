@@ -44,6 +44,10 @@
         "simCameraProperties": {
             "default": null,
             "type" : "string"
+        },
+        "simulateWithPhysicalCamera": {
+            "default": false,
+            "type": "boolean"
         }
     }
 }

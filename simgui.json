@@ -50,11 +50,82 @@
         }
       },
       "/SmartDashboard/VisionSystemSim-VisionSim/Sim Field": {
+        "apriltag": {
+          "image": "C:\\Users\\henry\\ZTLDR\\field_images\\apriltag.png"
+        },
         "bottom": 1638,
+        "cameras": {
+          "arrowColor": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "arrowSize": 19,
+          "arrowWeight": 3.0,
+          "color": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "style": "Hidden"
+        },
+        "exampleCamera/visionPoseEstimation": {
+          "arrowColor": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 3.0,
+          "color": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "weight": 3.0
+        },
         "height": 8.051901817321777,
         "left": 534,
+        "maybeRealCamera/visionPoseEstimation": {
+          "arrowColor": [
+            0.0,
+            0.49803921580314636,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 3.0,
+          "color": [
+            0.0,
+            0.49803921580314636,
+            1.0,
+            255.0
+          ],
+          "weight": 3.0
+        },
+        "physicalCameraUsedWithSim/visionPoseEstimation": {
+          "arrowColor": [
+            0.0,
+            0.0,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 3.0,
+          "color": [
+            0.0,
+            0.0,
+            1.0,
+            255.0
+          ],
+          "weight": 3.0
+        },
         "right": 3466,
         "top": 291,
+        "visibleTargetPoses": {
+          "image": "C:\\Users\\henry\\ZTLDR\\field_images\\visible-vision-target.png"
+        },
         "width": 17.54825210571289,
         "window": {
           "visible": true
@@ -81,6 +152,14 @@
       }
     },
     "transitory": {
+      "CameraPublisher": {
+        "UI Name-processed": {
+          "string[]##v_/CameraPublisher/UI Name-processed/streams": {
+            "open": true
+          }
+        },
+        "open": true
+      },
       "Elastic": {
         "open": true
       },
@@ -113,6 +192,15 @@
       "odometry": {
         "open": true
       },
+      "photonvision": {
+        "HD Pro Webcam C920": {
+          "open": true
+        },
+        "HD_Pro_Webcam_C920": {
+          "open": true
+        },
+        "open": true
+      },
       "turret": {
         "open": true,
         "spiny": {
@@ -133,7 +221,6 @@
         "open": true
       },
       "open": true
-    },
-    "visible": true
+    }
   }
 }
