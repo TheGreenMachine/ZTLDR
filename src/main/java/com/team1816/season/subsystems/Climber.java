@@ -12,7 +12,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     public static final String NAME = "climber";
     private final IMotor climberMotor = (IMotor)factory.getDevice(NAME, "climberMotor");
     private double curPosition;
-    private CLIMBER_STATE wantedState = CLIMBER_STATE.REST;
+    private WantedState wantedState = WantedState.REST;
     VelocityVoltage climReq = new VelocityVoltage(0);
 
     @Override
@@ -36,14 +36,14 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
         }
     }
 
-    public enum CLIMBER_STATE {
+    public enum WantedState {
         REST,
         L1,
         L2,
         L3
     }
 
-    public void setWantedState(CLIMBER_STATE state) {
+    public void setWantedState(WantedState state) {
         wantedState = state;
     }
 }

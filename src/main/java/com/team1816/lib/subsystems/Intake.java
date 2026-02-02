@@ -21,7 +21,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     private VelocityVoltage velocityControl = new VelocityVoltage(0);
     private PositionVoltage positionControl = new PositionVoltage(0);
-    private INTAKE_STATE wantedState = INTAKE_STATE.INTAKE_IDLE;
+    private WantedState wantedState = WantedState.IDLING;
 
     public double currentVoltage = 0;
     public double currentPosition = 0;
@@ -29,10 +29,10 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public double currentFlipperAngle = 67;
     private Instant descentStart;
 
-    public enum INTAKE_STATE {
-        INTAKE_IN,
-        INTAKE_OUT,
-        INTAKE_IDLE
+    public enum WantedState {
+        INTAKING,
+        OUTTAKING,
+        IDLING
     }
 
     public void periodic() {
@@ -40,8 +40,8 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         applyState();
     }
 
-    public void setWantedState(INTAKE_STATE state) {
-        if((state == INTAKE_STATE.INTAKE_IN || state == INTAKE_STATE.INTAKE_OUT) && wantedState == INTAKE_STATE.INTAKE_IDLE) {
+    public void setWantedState(WantedState state) {
+        if((state == WantedState.INTAKING || state == WantedState.OUTTAKING) && wantedState == WantedState.IDLING) {
             descentStart = Instant.now();
         }
 
@@ -70,9 +70,9 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     private void applyState() {
         double intakeSpeed = -10;
         switch (wantedState) {
-            case INTAKE_IN:
+            case INTAKING:
                 intakeSpeed = 10;
-            case INTAKE_OUT:
+            case OUTTAKING:
                 if(!canSuckOrBlow()) {
                     intakeSpeed = 0;
                 }
@@ -81,7 +81,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
                 setFlipperAngle(225);
             break;
 
-            case INTAKE_IDLE:
+            case IDLING:
             default:
                 setTurretSpeed(0);
                 setFlipperAngle(45);
