@@ -23,7 +23,8 @@ public class Superstructure extends SubsystemBase {
         TURRET_IDLE,
         INTAKE_IN,
         INTAKE_OUT,
-        INTAKE_IDLE,
+        INTAKE_UP,
+        INTAKE_DOWN,
     }
 
     public enum CurrentSuperState {
@@ -34,7 +35,8 @@ public class Superstructure extends SubsystemBase {
         TURRET_IDLE,
         INTAKE_IN,
         INTAKE_OUT,
-        INTAKE_IDLE,
+        INTAKE_UP,
+        INTAKE_DOWN,
     }
 
     protected WantedSuperState wantedSuperState = WantedSuperState.TELEOP_IDLE;
@@ -85,8 +87,11 @@ public class Superstructure extends SubsystemBase {
             case INTAKE_OUT:
                 currentSuperState = CurrentSuperState.INTAKE_OUT;
                 break;
-            case INTAKE_IDLE:
-                currentSuperState = CurrentSuperState.INTAKE_IDLE;
+            case INTAKE_UP:
+                currentSuperState = CurrentSuperState.INTAKE_UP;
+                break;
+            case INTAKE_DOWN:
+                currentSuperState = CurrentSuperState.INTAKE_DOWN;
                 break;
             case TELEOP_DRIVE:
                 currentSuperState = CurrentSuperState.TELEOP_DRIVE;
@@ -117,8 +122,12 @@ public class Superstructure extends SubsystemBase {
                 intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
                 break;
-            case INTAKE_IDLE:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IDLE);
+            case INTAKE_UP:
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+                swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
+                break;
+            case INTAKE_DOWN:
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
                 swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
                 break;
             case TURRET_IDLE:

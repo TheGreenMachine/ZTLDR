@@ -31,6 +31,8 @@ subsystems:
                 kD: 0.240234
         constants: # TODO: all of these
             intakeChannel: 7
+            outSpeed: 10
+            inSpeed: -10
     climber:
         devices:
             climberMotor:
