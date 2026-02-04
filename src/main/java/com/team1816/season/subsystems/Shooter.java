@@ -10,7 +10,6 @@ import com.team1816.season.RobotState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -44,8 +43,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final IMotor turretMotor = (IMotor) factory.getDevice(NAME, "turretMotor");
 
     private final IMotor inclineMotor = (IMotor) factory.getDevice(NAME, "inclineMotor");
-    private final IMotor shooterMotorLeader = (IMotor) factory.getDevice(NAME, "shooterMotorLeader");
-    private final IMotor shooterMotorFollower = (IMotor) factory.getDevice(NAME, "shooterMotorFollower");
+    private final IMotor shooterMotorUpper = (IMotor) factory.getDevice(NAME, "shooterMotorUpper");
+    private final IMotor shooterMotorLower = (IMotor) factory.getDevice(NAME, "shooterMotorLower");
     private final IMotor gatekeeperMotor = (IMotor) factory.getDevice(NAME, "gatekeeperMotor");
 
     private double gatekeeperSetUpSpeed = 0.7; //NUMBERS ARE TO CHANGE!!! + Unit is RPS
@@ -144,7 +143,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 //        currentTurretPosition = turretMotor.getMotorPosition();
         curretGateKeeperSpeed = gatekeeperMotor.getMotorVelocity();
         currentInclinePosition = inclineMotor.getMotorPosition();
-        currentShooterVelocity = shooterMotorLeader.getMotorVelocity();
+        currentShooterVelocity = shooterMotorUpper.getMotorVelocity();
         desiredInclineAngle = setLaunchAngle(RobotPositionValues.getHypotonuse(),1.8288, ExitVelocity,9.8);
 
         var robotPose = BaseRobotState.swerveDriveState.Pose;
@@ -270,7 +269,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public void setShooterSpeed(double wantedSpeed) {
         SmartDashboard.putNumber("Shooter Velocity", wantedSpeed);
 
-        shooterMotorLeader.setControl(velocityControl.withVelocity(wantedSpeed));
+        shooterMotorUpper.setControl(velocityControl.withVelocity(wantedSpeed));
     }
     private void computeStuff() {
         var xPose = 4.6228;

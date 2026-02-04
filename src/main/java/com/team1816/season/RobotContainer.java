@@ -1,5 +1,6 @@
 package com.team1816.season;
 
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.Singleton;
@@ -28,8 +29,6 @@ public class RobotContainer extends BaseRobotContainer {
        // Singleton.CreateSubSystem(Shooter.class);
 
         superstructure = new Superstructure(swerve);
-
-
 
         initializeAutonomous();
 

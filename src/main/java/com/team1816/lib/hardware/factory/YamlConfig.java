@@ -1,6 +1,7 @@
 package com.team1816.lib.hardware.factory;
 
 import com.team1816.lib.hardware.RobotConfiguration;
+import com.team1816.lib.util.GreenLogger;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -28,11 +29,16 @@ public class YamlConfig {
     }
 
     public static RobotConfiguration loadFrom(InputStream input) {
-        Representer representer = new Representer(new DumperOptions());
-        representer.getPropertyUtils().setSkipMissingProperties(true);
-        Yaml yaml = new Yaml(new Constructor(RobotConfiguration.class, new LoaderOptions()), representer);
-        yaml.setBeanAccess(BeanAccess.FIELD);
-        return yaml.load(input);
+        try {
+            Representer representer = new Representer(new DumperOptions());
+            representer.getPropertyUtils().setSkipMissingProperties(true);
+            Yaml yaml = new Yaml(new Constructor(RobotConfiguration.class, new LoaderOptions()), representer);
+            yaml.setBeanAccess(BeanAccess.FIELD);
+            return yaml.load(input);
+        }catch(Exception exp){
+            GreenLogger.log(exp.getMessage());
+        }
+        return new RobotConfiguration();
     }
 
     @Override

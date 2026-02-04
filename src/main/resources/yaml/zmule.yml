@@ -46,27 +46,32 @@ subsystems:
         devices:
             inclineMotor:
                 # TODO: Change numbers if necessary
-                deviceType: TalonFX
+                deviceType: TalonFXS
+                motorType: NEO550_JST
+                remoteSensor: RemoteCANcoder
+                remoteSensorId: 1
                 # KEEP THIS ID
                 id: 39
                 motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
+                statorCurrentLimit: 30
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
-            shooterMotorFollower:
+            inclineCoder:
+                id: 1
+                deviceType: CANcoder
+            shooterMotorLower:
                 # TODO: Change numbers if necessary
                 deviceType: TalonFX
                 # KEEP THIS ID
                 id: 16
-                followId: 15
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
 
-            shooterMotorLeader:
+            shooterMotorUpper:
                 # TODO: Change numbers if necessary
                 deviceType: TalonFX
                 # KEEP THIS ID
@@ -95,11 +100,6 @@ subsystems:
                 motorType: Minion_JST
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
-                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 1
-            turretCoder:
-                id: 1
-                deviceType: CANcoder
         pidConfig:
             slot0:
                 kP: 48.046920
@@ -117,6 +117,7 @@ subsystems:
             maxLevel: 96
             ledCount: 66
     drivetrain:
+        implemented: false
         devices:
             flDr:
                 id: 35
