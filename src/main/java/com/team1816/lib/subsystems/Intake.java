@@ -15,7 +15,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     static final String NAME = "intake";
 
     private static final double GEAR_RATIO = 1;
-    private static double[] intakeSpeeds = new double[] {
+    private static final double[] intakeSpeeds = new double[] {
         factory.getConstant(NAME, "outSpeed", 10, true),
         factory.getConstant(NAME, "inSpeed", -10, false),
         0, 0 // intake shouldn't spin on down and up
@@ -41,7 +41,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         INTAKE_DOWN(2),
         INTAKE_UP(3);
 
-        public int val;
+        public final int val;
         INTAKE_STATE (int val) { this.val = val; }
     }
 
@@ -88,7 +88,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
                 setTurretSpeed(intakeSpeed);
                 setFlipperAngle(225);
             }
-            case INTAKE_UP, default -> {
+            default -> {
                 setTurretSpeed(0);
                 setFlipperAngle(45);
             }
