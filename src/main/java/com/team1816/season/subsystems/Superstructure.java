@@ -230,13 +230,13 @@ public class Superstructure extends SubsystemBase {
         }
 
         if (wantedIntakeState == WantedIntakeState.INTAKING) {
-            intake.setWantedState(Intake.INTAKE_STATE.INTAKING);
+            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
         }
         else if (wantedIntakeState == WantedIntakeState.OUTTAKING) {
-            intake.setWantedState(Intake.INTAKE_STATE.OUTTAKING);
+            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
         }
         else if (wantedIntakeState == WantedIntakeState.IDLING) {
-            intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
         }
 
         if (wantedIndexerState == WantedIndexerState.INDEXING) {
