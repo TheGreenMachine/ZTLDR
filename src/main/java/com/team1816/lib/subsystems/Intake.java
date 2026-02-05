@@ -93,6 +93,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
                 setFlipperAngle(45);
             }
         }
+        SmartDashboard.putString("Intake state: ", wantedState.toString());
     }
 
     public void setFlipperAngle(double wantedAngle) {
