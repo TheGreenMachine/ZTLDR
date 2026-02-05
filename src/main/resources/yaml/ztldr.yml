@@ -31,6 +31,8 @@ subsystems:
                 kD: 0.240234
         constants: # TODO: all of these
             intakeChannel: 7
+            outSpeed: 10
+            inSpeed: -10
     climber:
         devices:
             climberMotor:
@@ -80,9 +82,10 @@ subsystems:
                 kI: 0
                 kD: 0.240234
     ledManager:
+        implemented: false
         devices:
             argb:
-                id: 12
+                id: -1
                 deviceType: CANifier
             drgb:
                 id: 10

@@ -57,5 +57,18 @@ public class RobotContainer extends BaseRobotContainer {
         operatorController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.IDLING)));
         operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.setIndexerControlState(Superstructure.IndexerControlState.OVERRIDING)));
         operatorController.povDown().onFalse(Commands.runOnce(() -> superstructure.setIndexerControlState(Superstructure.IndexerControlState.DEFAULTING)));
+
+        // controller.leftTrigger().and(controller.rightTrigger().negate()).whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_IN))
+        //     .or(controller.rightTrigger().and(controller.leftTrigger().negate()).whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_OUT)))
+        //     .or(controller.leftTrigger().and(controller.rightTrigger()).whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_UP)))
+        //     .or(controller.leftTrigger().negate().and(controller.rightTrigger().negate()).whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_UP)));
+//        controller.y().onTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.TURRET_TO_0))
+//            .onFalse(superstructure.setStateCommand(Superstructure.WantedSuperState.TURRET_IDLE));
+//        controller.a().onTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.TURRET_TO_180))
+//            .onFalse(superstructure.setStateCommand(Superstructure.WantedSuperState.TURRET_IDLE));
+        // controller.povUp().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_UP));
+        // controller.povDown().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_DOWN));
+        // controller.leftBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_OUT));
+        // controller.rightBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_IN));
     }
 }

@@ -12,16 +12,22 @@ import java.time.Instant;
 import static com.team1816.lib.Singleton.factory;
 
 public class Intake extends SubsystemBase implements ITestableSubsystem {
-    private static final double GEAR_RATIO = 1;
+    static final String NAME = "intake";
 
-    String NAME = "intake";
+    private static final double GEAR_RATIO = 1;
+    private static final double[] intakeSpeeds = new double[] {
+        factory.getConstant(NAME, "outSpeed", 10, true),
+        factory.getConstant(NAME, "inSpeed", -10, false),
+        0, 0 // intake shouldn't spin on down and up
+    };
+
 
     private final IMotor intake = (IMotor) factory.getDevice(NAME, "intakeMotor");
     private final IMotor flipper = (IMotor) factory.getDevice(NAME, "flipperMotor");
 
     private VelocityVoltage velocityControl = new VelocityVoltage(0);
     private PositionVoltage positionControl = new PositionVoltage(0);
-    private INTAKE_STATE wantedState = INTAKE_STATE.IDLING;
+    private INTAKE_STATE wantedState = INTAKE_STATE.INTAKE_UP;
 
     public double currentVoltage = 0;
     public double currentPosition = 0;
@@ -30,9 +36,13 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     private Instant descentStart;
 
     public enum INTAKE_STATE {
-        INTAKING,
-        OUTTAKING,
-        IDLING
+        INTAKE_IN(0),
+        INTAKE_OUT(1),
+        INTAKE_DOWN(2),
+        INTAKE_UP(3);
+
+        public final int val;
+        INTAKE_STATE (int val) { this.val = val; }
     }
 
     public void periodic() {
@@ -41,7 +51,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     }
 
     public void setWantedState(INTAKE_STATE state) {
-        if((state == INTAKE_STATE.INTAKING || state == INTAKE_STATE.OUTTAKING) && wantedState == INTAKE_STATE.IDLING) {
+        if((state == INTAKE_STATE.INTAKE_IN || state == INTAKE_STATE.INTAKE_OUT) && wantedState == INTAKE_STATE.INTAKE_UP) {
             descentStart = Instant.now();
         }
 
@@ -66,26 +76,22 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
             || Duration.between(currentTime, descentStart).toSeconds() <= timeOverride) ;
     }
 
-
     private void applyState() {
-        double intakeSpeed = -10;
         switch (wantedState) {
-            case INTAKING:
-                intakeSpeed = 10;
-            case OUTTAKING:
+            case INTAKE_IN, INTAKE_OUT, INTAKE_DOWN  -> {
+                double intakeSpeed = intakeSpeeds[wantedState.val];
+
                 if(!canSuckOrBlow()) {
                     intakeSpeed = 0;
                 }
 
                 setTurretSpeed(intakeSpeed);
                 setFlipperAngle(225);
-            break;
-
-            case IDLING:
-            default:
+            }
+            default -> {
                 setTurretSpeed(0);
                 setFlipperAngle(45);
-                break;
+            }
         }
         SmartDashboard.putString("Intake state: ", wantedState.toString());
     }
