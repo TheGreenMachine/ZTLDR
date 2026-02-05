@@ -18,6 +18,10 @@ public class BallisticCalculator {
     private Translation2d RobotSpeed;
     private Translation3d hubTranslation;
 
+    public BallisticSolution getBallisticSolution(Translation3d launcher, Translation3d target, double velocity) {
+        return new BallisticSolution(0, 0, 0);
+    }
+
     public void getConstants(ballisticConstants ballistic_Constants, BallisticConstraints ballisitc_Constraints) {
         this.ballistic_Constants = ballistic_Constants;
         this.ballisitc_Constraints = ballisitc_Constraints;
