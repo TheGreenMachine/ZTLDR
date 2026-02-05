@@ -19,18 +19,23 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final IMotor shooterMotor = (IMotor) factory.getDevice(NAME, "shooterMotor");
     private VoltageOut voltageControl = new VoltageOut(0);
     private PositionVoltage positionControl = new PositionVoltage(0);
-    private SHOOTER_STATE wantedState = SHOOTER_STATE.SHOOTER_IDLE;
+    private SHOOTER_STATE wantedState = SHOOTER_STATE.IDLING;
+    private GATEKEEPER_STATE gatekeeperState = GATEKEEPER_STATE.CLOSED;
 
     public double currentVoltage = 0;
     public double currentPosition = 0;
 
     public enum SHOOTER_STATE {
-        SHOOTER_TO_0,
-        SHOOTER_TO_180,
-        SHOOTER_TO_ANGLE,
-        SHOOTER_ROTATE_LEFT,
-        SHOOTER_ROTATE_RIGHT,
-        SHOOTER_IDLE
+        DISTANCE_ONE,
+        DISTANCE_TWO,
+        DISTANCE_THREE,
+        AUTOMATIC,
+        IDLING
+    }
+
+    public enum GATEKEEPER_STATE {
+        OPEN,
+        CLOSED
     }
 
     public void periodic() {
@@ -55,26 +60,24 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         switch (wantedState) {
-            case SHOOTER_TO_0:
-                setShooterAngle(0);
+            case DISTANCE_ONE:
+
                 break;
-            case SHOOTER_TO_180:
-                setShooterAngle(180);
+            case DISTANCE_TWO:
+
                 break;
-            case SHOOTER_TO_ANGLE:
-                setShooterAngle(wantedAngle);
+            case DISTANCE_THREE:
+
                 break;
-            case SHOOTER_ROTATE_LEFT:
-                setShooterSpeed(1);
+            case AUTOMATIC:
+
                 break;
-            case SHOOTER_ROTATE_RIGHT:
-                setShooterSpeed(-1);
-                break;
-            case SHOOTER_IDLE:
+            case IDLING:
             default:
-                setShooterSpeed(0);
                 break;
         }
+        SmartDashboard.putString("Shooter state: ", wantedState.toString());
+        SmartDashboard.putString("Gatekeeper state: ", gatekeeperState.toString());
     }
 
     public void setShooterSpeed(double wantedSpeed) {
@@ -89,6 +92,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double rotations = (wantedAngle / 360.0) * GEAR_RATIO;
 
         shooterMotor.setControl(positionControl.withPosition(rotations));
+    }
+
+    public void setWantedGatekeeperState(GATEKEEPER_STATE gatekeeperState) {
+        this.gatekeeperState = gatekeeperState;
     }
 
 }

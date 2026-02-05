@@ -13,6 +13,17 @@ subsystems:
                 remoteOffest: .484
                 forwardSoftLimit: .33
                 reversSoftLimit: -.33
+            flipperMotor:
+                id: 2
+                deviceType: TalonFXS
+                motorType: Brushed_DC
+                neutralMode: Brake
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 20
+                remoteSensor: PulseWidth
+                remoteOffest: .484
+                forwardSoftLimit: .33
+                reversSoftLimit: -.33
         pidConfig:
             slot0:
                 kP: 48.046920
@@ -20,6 +31,8 @@ subsystems:
                 kD: 0.240234
         constants: # TODO: all of these
             intakeChannel: 7
+            outSpeed: 10
+            inSpeed: -10
     climber:
         devices:
             climberMotor:
@@ -69,9 +82,10 @@ subsystems:
                 kI: 0
                 kD: 0.240234
     ledManager:
+        implemented: false
         devices:
             argb:
-                id: 12
+                id: -1
                 deviceType: CANifier
             drgb:
                 id: 10
