@@ -53,21 +53,22 @@ public class Superstructure extends SubsystemBase {
         IDLING
     }
 
-    private enum WantedShooterState {
-        AUTOMATIC_SHOOTING,
-        MANUAL_SHOOTING
-    }
-
-    private enum WantedSwerveState {
-        AUTOMATIC_DRIVING,
-        MANUAL_DRIVING
-    }
-
-    public enum ShooterManualDistancePreset {
+    public enum WantedShooterState {
         DISTANCE_ONE,
         DISTANCE_TWO,
         DISTANCE_THREE,
-        DISTANCE_FOUR
+        AUTOMATIC,
+        IDLE
+    }
+
+    public enum WantedGatekeeperState {
+        OPEN,
+        CLOSED
+    }
+
+    public enum WantedSwerveState {
+        AUTOMATIC_DRIVING,
+        MANUAL_DRIVING
     }
 
     public enum WantedIntakeState {
@@ -82,15 +83,20 @@ public class Superstructure extends SubsystemBase {
         IDLING
     }
 
+    public enum IndexerControlState {
+        OVERRIDING,
+        DEFAULTING
+    }
+
     protected WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
     protected ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
-    public WantedShooterState wantedShooterState = WantedShooterState.AUTOMATIC_SHOOTING;
+    public WantedShooterState wantedShooterState = WantedShooterState.AUTOMATIC;
+    public WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
     public WantedSwerveState wantedSwerveState = WantedSwerveState.AUTOMATIC_DRIVING;
-
-    public ShooterManualDistancePreset shooterManualDistancePreset = ShooterManualDistancePreset.DISTANCE_ONE;
     public WantedIntakeState wantedIntakeState = WantedIntakeState.IDLING;
     public WantedIndexerState wantedIndexerState = WantedIndexerState.IDLING;
+    public IndexerControlState indexerControlState = IndexerControlState.DEFAULTING;
 
     public ClimbSide climbSide = ClimbSide.LEFT;
     public ClimbState climbState = ClimbState.IDLING;
@@ -99,6 +105,7 @@ public class Superstructure extends SubsystemBase {
         this.swerve = swerve;
         this.shooter = Singleton.get(Shooter.class);
         this.intake = Singleton.get(Intake.class);
+        this.indexer = Singleton.get(Indexer.class);
         this.climber = Singleton.get(Climber.class);
     }
 
@@ -124,8 +131,6 @@ public class Superstructure extends SubsystemBase {
                 actualSuperState = ActualSuperState.CLIMBING;
                 break;
             case IDLE:
-                actualSuperState = ActualSuperState.IDLING;
-                break;
             default:
                 actualSuperState = ActualSuperState.IDLING;
                 break;
@@ -146,7 +151,6 @@ public class Superstructure extends SubsystemBase {
                 declimbing();
                 break;
             case IDLING:
-                break;
             default:
                 actualSuperState = ActualSuperState.DEFAULTING;
                 break;
@@ -168,27 +172,26 @@ public class Superstructure extends SubsystemBase {
     private void climbing() {
         // TODO: Add all commented functions and states
         switch (climbState) {
-            case DRIVING_TO_BAR:
-                swerve.setDriveToPoseTarget();
-                swerve.setWantedState((Swerve.ActualState.DRIVING_TO_POSE));
-                intake.setWantedState(Intake.WantedState.RETRACTING);
-                shooter.setWantedState(Indexer.WantedState.RETRACTING);
-                if (swerve.isAtPose()) {
-                    climbState = ClimbState.DRIVING_ONTO_BAR;
-                }
-                break;
-            case DRIVING_ONTO_BAR:
-                swerve.setWantedState(Swerve.ActualState.DRIVING_TO_POSE);
-                if (swerve.isAtPose() && intake.isRetracted() && shooter.isRetracted()) {
-                    climbState = ClimbState.CLIMBING;
-                }
-                break;
-            case CLIMBING:
-                // This state covers all the climbing in the superstructure, the actual climbing states should be internal in the subsystem
-                climber.setWantedState(Climber.WantedState.CLIMBING);
-                break;
+//            case DRIVING_TO_BAR:
+//                swerve.setDriveToPoseTarget();
+//                swerve.setWantedState((Swerve.ActualState.DRIVING_TO_POSE));
+//                intake.setWantedState(Intake.INTAKE_STATE.RETRACTING);
+//                shooter.setWantedState(Shooter.SHOOTER_STATE.RETRACTING);
+//                if (swerve.isAtPose()) {
+//                    climbState = ClimbState.DRIVING_ONTO_BAR;
+//                }
+//                break;
+//            case DRIVING_ONTO_BAR:
+//                swerve.setWantedState(Swerve.ActualState.DRIVING_TO_POSE);
+//                if (swerve.isAtPose() && intake.isRetracted() && shooter.isRetracted()) {
+//                    climbState = ClimbState.CLIMBING;
+//                }
+//                break;
+//            case CLIMBING:
+//                // This state covers all the climbing in the superstructure, the actual climbing states should be internal in the subsystem
+//                climber.setWantedState(Climber.CLIMBER_STATE.CLIMBING);
+//                break;
             case IDLING:
-                break;
             default:
                 climbState = ClimbState.IDLING;
                 break;
@@ -196,15 +199,27 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void defaulting() {
-        // TODO: Add all commented functions and states by asking Clark what it is supposed to do, and
-        //  check everything mentioned by the comments
-
-        // Make shooter handle deploying (raising) correctly
-        if (wantedShooterState == WantedShooterState.AUTOMATIC_SHOOTING) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC_SHOOTING);
+        if (wantedShooterState == WantedShooterState.DISTANCE_ONE) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
         }
-        else if (wantedShooterState == WantedShooterState.MANUAL_SHOOTING) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.MANUAL_SHOOTING);
+        else if (wantedShooterState == WantedShooterState.DISTANCE_TWO) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
+        }
+        else if (wantedShooterState == WantedShooterState.DISTANCE_THREE) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
+        }
+        else if (wantedShooterState == WantedShooterState.AUTOMATIC) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
+        }
+        else if (wantedShooterState == WantedShooterState.IDLE) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.IDLING);
+        }
+
+        if (wantedGatekeeperState == WantedGatekeeperState.OPEN) {
+            shooter.setWantedGatekeeperState(Shooter.GATEKEEPER_STATE.OPEN);
+        }
+        else if (wantedGatekeeperState == WantedGatekeeperState.CLOSED) {
+            shooter.setWantedGatekeeperState(Shooter.GATEKEEPER_STATE.CLOSED);
         }
 
         if (wantedSwerveState == WantedSwerveState.AUTOMATIC_DRIVING) {
@@ -214,49 +229,52 @@ public class Superstructure extends SubsystemBase {
             swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
         }
 
-        if (shooterManualDistancePreset == ShooterManualDistancePreset.DISTANCE_ONE) {
-            shooter.setManualDistancePreset(shooter.ManualDistancePreset.DISTANCE_ONE);
-        }
-        else if (shooterManualDistancePreset == ShooterManualDistancePreset.DISTANCE_TWO) {
-            shooter.setManualDistancePreset(shooter.ManualDistancePreset.DISTANCE_TWO);
-        }
-        else if (shooterManualDistancePreset == ShooterManualDistancePreset.DISTANCE_THREE) {
-            shooter.setManualDistancePreset(shooter.ManualDistancePreset.DISTANCE_THREE);
-        }
-        else if (shooterManualDistancePreset == ShooterManualDistancePreset.DISTANCE_FOUR) {
-            shooter.setManualDistancePreset(shooter.ManualDistancePreset.DISTANCE_FOUR);
-        }
-
         if (wantedIntakeState == WantedIntakeState.INTAKING) {
-            intake.setWantedState(Intake.WantedState.INTAKING);
+            intake.setWantedState(Intake.INTAKE_STATE.INTAKING);
         }
         else if (wantedIntakeState == WantedIntakeState.OUTTAKING) {
-            intake.setWantedState(Intake.WantedState.OUTTAKING);
+            intake.setWantedState(Intake.INTAKE_STATE.OUTTAKING);
         }
         else if (wantedIntakeState == WantedIntakeState.IDLING) {
-            intake.setWantedState(Intake.WantedState.IDLING);
+            intake.setWantedState(Intake.INTAKE_STATE.IDLING);
         }
 
         if (wantedIndexerState == WantedIndexerState.INDEXING) {
-            indexer.setWantedState(Indexer.WantedState.INDEXING);
+            indexer.setWantedState(Indexer.INDEXER_STATE.INDEXING);
         }
         else if (wantedIndexerState == WantedIndexerState.OUTDEXING) {
-            indexer.setWantedState(Indexer.WantedState.OUTDEXING);
+            indexer.setWantedState(Indexer.INDEXER_STATE.OUTDEXING);
         }
         else if (wantedIndexerState == WantedIndexerState.IDLING) {
-            indexer.setWantedState(Indexer.WantedState.IDLING);
+            indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+        }
+
+        if (indexerControlState == IndexerControlState.OVERRIDING) {
+            indexer.setWantedState(Indexer.INDEXER_STATE.OUTDEXING);
+        }
+        else {
+            if (wantedIntakeState == WantedIntakeState.INTAKING || wantedGatekeeperState == WantedGatekeeperState.OPEN) {
+                indexer.setWantedState(Indexer.INDEXER_STATE.INDEXING);
+            }
+            else {
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+            }
         }
 
         swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
     }
 
-    public void setShooterManualDistancePreset(ShooterManualDistancePreset shooterManualDistancePreset) {
-        this.shooterManualDistancePreset = shooterManualDistancePreset;
+    public void setWantedShooterState(WantedShooterState wantedShooterState) {
+        this.wantedShooterState = wantedShooterState;
     }
 
     // Add functionality for this in both manual and auto shooter modes
-    public void setShootingEnabled(boolean shootingEnabled) {
-        shooter.setShootingEnabled(shootingEnabled);
+    public void setWantedGatekeeperState(Superstructure.WantedGatekeeperState gatekeeperState) {
+        this.wantedGatekeeperState = gatekeeperState;
+    }
+
+    public void setIndexerControlState(IndexerControlState indexerControlState) {
+        this.indexerControlState = indexerControlState;
     }
 
     public void setWantedIntakeState(WantedIntakeState wantedIntakeState) {
@@ -268,14 +286,14 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void teleopInit() {
-        wantedShooterState = WantedShooterState.AUTOMATIC_SHOOTING;
+        wantedShooterState = WantedShooterState.AUTOMATIC;
         wantedIntakeState = WantedIntakeState.INTAKING;
         wantedIndexerState = WantedIndexerState.INDEXING;
         wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
     }
 
     public void declimbing() {
-        climber.setWantedState(Climber.WantedState.DECLIMBING);
+        climber.setWantedState(Climber.CLIMBER_STATE.DOWNCLIMBING);
         actualSuperState = ActualSuperState.DEFAULTING;
     }
 

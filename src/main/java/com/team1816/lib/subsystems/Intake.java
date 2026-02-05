@@ -21,7 +21,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     private VelocityVoltage velocityControl = new VelocityVoltage(0);
     private PositionVoltage positionControl = new PositionVoltage(0);
-    private WantedState wantedState = WantedState.IDLING;
+    private INTAKE_STATE wantedState = INTAKE_STATE.IDLING;
 
     public double currentVoltage = 0;
     public double currentPosition = 0;
@@ -29,7 +29,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public double currentFlipperAngle = 67;
     private Instant descentStart;
 
-    public enum WantedState {
+    public enum INTAKE_STATE {
         INTAKING,
         OUTTAKING,
         IDLING
@@ -40,8 +40,8 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         applyState();
     }
 
-    public void setWantedState(WantedState state) {
-        if((state == WantedState.INTAKING || state == WantedState.OUTTAKING) && wantedState == WantedState.IDLING) {
+    public void setWantedState(INTAKE_STATE state) {
+        if((state == INTAKE_STATE.INTAKING || state == INTAKE_STATE.OUTTAKING) && wantedState == INTAKE_STATE.IDLING) {
             descentStart = Instant.now();
         }
 
@@ -87,6 +87,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
                 setFlipperAngle(45);
                 break;
         }
+        SmartDashboard.putString("Intake state: ", wantedState.toString());
     }
 
     public void setFlipperAngle(double wantedAngle) {

@@ -21,7 +21,8 @@ public class BaseRobotContainer {
     public static IDrivetrain drivetrain;
 
     protected Superstructure superstructure;
-    protected CommandXboxController controller = new CommandXboxController(0);
+    protected CommandXboxController driverController = new CommandXboxController(0);
+    protected CommandXboxController operatorController = new CommandXboxController(1);
 
     public SendableChooser<Command> autoChooser;
     public static Swerve swerve;
@@ -31,7 +32,7 @@ public class BaseRobotContainer {
         Singleton.CreateSubSystem(LedManager.class);
         drivetrain = Singleton.CreateSubSystem(Drivetrain.class);
 
-        swerve = new Swerve(drivetrain, controller);
+        swerve = new Swerve(drivetrain, driverController);
     }
 
     public void initializeAutonomous() {
