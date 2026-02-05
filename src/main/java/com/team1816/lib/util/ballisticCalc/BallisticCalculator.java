@@ -1,4 +1,4 @@
-package com.team1816.lib.util.ballisticCalc.src.main.java.com.ballistic;
+package com.team1816.lib.util.ballisticCalc;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation3d;

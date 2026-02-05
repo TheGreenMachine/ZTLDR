@@ -1,9 +1,9 @@
-package com.team1816.lib.util.ballisticCalc.src.test.java.com.ballistic;
+package com.team1816.lib.ballisticCalc;
 
-import com.team1816.lib.util.ballisticCalc.src.main.java.com.ballistic.BallProperties;
-import com.team1816.lib.util.ballisticCalc.src.main.java.com.ballistic.BallisticCalculator;
-import com.team1816.lib.util.ballisticCalc.src.main.java.com.ballistic.LaunchSolution;
-import com.team1816.lib.util.ballisticCalc.src.main.java.com.ballistic.LauncherConstraints;
+import com.team1816.lib.util.ballisticCalc.BallProperties;
+import com.team1816.lib.util.ballisticCalc.BallisticCalculator;
+import com.team1816.lib.util.ballisticCalc.LaunchSolution;
+import com.team1816.lib.util.ballisticCalc.LauncherConstraints;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.geometry.Pose3d;

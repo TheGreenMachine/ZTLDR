@@ -1,4 +1,4 @@
-package com.team1816.lib.util.ballisticCalc.src.main.java.com.ballistic;
+package com.team1816.lib.util.ballisticCalc;
 
 /**
  * Exception thrown when a ballistic calculation cannot be completed.
