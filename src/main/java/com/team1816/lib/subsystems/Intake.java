@@ -15,12 +15,6 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     static final String NAME = "intake";
 
     private static final double GEAR_RATIO = 1;
-    private static final double[] intakeSpeeds = new double[] {
-        factory.getConstant(NAME, "outSpeed", 10, true),
-        factory.getConstant(NAME, "inSpeed", -10, false),
-        0, 0 // intake shouldn't spin on down and up
-    };
-
 
     private final IMotor intake = (IMotor) factory.getDevice(NAME, "intakeMotor");
     private final IMotor flipper = (IMotor) factory.getDevice(NAME, "flipperMotor");
