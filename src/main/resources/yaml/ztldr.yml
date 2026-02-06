@@ -32,7 +32,13 @@ subsystems:
         constants: # TODO: all of these
             intakeChannel: 7
             outSpeed: 10
+            outAngle: 255
+
             inSpeed: -10
+            inAngle: 255
+
+            downAngle: 225
+            upAngle: 45
     climber:
         devices:
             climberMotor:
