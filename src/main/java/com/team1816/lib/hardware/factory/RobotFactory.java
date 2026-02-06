@@ -7,6 +7,7 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
 import com.team1816.lib.hardware.*;
+import com.team1816.lib.hardware.components.GhostDevice;
 import com.team1816.lib.hardware.components.IPhoenix6;
 import com.team1816.lib.hardware.components.gyro.Pigeon2Impl;
 import com.team1816.lib.hardware.components.led.CANdleImpl;
@@ -116,15 +117,13 @@ public class RobotFactory {
         }
         var subsystem = getSubsystemConfig(subsystemName);
 
-        // if subsystem is not implemented we don't need anything from it
-        if (!subsystem.implemented) return null;
-
         // we should have devices defined verify that
         if (subsystem.devices == null) {
             throw new IllegalArgumentException("Devices not defined for " + subsystemName);
         }
         // ensure device is defined in yaml
         var deviceConfig = subsystem.devices.get(deviceName);
+
         if (deviceConfig == null) {
             throw new IllegalArgumentException("Device " + deviceName + " not found");
         }
@@ -139,6 +138,9 @@ public class RobotFactory {
     // Used to get devices by there id  Used by CTRE swerve
     public IPhoenix6 getDeviceById(String subsystemName, int id) {
         var config = factory.getSubsystemConfig(subsystemName);
+        // CTRE swerve cannot use ghosted devices they look for specific types
+        // and will die when created, so send nulls instead
+        if(!config.implemented) return null;
         for (var key : config.devices.keySet()) {
             var device = config.devices.get(key);
             if (device.id == id) {
@@ -171,6 +173,7 @@ public class RobotFactory {
             canbus = canBusMap.get(bus);
         }
 
+        if(!subsystemConfig.implemented) return new GhostDevice(deviceConfig.id, canbus);
 
         switch (deviceConfig.deviceType) {
             case TalonFX -> {

@@ -57,11 +57,6 @@ public class Singleton {
             throw new RuntimeException("Subsystem " + type.getName() + " already created you can't have more than one instance");
         }
         try {
-            // check to see if the subsystem is implemented. If it is not
-            // implemented we will return null to prevent any motors from
-            // being configured.
-            var name = (String) type.getField("NAME").get(null);
-            if(!factory.getSubsystemConfig(name).implemented) return null;
             var system = type.getDeclaredConstructor().newInstance();
             subSystems.put(type, system);
             return system;

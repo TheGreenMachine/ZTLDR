@@ -32,7 +32,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private SHOOTER_STATE wantedState = SHOOTER_STATE.AUTOMATIC;
     private GATEKEEPER_STATE gatekeeperState = GATEKEEPER_STATE.CLOSED;
 
-    private BallisticCalculator ballisticCalculator;
+    private BallisticCalculator ballisticCalculator = new BallisticCalculator();
     private double targetX;
     private Translation3d targetTranslation;
 

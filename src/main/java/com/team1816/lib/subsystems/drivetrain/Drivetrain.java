@@ -48,7 +48,6 @@ public class Drivetrain extends SwerveDrivetrain<CommonTalon, CommonTalon, Paren
         //default to filed centric
         fieldCentric = factory.getConstant(NAME, "fieldCentric", 1) == 1;
         GreenLogger.log("FieldCentric: " + fieldCentric);
-
         configureAutoBuilder();
         if (Utils.isSimulation()) {
             startSimThread();
@@ -57,7 +56,8 @@ public class Drivetrain extends SwerveDrivetrain<CommonTalon, CommonTalon, Paren
 
     @Override
     public void setSwerveState(SwerveRequest request) {
-        this.setControl(request);
+        if(config.implemented)
+            this.setControl(request);
     }
 
     @Override
