@@ -26,7 +26,7 @@ public class Superstructure extends SubsystemBase {
     public enum ActualSuperState {
         DEFAULTING,
         CLIMBING,
-        DECLIMBING,
+        DOWNCLIMBING,
         IDLING
     }
 
@@ -120,8 +120,8 @@ public class Superstructure extends SubsystemBase {
     private ActualSuperState handleStateTransitions() {
         switch (wantedSuperState) {
             case DEFAULT:
-                if (actualSuperState == ActualSuperState.CLIMBING || actualSuperState == ActualSuperState.DECLIMBING) {
-                    actualSuperState = ActualSuperState.DECLIMBING;
+                if (actualSuperState == ActualSuperState.CLIMBING || actualSuperState == ActualSuperState.DOWNCLIMBING) {
+                    actualSuperState = ActualSuperState.DOWNCLIMBING;
                 }
                 else {
                     actualSuperState = ActualSuperState.DEFAULTING;
@@ -147,8 +147,8 @@ public class Superstructure extends SubsystemBase {
             case CLIMBING:
                 climbing();
                 break;
-            case DECLIMBING:
-                declimbing();
+            case DOWNCLIMBING:
+                downclimbing();
                 break;
             case IDLING:
             default:
@@ -212,7 +212,7 @@ public class Superstructure extends SubsystemBase {
             shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
         }
         else if (wantedShooterState == WantedShooterState.IDLE) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.IDLING);
+            shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
         }
 
         if (wantedGatekeeperState == WantedGatekeeperState.OPEN) {
@@ -285,14 +285,18 @@ public class Superstructure extends SubsystemBase {
         this.wantedIndexerState = wantedIndexerState;
     }
 
-    public void teleopInit() {
-        wantedShooterState = WantedShooterState.AUTOMATIC;
-        wantedIntakeState = WantedIntakeState.INTAKING;
-        wantedIndexerState = WantedIndexerState.INDEXING;
-        wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
+    public void setWantedSwerveState(WantedSwerveState wantedSwerveState) {
+        this.wantedSwerveState = wantedSwerveState;
     }
 
-    public void declimbing() {
+    public void teleopInit() {
+        setWantedShooterState(WantedShooterState.AUTOMATIC);
+        setIndexerControlState(IndexerControlState.DEFAULTING);
+        setWantedIntakeState(WantedIntakeState.INTAKING);
+        setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING);
+    }
+
+    public void downclimbing() {
         climber.setWantedState(Climber.CLIMBER_STATE.DOWNCLIMBING);
         actualSuperState = ActualSuperState.DEFAULTING;
     }
