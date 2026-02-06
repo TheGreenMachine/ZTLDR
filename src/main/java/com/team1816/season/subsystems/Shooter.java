@@ -76,6 +76,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             default:
                 break;
         }
+        
         SmartDashboard.putString("Shooter state: ", wantedState.toString());
         SmartDashboard.putString("Gatekeeper state: ", gatekeeperState.toString());
     }

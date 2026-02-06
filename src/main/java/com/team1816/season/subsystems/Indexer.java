@@ -42,6 +42,7 @@ public class Indexer extends SubsystemBase implements ITestableSubsystem {
             default:
                 break;
         }
+
         SmartDashboard.putString("Indexer state: ", wantedState.toString());
     }
 
