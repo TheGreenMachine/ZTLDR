@@ -15,12 +15,6 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     static final String NAME = "intake";
 
     private static final double GEAR_RATIO = 1;
-    private static final double[] intakeSpeeds = new double[] {
-        factory.getConstant(NAME, "outSpeed", 10, true),
-        factory.getConstant(NAME, "inSpeed", -10, false),
-        0, 0 // intake shouldn't spin on down and up
-    };
-
 
     private final IMotor intake = (IMotor) factory.getDevice(NAME, "intakeMotor");
     private final IMotor flipper = (IMotor) factory.getDevice(NAME, "flipperMotor");
@@ -33,16 +27,38 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public double currentPosition = 0;
 
     public double currentFlipperAngle = 67;
-    private Instant descentStart;
+    private Instant descentStart = Instant.now();
 
     public enum INTAKE_STATE {
-        INTAKE_IN(0),
-        INTAKE_OUT(1),
-        INTAKE_DOWN(2),
-        INTAKE_UP(3);
+        INTAKE_IN(
+            factory.getConstant(NAME, "inSpeed", 10, true),
+            factory.getConstant(NAME, "inAngle", 10, true)
+        ),
+        INTAKE_OUT(
+            factory.getConstant(NAME, "outSpeed", -10, true),
+            factory.getConstant(NAME, "outAngle", 225, true)
+        ),
+        INTAKE_DOWN(
+            0,
+            factory.getConstant(NAME, "downAngle", 225, true)
+        ),
+        INTAKE_UP(
+            0,
+            factory.getConstant(NAME, "upAngle", 45, true)
+        );
 
-        public final int val;
-        INTAKE_STATE (int val) { this.val = val; }
+        private final double speed, angle;
+        INTAKE_STATE (double speed, double angle) {
+            this.speed = speed;
+            this.angle = angle;
+        }
+
+        public double getAngle() {
+            return angle;
+        }
+        public double getSpeed() {
+            return speed;
+        }
     }
 
     public void periodic() {
@@ -77,23 +93,11 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void applyState() {
-        switch (wantedState) {
-            case INTAKE_IN, INTAKE_OUT, INTAKE_DOWN  -> {
-                double intakeSpeed = intakeSpeeds[wantedState.val];
+        double intakeSpeed = canSuckOrBlow() ? wantedState.getSpeed() : 0;
+        double flipperAngle = wantedState.getAngle();
 
-                if(!canSuckOrBlow()) {
-                    intakeSpeed = 0;
-                }
-
-                setTurretSpeed(intakeSpeed);
-                setFlipperAngle(225);
-            }
-            default -> {
-                setTurretSpeed(0);
-                setFlipperAngle(45);
-            }
-        }
-        SmartDashboard.putString("Intake state: ", wantedState.toString());
+        setTurretSpeed(intakeSpeed);
+        setFlipperAngle(flipperAngle);
     }
 
     public void setFlipperAngle(double wantedAngle) {
