@@ -81,7 +81,8 @@ public class Robot extends TimedRobot {
                 autonomousCommand.cancel();
             }
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ENABLED);
-            robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.TELEOP_DRIVE);
+            robotContainer.teleopInit();
+            //robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
             Elastic.selectTab("Teleoperated");
         } catch (Throwable t) {
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
@@ -117,6 +118,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopExit() {
-        robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.TELEOP_IDLE);
+        robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.IDLE);
     }
 }

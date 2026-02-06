@@ -39,7 +39,7 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
     private static StringPublisher fieldTypePub;
     private static final double[] poseArray = new double[3];
 
-    private SWERVE_STATE wantedState = SWERVE_STATE.SWERVE_IDLE;
+    private ActualState wantedState = ActualState.IDLING;
 
     public Swerve(IDrivetrain drivetrain, CommandXboxController controller) {
         this.drivetrain = drivetrain;
@@ -65,9 +65,10 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
         fieldTypePub = netTable.getStringTopic("Field/.type").publish();
     }
 
-    public enum SWERVE_STATE {
-        SWERVE_DRIVE,
-        SWERVE_IDLE
+    public enum ActualState {
+        MANUAL_DRIVING,
+        AUTOMATIC_DRIVING,
+        IDLING
     }
 
     @Override
@@ -121,19 +122,23 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
 
     private void applyStates() {
         switch (wantedState) {
-            case SWERVE_DRIVE:
+            case MANUAL_DRIVING:
                 SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
                     .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
                 drivetrain.setSwerveState(GetSwerverCommand(drive));
                 break;
-            case SWERVE_IDLE:
+            case AUTOMATIC_DRIVING:
+                // TODO: something here, idk
+                break;
+            case IDLING:
+                break;
             default:
                 drivetrain.setSwerveState(new SwerveRequest.Idle());
                 break;
         }
     }
 
-    public void setWantedState(SWERVE_STATE state) {
+    public void setWantedState(ActualState state) {
         this.wantedState = state;
     }
 

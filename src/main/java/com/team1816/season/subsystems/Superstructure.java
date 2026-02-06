@@ -2,8 +2,8 @@ package com.team1816.season.subsystems;
 
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.Intake;
-import com.team1816.lib.subsystems.Turret;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -11,137 +11,148 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class Superstructure extends SubsystemBase {
     private final Swerve swerve;
-    private final Turret turret;
+    private final Shooter shooter;
     private final Intake intake;
+    private final Indexer indexer;
+    private final Climber climber;
     protected CommandXboxController controller;
 
     public enum WantedSuperState {
-        TELEOP_IDLE,
-        TELEOP_DRIVE,
-        TURRET_TO_0,
-        TURRET_TO_180,
-        TURRET_IDLE,
-        INTAKE_IN,
-        INTAKE_OUT,
-        INTAKE_UP,
-        INTAKE_DOWN,
+        DEFAULT,
+        CLIMB,
+        IDLE
     }
 
-    public enum CurrentSuperState {
-        TELEOP_IDLE,
-        TELEOP_DRIVE,
-        TURRET_TO_0,
-        TURRET_TO_180,
-        TURRET_IDLE,
-        INTAKE_IN,
-        INTAKE_OUT,
-        INTAKE_UP,
-        INTAKE_DOWN,
+    public enum ActualSuperState {
+        DEFAULTING,
+        CLIMBING,
+        DECLIMBING,
+        IDLING
     }
 
-    protected WantedSuperState wantedSuperState = WantedSuperState.TELEOP_IDLE;
-    protected CurrentSuperState currentSuperState = CurrentSuperState.TELEOP_IDLE;
-    private CurrentSuperState previousSuperState;
+    public enum ClimbSide {
+        // TODO: Get these poses from Choreo.
+        LEFT(Pose2d.kZero),
+        RIGHT(Pose2d.kZero);
+
+        private final Pose2d climbPose;
+
+        ClimbSide(Pose2d climbPose) {
+            this.climbPose = climbPose;
+        }
+
+        public Pose2d getClimbPose() {
+            return climbPose;
+        }
+    }
+
+    private enum ClimbState {
+        DRIVING_TO_BAR,
+        DRIVING_ONTO_BAR,
+        CLIMBING,
+        IDLING
+    }
+
+    public enum WantedShooterState {
+        DISTANCE_ONE,
+        DISTANCE_TWO,
+        DISTANCE_THREE,
+        AUTOMATIC,
+        IDLE
+    }
+
+    public enum WantedGatekeeperState {
+        OPEN,
+        CLOSED
+    }
+
+    public enum WantedSwerveState {
+        AUTOMATIC_DRIVING,
+        MANUAL_DRIVING
+    }
+
+    public enum WantedIntakeState {
+        INTAKING,
+        OUTTAKING,
+        IDLING
+    }
+
+    public enum WantedIndexerState {
+        INDEXING,
+        OUTDEXING,
+        IDLING
+    }
+
+    public enum IndexerControlState {
+        OVERRIDING,
+        DEFAULTING
+    }
+
+    protected WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
+    protected ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
+
+    public WantedShooterState wantedShooterState = WantedShooterState.AUTOMATIC;
+    public WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
+    public WantedSwerveState wantedSwerveState = WantedSwerveState.AUTOMATIC_DRIVING;
+    public WantedIntakeState wantedIntakeState = WantedIntakeState.IDLING;
+    public WantedIndexerState wantedIndexerState = WantedIndexerState.IDLING;
+    public IndexerControlState indexerControlState = IndexerControlState.DEFAULTING;
+
+    public ClimbSide climbSide = ClimbSide.LEFT;
+    public ClimbState climbState = ClimbState.IDLING;
 
     public Superstructure(Swerve swerve) {
         this.swerve = swerve;
-        this.turret = Singleton.get(Turret.class);
+        this.shooter = Singleton.get(Shooter.class);
         this.intake = Singleton.get(Intake.class);
+        this.indexer = Singleton.get(Indexer.class);
+        this.climber = Singleton.get(Climber.class);
     }
 
     @Override
     public void periodic() {
-//        boolean l = controller.leftBumper().getAsBoolean();
-//        boolean r = controller.rightBumper().getAsBoolean();
-//
-//        if ((l && r) || (!l && !r)){
-//            setWantedSuperState(WantedSuperState.TURRET_IDLE);
-//        } else if (l) {
-//            setWantedSuperState(WantedSuperState.TURRET_ROTATE_LEFT);
-//        } else {
-//            setWantedSuperState(WantedSuperState.TURRET_ROTATE_RIGHT);
-//        }
 
-        previousSuperState = currentSuperState;
-
-        currentSuperState = handleStateTransitions();
+        actualSuperState = handleStateTransitions();
 
         applyStates();
     }
 
-    private CurrentSuperState handleStateTransitions() {
-        previousSuperState = currentSuperState;
+    private ActualSuperState handleStateTransitions() {
         switch (wantedSuperState) {
-            case TURRET_TO_0:
-                currentSuperState = CurrentSuperState.TURRET_TO_0;
+            case DEFAULT:
+                if (actualSuperState == ActualSuperState.CLIMBING || actualSuperState == ActualSuperState.DECLIMBING) {
+                    actualSuperState = ActualSuperState.DECLIMBING;
+                }
+                else {
+                    actualSuperState = ActualSuperState.DEFAULTING;
+                }
                 break;
-            case TURRET_TO_180:
-                currentSuperState = CurrentSuperState.TURRET_TO_180;
+            case CLIMB:
+                actualSuperState = ActualSuperState.CLIMBING;
                 break;
-            case TURRET_IDLE:
-                currentSuperState = CurrentSuperState.TURRET_IDLE;
-                break;
-            case INTAKE_IN:
-                currentSuperState = CurrentSuperState.INTAKE_IN;
-                break;
-            case INTAKE_OUT:
-                currentSuperState = CurrentSuperState.INTAKE_OUT;
-                break;
-            case INTAKE_UP:
-                currentSuperState = CurrentSuperState.INTAKE_UP;
-                break;
-            case INTAKE_DOWN:
-                currentSuperState = CurrentSuperState.INTAKE_DOWN;
-                break;
-            case TELEOP_DRIVE:
-                currentSuperState = CurrentSuperState.TELEOP_DRIVE;
-                break;
+            case IDLE:
             default:
-                currentSuperState = CurrentSuperState.TELEOP_IDLE;
+                actualSuperState = ActualSuperState.IDLING;
                 break;
         }
 
-        return currentSuperState;
+        return actualSuperState;
     }
 
     protected void applyStates() {
-        switch (currentSuperState) {
-            case TURRET_TO_0:
-                turret.setWantedState(Turret.TURRET_STATE.TURRET_TO_0);
-                swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
+        switch (actualSuperState) {
+            case DEFAULTING:
+                defaulting();
                 break;
-            case TURRET_TO_180:
-                turret.setWantedState(Turret.TURRET_STATE.TURRET_TO_180);
-                swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
+            case CLIMBING:
+                climbing();
                 break;
-            case INTAKE_IN:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
-                swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
+            case DECLIMBING:
+                declimbing();
                 break;
-            case INTAKE_OUT:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
-                swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
-                break;
-            case INTAKE_UP:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
-                swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
-                break;
-            case INTAKE_DOWN:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
-                swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
-                break;
-            case TURRET_IDLE:
-                turret.setWantedState(Turret.TURRET_STATE.TURRET_IDLE);
-                swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
-                break;
-            case TELEOP_DRIVE:
-                turret.setWantedState(Turret.TURRET_STATE.TURRET_IDLE);
-                swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_DRIVE);
-                break;
-            case TELEOP_IDLE:
+            case IDLING:
             default:
-                turret.setWantedState(Turret.TURRET_STATE.TURRET_IDLE);
-                swerve.setWantedState(Swerve.SWERVE_STATE.SWERVE_IDLE);
+                actualSuperState = ActualSuperState.DEFAULTING;
                 break;
         }
     }
@@ -151,9 +162,139 @@ public class Superstructure extends SubsystemBase {
     }
 
     public Command setStateCommand(WantedSuperState superState) {
-        Command commandToReturn = new InstantCommand(() -> setWantedSuperState(superState));
+        return new InstantCommand(() -> setWantedSuperState(superState));
+    }
 
-        return commandToReturn;
+    public void setClimbSide(ClimbSide climbSide) {
+        this.climbSide = climbSide;
+    }
+
+    private void climbing() {
+        // TODO: Add all commented functions and states
+        switch (climbState) {
+//            case DRIVING_TO_BAR:
+//                swerve.setDriveToPoseTarget();
+//                swerve.setWantedState((Swerve.ActualState.DRIVING_TO_POSE));
+//                intake.setWantedState(Intake.INTAKE_STATE.RETRACTING);
+//                shooter.setWantedState(Shooter.SHOOTER_STATE.RETRACTING);
+//                if (swerve.isAtPose()) {
+//                    climbState = ClimbState.DRIVING_ONTO_BAR;
+//                }
+//                break;
+//            case DRIVING_ONTO_BAR:
+//                swerve.setWantedState(Swerve.ActualState.DRIVING_TO_POSE);
+//                if (swerve.isAtPose() && intake.isRetracted() && shooter.isRetracted()) {
+//                    climbState = ClimbState.CLIMBING;
+//                }
+//                break;
+//            case CLIMBING:
+//                // This state covers all the climbing in the superstructure, the actual climbing states should be internal in the subsystem
+//                climber.setWantedState(Climber.CLIMBER_STATE.CLIMBING);
+//                break;
+            case IDLING:
+            default:
+                climbState = ClimbState.IDLING;
+                break;
+        }
+    }
+
+    private void defaulting() {
+        if (wantedShooterState == WantedShooterState.DISTANCE_ONE) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
+        }
+        else if (wantedShooterState == WantedShooterState.DISTANCE_TWO) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
+        }
+        else if (wantedShooterState == WantedShooterState.DISTANCE_THREE) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
+        }
+        else if (wantedShooterState == WantedShooterState.AUTOMATIC) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
+        }
+        else if (wantedShooterState == WantedShooterState.IDLE) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.IDLING);
+        }
+
+        if (wantedGatekeeperState == WantedGatekeeperState.OPEN) {
+            shooter.setWantedGatekeeperState(Shooter.GATEKEEPER_STATE.OPEN);
+        }
+        else if (wantedGatekeeperState == WantedGatekeeperState.CLOSED) {
+            shooter.setWantedGatekeeperState(Shooter.GATEKEEPER_STATE.CLOSED);
+        }
+
+        if (wantedSwerveState == WantedSwerveState.AUTOMATIC_DRIVING) {
+            swerve.setWantedState(Swerve.ActualState.AUTOMATIC_DRIVING);
+        }
+        else if (wantedSwerveState == WantedSwerveState.MANUAL_DRIVING) {
+            swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
+        }
+
+        if (wantedIntakeState == WantedIntakeState.INTAKING) {
+            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
+        }
+        else if (wantedIntakeState == WantedIntakeState.OUTTAKING) {
+            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
+        }
+        else if (wantedIntakeState == WantedIntakeState.IDLING) {
+            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+        }
+
+        if (wantedIndexerState == WantedIndexerState.INDEXING) {
+            indexer.setWantedState(Indexer.INDEXER_STATE.INDEXING);
+        }
+        else if (wantedIndexerState == WantedIndexerState.OUTDEXING) {
+            indexer.setWantedState(Indexer.INDEXER_STATE.OUTDEXING);
+        }
+        else if (wantedIndexerState == WantedIndexerState.IDLING) {
+            indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+        }
+
+        if (indexerControlState == IndexerControlState.OVERRIDING) {
+            indexer.setWantedState(Indexer.INDEXER_STATE.OUTDEXING);
+        }
+        else {
+            if (wantedIntakeState == WantedIntakeState.INTAKING || wantedGatekeeperState == WantedGatekeeperState.OPEN) {
+                indexer.setWantedState(Indexer.INDEXER_STATE.INDEXING);
+            }
+            else {
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+            }
+        }
+
+        swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
+    }
+
+    public void setWantedShooterState(WantedShooterState wantedShooterState) {
+        this.wantedShooterState = wantedShooterState;
+    }
+
+    // Add functionality for this in both manual and auto shooter modes
+    public void setWantedGatekeeperState(Superstructure.WantedGatekeeperState gatekeeperState) {
+        this.wantedGatekeeperState = gatekeeperState;
+    }
+
+    public void setIndexerControlState(IndexerControlState indexerControlState) {
+        this.indexerControlState = indexerControlState;
+    }
+
+    public void setWantedIntakeState(WantedIntakeState wantedIntakeState) {
+        this.wantedIntakeState = wantedIntakeState;
+    }
+
+    public void setWantedIndexerState(WantedIndexerState wantedIndexerState) {
+        this.wantedIndexerState = wantedIndexerState;
+    }
+
+    public void teleopInit() {
+        wantedShooterState = WantedShooterState.AUTOMATIC;
+        wantedIntakeState = WantedIntakeState.INTAKING;
+        wantedIndexerState = WantedIndexerState.INDEXING;
+        wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
+    }
+
+    public void declimbing() {
+        climber.setWantedState(Climber.CLIMBER_STATE.DOWNCLIMBING);
+        actualSuperState = ActualSuperState.DEFAULTING;
     }
 
 }
