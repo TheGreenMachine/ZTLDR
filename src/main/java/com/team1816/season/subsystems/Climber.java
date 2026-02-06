@@ -39,6 +39,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
             default:
                 break;
         }
+
         SmartDashboard.putString("Climber state: ", wantedState.toString());
     }
 

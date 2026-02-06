@@ -94,7 +94,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void applyState() {
-
         double launchAngle = wantedState.getLaunchAngle();
         double rotationAngle = wantedState.getRotationAngle();
         double launchVelocity = wantedState.getLaunchVelocity();
@@ -122,6 +121,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         SmartDashboard.putString("Shooter state: ", wantedState.toString());
         SmartDashboard.putString("Gatekeeper state: ", gatekeeperState.toString());
+
+        SmartDashboard.putNumber("Launch Angle: ", launchAngle);
+        SmartDashboard.putNumber("Rotation Angle: ", rotationAngle);
+        SmartDashboard.putNumber("Launch Velocity: ", launchVelocity);
     }
 
     private void setShooterVelocity(double wantedVelocity) {

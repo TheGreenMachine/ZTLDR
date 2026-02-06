@@ -98,6 +98,10 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
         setTurretSpeed(intakeSpeed);
         setFlipperAngle(flipperAngle);
+
+        SmartDashboard.putString("Intake state: ", wantedState.toString());
+        SmartDashboard.putNumber("Intake speed: ", intakeSpeed);
+        SmartDashboard.putNumber("Flipper angle: ", flipperAngle);
     }
 
     public void setFlipperAngle(double wantedAngle) {
