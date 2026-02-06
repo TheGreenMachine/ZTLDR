@@ -74,7 +74,8 @@ public class Superstructure extends SubsystemBase {
     public enum WantedIntakeState {
         INTAKING,
         OUTTAKING,
-        IDLING
+        DOWN,
+        UP,
     }
 
     public enum WantedIndexerState {
@@ -94,7 +95,7 @@ public class Superstructure extends SubsystemBase {
     public WantedShooterState wantedShooterState = WantedShooterState.AUTOMATIC;
     public WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
     public WantedSwerveState wantedSwerveState = WantedSwerveState.AUTOMATIC_DRIVING;
-    public WantedIntakeState wantedIntakeState = WantedIntakeState.IDLING;
+    public WantedIntakeState wantedIntakeState = WantedIntakeState.UP;
     public WantedIndexerState wantedIndexerState = WantedIndexerState.IDLING;
     public IndexerControlState indexerControlState = IndexerControlState.DEFAULTING;
 
@@ -235,7 +236,10 @@ public class Superstructure extends SubsystemBase {
         else if (wantedIntakeState == WantedIntakeState.OUTTAKING) {
             intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
         }
-        else if (wantedIntakeState == WantedIntakeState.IDLING) {
+        else if (wantedIntakeState == WantedIntakeState.DOWN) {
+            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
+        }
+        else if (wantedIntakeState == WantedIntakeState.UP) {
             intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
         }
 
@@ -269,7 +273,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     // Add functionality for this in both manual and auto shooter modes
-    public void setWantedGatekeeperState(Superstructure.WantedGatekeeperState gatekeeperState) {
+    public void setWantedGatekeeperState(WantedGatekeeperState gatekeeperState) {
         this.wantedGatekeeperState = gatekeeperState;
     }
 
@@ -278,6 +282,13 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void setWantedIntakeState(WantedIntakeState wantedIntakeState) {
+        if(wantedIntakeState == this.wantedIntakeState) {
+            wantedIntakeState = switch (wantedIntakeState) {
+                case INTAKING, OUTTAKING, DOWN -> WantedIntakeState.DOWN;
+                case UP -> WantedIntakeState.UP;
+            };
+        }
+
         this.wantedIntakeState = wantedIntakeState;
     }
 

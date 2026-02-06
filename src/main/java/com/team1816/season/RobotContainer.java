@@ -51,10 +51,12 @@ public class RobotContainer extends BaseRobotContainer {
         driverController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedShooterState(Superstructure.WantedShooterState.DISTANCE_THREE)));
         driverController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC)));
 
+        driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.INTAKING)));
+        driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.OUTTAKING)));
+        driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.UP)));
+        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.DOWN)));
 
-        operatorController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.INTAKING)));
-        operatorController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.OUTTAKING)));
-        operatorController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.IDLING)));
+        //operatorController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.UP)));
         operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.setIndexerControlState(Superstructure.IndexerControlState.OVERRIDING)));
         operatorController.povDown().onFalse(Commands.runOnce(() -> superstructure.setIndexerControlState(Superstructure.IndexerControlState.DEFAULTING)));
 
