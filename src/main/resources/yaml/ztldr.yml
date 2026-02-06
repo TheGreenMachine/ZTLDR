@@ -93,6 +93,8 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+    gatekeeper:
+        devices:
             gatekeeperTopMotor:
                 deviceType: TalonFX
                 id: 21
