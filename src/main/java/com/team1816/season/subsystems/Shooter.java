@@ -21,16 +21,14 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private double wantedAngle = 0.0;
 
-    private final IMotor topLaunchMotor = (IMotor) factory.getDevice(NAME, "shooterMotor");
-    private final IMotor bottomLaunchMotor = (IMotor) factory.getDevice(NAME, "shooterMotor");
-    private final IMotor launchAngleMotor = (IMotor) factory.getDevice(NAME, "shooterMotor");
-    private final IMotor rotationAngleMotor = (IMotor) factory.getDevice(NAME, "shooterMotor");
-    private final IMotor gatekeeperMotor = (IMotor) factory.getDevice(NAME, "shooterMotor");
+    private final IMotor topLaunchMotor = (IMotor) factory.getDevice(NAME, "topLaunchMotor");
+    private final IMotor bottomLaunchMotor = (IMotor) factory.getDevice(NAME, "bottomLaunchMotor");
+    private final IMotor launchAngleMotor = (IMotor) factory.getDevice(NAME, "launchAngleMotor");
+    private final IMotor rotationAngleMotor = (IMotor) factory.getDevice(NAME, "rotationAngleMotor");
 
     private VoltageOut voltageControl = new VoltageOut(0);
     private PositionVoltage positionControl = new PositionVoltage(0);
     private SHOOTER_STATE wantedState = SHOOTER_STATE.AUTOMATIC;
-    private GATEKEEPER_STATE gatekeeperState = GATEKEEPER_STATE.CLOSED;
 
     private BallisticCalculator ballisticCalculator = new BallisticCalculator();
     private double targetX;
@@ -66,11 +64,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double getLaunchVelocity() {
             return launchVelocity;
         }
-    }
-
-    public enum GATEKEEPER_STATE {
-        OPEN,
-        CLOSED
     }
 
     public void periodic() {
@@ -120,7 +113,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         setShooterVelocity(launchVelocity);
 
         SmartDashboard.putString("Shooter state: ", wantedState.toString());
-        SmartDashboard.putString("Gatekeeper state: ", gatekeeperState.toString());
 
         SmartDashboard.putNumber("Launch Angle: ", launchAngle);
         SmartDashboard.putNumber("Rotation Angle: ", rotationAngle);
@@ -139,17 +131,13 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private void setShooterLaunchAngle(double wantedAngle) {
         double rotations = (wantedAngle / 360.0) * GEAR_RATIO;
 
-        rotationAngleMotor.setControl(positionControl.withPosition(rotations));
+        launchAngleMotor.setControl(positionControl.withPosition(rotations));
     }
 
     private void setShooterRotationAngle(double wantedAngle) {
         double rotations = (wantedAngle / 360.0) * GEAR_RATIO;
 
         rotationAngleMotor.setControl(positionControl.withPosition(rotations));
-    }
-
-    public void setWantedGatekeeperState(GATEKEEPER_STATE gatekeeperState) {
-        this.gatekeeperState = gatekeeperState;
     }
 
 }

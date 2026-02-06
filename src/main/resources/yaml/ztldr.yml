@@ -14,7 +14,7 @@ subsystems:
                 forwardSoftLimit: .33
                 reversSoftLimit: -.33
             flipperMotor:
-                id: 2
+                id: 3
                 deviceType: TalonFXS
                 motorType: Brushed_DC
                 neutralMode: Brake
@@ -61,9 +61,49 @@ subsystems:
                     expoKA: 0.04
     shooter:
         devices:
-            shooterMotor:
+            topLaunchMotor:
                 deviceType: TalonFX
-                id: 16
+                id: 17
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+            bottomLaunchMotor:
+                deviceType: TalonFX
+                id: 18
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+            launchAngleMotor:
+                deviceType: TalonFX
+                id: 19
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+            rotationAngleMotor:
+                deviceType: TalonFX
+                id: 20
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+            gatekeeperTopMotor:
+                deviceType: TalonFX
+                id: 21
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+            gatekeeperBottomMotor:
+                deviceType: TalonFX
+                id: 22
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
                 motionMagic:
