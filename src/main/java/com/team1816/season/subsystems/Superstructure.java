@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class Superstructure extends SubsystemBase {
     private final Swerve swerve;
     private final Shooter shooter;
+    private final Gatekeeper gatekeeper;
     private final Intake intake;
     private final Indexer indexer;
     private final Climber climber;
@@ -105,6 +106,7 @@ public class Superstructure extends SubsystemBase {
     public Superstructure(Swerve swerve) {
         this.swerve = swerve;
         this.shooter = Singleton.get(Shooter.class);
+        this.gatekeeper = Singleton.get(Gatekeeper.class);
         this.intake = Singleton.get(Intake.class);
         this.indexer = Singleton.get(Indexer.class);
         this.climber = Singleton.get(Climber.class);
@@ -217,10 +219,10 @@ public class Superstructure extends SubsystemBase {
         }
 
         if (wantedGatekeeperState == WantedGatekeeperState.OPEN) {
-            shooter.setWantedGatekeeperState(Shooter.GATEKEEPER_STATE.OPEN);
+            gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.OPEN);
         }
         else if (wantedGatekeeperState == WantedGatekeeperState.CLOSED) {
-            shooter.setWantedGatekeeperState(Shooter.GATEKEEPER_STATE.CLOSED);
+            gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
         }
 
         if (wantedSwerveState == WantedSwerveState.AUTOMATIC_DRIVING) {
@@ -302,6 +304,7 @@ public class Superstructure extends SubsystemBase {
 
     public void teleopInit() {
         setWantedShooterState(WantedShooterState.AUTOMATIC);
+        setWantedGatekeeperState(WantedGatekeeperState.CLOSED);
         setIndexerControlState(IndexerControlState.DEFAULTING);
         setWantedIntakeState(WantedIntakeState.INTAKING);
         setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING);
