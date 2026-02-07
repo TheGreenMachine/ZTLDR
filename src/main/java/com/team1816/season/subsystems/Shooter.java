@@ -9,7 +9,15 @@ import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.team1816.lib.Singleton.factory;
@@ -32,11 +40,22 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     //AUTO AIM
     private BallisticCalculator ballisticCalculator = new BallisticCalculator();
     private AUTO_AIM_TARGETS currentTarget = AUTO_AIM_TARGETS.BLUE_HUB;
-    private static final Translation3d SHOOTER_OFFSET = new Translation3d(0, 0, 22); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+    Translation3d launcherTranslation = new Translation3d(0,0,0).plus(SHOOTER_OFFSET);
 
     //CONSTANTS
     private static final double MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE = 3.5/1; //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
     private static final double MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE = 3.5/1; //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+    private static final Translation3d SHOOTER_OFFSET = new Translation3d(0, 0, 22); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+
+    //MECHANISMS
+    private final NetworkTable networkTable;
+    private DoubleArrayPublisher turretFieldPose;
+    private final double[] poseArray = new double[3];
+
+    public Mechanism2d launchMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
+    public MechanismRoot2d launchMechRoot = launchMech.getRoot("Launch Root", 1.5, 0);
+    public MechanismLigament2d launchAngleML = launchMechRoot.append(
+        new MechanismLigament2d("Launch Angle", 1, 0));
 
     public enum AUTO_AIM_TARGETS{
         BLUE_HUB(new Translation3d(4.6228, 3.8608, 40)),
@@ -54,8 +73,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     public enum SHOOTER_STATE {
-        DISTANCE_ONE(45, 0, 10),
-        DISTANCE_TWO(45, 0, 20),
+        DISTANCE_ONE(45, 45, 10),
+        DISTANCE_TWO(45, 90, 20),
         DISTANCE_THREE(45, 0, 30),
         AUTOMATIC(-1, -1, -1),
         IDLE(0, 0, 0);
@@ -82,6 +101,13 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         }
     }
 
+    public Shooter(){
+        super();
+        networkTable = NetworkTableInstance.getDefault().getTable("");
+        turretFieldPose = networkTable.getDoubleArrayTopic("Field/Turret").publish();
+        SmartDashboard.putData("Shooter Incline", launchMech);
+    }
+
     public void periodic() {
         readFromHardware();
         applyState();
@@ -89,6 +115,15 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     @Override
     public void readFromHardware() {
+        launcherTranslation = new Translation3d(BaseRobotState.swerveDriveState.Pose.getX(), BaseRobotState.swerveDriveState.Pose.getY(), 0).plus(SHOOTER_OFFSET);
+
+        var robotPose = BaseRobotState.swerveDriveState.Pose;
+        poseArray[0] = robotPose.getX();
+        poseArray[1] = robotPose.getY();
+        poseArray[2] = rotationAngleMotor.getMotorPosition() / MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE;
+        turretFieldPose.set(poseArray);
+
+        launchAngleML.setAngle(launchAngleMotor.getMotorPosition() / MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE);
     }
 
     private void applyState() {
@@ -97,7 +132,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double launchVelocity = wantedState.getLaunchVelocity();
 
         if (wantedState == SHOOTER_STATE.AUTOMATIC) {
-            Translation3d launcherTranslation = new Translation3d(BaseRobotState.swerveDriveState.Pose.getX(), BaseRobotState.swerveDriveState.Pose.getY(), 0).plus(SHOOTER_OFFSET);
             // TODO: figure out hub z value
             BallisticSolution ballisticSolution = ballisticCalculator.getBallisticSolution(launcherTranslation, currentTarget.getPosition(), 10);
             launchAngle = ballisticSolution.getLaunchAngle();
@@ -117,7 +151,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     public void setWantedState(SHOOTER_STATE state) {
-        System.out.println("Setting Shooter to: "+state);
         this.wantedState = state;
     }
 
@@ -137,7 +170,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         double output = MathUtil.clamp(rotations, 0, 1000); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
 
-        launchAngleMotor.setControl(positionControl.withPosition(rotations));
+        launchAngleMotor.setControl(positionControl.withPosition(output));
     }
 
     private void setRotationAngle(double wantedAngleDegrees) {
@@ -145,7 +178,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         double output = MathUtil.clamp(rotations, -100, 100); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
 
-        rotationAngleMotor.setControl(positionControl.withPosition(rotations));
+        rotationAngleMotor.setControl(positionControl.withPosition(output));
     }
 
 }
