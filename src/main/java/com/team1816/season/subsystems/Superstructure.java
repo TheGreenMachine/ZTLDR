@@ -26,8 +26,6 @@ public class Superstructure extends SubsystemBase {
 
     public enum ActualSuperState {
         DEFAULTING,
-        CLIMBING,
-        DOWNCLIMBING,
         IDLING
     }
 
@@ -123,15 +121,7 @@ public class Superstructure extends SubsystemBase {
     private ActualSuperState handleStateTransitions() {
         switch (wantedSuperState) {
             case DEFAULT:
-                if (actualSuperState == ActualSuperState.CLIMBING || actualSuperState == ActualSuperState.DOWNCLIMBING) {
-                    actualSuperState = ActualSuperState.DOWNCLIMBING;
-                }
-                else {
-                    actualSuperState = ActualSuperState.DEFAULTING;
-                }
-                break;
-            case CLIMB:
-                actualSuperState = ActualSuperState.CLIMBING;
+                actualSuperState = ActualSuperState.DEFAULTING;
                 break;
             case IDLE:
             default:
@@ -146,12 +136,6 @@ public class Superstructure extends SubsystemBase {
         switch (actualSuperState) {
             case DEFAULTING:
                 defaulting();
-                break;
-            case CLIMBING:
-                climbing();
-                break;
-            case DOWNCLIMBING:
-                downclimbing();
                 break;
             case IDLING:
             default:
@@ -309,10 +293,4 @@ public class Superstructure extends SubsystemBase {
         setWantedIntakeState(WantedIntakeState.INTAKING);
         setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING);
     }
-
-    public void downclimbing() {
-        climber.setWantedState(Climber.CLIMBER_STATE.DOWNCLIMBING);
-        actualSuperState = ActualSuperState.DEFAULTING;
-    }
-
 }

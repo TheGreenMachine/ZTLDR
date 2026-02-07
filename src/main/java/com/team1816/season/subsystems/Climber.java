@@ -16,7 +16,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     public static final String NAME = "climber";
     private boolean wantedStateChanged;
 
-    private CLIMBER_WANTED_STATE wantedState = CLIMBER_WANTED_STATE.STOW;
+    private CLIMBER_STATE wantedState = CLIMBER_STATE.STOW;
 
     public final Mechanism2d climberMech = new Mechanism2d(6, 6.5);
     public final MechanismRoot2d climberMechRoot = climberMech.getRoot("root", 1, 1.5);
@@ -70,11 +70,27 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         switch (wantedState) {
-            case STOW -> coordinateControlRequest(climbPositionStow, stowerPositionStow);
-            case READY -> coordinateControlRequest(climbPositionReady, stowerPositionUnstow);
-            case L1 -> coordinateControlRequest(climbPositionL1, stowerPositionUnstow);
-            case L2 -> coordinateControlRequest(climbPositionL2, stowerPositionUnstow);
-            case L3 -> coordinateControlRequest(climbPositionL3, stowerPositionUnstow);
+            case STOW -> {
+                climbMotor.setControl(climbReq.withPosition(climbPositionStow));
+                stowerMotor.setControl(stowerReq.withPosition(stowerPositionStow));
+            }
+
+            case READY -> {
+                climbMotor.setControl(climbReq.withPosition(climbPositionReady));
+                stowerMotor.setControl(stowerReq.withPosition(stowerPositionUnstow));
+            }
+            case L1 -> {
+                climbMotor.setControl(climbReq.withPosition(climbPositionL1));
+                stowerMotor.setControl(stowerReq.withPosition(stowerPositionUnstow));
+            }
+            case L2 -> {
+                climbMotor.setControl(climbReq.withPosition(climbPositionL2));
+                stowerMotor.setControl(stowerReq.withPosition(stowerPositionUnstow));
+            }
+            case L3 -> {
+                climbMotor.setControl(climbReq.withPosition(climbPositionL3));
+                stowerMotor.setControl(stowerReq.withPosition(stowerPositionUnstow));
+            }
         }
     }
 
@@ -118,7 +134,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
         SmartDashboard.putString("Climber state: ", wantedState.toString());
     }
 
-    public enum CLIMBER_WANTED_STATE {
+    public enum CLIMBER_STATE {
         STOW,
         READY,
         L1,
@@ -126,15 +142,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
         L3
     }
 
-    public enum CLIMBER_SYSTEM_STATE {
-        STOW,
-        READY,
-        L1,
-        L2,
-        L3
-    }
-
-    public void setWantedState(CLIMBER_WANTED_STATE wantedState) {
+    public void setWantedState(CLIMBER_STATE wantedState) {
         wantedStateChanged = true;
         this.wantedState = wantedState;
     }
