@@ -78,6 +78,12 @@
         "motionMagic" :  {
             "default": null,
             "$ref": "motionmagicconfig.schema.json"
+        },
+        "pidConfig": {
+            "default": null,
+            "type": "object",
+            "existingJavaType": "java.util.Map<String, PIDSlotConfiguration>",
+            "additionalProperties": false
         }
     }
 }

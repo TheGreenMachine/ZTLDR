@@ -70,6 +70,9 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+                pidConfig:
+                    slot0:
+                        kV: 0.135
 
             shooterMotorUpper:
                 # TODO: Change numbers if necessary
@@ -81,6 +84,9 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+                pidConfig:
+                    slot0:
+                        kV: 0.135
 
             gatekeeperMotor:
                 # TODO: Change numbers if necessary
@@ -92,6 +98,9 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+                pidConfig:
+                    slot0:
+                        kV: 0.1
 
             turretMotor:
                 # TODO: Change numbers if necessary

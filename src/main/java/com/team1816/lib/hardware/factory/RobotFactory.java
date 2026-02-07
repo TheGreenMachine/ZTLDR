@@ -238,19 +238,19 @@ public class RobotFactory {
         }
         if (parentConfig != null) {
             // Update defaults with yaml values
-            ApplyYamlConfigs(subsystemConfig, deviceConfig, parentConfig);
+            ApplyYamlConfigs(deviceConfig, parentConfig);
         }
         return parentConfig;
     }
 
-    private void ApplyYamlConfigs(SubsystemConfig subsystemConfig, DeviceConfiguration deviceConfig, ParentConfiguration parentConfig) {
+    private void ApplyYamlConfigs(DeviceConfiguration deviceConfig, ParentConfiguration parentConfig) {
         switch (deviceConfig.deviceType) {
             case TalonFX -> {
                 var clazz = (TalonFXConfiguration) parentConfig;
                 clazz.MotorOutput = GetMotorOutputConfigs(deviceConfig);
-                clazz.Slot0 = Slot0Configs.from(GetSlotConfigs(subsystemConfig.pidConfig, 0));
-                clazz.Slot1 = Slot1Configs.from(GetSlotConfigs(subsystemConfig.pidConfig, 1));
-                clazz.Slot2 = Slot2Configs.from(GetSlotConfigs(subsystemConfig.pidConfig, 2));
+                clazz.Slot0 = Slot0Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 0));
+                clazz.Slot1 = Slot1Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 1));
+                clazz.Slot2 = Slot2Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 2));
                 clazz.CurrentLimits = GetCurrentConfigs(deviceConfig);
                 clazz.SoftwareLimitSwitch = GetSoftLimitConfigs(deviceConfig);
                 clazz.Feedback = GetFeedbackConfigs(deviceConfig);
@@ -259,9 +259,9 @@ public class RobotFactory {
                 var clazz = (TalonFXSConfiguration) parentConfig;
                 clazz.MotorOutput = GetMotorOutputConfigs(deviceConfig);
                 clazz.Commutation = GetCommunicationConfigs(deviceConfig);
-                clazz.Slot0 = Slot0Configs.from(GetSlotConfigs(subsystemConfig.pidConfig, 0));
-                clazz.Slot1 = Slot1Configs.from(GetSlotConfigs(subsystemConfig.pidConfig, 1));
-                clazz.Slot2 = Slot2Configs.from(GetSlotConfigs(subsystemConfig.pidConfig, 2));
+                clazz.Slot0 = Slot0Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 0));
+                clazz.Slot1 = Slot1Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 1));
+                clazz.Slot2 = Slot2Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 2));
                 clazz.CurrentLimits = GetCurrentConfigs(deviceConfig);
                 clazz.SoftwareLimitSwitch = GetSoftLimitConfigs(deviceConfig);
                 clazz.ExternalFeedback = GetExternalFeedbackConfigs(deviceConfig);
