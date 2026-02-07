@@ -28,11 +28,11 @@ public class NamedCommandRegistrar {
         }));
 
         NamedCommands.registerCommand("indexing", Commands.runOnce(() -> {
-            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.INDEXING); //TODO: MAY NEED TO CHANGE
+            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.PASSIVE_FEEDING); //TODO: MAY NEED TO CHANGE
         }));
 
         NamedCommands.registerCommand("outdexing", Commands.runOnce(() -> {
-            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.OUTDEXING); //TODO: MAY NEED TO CHANGE
+            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.ACTIVE_FEEDING); //TODO: MAY NEED TO CHANGE
         }));
 
         NamedCommands.registerCommand("openGatekeeper", Commands.runOnce(() -> {
@@ -50,17 +50,17 @@ public class NamedCommandRegistrar {
 
         NamedCommands.registerCommand("intaking", Commands.runOnce(() -> {
             robotContainer.getSuperstructure().setWantedIntakeState(Superstructure.WantedIntakeState.INTAKING);
-            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.INDEXING);
+            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.PASSIVE_FEEDING);
         }));
 
         NamedCommands.registerCommand("automatedShooting", Commands.runOnce(() -> {
-            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.OUTDEXING);
+            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.ACTIVE_FEEDING);
             robotContainer.getSuperstructure().setWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
             robotContainer.getSuperstructure().setWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC);
         }));
 
         NamedCommands.registerCommand("automatedShooting", Commands.runOnce(() -> {
-            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.OUTDEXING);
+            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.ACTIVE_FEEDING);
             robotContainer.getSuperstructure().setWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
             robotContainer.getSuperstructure().setWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC);
         }));

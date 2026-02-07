@@ -80,8 +80,9 @@ public class Superstructure extends SubsystemBase {
     }
 
     public enum WantedIndexerState {
-        INDEXING,
-        OUTDEXING,
+        PASSIVE_FEEDING,
+        ACTIVE_FEEDING,
+        AGITATING,
         IDLING
     }
 
@@ -245,22 +246,22 @@ public class Superstructure extends SubsystemBase {
             intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
         }
 
-        if (wantedIndexerState == WantedIndexerState.INDEXING) {
-            indexer.setWantedState(Indexer.INDEXER_STATE.INDEXING);
+        if (wantedIndexerState == WantedIndexerState.PASSIVE_FEEDING) {
+            indexer.setWantedState(Indexer.INDEXER_STATE.PASSIVE_FEEDING);
         }
-        else if (wantedIndexerState == WantedIndexerState.OUTDEXING) {
-            indexer.setWantedState(Indexer.INDEXER_STATE.OUTDEXING);
+        else if (wantedIndexerState == WantedIndexerState.ACTIVE_FEEDING) {
+            indexer.setWantedState(Indexer.INDEXER_STATE.ACTIVE_FEEDING);
         }
         else if (wantedIndexerState == WantedIndexerState.IDLING) {
             indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
         }
 
         if (indexerControlState == IndexerControlState.OVERRIDING) {
-            indexer.setWantedState(Indexer.INDEXER_STATE.OUTDEXING);
+            indexer.setWantedState(Indexer.INDEXER_STATE.ACTIVE_FEEDING);
         }
         else {
             if (wantedIntakeState == WantedIntakeState.INTAKING || wantedGatekeeperState == WantedGatekeeperState.OPEN) {
-                indexer.setWantedState(Indexer.INDEXER_STATE.INDEXING);
+                indexer.setWantedState(Indexer.INDEXER_STATE.PASSIVE_FEEDING);
             }
             else {
                 indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
