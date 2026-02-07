@@ -31,22 +31,19 @@ subsystems:
                 kD: 0.240234
         constants: # TODO: all of these
             intakeChannel: 7
-            outSpeed: 10
-            outAngle: 255
-
-            inSpeed: -10
-            inAngle: 255
-
-            downAngle: 225
-            upAngle: 45
     climber:
         devices:
             climberMotor:
-                deviceType: TalonFX
                 id: 16
+                deviceType: TalonFX
+                neutralMode: Brake
                 motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
+            stowerMotor:
+                id: 16
+                deviceType: TalonFX
+                neutralMode: Brake
+                motorRotation: Clockwise_Positive
+                motionMagicExpo:
                     expoKV: 0.05
                     expoKA: 0.04
     indexer:
@@ -111,24 +108,14 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
-    turret:
-        devices:
-            turretMotor:
-                id: 0
-                deviceType: TalonFXS
-                motorType: Minion_JST
-                neutralMode: Brake
-                motorRotation: Clockwise_Positive
-                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 1
-            turretCoder:
-                id: 1
-                deviceType: CANcoder
-        pidConfig:
-            slot0:
-                kP: 48.046920
-                kI: 0
-                kD: 0.240234
+        constants:
+            climbPositionStow: 0
+            climbPositionUnstow: 3
+            climbPositionL1: 5
+            climbPositionL2: 7
+            climbPositionL3: 10
+            stowerPositionStow: 1
+            stowerPositionUnstow: 100
     ledManager:
         implemented: false
         devices:
