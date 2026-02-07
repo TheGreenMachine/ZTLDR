@@ -15,6 +15,7 @@ import com.team1816.lib.hardware.components.motor.TalonFXImpl;
 import com.team1816.lib.hardware.components.motor.TalonFXSImpl;
 import com.team1816.lib.hardware.components.sensor.CANCoderImpl;
 import com.team1816.lib.hardware.components.sensor.CanRangeImpl;
+import com.team1816.lib.util.AngleVelocityPair;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -104,6 +105,13 @@ public class RobotFactory {
             return defaultVal;
         }
         return getSubsystemConfig(subsystemName).constants.get(name);
+    }
+
+    public HashMap<Double, AngleVelocityPair> getTargetConfig() {
+        if (config.targetMap == null) {
+            return new HashMap<Double, AngleVelocityPair>();
+        }
+        return config.targetMap;
     }
 
     public String getDefaultAuto() {

@@ -17,6 +17,9 @@
         "defaultAuto": {
             "type": "string",
             "default": ""
+        },
+        "targetMap": {
+            "$ref": "targetmap.schema.json"
         }
     },
     "additionalProperties": false,
