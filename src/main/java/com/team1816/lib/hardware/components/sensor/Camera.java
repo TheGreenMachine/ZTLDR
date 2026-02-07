@@ -165,7 +165,7 @@ public class Camera {
                     // Find the AprilTag's pose on the field based on its position relative to the
                     // camera, the position of the camera on the robot, and the current estimated
                     // position of the robot on the field.
-                    new Pose3d(BaseRobotState.swerveDriveState.Pose)
+                    new Pose3d(BaseRobotState.robotPose)
                         .plus(robotToCamera)
                         .plus(target.getBestCameraToTarget())
                 )

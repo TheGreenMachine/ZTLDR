@@ -4,12 +4,10 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.FlippingUtil;
 import com.pathplanner.lib.util.PPLibTelemetry;
+import com.team1816.lib.subsystems.BaseSuperstructure;
 import com.team1816.lib.subsystems.LedManager;
 import com.team1816.lib.subsystems.Vision;
-import com.team1816.lib.subsystems.drivetrain.IDrivetrain;
-import com.team1816.lib.subsystems.drivetrain.Drivetrain;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
-import com.team1816.season.subsystems.Superstructure;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -18,23 +16,23 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
-public class BaseRobotContainer {
-    public static IDrivetrain drivetrain;
-
-    protected Superstructure superstructure;
+public abstract class BaseRobotContainer<T extends BaseSuperstructure> {
+    protected final T superstructure;
     protected CommandXboxController controller = new CommandXboxController(0);
 
     public SendableChooser<Command> autoChooser;
-    public static Swerve swerve;
-    public static Vision vision;
+    public final Swerve swerve = new Swerve(controller);
+    public final Vision vision = new Vision();
     private boolean poseInitialized;
+
+    protected BaseRobotContainer() {
+        superstructure = createSuperstructure();
+    }
+
+    protected abstract T createSuperstructure();
 
     public void initializeLibSubSystems() {
         Singleton.CreateSubSystem(LedManager.class);
-        drivetrain = Singleton.CreateSubSystem(Drivetrain.class);
-
-        swerve = new Swerve(drivetrain, controller);
-        vision = new Vision();
     }
 
     public void initializeAutonomous() {
@@ -63,7 +61,7 @@ public class BaseRobotContainer {
                     // Reset odometry and update Field2d this is to give drivers clue that the
                     // proper auto is set prior to auto start
                     GreenLogger.log("Init " + startingPose);
-                    drivetrain.resetPose(startingPose);
+                    swerve.resetPose(startingPose);
                     PPLibTelemetry.setTargetPose(startingPose);
                     poseInitialized = true;
                 }
@@ -71,5 +69,12 @@ public class BaseRobotContainer {
                 GreenLogger.log("Error loading auto pose: " + e.getMessage());
             }
         }
+    }
+
+    /**
+     * Tells the superstructure to add vision measurements to the drivetrain pose estimate.
+     */
+    public void addVisionMeasurementsToDrivetrain() {
+        superstructure.addVisionMeasurementsToDrivetrain();
     }
 }

@@ -4,22 +4,25 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.team1816.lib.BaseRobotState;
+import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.ITestableSubsystem;
-import com.team1816.lib.util.SubsystemDataProcessor;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDataRefresher, ITestableSubsystem {
+public class Swerve extends SubsystemBase implements ITestableSubsystem {
 
-    private final IDrivetrain drivetrain;
+    private final IDrivetrain drivetrain = Singleton.CreateSubSystem(CTRESwerveDrivetrainImpl.class);
     private final CommandXboxController controller;
     private final SlewRateLimiter xLimiter = new SlewRateLimiter(3);    // forward/back
     private final SlewRateLimiter yLimiter = new SlewRateLimiter(3);    // strafe
@@ -41,16 +44,13 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
 
     private SWERVE_STATE wantedState = SWERVE_STATE.SWERVE_IDLE;
 
-    public Swerve(IDrivetrain drivetrain, CommandXboxController controller) {
-        this.drivetrain = drivetrain;
+    public Swerve(CommandXboxController controller) {
         this.controller = controller;
         var kinematics = drivetrain.getKinematicsConfig();
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         // setup teleop drivetrain command
         maxAngularRate = RotationsPerSecond.of(kinematics.maxAngularRate).in(RadiansPerSecond);
-
-        SubsystemDataProcessor.createAndStartSubsystemDataProcessor(this);
 
         NetworkTable netTable;
         netTable = NetworkTableInstance.getDefault().getTable("");
@@ -81,7 +81,8 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
         // Get state to use locally
         swerveDriveState = drivetrain.getState();
         // Publish the state to the base robot state
-        BaseRobotState.swerveDriveState = swerveDriveState;
+        BaseRobotState.robotPose = swerveDriveState.Pose;
+        BaseRobotState.robotSpeeds = swerveDriveState.Speeds;
         processSwerveState();
     }
 
@@ -156,5 +157,33 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
         poseArray[2] = pose.getRotation().getDegrees();
         fieldTypePub.set("Field2d");
         fieldPub.set(poseArray);
+    }
+
+    public void resetPose(Pose2d pose) {
+        drivetrain.resetPose(pose);
+    }
+
+    /**
+     * Adds a vision measurement to the Kalman Filter. This will correct the
+     * odometry pose estimate while still accounting for measurement noise.
+     *
+     * @param visionRobotPoseMeters    The pose of the robot as measured by the
+     *                                 vision camera.
+     * @param timestampSeconds         The timestamp of the vision measurement in
+     *                                 seconds.
+     * @param visionMeasurementStdDevs Standard deviations of the vision pose
+     *                                 measurement (x position
+     *                                 in meters, y position in meters, and heading
+     *                                 in radians). Increase these numbers to trust
+     *                                 the vision pose measurement less.
+     */
+    public void addVisionMeasurement(
+        Pose2d visionRobotPoseMeters,
+        double timestampSeconds,
+        Matrix<N3, N1> visionMeasurementStdDevs)
+    {
+        drivetrain.addVisionMeasurement(
+            visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs
+        );
     }
 }

@@ -5,15 +5,10 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.team1816.lib.hardware.KinematicsConfig;
 import com.team1816.lib.hardware.SubsystemConfig;
 import com.team1816.lib.subsystems.ITestableSubsystem;
-import com.team1816.lib.util.SubsystemDataProcessor;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj2.command.Command;
-
-import java.util.function.Supplier;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 
 import static com.team1816.lib.Singleton.factory;
 
@@ -67,4 +62,24 @@ public interface IDrivetrain extends ITestableSubsystem {
     default double clampVelocity(double velocity) {
         return Math.min(Math.max(velocity, -maxSpd), maxSpd);
     }
+
+    /**
+     * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
+     * while still accounting for measurement noise.
+     *
+     * @param visionRobotPoseMeters    The pose of the robot as measured by the vision camera.
+     * @param timestampSeconds         The timestamp of the vision measurement in seconds. This
+     *                                 should be an FGPA timestamp, which is what PhotonVision
+     *                                 returns as part of its {@link
+     *                                 org.photonvision.EstimatedRobotPose}.
+     * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x
+     *                                 position in meters, y position in meters, and heading in
+     *                                 radians). Increase these numbers to trust the vision pose
+     *                                 measurement less.
+     */
+    void addVisionMeasurement(
+        Pose2d visionRobotPoseMeters,
+        double timestampSeconds,
+        Matrix<N3, N1> visionMeasurementStdDevs
+    );
 }

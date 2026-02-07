@@ -1,5 +1,6 @@
 package com.team1816.season;
 
+import com.team1816.lib.BaseRobot;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.commands.SubsystemTestCommand;
 import com.team1816.lib.events.PubSubHandler;
@@ -15,11 +16,10 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-public class Robot extends TimedRobot {
-
-    private RobotContainer robotContainer;
+public class Robot extends BaseRobot<RobotContainer> {
 
     public Robot() {
+        super(new RobotContainer());
     }
 
     double periodicLoopTime;
@@ -35,7 +35,6 @@ public class Robot extends TimedRobot {
             // used to serve elastic dashboards must be port 5800
             WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
             GreenLogger.periodicLog("timings/RobotLoop (ms)", () -> periodicLoopTime);
-            robotContainer = new RobotContainer();
         } catch (Throwable t) {
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
             GreenLogger.log(t);
@@ -55,7 +54,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        if(robotContainer == null) return;
         robotContainer.updateInitialPose();
     }
 

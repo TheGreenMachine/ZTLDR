@@ -151,7 +151,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      * meters, y position in meters, and heading in radians, although the units are somewhat
      * ambiguous).
      */
-    public Matrix<N3, N1> calculateEstimationStandardDeviations(EstimatedRobotPose estimatedRobotPose) {
+    private Matrix<N3, N1> calculateEstimationStandardDeviations(EstimatedRobotPose estimatedRobotPose) {
         PhotonPoseEstimator.PoseStrategy strategy = estimatedRobotPose.strategy;
 
         // If we didn't use a multi-tag strategy. This would happen if we only saw one tag, or
@@ -245,11 +245,5 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
         for (Camera camera : cameras) {
             camera.updateCameraOnSimField(visionSim);
         }
-    }
-
-    @Override
-    public void periodic() {
-        //TODO: make this called from a thread that will then send the results to the drivetrain
-        getVisionEstimatedPosesWithStdDevs();
     }
 }

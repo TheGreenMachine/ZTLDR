@@ -15,7 +15,11 @@ import com.pathplanner.lib.controllers.PathFollowingController;
 import com.team1816.lib.hardware.SubsystemConfig;
 import com.team1816.lib.hardware.components.motor.WpiMotorUtil;
 import com.team1816.lib.util.GreenLogger;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
@@ -24,7 +28,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import static com.team1816.lib.Singleton.factory;
 import static com.team1816.lib.util.FormatUtils.GetDisplay;
 
-public class Drivetrain extends SwerveDrivetrain<CommonTalon, CommonTalon, ParentDevice> implements IDrivetrain {
+public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, CommonTalon, ParentDevice> implements IDrivetrain {
 
     SubsystemConfig config = factory.getSubsystemConfig(NAME);
     private static final double SIM_LOOP_PERIOD = 0.005; // 5 ms
@@ -38,7 +42,7 @@ public class Drivetrain extends SwerveDrivetrain<CommonTalon, CommonTalon, Paren
 
     // Creates the CTRE swerve drivetrain.  The getDeviceById calls are made by the CTRE class and are based
     // on the defined values in the getSwerveModuleConstants
-    public Drivetrain() {
+    public CTRESwerveDrivetrainImpl() {
         super((id, bus) -> (CommonTalon) factory.getDeviceById(NAME, id),
             (id, bus) -> (CommonTalon) factory.getDeviceById(NAME, id),
             (id, bus) -> (ParentDevice) factory.getDeviceById(NAME, id),
@@ -134,6 +138,35 @@ public class Drivetrain extends SwerveDrivetrain<CommonTalon, CommonTalon, Paren
                 return false;
             },
             this // Subsystem for requirements
+        );
+    }
+
+    /**
+     * Adds vision measurements to CTRE's SwerveDrivetrain to combine with odometry data to
+     * estimate the drivetrain pose. This method takes in an FGPA timestamp for the vision estimate
+     * (which is returned by PhotonVision) and converts it to a timestamp in CTRE's expected time
+     * base before passing off the parameters to CTRE's addVisionMeasurement.
+     *
+     * @param visionRobotPoseMeters    The pose of the robot as measured by the vision camera.
+     * @param timestampSeconds         The timestamp of the vision measurement in seconds. This
+     *                                 should be an FGPA timestamp, which is what PhotonVision
+     *                                 returns as part of its {@link
+     *                                 org.photonvision.EstimatedRobotPose}.
+     * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement (x
+     *                                 position in meters, y position in meters, and heading in
+     *                                 radians). Increase these numbers to trust the vision pose
+     *                                 measurement less.
+     */
+    @Override
+    public void addVisionMeasurement(
+        Pose2d visionRobotPoseMeters,
+        double timestampSeconds,
+        Matrix<N3, N1> visionMeasurementStdDevs)
+    {
+        super.addVisionMeasurement(
+            visionRobotPoseMeters,
+            Utils.fpgaToCurrentTime(timestampSeconds),
+            visionMeasurementStdDevs
         );
     }
 }

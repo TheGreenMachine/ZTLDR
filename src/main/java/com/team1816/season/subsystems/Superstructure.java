@@ -1,16 +1,16 @@
 package com.team1816.season.subsystems;
 
 import com.team1816.lib.Singleton;
+import com.team1816.lib.subsystems.BaseSuperstructure;
 import com.team1816.lib.subsystems.Intake;
 import com.team1816.lib.subsystems.Turret;
+import com.team1816.lib.subsystems.Vision;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
-public class Superstructure extends SubsystemBase {
-    private final Swerve swerve;
+public class Superstructure extends BaseSuperstructure {
     private final Turret turret;
     private final Intake intake;
     protected CommandXboxController controller;
@@ -41,8 +41,8 @@ public class Superstructure extends SubsystemBase {
     protected CurrentSuperState currentSuperState = CurrentSuperState.TELEOP_IDLE;
     private CurrentSuperState previousSuperState;
 
-    public Superstructure(Swerve swerve) {
-        this.swerve = swerve;
+    public Superstructure(Swerve swerve, Vision vision) {
+        super(swerve, vision);
         this.turret = Singleton.get(Turret.class);
         this.intake = Singleton.get(Intake.class);
     }
@@ -147,4 +147,7 @@ public class Superstructure extends SubsystemBase {
         return commandToReturn;
     }
 
+    // TODO: Override this to handle going over the bump case.
+//    @Override
+//    public void addVisionMeasurementsToDrivetrain() {}
 }
