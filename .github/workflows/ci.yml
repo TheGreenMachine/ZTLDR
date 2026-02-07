@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '17'
 
       - uses: gradle/actions/setup-gradle@v4
 
@@ -28,3 +28,19 @@ jobs:
         with:
           name: test-results
           path: '**/build/test-results/**/TEST-*.xml'
+      - name: Upload Jacoco html report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+            name: jacoco-report-html
+            path: build/reports/jacoco/test/html
+            retention-days: 14
+      - name: Publish Jacoco coverage to pull_request
+            if: always()
+            uses:
+                paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+                token: ${{ secrets.GITHUB_TOKEN }}
+                min-coverage-overall: 70
+                min-coverage-changes-files: 60
+                title: Code Coverage Report
+                update-comment: true
