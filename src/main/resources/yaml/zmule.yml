@@ -13,11 +13,7 @@ subsystems:
                 remoteOffest: .484
                 forwardSoftLimit: .33
                 reversSoftLimit: -.33
-        pidConfig:
-            slot0:
-                kP: 48.046920
-                kI: 0
-                kD: 0.240234
+
         constants: # TODO: all of these
             intakeChannel: 7
     climber:
@@ -72,6 +68,7 @@ subsystems:
                     expoKA: 0.04
                 pidConfig:
                     slot0:
+                        kP: 1
                         kV: 0.135
 
             shooterMotorUpper:
@@ -86,6 +83,7 @@ subsystems:
                     expoKA: 0.04
                 pidConfig:
                     slot0:
+                        kP: 1
                         kV: 0.135
 
             gatekeeperMotor:
@@ -100,6 +98,7 @@ subsystems:
                     expoKA: 0.04
                 pidConfig:
                     slot0:
+                        kP: 0.1
                         kV: 0.1
 
             turretMotor:
@@ -109,11 +108,7 @@ subsystems:
                 motorType: Minion_JST
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
-        pidConfig:
-            slot0:
-                kP: 48.046920
-                kI: 0
-                kD: 0.240234
+
     ledManager:
         implemented: false
         devices:
