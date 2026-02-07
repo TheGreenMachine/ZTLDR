@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
 
     private RobotContainer robotContainer;
+    private NamedCommandRegistrar namedCommandRegistrar;
 
     public Robot() {
     }
@@ -40,6 +41,7 @@ public class Robot extends TimedRobot {
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
             GreenLogger.log(t);
         }
+        namedCommandRegistrar.RegisterCommands();
     }
 
     @Override
