@@ -48,10 +48,11 @@ public class Superstructure extends SubsystemBase {
     }
 
     private enum ClimbState {
-        DRIVING_TO_BAR,
-        DRIVING_ONTO_BAR,
-        CLIMBING,
-        IDLING
+        IDLING,
+        L3_CLIMBING,
+        L3_ClIMBING_DOWN,
+        L1_CLIMING,
+        L1_CLIMBING_DOWN
     }
 
     public enum WantedShooterState {
@@ -176,25 +177,18 @@ public class Superstructure extends SubsystemBase {
     private void climbing() {
         // TODO: Add all commented functions and states
         switch (climbState) {
-//            case DRIVING_TO_BAR:
-//                swerve.setDriveToPoseTarget();
-//                swerve.setWantedState((Swerve.ActualState.DRIVING_TO_POSE));
-//                intake.setWantedState(Intake.INTAKE_STATE.RETRACTING);
-//                shooter.setWantedState(Shooter.SHOOTER_STATE.RETRACTING);
-//                if (swerve.isAtPose()) {
-//                    climbState = ClimbState.DRIVING_ONTO_BAR;
-//                }
-//                break;
-//            case DRIVING_ONTO_BAR:
-//                swerve.setWantedState(Swerve.ActualState.DRIVING_TO_POSE);
-//                if (swerve.isAtPose() && intake.isRetracted() && shooter.isRetracted()) {
-//                    climbState = ClimbState.CLIMBING;
-//                }
-//                break;
-//            case CLIMBING:
-//                // This state covers all the climbing in the superstructure, the actual climbing states should be internal in the subsystem
-//                climber.setWantedState(Climber.CLIMBER_STATE.CLIMBING);
-//                break;
+            case L3_CLIMBING:
+
+                break;
+            case L3_ClIMBING_DOWN:
+
+                break;
+            case L1_CLIMING:
+
+                break;
+            case L1_CLIMBING_DOWN:
+
+                break;
             case IDLING:
             default:
                 climbState = ClimbState.IDLING;
@@ -312,8 +306,17 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void downclimbing() {
-        climber.setWantedState(Climber.CLIMBER_STATE.DOWNCLIMBING);
-        actualSuperState = ActualSuperState.DEFAULTING;
+        switch (climbState) {
+            case L1_CLIMING:
+                climber.setWantedState(Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
+                actualSuperState = ActualSuperState.DEFAULTING;
+                break;
+            case L3_CLIMBING:
+                climber.setWantedState(Climber.CLIMBER_STATE.L3_DOWN_CLIMBING);
+                actualSuperState = ActualSuperState.DEFAULTING;
+                break;
+
+        }
     }
 
 }
