@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class Superstructure extends SubsystemBase {
     private final Swerve swerve;
     private final Shooter shooter;
+    private final Gatekeeper gatekeeper;
     private final Intake intake;
     private final Indexer indexer;
     private final Climber climber;
@@ -74,7 +75,8 @@ public class Superstructure extends SubsystemBase {
     public enum WantedIntakeState {
         INTAKING,
         OUTTAKING,
-        IDLING
+        DOWN,
+        UP,
     }
 
     public enum WantedIndexerState {
@@ -94,7 +96,7 @@ public class Superstructure extends SubsystemBase {
     public WantedShooterState wantedShooterState = WantedShooterState.AUTOMATIC;
     public WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
     public WantedSwerveState wantedSwerveState = WantedSwerveState.AUTOMATIC_DRIVING;
-    public WantedIntakeState wantedIntakeState = WantedIntakeState.IDLING;
+    public WantedIntakeState wantedIntakeState = WantedIntakeState.UP;
     public WantedIndexerState wantedIndexerState = WantedIndexerState.IDLING;
     public IndexerControlState indexerControlState = IndexerControlState.DEFAULTING;
 
@@ -104,6 +106,7 @@ public class Superstructure extends SubsystemBase {
     public Superstructure(Swerve swerve) {
         this.swerve = swerve;
         this.shooter = Singleton.get(Shooter.class);
+        this.gatekeeper = Singleton.get(Gatekeeper.class);
         this.intake = Singleton.get(Intake.class);
         this.indexer = Singleton.get(Indexer.class);
         this.climber = Singleton.get(Climber.class);
@@ -216,10 +219,10 @@ public class Superstructure extends SubsystemBase {
         }
 
         if (wantedGatekeeperState == WantedGatekeeperState.OPEN) {
-            shooter.setWantedGatekeeperState(Shooter.GATEKEEPER_STATE.OPEN);
+            gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.OPEN);
         }
         else if (wantedGatekeeperState == WantedGatekeeperState.CLOSED) {
-            shooter.setWantedGatekeeperState(Shooter.GATEKEEPER_STATE.CLOSED);
+            gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
         }
 
         if (wantedSwerveState == WantedSwerveState.AUTOMATIC_DRIVING) {
@@ -235,7 +238,10 @@ public class Superstructure extends SubsystemBase {
         else if (wantedIntakeState == WantedIntakeState.OUTTAKING) {
             intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
         }
-        else if (wantedIntakeState == WantedIntakeState.IDLING) {
+        else if (wantedIntakeState == WantedIntakeState.DOWN) {
+            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
+        }
+        else if (wantedIntakeState == WantedIntakeState.UP) {
             intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
         }
 
@@ -269,7 +275,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     // Add functionality for this in both manual and auto shooter modes
-    public void setWantedGatekeeperState(Superstructure.WantedGatekeeperState gatekeeperState) {
+    public void setWantedGatekeeperState(WantedGatekeeperState gatekeeperState) {
         this.wantedGatekeeperState = gatekeeperState;
     }
 
@@ -278,6 +284,13 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void setWantedIntakeState(WantedIntakeState wantedIntakeState) {
+        if(wantedIntakeState == this.wantedIntakeState) {
+            wantedIntakeState = switch (wantedIntakeState) {
+                case INTAKING, OUTTAKING, DOWN -> WantedIntakeState.DOWN;
+                case UP -> WantedIntakeState.UP;
+            };
+        }
+
         this.wantedIntakeState = wantedIntakeState;
     }
 
@@ -291,6 +304,7 @@ public class Superstructure extends SubsystemBase {
 
     public void teleopInit() {
         setWantedShooterState(WantedShooterState.AUTOMATIC);
+        setWantedGatekeeperState(WantedGatekeeperState.CLOSED);
         setIndexerControlState(IndexerControlState.DEFAULTING);
         setWantedIntakeState(WantedIntakeState.INTAKING);
         setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING);

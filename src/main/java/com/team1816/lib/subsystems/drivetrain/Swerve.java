@@ -25,7 +25,7 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
     private final SlewRateLimiter yLimiter = new SlewRateLimiter(3);    // strafe
     private final SlewRateLimiter rotLimiter = new SlewRateLimiter(6);  // rotation
     private static double maxAngularRate = 0;
-    private SwerveDrivetrain.SwerveDriveState swerveDriveState;
+    private SwerveDrivetrain.SwerveDriveState swerveDriveState = new  SwerveDrivetrain.SwerveDriveState();
 
     /* Robot swerve drive state */
     private static StructPublisher<Pose2d> drivePose;
