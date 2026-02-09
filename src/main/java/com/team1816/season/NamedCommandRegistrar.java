@@ -27,12 +27,12 @@ public class NamedCommandRegistrar {
             robotContainer.getSuperstructure().setWantedIntakeState(Superstructure.WantedIntakeState.INTAKING);
         }));
 
-        NamedCommands.registerCommand("indexing", Commands.runOnce(() -> {
-            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.PASSIVE_FEEDING); //TODO: MAY NEED TO CHANGE
+        NamedCommands.registerCommand("passiveFeeding", Commands.runOnce(() -> {
+            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.PASSIVE_FEEDING);
         }));
 
-        NamedCommands.registerCommand("outdexing", Commands.runOnce(() -> {
-            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.ACTIVE_FEEDING); //TODO: MAY NEED TO CHANGE
+        NamedCommands.registerCommand("activeFeeding", Commands.runOnce(() -> {
+            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.ACTIVE_FEEDING);
         }));
 
         NamedCommands.registerCommand("openGatekeeper", Commands.runOnce(() -> {

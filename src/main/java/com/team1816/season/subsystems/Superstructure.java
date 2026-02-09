@@ -177,79 +177,46 @@ public class Superstructure extends SubsystemBase {
     private void climbing() {
         // TODO: Add all commented functions and states
         switch (climbState) {
-            case L3_CLIMBING:
 
-                break;
-            case L3_ClIMBING_DOWN:
-
-                break;
-            case L1_CLIMING:
-
-                break;
-            case L1_CLIMBING_DOWN:
-
-                break;
-            case IDLING:
-            default:
-                climbState = ClimbState.IDLING;
-                break;
         }
     }
 
     private void defaulting() {
-        if (wantedShooterState == WantedShooterState.DISTANCE_ONE) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
-        }
-        else if (wantedShooterState == WantedShooterState.DISTANCE_TWO) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
-        }
-        else if (wantedShooterState == WantedShooterState.DISTANCE_THREE) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
-        }
-        else if (wantedShooterState == WantedShooterState.AUTOMATIC) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
-        }
-        else if (wantedShooterState == WantedShooterState.IDLE) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
+
+        switch (wantedShooterState) {
+            case DISTANCE_ONE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
+            case DISTANCE_TWO -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
+            case DISTANCE_THREE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
+            case IDLE -> shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
         }
 
-        if (wantedGatekeeperState == WantedGatekeeperState.OPEN) {
-            gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.OPEN);
-        }
-        else if (wantedGatekeeperState == WantedGatekeeperState.CLOSED) {
-            gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
+        switch (wantedGatekeeperState) {
+            case OPEN -> gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.OPEN);
+            case CLOSED -> gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
         }
 
-        if (wantedSwerveState == WantedSwerveState.AUTOMATIC_DRIVING) {
-            swerve.setWantedState(Swerve.ActualState.AUTOMATIC_DRIVING);
-        }
-        else if (wantedSwerveState == WantedSwerveState.MANUAL_DRIVING) {
-            swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
+        switch(wantedSwerveState) {
+            case AUTOMATIC_DRIVING -> swerve.setWantedState(Swerve.ActualState.AUTOMATIC_DRIVING);
+            case MANUAL_DRIVING -> swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
         }
 
-        if (wantedIntakeState == WantedIntakeState.INTAKING) {
-            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
-        }
-        else if (wantedIntakeState == WantedIntakeState.OUTTAKING) {
-            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
-        }
-        else if (wantedIntakeState == WantedIntakeState.DOWN) {
-            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
-        }
-        else if (wantedIntakeState == WantedIntakeState.UP) {
-            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+        switch (wantedIntakeState) {
+            case INTAKING -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
+            case OUTTAKING -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
+            case DOWN -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
+            case UP -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+
         }
 
-        if (wantedIndexerState == WantedIndexerState.PASSIVE_FEEDING) {
-            indexer.setWantedState(Indexer.INDEXER_STATE.PASSIVE_FEEDING);
-        }
-        else if (wantedIndexerState == WantedIndexerState.ACTIVE_FEEDING) {
-            indexer.setWantedState(Indexer.INDEXER_STATE.ACTIVE_FEEDING);
-        }
-        else if (wantedIndexerState == WantedIndexerState.IDLING) {
-            indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+        switch (wantedIndexerState) {
+            case PASSIVE_FEEDING -> indexer.setWantedState(Indexer.INDEXER_STATE.PASSIVE_FEEDING);
+            case ACTIVE_FEEDING -> indexer.setWantedState(Indexer.INDEXER_STATE.ACTIVE_FEEDING);
+            case IDLING -> indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
         }
 
+        /**
+         * What is this doing???
+         */
         if (indexerControlState == IndexerControlState.OVERRIDING) {
             indexer.setWantedState(Indexer.INDEXER_STATE.ACTIVE_FEEDING);
         }
