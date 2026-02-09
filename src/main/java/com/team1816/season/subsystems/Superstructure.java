@@ -21,14 +21,19 @@ public class Superstructure extends SubsystemBase {
     public enum WantedSuperState {
         DEFAULT,
         CLIMB,
-        IDLE
+        DOWNCLIMB,
+        IDLE,
+        SNOWBLOWER,
+        STORAGE_INTAKE,
     }
 
     public enum ActualSuperState {
         DEFAULTING,
         CLIMBING,
         DOWNCLIMBING,
-        IDLING
+        IDLING,
+        SNOWBLOWING,
+        STORAGE_INTAKING
     }
 
     public enum ClimbSide {
@@ -135,6 +140,14 @@ public class Superstructure extends SubsystemBase {
             case CLIMB:
                 actualSuperState = ActualSuperState.CLIMBING;
                 break;
+            case DOWNCLIMB:
+                actualSuperState = ActualSuperState.DOWNCLIMBING;
+                break;
+            case SNOWBLOWER:
+                actualSuperState = ActualSuperState.SNOWBLOWING;
+                break;
+            case STORAGE_INTAKE:
+                actualSuperState = ActualSuperState.STORAGE_INTAKING;
             case IDLE:
             default:
                 actualSuperState = ActualSuperState.IDLING;
@@ -154,6 +167,12 @@ public class Superstructure extends SubsystemBase {
                 break;
             case DOWNCLIMBING:
                 downclimbing();
+                break;
+            case STORAGE_INTAKING:
+                storageIntaking();
+                break;
+            case SNOWBLOWING:
+                snowBlower();
                 break;
             case IDLING:
             default:
@@ -175,8 +194,56 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void climbing() {
-        // TODO: Add all commented functions and states
-        switch (climbState) {
+        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
+            case L1_CLIMING:
+                climber.setWantedState(Climber.CLIMBER_STATE.L1_CLIMBING);
+                actualSuperState = ActualSuperState.CLIMBING;
+                break;
+            case L3_CLIMBING:
+                climber.setWantedState(Climber.CLIMBER_STATE.L3_CLIMBING);
+                actualSuperState = ActualSuperState.CLIMBING;
+                break;
+
+        }
+    }
+    public void storageIntaking() {
+        switch (wantedIntakeState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
+            case INTAKING:
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
+                actualSuperState = ActualSuperState.STORAGE_INTAKING;
+                break;
+            case OUTTAKING:
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
+                actualSuperState = ActualSuperState.STORAGE_INTAKING;
+                break;
+            case UP:
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+                actualSuperState = ActualSuperState.STORAGE_INTAKING;
+                break;
+            case DOWN:
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
+                actualSuperState = ActualSuperState.STORAGE_INTAKING;
+                break;
+            default:
+                actualSuperState = ActualSuperState.DEFAULTING;
+
+        }
+    }
+    public void snowBlower () {
+        //WILL NEED TO ADD MULTIPLE SUBSYSTEMS
+    }
+
+
+    public void downclimbing() {
+        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
+            case L1_CLIMBING_DOWN:
+                climber.setWantedState(Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
+                actualSuperState = ActualSuperState.DOWNCLIMBING;
+                break;
+            case L3_ClIMBING_DOWN:
+                climber.setWantedState(Climber.CLIMBER_STATE.L3_DOWN_CLIMBING);
+                actualSuperState = ActualSuperState.DOWNCLIMBING;
+                break;
 
         }
     }
@@ -270,20 +337,6 @@ public class Superstructure extends SubsystemBase {
         setIndexerControlState(IndexerControlState.DEFAULTING);
         setWantedIntakeState(WantedIntakeState.INTAKING);
         setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING);
-    }
-
-    public void downclimbing() {
-        switch (climbState) {
-            case L1_CLIMING:
-                climber.setWantedState(Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
-                actualSuperState = ActualSuperState.DEFAULTING;
-                break;
-            case L3_CLIMBING:
-                climber.setWantedState(Climber.CLIMBER_STATE.L3_DOWN_CLIMBING);
-                actualSuperState = ActualSuperState.DEFAULTING;
-                break;
-
-        }
     }
 
 }
