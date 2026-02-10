@@ -47,27 +47,23 @@ public class NamedCommandRegistrar {
         /**
          * Combined subsystem Actions (will be used)
          */
-
-        NamedCommands.registerCommand("intaking", Commands.runOnce(() -> {
-            robotContainer.getSuperstructure().setWantedIntakeState(Superstructure.WantedIntakeState.INTAKING);
-            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.PASSIVE_FEEDING);
+        NamedCommands.registerCommand("snowblowing", Commands.runOnce(() -> { //Intake and shoot balls at the same time
+            robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER);
+        }));
+        NamedCommands.registerCommand("storageShooting", Commands.runOnce(() -> { //Shoots the balls solely in the indexer(Feeder)
+            robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.STORAGE_SHOOTER);
+        }));
+        NamedCommands.registerCommand("storageIntake", Commands.runOnce(() -> { //Intake balls into the indexer(Feeder) without shooting them
+            robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.STORAGE_INTAKE);
+        }));
+        NamedCommands.registerCommand("l1Climbing", Commands.runOnce(() -> {
+            robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.L1_CLIMB);
+        }));
+        NamedCommands.registerCommand("idling", Commands.runOnce(() -> {
+            robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.IDLE);
         }));
 
-        NamedCommands.registerCommand("automatedShooting", Commands.runOnce(() -> {
-            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.ACTIVE_FEEDING);
-            robotContainer.getSuperstructure().setWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
-            robotContainer.getSuperstructure().setWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC);
-        }));
 
-        NamedCommands.registerCommand("automatedShooting", Commands.runOnce(() -> {
-            robotContainer.getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.ACTIVE_FEEDING);
-            robotContainer.getSuperstructure().setWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
-            robotContainer.getSuperstructure().setWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC);
-        }));
-
-        NamedCommands.registerCommand("snowblowerShooting", Commands.runOnce(() -> {
-            //What would be in here? (indexer mainly)
-        }));
 
 
 

@@ -20,20 +20,26 @@ public class Superstructure extends SubsystemBase {
 
     public enum WantedSuperState {
         DEFAULT,
-        CLIMB,
-        DOWNCLIMB,
+        L1_CLIMB,
+        L3_CLIMB,
+        L1_DOWNCLIMB,
+        L3_DOWNCLIMB,
         IDLE,
         SNOWBLOWER,
         STORAGE_INTAKE,
+        STORAGE_SHOOTER
     }
 
     public enum ActualSuperState {
         DEFAULTING,
-        CLIMBING,
-        DOWNCLIMBING,
+        L1_CLIMBING,
+        L3_CLIMBING,
+        L1_DOWNCLIMBING,
+        L3_DOWNCLIMBING,
         IDLING,
         SNOWBLOWING,
-        STORAGE_INTAKING
+        STORAGE_INTAKING,
+        STORAGE_SHOOTING
     }
 
     public enum ClimbSide {
@@ -131,24 +137,34 @@ public class Superstructure extends SubsystemBase {
     private ActualSuperState handleStateTransitions() {
         switch (wantedSuperState) {
             case DEFAULT:
-                if (actualSuperState == ActualSuperState.CLIMBING || actualSuperState == ActualSuperState.DOWNCLIMBING) {
-                    actualSuperState = ActualSuperState.DOWNCLIMBING;
+                if (actualSuperState == ActualSuperState.L1_CLIMBING || actualSuperState == ActualSuperState.L1_DOWNCLIMBING) {
+                    actualSuperState = ActualSuperState.L1_DOWNCLIMBING;
                 }
                 else {
                     actualSuperState = ActualSuperState.DEFAULTING;
                 }
                 break;
-            case CLIMB:
-                actualSuperState = ActualSuperState.CLIMBING;
+            case L1_CLIMB:
+                actualSuperState = ActualSuperState.L1_CLIMBING;
                 break;
-            case DOWNCLIMB:
-                actualSuperState = ActualSuperState.DOWNCLIMBING;
+            case L3_CLIMB:
+                actualSuperState = ActualSuperState.L3_CLIMBING;
+                break;
+            case L1_DOWNCLIMB:
+                actualSuperState = ActualSuperState.L1_DOWNCLIMBING;
+                break;
+            case L3_DOWNCLIMB:
+                actualSuperState = ActualSuperState.L3_DOWNCLIMBING;
                 break;
             case SNOWBLOWER:
                 actualSuperState = ActualSuperState.SNOWBLOWING;
                 break;
             case STORAGE_INTAKE:
                 actualSuperState = ActualSuperState.STORAGE_INTAKING;
+                break;
+            case STORAGE_SHOOTER:
+                actualSuperState = ActualSuperState.STORAGE_SHOOTING;
+                break;
             case IDLE:
             default:
                 actualSuperState = ActualSuperState.IDLING;
@@ -163,21 +179,28 @@ public class Superstructure extends SubsystemBase {
             case DEFAULTING:
                 defaulting();
                 break;
-            case CLIMBING:
-                climbing();
+            case L1_CLIMBING:
+                l1Climbing();
                 break;
-            case DOWNCLIMBING:
-                downclimbing();
+            case L1_DOWNCLIMBING:
+                l1Downclimbing();
                 break;
+            case L3_CLIMBING:
+                l3Climbing();
+                break;
+            case L3_DOWNCLIMBING:
+                l3DownClimbing();
             case STORAGE_INTAKING:
                 storageIntaking();
                 break;
             case SNOWBLOWING:
                 snowBlowing();
                 break;
+            case STORAGE_SHOOTING:
+                storageShooting();
             case IDLING:
             default:
-                actualSuperState = ActualSuperState.DEFAULTING;
+                defaulting();
                 break;
         }
     }
@@ -194,27 +217,32 @@ public class Superstructure extends SubsystemBase {
         this.climbSide = climbSide;
     }
 
-    private void climbing() {
+    private void l1Climbing() {
         switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L1_CLIMING:
                 climber.setWantedState(Climber.CLIMBER_STATE.L1_CLIMBING);
                 intake.setWantedState(Intake.INTAKE_STATE.IDLING);
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
-                actualSuperState = ActualSuperState.CLIMBING;
-                break;
-            case L3_CLIMBING:
-                climber.setWantedState(Climber.CLIMBER_STATE.L3_CLIMBING);
-                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
-                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
-                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
-                actualSuperState = ActualSuperState.CLIMBING;
+                actualSuperState = ActualSuperState.L1_CLIMBING;
                 break;
             default:
                 actualSuperState = ActualSuperState.IDLING;
 
         }
-
+    }
+    private void l3Climbing() {
+        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
+            case L3_CLIMBING:
+                climber.setWantedState(Climber.CLIMBER_STATE.L3_CLIMBING);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                actualSuperState = ActualSuperState.L3_CLIMBING;
+                break;
+            default:
+                actualSuperState = ActualSuperState.IDLING;
+        }
     }
     public void storageIntaking() {
         switch (wantedIntakeState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
@@ -262,25 +290,69 @@ public class Superstructure extends SubsystemBase {
     }
 
 
-    public void downclimbing() {
+    public void l1Downclimbing() {
         switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L1_CLIMBING_DOWN:
                 climber.setWantedState(Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
                 intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN); //WILL NEED TO CONFIDE WITH BUILD FOR ALL WANT STATES FOR THE ACTIONS
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
-                actualSuperState = ActualSuperState.DOWNCLIMBING;
+                actualSuperState = ActualSuperState.L1_DOWNCLIMBING;
                 break;
+            default:
+                actualSuperState = ActualSuperState.IDLING;
+
+        }
+    }
+    public void l3DownClimbing() {
+        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L3_ClIMBING_DOWN:
                 climber.setWantedState(Climber.CLIMBER_STATE.L3_DOWN_CLIMBING);
                 intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
-                actualSuperState = ActualSuperState.DOWNCLIMBING;
+                actualSuperState = ActualSuperState.L3_DOWNCLIMBING;
                 break;
             default:
                 actualSuperState = ActualSuperState.IDLING;
 
+        }
+    }
+
+    private void storageShooting() {
+        switch (wantedShooterState) {
+            case AUTOMATIC:
+                shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                break;
+            case DISTANCE_ONE:
+                shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                break;
+            case DISTANCE_TWO:
+                shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                break;
+            case DISTANCE_THREE:
+                shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                break;
+            case IDLE:
+                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                break;
+            default:
+                actualSuperState = ActualSuperState.IDLING;
         }
     }
 
