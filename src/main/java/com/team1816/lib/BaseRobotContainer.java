@@ -37,7 +37,7 @@ public class BaseRobotContainer {
 
         swerve = new Swerve(drivetrain, driverController);
 
-        pathfindManager = new PathfindManager();
+        pathfindManager = Singleton.get(PathfindManager.class);
     }
 
     public void initializeAutonomous() {
