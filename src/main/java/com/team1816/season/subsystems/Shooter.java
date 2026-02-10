@@ -7,6 +7,7 @@ import com.team1816.lib.ballisticCalc.BallisticCalculator;
 import com.team1816.lib.ballisticCalc.BallisticSolution;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -36,6 +37,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public double currentVoltage = 0;
     public double currentPosition = 0;
+
+    // TODO: make this private after testing is finished
+    public ShooterTableCalculator shooterTableCalculator = new ShooterTableCalculator();
 
     public enum SHOOTER_STATE {
         DISTANCE_ONE(45, 0, 10),

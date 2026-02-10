@@ -1,0 +1,22 @@
+{
+    "type": "object",
+    "title": "Angle Velocity Pair Config",
+    "additionalProperties": false,
+    "properties": {
+        "angle": {
+            "type": "number"
+        },
+        "velocity": {
+            "type": "number"
+        }
+    },
+    "anyOf": [
+        {
+            "required": [
+                "angle",
+                "velocity"
+            ]
+        }
+    ]
+}
+

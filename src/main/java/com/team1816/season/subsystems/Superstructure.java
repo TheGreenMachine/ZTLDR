@@ -3,6 +3,7 @@ package com.team1816.season.subsystems;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.Intake;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
+import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -110,6 +111,14 @@ public class Superstructure extends SubsystemBase {
         this.intake = Singleton.get(Intake.class);
         this.indexer = Singleton.get(Indexer.class);
         this.climber = Singleton.get(Climber.class);
+
+        GreenLogger.log("Shooter table test values" + shooter.shooterTableCalculator.getShooterSetting(0)
+            + " " + shooter.shooterTableCalculator.getShooterSetting(5)
+            + " " + shooter.shooterTableCalculator.getShooterSetting(5.1)
+            + " " + shooter.shooterTableCalculator.getShooterSetting(0.123)
+            + " " + shooter.shooterTableCalculator.getShooterSetting(0.49)
+            + " " + shooter.shooterTableCalculator.getShooterSetting(2.01)
+            + " " + shooter.shooterTableCalculator.getShooterSetting(3.7));
     }
 
     @Override

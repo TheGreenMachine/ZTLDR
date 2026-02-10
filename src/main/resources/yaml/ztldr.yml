@@ -1,38 +1,38 @@
 defaultAuto: "Simple S"
 targetMap:
-    0:
+    0.0:
         angle: 35.0
-        power: 0.07
+        velocity: 0.07
     0.5:
         angle: 31.0
-        power: 0.09
+        velocity: 0.09
     1.0:
         angle: 33.0
-        power: 0.12
+        velocity: 0.12
     1.5:
         angle: 32.0
-        power: 0.11
+        velocity: 0.11
     2.0:
         angle: 31.0
-        power: 0.14
+        velocity: 0.14
     2.5:
         angle: 36.0
-        power: 0.10
+        velocity: 0.10
     3.0:
         angle: 37.0
-        power: 0.12
+        velocity: 0.12
     3.5:
         angle: 40.0
-        power: 0.15
+        velocity: 0.15
     4.0:
         angle: 38.0
-        power: 0.17
+        velocity: 0.17
     4.5:
         angle: 39.0
-        power: 0.16
+        velocity: 0.16
     5.0:
         angle: 42.0
-        power: 0.19
+        velocity: 0.19
 subsystems:
     intake:
         devices:
