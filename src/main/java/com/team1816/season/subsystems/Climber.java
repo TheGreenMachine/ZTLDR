@@ -11,7 +11,8 @@ import static com.team1816.lib.Singleton.factory;
 public class Climber extends SubsystemBase implements ITestableSubsystem {
 
     public static final String NAME = "climber";
-    private final IMotor climberMotor = (IMotor)factory.getDevice(NAME, "climberMotor");
+    private final IMotor climberFlipMotor = (IMotor)factory.getDevice(NAME, "climberFlipMotor");
+    private final IMotor linearMotor = (IMotor)factory.getDevice(NAME, "linearMotor"); //Build-team had a cool name for this
     private double curPosition;
     private CLIMBER_STATE wantedState = CLIMBER_STATE.IDLING;
     VelocityVoltage climReq = new VelocityVoltage(0);
@@ -24,18 +25,26 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
 
     @Override
     public void readFromHardware() {
-        curPosition = climberMotor.getMotorPosition();
+        curPosition = climberFlipMotor.getMotorPosition();
     }
 
     private void applyState() {
         switch (wantedState) {
-            case CLIMBING:
-
-                break;
-            case DOWNCLIMBING:
-
-                break;
             case IDLING:
+
+                break;
+            case L3_CLIMBING:
+
+                break;
+            case L3_DOWN_CLIMBING:
+
+                break;
+            case L1_CLIMBING:
+
+                break;
+            case L1_DOWN_CLIMBING:
+
+                break;
             default:
                 break;
         }
@@ -44,9 +53,13 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     }
 
     public enum CLIMBER_STATE {
-        CLIMBING,
-        DOWNCLIMBING,
-        IDLING
+        IDLING,
+        L3_CLIMBING,
+        L3_DOWN_CLIMBING,
+        L1_CLIMBING,
+        L1_DOWN_CLIMBING
+
+
     }
 
     public void setWantedState(CLIMBER_STATE wantedState) {

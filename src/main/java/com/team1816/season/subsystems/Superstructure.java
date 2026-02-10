@@ -21,15 +21,26 @@ public class Superstructure extends SubsystemBase {
 
     public enum WantedSuperState {
         DEFAULT,
-        CLIMB,
-        IDLE
+        L1_CLIMB,
+        L3_CLIMB,
+        L1_DOWNCLIMB,
+        L3_DOWNCLIMB,
+        IDLE,
+        SNOWBLOWER,
+        STORAGE_INTAKE,
+        STORAGE_SHOOTER
     }
 
     public enum ActualSuperState {
         DEFAULTING,
-        CLIMBING,
-        DOWNCLIMBING,
-        IDLING
+        L1_CLIMBING,
+        L3_CLIMBING,
+        L1_DOWNCLIMBING,
+        L3_DOWNCLIMBING,
+        IDLING,
+        SNOWBLOWING,
+        STORAGE_INTAKING,
+        STORAGE_SHOOTING
     }
 
     public enum ClimbSide {
@@ -48,11 +59,12 @@ public class Superstructure extends SubsystemBase {
         }
     }
 
-    private enum ClimbState {
-        DRIVING_TO_BAR,
-        DRIVING_ONTO_BAR,
-        CLIMBING,
-        IDLING
+    private enum WantedClimbState {
+        IDLING,
+        L3_CLIMBING,
+        L3_ClIMBING_DOWN,
+        L1_CLIMING,
+        L1_CLIMBING_DOWN
     }
 
     public enum WantedShooterState {
@@ -78,11 +90,13 @@ public class Superstructure extends SubsystemBase {
         OUTTAKING,
         DOWN,
         UP,
+        IDLING
     }
 
     public enum WantedIndexerState {
-        INDEXING,
-        OUTDEXING,
+        PASSIVE_FEEDING,
+        ACTIVE_FEEDING,
+        AGITATING,
         IDLING
     }
 
@@ -94,15 +108,15 @@ public class Superstructure extends SubsystemBase {
     protected WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
     protected ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
-    public WantedShooterState wantedShooterState = WantedShooterState.AUTOMATIC;
+    public WantedShooterState wantedShooterState = WantedShooterState.IDLE;
     public WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
-    public WantedSwerveState wantedSwerveState = WantedSwerveState.AUTOMATIC_DRIVING;
+    public WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
     public WantedIntakeState wantedIntakeState = WantedIntakeState.UP;
     public WantedIndexerState wantedIndexerState = WantedIndexerState.IDLING;
     public IndexerControlState indexerControlState = IndexerControlState.DEFAULTING;
 
     public ClimbSide climbSide = ClimbSide.LEFT;
-    public ClimbState climbState = ClimbState.IDLING;
+    public WantedClimbState climbState = WantedClimbState.IDLING;
 
     public Superstructure(Swerve swerve) {
         this.swerve = swerve;
@@ -124,15 +138,33 @@ public class Superstructure extends SubsystemBase {
     private ActualSuperState handleStateTransitions() {
         switch (wantedSuperState) {
             case DEFAULT:
-                if (actualSuperState == ActualSuperState.CLIMBING || actualSuperState == ActualSuperState.DOWNCLIMBING) {
-                    actualSuperState = ActualSuperState.DOWNCLIMBING;
+                if (actualSuperState == ActualSuperState.L1_CLIMBING || actualSuperState == ActualSuperState.L1_DOWNCLIMBING) {
+                    actualSuperState = ActualSuperState.L1_DOWNCLIMBING;
                 }
                 else {
                     actualSuperState = ActualSuperState.DEFAULTING;
                 }
                 break;
-            case CLIMB:
-                actualSuperState = ActualSuperState.CLIMBING;
+            case L1_CLIMB:
+                actualSuperState = ActualSuperState.L1_CLIMBING;
+                break;
+            case L3_CLIMB:
+                actualSuperState = ActualSuperState.L3_CLIMBING;
+                break;
+            case L1_DOWNCLIMB:
+                actualSuperState = ActualSuperState.L1_DOWNCLIMBING;
+                break;
+            case L3_DOWNCLIMB:
+                actualSuperState = ActualSuperState.L3_DOWNCLIMBING;
+                break;
+            case SNOWBLOWER:
+                actualSuperState = ActualSuperState.SNOWBLOWING;
+                break;
+            case STORAGE_INTAKE:
+                actualSuperState = ActualSuperState.STORAGE_INTAKING;
+                break;
+            case STORAGE_SHOOTER:
+                actualSuperState = ActualSuperState.STORAGE_SHOOTING;
                 break;
             case IDLE:
             default:
@@ -148,15 +180,28 @@ public class Superstructure extends SubsystemBase {
             case DEFAULTING:
                 defaulting();
                 break;
-            case CLIMBING:
-                climbing();
+            case L1_CLIMBING:
+                l1Climbing();
                 break;
-            case DOWNCLIMBING:
-                downclimbing();
+            case L1_DOWNCLIMBING:
+                l1Downclimbing();
                 break;
+            case L3_CLIMBING:
+                l3Climbing();
+                break;
+            case L3_DOWNCLIMBING:
+                l3DownClimbing();
+            case STORAGE_INTAKING:
+                storageIntaking();
+                break;
+            case SNOWBLOWING:
+                snowBlowing();
+                break;
+            case STORAGE_SHOOTING:
+                storageShooting();
             case IDLING:
             default:
-                actualSuperState = ActualSuperState.DEFAULTING;
+                defaulting();
                 break;
         }
     }
@@ -173,95 +218,188 @@ public class Superstructure extends SubsystemBase {
         this.climbSide = climbSide;
     }
 
-    private void climbing() {
-        // TODO: Add all commented functions and states
-        switch (climbState) {
-//            case DRIVING_TO_BAR:
-//                swerve.setDriveToPoseTarget();
-//                swerve.setWantedState((Swerve.ActualState.DRIVING_TO_POSE));
-//                intake.setWantedState(Intake.INTAKE_STATE.RETRACTING);
-//                shooter.setWantedState(Shooter.SHOOTER_STATE.RETRACTING);
-//                if (swerve.isAtPose()) {
-//                    climbState = ClimbState.DRIVING_ONTO_BAR;
-//                }
-//                break;
-//            case DRIVING_ONTO_BAR:
-//                swerve.setWantedState(Swerve.ActualState.DRIVING_TO_POSE);
-//                if (swerve.isAtPose() && intake.isRetracted() && shooter.isRetracted()) {
-//                    climbState = ClimbState.CLIMBING;
-//                }
-//                break;
-//            case CLIMBING:
-//                // This state covers all the climbing in the superstructure, the actual climbing states should be internal in the subsystem
-//                climber.setWantedState(Climber.CLIMBER_STATE.CLIMBING);
-//                break;
-            case IDLING:
-            default:
-                climbState = ClimbState.IDLING;
+    private void l1Climbing() {
+        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
+            case L1_CLIMING:
+                climber.setWantedState(Climber.CLIMBER_STATE.L1_CLIMBING);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                actualSuperState = ActualSuperState.L1_CLIMBING;
                 break;
+            default:
+                actualSuperState = ActualSuperState.IDLING;
+
+        }
+    }
+    private void l3Climbing() {
+        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
+            case L3_CLIMBING:
+                climber.setWantedState(Climber.CLIMBER_STATE.L3_CLIMBING);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                actualSuperState = ActualSuperState.L3_CLIMBING;
+                break;
+            default:
+                actualSuperState = ActualSuperState.IDLING;
+        }
+    }
+    public void storageIntaking() {
+        switch (wantedIntakeState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
+            case INTAKING:
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                actualSuperState = ActualSuperState.STORAGE_INTAKING;
+                break;
+            case OUTTAKING:
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                actualSuperState = ActualSuperState.STORAGE_INTAKING;
+                break;
+            case UP:
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                actualSuperState = ActualSuperState.STORAGE_INTAKING;
+                break;
+            case DOWN:
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                actualSuperState = ActualSuperState.STORAGE_INTAKING;
+                break;
+            case IDLING:
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                actualSuperState = ActualSuperState.STORAGE_INTAKING;
+            default:
+                actualSuperState = ActualSuperState.IDLING;
+
+        }
+    }
+    public void snowBlowing() {
+        //WILL NEED TO ADD MULTIPLE SUBSYSTEMS
+    }
+
+
+    public void l1Downclimbing() {
+        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
+            case L1_CLIMBING_DOWN:
+                climber.setWantedState(Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN); //WILL NEED TO CONFIDE WITH BUILD FOR ALL WANT STATES FOR THE ACTIONS
+                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                actualSuperState = ActualSuperState.L1_DOWNCLIMBING;
+                break;
+            default:
+                actualSuperState = ActualSuperState.IDLING;
+
+        }
+    }
+    public void l3DownClimbing() {
+        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
+            case L3_ClIMBING_DOWN:
+                climber.setWantedState(Climber.CLIMBER_STATE.L3_DOWN_CLIMBING);
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
+                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                actualSuperState = ActualSuperState.L3_DOWNCLIMBING;
+                break;
+            default:
+                actualSuperState = ActualSuperState.IDLING;
+
+        }
+    }
+
+    private void storageShooting() {
+        switch (wantedShooterState) {
+            case AUTOMATIC:
+                shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                break;
+            case DISTANCE_ONE:
+                shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                break;
+            case DISTANCE_TWO:
+                shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                break;
+            case DISTANCE_THREE:
+                shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                break;
+            case IDLE:
+                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
+                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING);
+                indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+                break;
+            default:
+                actualSuperState = ActualSuperState.IDLING;
         }
     }
 
     private void defaulting() {
-        if (wantedShooterState == WantedShooterState.DISTANCE_ONE) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
-        }
-        else if (wantedShooterState == WantedShooterState.DISTANCE_TWO) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
-        }
-        else if (wantedShooterState == WantedShooterState.DISTANCE_THREE) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
-        }
-        else if (wantedShooterState == WantedShooterState.AUTOMATIC) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
-        }
-        else if (wantedShooterState == WantedShooterState.IDLE) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
+
+        switch (wantedShooterState) {
+            case DISTANCE_ONE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
+            case DISTANCE_TWO -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
+            case DISTANCE_THREE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
+            case IDLE -> shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
         }
 
-        if (wantedGatekeeperState == WantedGatekeeperState.OPEN) {
-            gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.OPEN);
-        }
-        else if (wantedGatekeeperState == WantedGatekeeperState.CLOSED) {
-            gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
+        switch (wantedGatekeeperState) {
+            case OPEN -> gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.OPEN);
+            case CLOSED -> gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
         }
 
-        if (wantedSwerveState == WantedSwerveState.AUTOMATIC_DRIVING) {
-            swerve.setWantedState(Swerve.ActualState.AUTOMATIC_DRIVING);
-        }
-        else if (wantedSwerveState == WantedSwerveState.MANUAL_DRIVING) {
-            swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
+        switch(wantedSwerveState) {
+            case AUTOMATIC_DRIVING -> swerve.setWantedState(Swerve.ActualState.AUTOMATIC_DRIVING);
+            case MANUAL_DRIVING -> swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
         }
 
-        if (wantedIntakeState == WantedIntakeState.INTAKING) {
-            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
-        }
-        else if (wantedIntakeState == WantedIntakeState.OUTTAKING) {
-            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
-        }
-        else if (wantedIntakeState == WantedIntakeState.DOWN) {
-            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
-        }
-        else if (wantedIntakeState == WantedIntakeState.UP) {
-            intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+        switch (wantedIntakeState) {
+            case INTAKING -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
+            case OUTTAKING -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
+            case DOWN -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
+            case UP -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+
         }
 
-        if (wantedIndexerState == WantedIndexerState.INDEXING) {
-            indexer.setWantedState(Indexer.INDEXER_STATE.INDEXING);
-        }
-        else if (wantedIndexerState == WantedIndexerState.OUTDEXING) {
-            indexer.setWantedState(Indexer.INDEXER_STATE.OUTDEXING);
-        }
-        else if (wantedIndexerState == WantedIndexerState.IDLING) {
-            indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
+        switch (wantedIndexerState) {
+            case PASSIVE_FEEDING -> indexer.setWantedState(Indexer.INDEXER_STATE.PASSIVE_FEEDING);
+            case ACTIVE_FEEDING -> indexer.setWantedState(Indexer.INDEXER_STATE.ACTIVE_FEEDING);
+            case AGITATING -> indexer.setWantedState(Indexer.INDEXER_STATE.AGITATING);
+            case IDLING -> indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
         }
 
+        /**
+         * What is this doing???
+         */
         if (indexerControlState == IndexerControlState.OVERRIDING) {
-            indexer.setWantedState(Indexer.INDEXER_STATE.OUTDEXING);
+            indexer.setWantedState(Indexer.INDEXER_STATE.ACTIVE_FEEDING);
         }
         else {
             if (wantedIntakeState == WantedIntakeState.INTAKING || wantedGatekeeperState == WantedGatekeeperState.OPEN) {
-                indexer.setWantedState(Indexer.INDEXER_STATE.INDEXING);
+                indexer.setWantedState(Indexer.INDEXER_STATE.PASSIVE_FEEDING);
             }
             else {
                 indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
@@ -288,7 +426,7 @@ public class Superstructure extends SubsystemBase {
         if(wantedIntakeState == this.wantedIntakeState) {
             wantedIntakeState = switch (wantedIntakeState) {
                 case INTAKING, OUTTAKING, DOWN -> WantedIntakeState.DOWN;
-                case UP -> WantedIntakeState.UP;
+                case UP, IDLING -> WantedIntakeState.UP;
             };
         }
 
@@ -309,11 +447,6 @@ public class Superstructure extends SubsystemBase {
         setIndexerControlState(IndexerControlState.DEFAULTING);
         setWantedIntakeState(WantedIntakeState.INTAKING);
         setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING);
-    }
-
-    public void downclimbing() {
-        climber.setWantedState(Climber.CLIMBER_STATE.DOWNCLIMBING);
-        actualSuperState = ActualSuperState.DEFAULTING;
     }
 
 }

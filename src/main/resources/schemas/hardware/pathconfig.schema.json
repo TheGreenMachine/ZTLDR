@@ -1,0 +1,42 @@
+{
+    "type": "object",
+    "title": "Path Config",
+    "additionalProperties": false,
+    "properties": {
+        "x": {
+            "type": "number",
+            "description": "metric x value of target position"
+        },
+        "y": {
+            "type": "number",
+            "description": "metric y value of target position"
+        },
+        "rotation": {
+            "type": "number",
+            "description": "degrees of rotation of target position"
+        },
+        "targetVelocity": {
+            "type": "number",
+            "description": "meters/second of target end velocity",
+            "default": 0
+        },
+        "flippable": {
+            "type": "boolean",
+            "description": "whether the target location should flip based on side",
+            "default": true
+        },
+        "constraints": {
+            "$ref": "pathconstraints.schema.json",
+            "description": "override for default path constraints"
+        }
+    },
+    "anyOf": [
+        {
+            "required": [
+                "x",
+                "y",
+                "rotation"
+            ]
+        }
+    ]
+}

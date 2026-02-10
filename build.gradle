@@ -4,11 +4,25 @@ plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2026.2.1"
     id 'org.jsonschema2dataclass' version '4.0.1'
+    id 'jacoco'
+}
+
+jacoco {
+    toolVersion = "0.8.14"  // or latest stable version
 }
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true     // needed for most GitHub Actions reporters
+        html.required = true    // nice local viewing + upload as artifact
+        csv.required = false
+    }
 }
 
 def ROBOT_MAIN_CLASS = "com.team1816.season.Main"
@@ -126,11 +140,11 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.+'
     testImplementation 'org.hamcrest:hamcrest:2.2'
 }
-// killed build
-//test{
-//    useJUnitPlatform()
-//    systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
-//}
+
+test{
+    finalizedBy jacocoTestReport  // generate report after tests
+    useJUnitPlatform()
+}
 
 // Simulation configuration (e.g. environment variables).
 wpi.sim.addGui().defaultEnabled.set(true)

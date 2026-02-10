@@ -75,7 +75,7 @@ subsystems:
             upAngle: 45
     climber:
         devices:
-            climberMotor:
+            climberFlipMotor:
                 deviceType: TalonFX
                 id: 16
                 motorRotation: Clockwise_Positive
@@ -83,6 +83,15 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+            linearMotor:
+                deviceType: TalonFX
+                id: 28
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+
     indexer:
         devices:
             indexerMotor:
@@ -100,33 +109,22 @@ subsystems:
                 id: 17
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
             bottomLaunchMotor:
                 deviceType: TalonFX
                 id: 18
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
                 motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
             launchAngleMotor:
                 deviceType: TalonFX
                 id: 19
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
             rotationAngleMotor:
                 deviceType: TalonFX
                 id: 20
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
     gatekeeper:
         devices:
             gatekeeperTopMotor:
@@ -276,3 +274,16 @@ subsystems:
         constants:
             translationKp: 3
             rotationKp: 3
+
+autopathing:
+    paths:
+        ethan:
+            x: 3.50
+            y: 1.50
+            rotation: 156.00
+            flippable: false
+    constraints:
+        maxVelocity: 3.00
+        maxAccel: 3.00
+        maxAngularVelocity: 540.000
+        maxAngularAccel: 720.000
