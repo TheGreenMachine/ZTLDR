@@ -45,6 +45,10 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         INTAKE_UP(
             0,
             factory.getConstant(NAME, "upAngle", 45, true)
+        ),
+        IDLING( //ASK INTAKE WHAT THE DEFAULT IS
+            0,
+            factory.getConstant(NAME, "idleAngle", 45, true)
         );
 
         private final double speed, angle;
