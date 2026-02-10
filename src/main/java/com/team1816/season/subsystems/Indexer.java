@@ -13,6 +13,7 @@ public class Indexer extends SubsystemBase implements ITestableSubsystem {
 
     public static final String NAME = "indexer";
     private final IMotor indexerMotor = (IMotor)factory.getDevice(NAME, "indexerMotor");
+//    private final IMotor indexerMotorTop = (IMotor)factory.getDevice(NAME, "indexerMotorTop"); //May need to implement
     private double curPosition;
     private INDEXER_STATE wantedState = INDEXER_STATE.IDLING;
     VelocityVoltage indexReq = new VelocityVoltage(0);
@@ -32,13 +33,18 @@ public class Indexer extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         switch (wantedState) {
-            case INDEXING:
+            case PASSIVE_FEEDING:
 
                 break;
-            case OUTDEXING:
+            case ACTIVE_FEEDING:
+
+                break;
+            case AGITATING:
 
                 break;
             case IDLING:
+
+                break;
             default:
                 break;
         }
@@ -49,8 +55,9 @@ public class Indexer extends SubsystemBase implements ITestableSubsystem {
 
 
     public enum INDEXER_STATE {
-        INDEXING,
-        OUTDEXING,
+        PASSIVE_FEEDING,
+        ACTIVE_FEEDING,
+        AGITATING,
         IDLING
     }
 

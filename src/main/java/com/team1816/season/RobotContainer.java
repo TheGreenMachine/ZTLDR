@@ -22,6 +22,7 @@ public class RobotContainer extends BaseRobotContainer {
         initializeAutonomous();
 
         configureBindings();
+        registerCommands();
     }
 
     public Superstructure getSuperstructure() {
@@ -73,5 +74,53 @@ public class RobotContainer extends BaseRobotContainer {
         // controller.povDown().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_DOWN));
         // controller.leftBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_OUT));
         // controller.rightBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_IN));
+    }
+    public final void registerCommands() {
+        /**
+         * Individual Subsystem Action (not needed, just here)
+         */
+        NamedCommands.registerCommand("automatedShoot", Commands.runOnce(() -> {
+             getSuperstructure().setWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC);
+        }));
+
+        NamedCommands.registerCommand("intake", Commands.runOnce(() -> {
+             getSuperstructure().setWantedIntakeState(Superstructure.WantedIntakeState.INTAKING);
+        }));
+
+        NamedCommands.registerCommand("passiveFeeding", Commands.runOnce(() -> {
+             getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.PASSIVE_FEEDING);
+        }));
+
+        NamedCommands.registerCommand("activeFeeding", Commands.runOnce(() -> {
+             getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.ACTIVE_FEEDING);
+        }));
+
+        NamedCommands.registerCommand("openGatekeeper", Commands.runOnce(() -> {
+             getSuperstructure().setWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
+        }));
+
+        NamedCommands.registerCommand("closeGatekeeper", Commands.runOnce(() -> {
+             getSuperstructure().setWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSED);
+        }));
+
+
+        /**
+         * Combined subsystem Actions (will be used)
+         */
+        NamedCommands.registerCommand("snowblowing", Commands.runOnce(() -> { //Intake and shoot balls at the same time
+             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER);
+        }));
+        NamedCommands.registerCommand("storageShooting", Commands.runOnce(() -> { //Shoots the balls solely in the indexer(Feeder)
+             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.STORAGE_SHOOTER);
+        }));
+        NamedCommands.registerCommand("storageIntake", Commands.runOnce(() -> { //Intake balls into the indexer(Feeder) without shooting them
+             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.STORAGE_INTAKE);
+        }));
+        NamedCommands.registerCommand("l1Climbing", Commands.runOnce(() -> {
+             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.L1_CLIMB);
+        }));
+        NamedCommands.registerCommand("idling", Commands.runOnce(() -> {
+             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.IDLE);
+        }));
     }
 }
