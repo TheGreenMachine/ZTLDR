@@ -6,6 +6,7 @@ import com.team1816.lib.Singleton;
 import com.team1816.season.subsystems.Indexer;
 import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public class RobotContainer extends BaseRobotContainer {
     public RobotContainer() {

@@ -4,6 +4,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.FlippingUtil;
 import com.pathplanner.lib.util.PPLibTelemetry;
+import com.team1816.lib.auto.PathfindManager;
 import com.team1816.lib.subsystems.LedManager;
 import com.team1816.lib.subsystems.drivetrain.IDrivetrain;
 import com.team1816.lib.subsystems.drivetrain.Drivetrain;
@@ -28,11 +29,15 @@ public class BaseRobotContainer {
     public static Swerve swerve;
     private boolean poseInitialized;
 
+    protected PathfindManager pathfindManager;
+
     public void initializeLibSubSystems() {
         Singleton.CreateSubSystem(LedManager.class);
         drivetrain = Singleton.CreateSubSystem(Drivetrain.class);
 
         swerve = new Swerve(drivetrain, driverController);
+
+        pathfindManager = Singleton.get(PathfindManager.class);
     }
 
     public void initializeAutonomous() {

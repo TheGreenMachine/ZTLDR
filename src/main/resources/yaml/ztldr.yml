@@ -231,3 +231,16 @@ subsystems:
         constants:
             translationKp: 3
             rotationKp: 3
+
+autopathing:
+    paths:
+        ethan:
+            x: 3.50
+            y: 1.50
+            rotation: 156.00
+            flippable: false
+    constraints:
+        maxVelocity: 3.00
+        maxAccel: 3.00
+        maxAngularVelocity: 540.000
+        maxAngularAccel: 720.000

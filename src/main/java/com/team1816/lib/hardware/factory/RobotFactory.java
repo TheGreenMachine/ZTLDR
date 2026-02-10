@@ -6,6 +6,8 @@ import com.ctre.phoenix6.signals.*;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
+import com.pathplanner.lib.path.PathConstraints;
+import com.team1816.lib.commands.PathfindToPoseCommand;
 import com.team1816.lib.hardware.*;
 import com.team1816.lib.hardware.components.GhostDevice;
 import com.team1816.lib.hardware.components.IPhoenix6;
@@ -17,11 +19,14 @@ import com.team1816.lib.hardware.components.motor.TalonFXSImpl;
 import com.team1816.lib.hardware.components.sensor.CANCoderImpl;
 import com.team1816.lib.hardware.components.sensor.CanRangeImpl;
 import com.team1816.lib.util.GreenLogger;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.team1816.lib.Singleton.factory;
 import static com.team1816.lib.hardware.components.motor.WpiMotorUtil.getModuleName;
@@ -109,6 +114,51 @@ public class RobotFactory {
 
     public String getDefaultAuto() {
         return config.defaultAuto;
+    }
+
+    public Set<String> getPathNames() {
+        return config.autopathing.paths.keySet();
+    }
+
+    public PathConfig getPathConfig(String pathName) {
+        PathConfig pathConfig = config.autopathing.paths.get(pathName);
+        if (pathConfig.constraints == null) {
+            pathConfig.constraints = config.autopathing.constraints;
+        }
+
+        return pathConfig;
+    }
+
+    public List<PathfindToPoseCommand> getPaths() {
+        List<PathfindToPoseCommand> paths = new ArrayList<>(factory.getPathNames().size());
+
+        for (String pathName : factory.getPathNames()) {
+            PathConfig config = factory.getPathConfig(pathName);
+
+            PathConstraintsConfig constraintsConfig = config.constraints;
+
+            PathConstraints constraints = new PathConstraints(
+                constraintsConfig.maxVelocity,
+                constraintsConfig.maxAccel,
+                Units.degreesToRadians(constraintsConfig.maxAngularVelocity),
+                Units.degreesToRadians(constraintsConfig.maxAngularAccel)
+            );
+
+            PathfindToPoseCommand command = new PathfindToPoseCommand(
+                pathName,
+                new Pose2d(
+                    new Translation2d(config.x, config.y),
+                    Rotation2d.fromDegrees(config.rotation)
+                ),
+                constraints,
+                config.flippable,
+                config.targetVelocity
+            );
+
+            paths.add(command);
+        }
+
+        return Collections.unmodifiableList(paths);
     }
 
     public IPhoenix6 getDevice(String subsystemName, String deviceName) {

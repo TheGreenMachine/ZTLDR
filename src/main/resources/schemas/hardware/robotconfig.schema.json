@@ -17,6 +17,10 @@
         "defaultAuto": {
             "type": "string",
             "default": ""
+        },
+        "autopathing": {
+            "type": "object",
+            "existingJavaType": "AutopathingConfig"
         }
     },
     "additionalProperties": false,
@@ -26,7 +30,8 @@
                 "subsystems",
                 "infrastructure",
                 "constants",
-                "controlboard"
+                "controlboard",
+                "autopathing"
             ]
         }
     ]
