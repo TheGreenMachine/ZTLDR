@@ -50,6 +50,8 @@ subsystems:
                 id: 39
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 30
+                remoteOffest: 0.002
+                forwardSoftLimit: 0.085
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
