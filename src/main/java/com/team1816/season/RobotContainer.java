@@ -73,9 +73,5 @@ public class RobotContainer extends BaseRobotContainer {
         // controller.povDown().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_DOWN));
         // controller.leftBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_OUT));
         // controller.rightBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_IN));
-
-        driverController.a().onTrue(new InstantCommand(() -> {
-            pathfindManager.startPathfinding();
-        }));
     }
 }
