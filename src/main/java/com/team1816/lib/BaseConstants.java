@@ -16,7 +16,7 @@ public final class BaseConstants {
 //            new AprilTagFieldLayout(
 //                List.of(
 //                    new AprilTag(15, new Pose3d(
-//                        new Translation3d(1, 0, Units.inchesToMeters(24)),
+//                        new Translation3d(3, 3, Units.inchesToMeters(24)),
 //                        new Rotation3d(0, 0, Math.PI)
 //                    ))
 //                ), 16.48, 8.10
