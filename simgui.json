@@ -28,7 +28,9 @@
       "/FMSInfo": "FMSInfo",
       "/Field": "Field2d",
       "/SmartDashboard/Auto Mode": "String Chooser",
-      "/SmartDashboard/PathPlanner": "Alerts"
+      "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/Pathfind Target": "String Chooser",
+      "/SmartDashboard/Shooter Incline": "Mechanism2d"
     },
     "windows": {
       "/Field": {
