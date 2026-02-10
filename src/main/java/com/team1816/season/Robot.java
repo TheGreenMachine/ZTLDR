@@ -40,7 +40,6 @@ public class Robot extends TimedRobot {
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
             GreenLogger.log(t);
         }
-        robotContainer.RegisterCommands();
     }
 
     @Override

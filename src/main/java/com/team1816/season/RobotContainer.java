@@ -21,6 +21,7 @@ public class RobotContainer extends BaseRobotContainer {
         initializeAutonomous();
 
         configureBindings();
+        registerCommands();
     }
 
     public Superstructure getSuperstructure() {
@@ -73,7 +74,7 @@ public class RobotContainer extends BaseRobotContainer {
         // controller.leftBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_OUT));
         // controller.rightBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_IN));
     }
-    public final void RegisterCommands() {
+    public final void registerCommands() {
         /**
          * Individual Subsystem Action (not needed, just here)
          */
