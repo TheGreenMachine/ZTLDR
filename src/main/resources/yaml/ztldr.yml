@@ -75,33 +75,22 @@ subsystems:
                 id: 17
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
             bottomLaunchMotor:
                 deviceType: TalonFX
                 id: 18
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
                 motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
             launchAngleMotor:
                 deviceType: TalonFX
                 id: 19
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
             rotationAngleMotor:
                 deviceType: TalonFX
                 id: 20
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
     gatekeeper:
         devices:
             gatekeeperTopMotor:
