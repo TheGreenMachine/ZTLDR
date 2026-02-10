@@ -111,14 +111,6 @@ public class Superstructure extends SubsystemBase {
         this.intake = Singleton.get(Intake.class);
         this.indexer = Singleton.get(Indexer.class);
         this.climber = Singleton.get(Climber.class);
-
-        GreenLogger.log("Shooter table test values" + shooter.shooterTableCalculator.getShooterSetting(0)
-            + " " + shooter.shooterTableCalculator.getShooterSetting(5)
-            + " " + shooter.shooterTableCalculator.getShooterSetting(5.1)
-            + " " + shooter.shooterTableCalculator.getShooterSetting(0.123)
-            + " " + shooter.shooterTableCalculator.getShooterSetting(0.49)
-            + " " + shooter.shooterTableCalculator.getShooterSetting(2.01)
-            + " " + shooter.shooterTableCalculator.getShooterSetting(3.7));
     }
 
     @Override
