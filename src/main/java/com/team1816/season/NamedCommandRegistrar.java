@@ -4,14 +4,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.wpilibj2.command.Commands;
 
-/**TODO: 1. Refactor indexStates (not quite right)
- *       2. Create Combined Actions in superstructure Actions for here
- *       3. Make sure this is in line with the current conventions of the codebase
- *       4. Make sure it works within pathplanner
- *       5. Generally update subsystem
- *
- */
-
 public class NamedCommandRegistrar {
     private RobotContainer robotContainer;
 
