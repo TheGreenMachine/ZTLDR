@@ -112,6 +112,13 @@ public class RobotFactory {
         return getSubsystemConfig(subsystemName).constants.get(name);
     }
 
+    public HashMap<String, AngleVelocityPairConfig> getTargetConfig() {
+        if (config.targetMap == null) {
+            return new HashMap<String, AngleVelocityPairConfig>();
+        }
+        return config.targetMap;
+    }
+
     public String getDefaultAuto() {
         return config.defaultAuto;
     }

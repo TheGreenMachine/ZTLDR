@@ -3,10 +3,9 @@ package com.team1816.season.subsystems;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.BaseRobotState;
-import com.team1816.lib.ballisticCalc.BallisticCalculator;
-import com.team1816.lib.ballisticCalc.BallisticSolution;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
@@ -38,7 +37,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private PositionVoltage positionControl = new PositionVoltage(0);
 
     //AUTO AIM
-    private BallisticCalculator ballisticCalculator = new BallisticCalculator();
     private AUTO_AIM_TARGETS currentTarget = AUTO_AIM_TARGETS.BLUE_HUB;
     Translation3d launcherTranslation = new Translation3d(0,0,0).plus(SHOOTER_OFFSET);
 
@@ -58,6 +56,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         new MechanismLigament2d("Launch Angle", 1, 0));
 
     public enum AUTO_AIM_TARGETS{
+        // TODO: figure out hub z value
         BLUE_HUB(new Translation3d(4.6228, 3.8608, 40)),
         RED_HUB(new Translation3d(11.915394, 3.8608, 40));
 
@@ -72,7 +71,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         }
     }
 
+    private ShooterTableCalculator shooterTableCalculator = new ShooterTableCalculator();
+
     public enum SHOOTER_STATE {
+        // TODO: figure out what default angles and velocities should be for manual mode
         DISTANCE_ONE(45, 45, 10),
         DISTANCE_TWO(45, 90, 20),
         DISTANCE_THREE(45, 0, 30),
@@ -132,11 +134,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double launchVelocity = wantedState.getLaunchVelocity();
 
         if (wantedState == SHOOTER_STATE.AUTOMATIC) {
-            // TODO: figure out hub z value
-            BallisticSolution ballisticSolution = ballisticCalculator.getBallisticSolution(launcherTranslation, currentTarget.getPosition(), 10);
-            launchAngle = ballisticSolution.getLaunchAngle();
-            rotationAngle = ballisticSolution.getRotationAngle();
-            launchVelocity = ballisticSolution.getLaunchVelocity();
+            double distance = launcherTranslation.getDistance(currentTarget.position);
+            launchAngle = shooterTableCalculator.getShooterSetting(distance).getFirst();
+            launchVelocity = shooterTableCalculator.getShooterSetting(distance).getSecond();
+            rotationAngle = Math.tan((launcherTranslation.getY()-currentTarget.position.getY())/(launcherTranslation.getX()-currentTarget.position.getX()));
         }
 
         setLaunchAngle(launchAngle);

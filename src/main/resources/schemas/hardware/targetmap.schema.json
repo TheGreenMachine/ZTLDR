@@ -1,0 +1,7 @@
+{
+    "type": "object",
+    "title": "Target Map Config",
+    "existingJavaType": "java.util.HashMap<String,AngleVelocityPairConfig>",
+    "additionalProperties": false,
+    "default": null
+}
