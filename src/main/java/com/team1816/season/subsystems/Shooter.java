@@ -59,6 +59,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         new MechanismLigament2d("Launch Angle", 1, 0));
 
     public enum AUTO_AIM_TARGETS{
+        // TODO: figure out hub z value
         BLUE_HUB(new Translation3d(4.6228, 3.8608, 40)),
         RED_HUB(new Translation3d(11.915394, 3.8608, 40));
 
@@ -73,10 +74,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         }
     }
 
-    // TODO: make this private after testing is finished
-    public ShooterTableCalculator shooterTableCalculator = new ShooterTableCalculator();
+    private ShooterTableCalculator shooterTableCalculator = new ShooterTableCalculator();
 
     public enum SHOOTER_STATE {
+        // TODO: figure out what default angles and velocities should be for manual mode
         DISTANCE_ONE(45, 45, 10),
         DISTANCE_TWO(45, 90, 20),
         DISTANCE_THREE(45, 0, 30),
@@ -136,11 +137,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double launchVelocity = wantedState.getLaunchVelocity();
 
         if (wantedState == SHOOTER_STATE.AUTOMATIC) {
-            // TODO: figure out hub z value
-            BallisticSolution ballisticSolution = ballisticCalculator.getBallisticSolution(launcherTranslation, currentTarget.getPosition(), 10);
-            launchAngle = ballisticSolution.getLaunchAngle();
-            rotationAngle = ballisticSolution.getRotationAngle();
-            launchVelocity = ballisticSolution.getLaunchVelocity();
+            double distance = launcherTranslation.getDistance(currentTarget.position);
+            launchAngle = shooterTableCalculator.getShooterSetting(distance).getFirst();
+            launchVelocity = shooterTableCalculator.getShooterSetting(distance).getSecond();
+            rotationAngle = Math.tan((launcherTranslation.getY()-currentTarget.position.getY())/(launcherTranslation.getX()-currentTarget.position.getX()));
         }
 
         setLaunchAngle(launchAngle);
