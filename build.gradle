@@ -244,6 +244,27 @@ task runZTLDR(type: JavaExec) {
     jvmArgs "-Djava.library.path=${jniDir}"
 }
 
+task runZMule(type: JavaExec) {
+    String jniDir = "${project.buildDir}/jni/release"
+    def inheritedPath = System.getenv("PATH")
+    environment "PATH", inheritedPath ? "${jniDir}:${inheritedPath}" : jniDir
+    String hal = fileTree(dir: "${project.buildDir}/jni/release", include: '*halsim_*.*').asPath
+    if (!DefaultNativePlatform.currentOperatingSystem.isWindows()) {
+        def inheritedLdLibraryPath = System.getenv("LD_LIBRARY_PATH")
+        environment "LD_LIBRARY_PATH", inheritedLdLibraryPath ? "${jniDir}:${inheritedLdLibraryPath}" : jniDir
+        environment "DYLD_FALLBACK_LIBRARY_PATH", jniDir
+        environment "DYLD_LIBRARY_PATH", jniDir
+        if (DefaultNativePlatform.currentOperatingSystem.isMacOsX()) {
+            jvmArgs "-XstartOnFirstThread"
+        }
+    }
+    environment "HALSIM_EXTENSIONS", hal
+    environment "ROBOT_NAME", "zmule"
+    dependsOn(jar, simulateExternalJavaRelease)
+    classpath = files(jar)
+    jvmArgs "-Djava.library.path=${jniDir}"
+}
+
 processResources {
     include 'yaml/**/*.yml'
     eachFile {
