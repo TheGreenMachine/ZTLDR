@@ -7,6 +7,7 @@ import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -15,7 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -135,8 +135,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         if (wantedState == SHOOTER_STATE.AUTOMATIC) {
             double distance = launcherTranslation.getDistance(currentTarget.position);
-            launchAngle = shooterTableCalculator.getShooterSetting(distance).getFirst();
-            launchVelocity = shooterTableCalculator.getShooterSetting(distance).getSecond();
+            Pair<Double, Double> angleVelocityPair = shooterTableCalculator.getShooterSetting(distance);
+            launchAngle = angleVelocityPair.getFirst();
+            launchVelocity = angleVelocityPair.getSecond();
             rotationAngle = Math.tan((launcherTranslation.getY()-currentTarget.position.getY())/(launcherTranslation.getX()-currentTarget.position.getX()));
         }
 
