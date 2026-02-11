@@ -107,9 +107,9 @@ public class Superstructure extends SubsystemBase {
     protected WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
     protected ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
-    public WantedShooterState wantedShooterState = WantedShooterState.AUTOMATIC;
+    public WantedShooterState wantedShooterState = WantedShooterState.IDLE;
     public WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
-    public WantedSwerveState wantedSwerveState = WantedSwerveState.AUTOMATIC_DRIVING;
+    public WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
     public WantedIntakeState wantedIntakeState = WantedIntakeState.UP;
     public WantedIndexerState wantedIndexerState = WantedIndexerState.IDLING;
     public IndexerControlState indexerControlState = IndexerControlState.DEFAULTING;

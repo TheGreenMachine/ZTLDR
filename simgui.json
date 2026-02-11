@@ -29,7 +29,8 @@
       "/Field": "Field2d",
       "/SmartDashboard/Auto Mode": "String Chooser",
       "/SmartDashboard/PathPlanner": "Alerts",
-      "/SmartDashboard/Pathfind Target": "String Chooser"
+      "/SmartDashboard/Pathfind Target": "String Chooser",
+      "/SmartDashboard/Shooter Incline": "Mechanism2d"
     },
     "windows": {
       "/Field": {
