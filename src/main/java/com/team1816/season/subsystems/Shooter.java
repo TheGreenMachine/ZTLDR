@@ -3,8 +3,6 @@ package com.team1816.season.subsystems;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.BaseRobotState;
-import com.team1816.lib.ballisticCalc.BallisticCalculator;
-import com.team1816.lib.ballisticCalc.BallisticSolution;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.ShooterTableCalculator;
@@ -39,7 +37,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private PositionVoltage positionControl = new PositionVoltage(0);
 
     //AUTO AIM
-    private BallisticCalculator ballisticCalculator = new BallisticCalculator();
     private AUTO_AIM_TARGETS currentTarget = AUTO_AIM_TARGETS.BLUE_HUB;
     Translation3d launcherTranslation = new Translation3d(0,0,0).plus(SHOOTER_OFFSET);
 
