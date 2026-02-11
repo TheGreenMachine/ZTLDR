@@ -232,6 +232,7 @@ public class Superstructure extends SubsystemBase {
 
         }
     }
+
     private void l3Climbing() {
         switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L3_CLIMBING:
@@ -245,6 +246,7 @@ public class Superstructure extends SubsystemBase {
                 actualSuperState = ActualSuperState.IDLING;
         }
     }
+
     public void storageIntaking() {
         switch (wantedIntakeState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case INTAKING:
@@ -286,6 +288,7 @@ public class Superstructure extends SubsystemBase {
 
         }
     }
+
     public void snowBlowing() {
         //WILL NEED TO ADD MULTIPLE SUBSYSTEMS
     }
@@ -305,6 +308,7 @@ public class Superstructure extends SubsystemBase {
 
         }
     }
+
     public void l3DownClimbing() {
         switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L3_ClIMBING_DOWN:
@@ -358,7 +362,6 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void defaulting() {
-
         switch (wantedShooterState) {
             case DISTANCE_ONE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
             case DISTANCE_TWO -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
@@ -448,5 +451,4 @@ public class Superstructure extends SubsystemBase {
         setWantedIntakeState(WantedIntakeState.INTAKING);
         setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING);
     }
-
 }

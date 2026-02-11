@@ -75,6 +75,7 @@ public class RobotContainer extends BaseRobotContainer {
         // controller.leftBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_OUT));
         // controller.rightBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_IN));
     }
+    
     public final void registerCommands() {
         /**
          * Individual Subsystem Action (not needed, just here)
