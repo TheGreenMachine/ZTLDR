@@ -6,7 +6,9 @@ import com.team1816.lib.Singleton;
 import com.team1816.season.subsystems.Indexer;
 import com.team1816.season.subsystems.Superstructure;
 
-public class RobotContainer extends BaseRobotContainer<Superstructure> {
+public class RobotContainer extends BaseRobotContainer {
+    private Superstructure superstructure;
+
     public RobotContainer() {
         NamedCommands.registerCommand("InTheZone", new InTheZoneCommand());
         // call the base to initialize library objects
@@ -15,14 +17,15 @@ public class RobotContainer extends BaseRobotContainer<Superstructure> {
 
         Singleton.CreateSubSystem(Indexer.class);
 
-        initializeAutonomous();
+        buildAutoChooser();
 
         configureBindings();
     }
 
     @Override
     protected Superstructure createSuperstructure() {
-        return new Superstructure(swerve, vision);
+        superstructure = new Superstructure(swerve, vision);
+        return superstructure;
     }
 
     public Superstructure getSuperstructure() {

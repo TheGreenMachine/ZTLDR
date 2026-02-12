@@ -1,6 +1,7 @@
 package com.team1816.season;
 
 import com.team1816.lib.BaseRobot;
+import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.commands.SubsystemTestCommand;
 import com.team1816.lib.events.PubSubHandler;
@@ -12,16 +13,11 @@ import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Threads;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-public class Robot extends BaseRobot<RobotContainer> {
-
-    public Robot() {
-        super(new RobotContainer());
-    }
-
+public class Robot extends BaseRobot {
+    private RobotContainer robotContainer;
     double periodicLoopTime;
     private Command autonomousCommand;
     private final PubSubHandler pubsub = Singleton.get(PubSubHandler.class);
@@ -116,5 +112,11 @@ public class Robot extends BaseRobot<RobotContainer> {
     @Override
     public void teleopExit() {
         robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.TELEOP_IDLE);
+    }
+
+    @Override
+    protected BaseRobotContainer createRobotContainer() {
+        robotContainer = new RobotContainer();
+        return robotContainer;
     }
 }

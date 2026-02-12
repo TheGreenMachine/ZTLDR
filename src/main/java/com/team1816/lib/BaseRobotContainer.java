@@ -16,26 +16,24 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
-public abstract class BaseRobotContainer<T extends BaseSuperstructure> {
-    protected final T superstructure;
+public abstract class BaseRobotContainer {
+    private final BaseSuperstructure baseSuperstructure;
     protected CommandXboxController controller = new CommandXboxController(0);
 
     public SendableChooser<Command> autoChooser;
-    public final Swerve swerve = new Swerve(controller);
-    public final Vision vision = new Vision();
+    protected final Swerve swerve = new Swerve(controller);
+    protected final Vision vision = new Vision();
     private boolean poseInitialized;
 
     protected BaseRobotContainer() {
-        superstructure = createSuperstructure();
+        baseSuperstructure = createSuperstructure();
     }
-
-    protected abstract T createSuperstructure();
 
     public void initializeLibSubSystems() {
         Singleton.CreateSubSystem(LedManager.class);
     }
 
-    public void initializeAutonomous() {
+    public void buildAutoChooser() {
         autoChooser = AutoBuilder.buildAutoChooser(Singleton.factory.getDefaultAuto());
         SmartDashboard.putData("Auto Mode", autoChooser);
         autoChooser.onChange(this::updatePoseOnSelection);
@@ -75,6 +73,24 @@ public abstract class BaseRobotContainer<T extends BaseSuperstructure> {
      * Tells the superstructure to add vision measurements to the drivetrain pose estimate.
      */
     public void addVisionMeasurementsToDrivetrain() {
-        superstructure.addVisionMeasurementsToDrivetrain();
+        baseSuperstructure.addVisionMeasurementsToDrivetrain();
     }
+
+    /**
+     * This method should be overridden in the season specific implementation of {@link
+     * BaseRobotContainer} to create the instance of the season specific implementation of {@link
+     * BaseSuperstructure}. It should then return this instance to allow {@link BaseRobotContainer}
+     * to access it.
+     * <p>
+     * It is important that the overriding method is where the new instance of the {@link
+     * BaseSuperstructure} implementation is actually created, instead of initializing it somewhere
+     * else like at the top of the class. This is because this method will be called in the
+     * constructor of {@link BaseRobotContainer}, meaning that it will run before <i>any</i> code
+     * in the season {@link BaseRobotContainer} implementation is run, causing all fields
+     * initialized elsewhere to still be null at this point.
+     *
+     * @return The instance of the season specific implementation of {@link BaseRobotContainer}
+     * from the season specific implementation of {@link BaseRobot}.
+     */
+    protected abstract BaseSuperstructure createSuperstructure();
 }
