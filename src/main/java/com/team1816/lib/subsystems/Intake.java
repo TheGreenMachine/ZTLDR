@@ -99,7 +99,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         currentFlipperAngle = (flipper.getMotorPosition() / GEAR_RATIO) * 360;
         currentVoltage = 0;
 
-        intakeAngleML.setAngle(3);
+        intakeAngleML.setAngle(wantedState.getAngle());
     }
 
     private boolean canSuckOrBlow() {
