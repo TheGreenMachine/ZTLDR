@@ -69,14 +69,33 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     }
 
     public enum CLIMBER_STATE {
-        IDLING,
-        L3_CLIMBING,
-        L3_DOWN_CLIMBING,
-        L1_CLIMBING,
-        L1_DOWN_CLIMBING
+        IDLING(
+            factory.getConstant(NAME, "idlePosition", 0, true)
+        ),
+        L3_CLIMBING(
+            factory.getConstant(NAME, "L3ClimbingPosition", 10, true)
+        ),
+        L3_DOWN_CLIMBING(
+            factory.getConstant(NAME, "L3ClimbingDownPosition", 0, true)
+        ),
+        L1_CLIMBING(
+            factory.getConstant(NAME, "L1ClimbingPosition", 10, true)
+        ),
+        L1_DOWN_CLIMBING(
+            factory.getConstant(NAME, "L1ClimbingDownPosition", 0, true)
+        );
 
 
+        private final double length;
+        CLIMBER_STATE (double length) {
+            this.length = length;
+        }
+
+        public double getLength() {
+            return length;
+        }
     }
+
 
     public void setWantedState(CLIMBER_STATE wantedState) {
         this.wantedState = wantedState;
