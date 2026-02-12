@@ -25,10 +25,6 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     VelocityVoltage climReq = new VelocityVoltage(0);
 
     //MECHANISMS *Need to ask build team for details
-    private final NetworkTable networkTable;
-    private DoubleArrayPublisher turretFieldPose;
-    private final double[] poseArray = new double[3];
-
     public Mechanism2d climberMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
     public MechanismRoot2d climberMechRoot = climberMech.getRoot("Climber Root", 1.5, 0);
     public MechanismLigament2d climberAngleML = climberMechRoot.append(
@@ -36,8 +32,6 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
 
     public Climber () {
         super();
-        networkTable = NetworkTableInstance.getDefault().getTable("");
-        turretFieldPose = networkTable.getDoubleArrayTopic("Field/Climber").publish();
         SmartDashboard.putData("Climber", climberMech);
     }
 

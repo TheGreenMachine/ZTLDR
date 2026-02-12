@@ -3,7 +3,11 @@ package com.team1816.lib.subsystems;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.hardware.components.motor.IMotor;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import java.time.Duration;
@@ -28,6 +32,17 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     public double currentFlipperAngle = 67;
     private Instant descentStart = Instant.now();
+
+    //MECHANISMS *Need to ask build team for details
+    public Mechanism2d intakeMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
+    public MechanismRoot2d intakeMechRoot = intakeMech.getRoot("Intake Root", 1.5, 0);
+    public MechanismLigament2d intakeAngleML = intakeMechRoot.append(
+        new MechanismLigament2d("Intake Angle", 1, 0));
+
+    public Intake () {
+        super();
+        SmartDashboard.putData("Intake", intakeMech);
+    }
 
     public enum INTAKE_STATE {
         INTAKE_IN(
