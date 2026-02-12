@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -71,7 +72,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public Mechanism2d launchMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
     public MechanismRoot2d launchMechRoot = launchMech.getRoot("Launch Root", 1.5, 0);
     public MechanismLigament2d launchAngleML = launchMechRoot.append(
-        new MechanismLigament2d("Launch Angle", 1, 0));
+        new MechanismLigament2d("Launch Angle", 1.5, 0));
 
     public enum AUTO_AIM_TARGETS{
         // TODO: figure out hub z value

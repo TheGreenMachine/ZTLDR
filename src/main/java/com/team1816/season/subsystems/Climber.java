@@ -3,9 +3,6 @@ package com.team1816.season.subsystems;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
-import edu.wpi.first.networktables.DoubleArrayPublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -26,9 +23,9 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
 
     //MECHANISMS *Need to ask build team for details
     public Mechanism2d climberMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
-    public MechanismRoot2d climberMechRoot = climberMech.getRoot("Climber Root", 1.5, 0);
-    public MechanismLigament2d climberAngleML = climberMechRoot.append(
-        new MechanismLigament2d("Climber Angle", 1, 0));
+    public MechanismRoot2d climberMechRoot = climberMech.getRoot("Climber Root", 1.5,0);
+    public MechanismLigament2d climberLiftML = climberMechRoot.append(
+        new MechanismLigament2d("Climber Lift", 1, 90));
 
     public Climber () {
         super();
@@ -44,6 +41,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     @Override
     public void readFromHardware() {
         curPosition = climberFlipMotor.getMotorPosition();
+        climberLiftML.setLength(2);
     }
 
     private void applyState() {
@@ -68,7 +66,6 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
         }
 
         SmartDashboard.putString("Climber state: ", wantedState.toString());
-        climberAngleML.setAngle(0); //TO ASK
     }
 
     public enum CLIMBER_STATE {

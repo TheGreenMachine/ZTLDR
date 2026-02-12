@@ -35,9 +35,9 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     //MECHANISMS *Need to ask build team for details
     public Mechanism2d intakeMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
-    public MechanismRoot2d intakeMechRoot = intakeMech.getRoot("Intake Root", 1.5, 0);
+    public MechanismRoot2d intakeMechRoot = intakeMech.getRoot("Intake Root", 0, 1);
     public MechanismLigament2d intakeAngleML = intakeMechRoot.append(
-        new MechanismLigament2d("Intake Angle", 1, 0));
+        new MechanismLigament2d("Intake Angle", 1.5, 0));
 
     public Intake () {
         super();
@@ -98,6 +98,8 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         currentPosition = intake.getMotorPosition();
         currentFlipperAngle = (flipper.getMotorPosition() / GEAR_RATIO) * 360;
         currentVoltage = 0;
+
+        intakeAngleML.setAngle(3);
     }
 
     private boolean canSuckOrBlow() {

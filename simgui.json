@@ -29,6 +29,7 @@
       "/Field": "Field2d",
       "/SmartDashboard/Auto Mode": "String Chooser",
       "/SmartDashboard/Climber": "Mechanism2d",
+      "/SmartDashboard/Intake": "Mechanism2d",
       "/SmartDashboard/PathPlanner": "Alerts",
       "/SmartDashboard/Pathfind Target": "String Chooser",
       "/SmartDashboard/Shooter Incline": "Mechanism2d"
@@ -51,6 +52,11 @@
         }
       },
       "/SmartDashboard/Climber": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Intake": {
         "window": {
           "visible": true
         }
