@@ -3,7 +3,14 @@ package com.team1816.season.subsystems;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.team1816.lib.Singleton.factory;
@@ -16,6 +23,23 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     private double curPosition;
     private CLIMBER_STATE wantedState = CLIMBER_STATE.IDLING;
     VelocityVoltage climReq = new VelocityVoltage(0);
+
+    //MECHANISMS *Need to ask build team for details
+    private final NetworkTable networkTable;
+    private DoubleArrayPublisher turretFieldPose;
+    private final double[] poseArray = new double[3];
+
+    public Mechanism2d climberMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
+    public MechanismRoot2d climberMechRoot = climberMech.getRoot("Climber Root", 1.5, 0);
+    public MechanismLigament2d climberAngleML = climberMechRoot.append(
+        new MechanismLigament2d("Climber Angle", 1, 0));
+
+    public Climber () {
+        super();
+        networkTable = NetworkTableInstance.getDefault().getTable("");
+        turretFieldPose = networkTable.getDoubleArrayTopic("Field/Climber").publish();
+        SmartDashboard.putData("Climber", climberMech);
+    }
 
     @Override
     public void periodic() {
@@ -50,6 +74,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
         }
 
         SmartDashboard.putString("Climber state: ", wantedState.toString());
+        climberAngleML.setAngle(0); //TO ASK
     }
 
     public enum CLIMBER_STATE {

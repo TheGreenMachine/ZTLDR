@@ -28,6 +28,7 @@
       "/FMSInfo": "FMSInfo",
       "/Field": "Field2d",
       "/SmartDashboard/Auto Mode": "String Chooser",
+      "/SmartDashboard/Climber": "Mechanism2d",
       "/SmartDashboard/PathPlanner": "Alerts",
       "/SmartDashboard/Pathfind Target": "String Chooser",
       "/SmartDashboard/Shooter Incline": "Mechanism2d"
@@ -45,6 +46,16 @@
         }
       },
       "/SmartDashboard/Auto Mode": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Climber": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Shooter Incline": {
         "window": {
           "visible": true
         }
