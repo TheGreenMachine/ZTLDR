@@ -41,7 +41,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     @Override
     public void readFromHardware() {
         curPosition = climberFlipMotor.getMotorPosition();
-        climberLiftML.setLength(2);
+        climberLiftML.setLength(wantedState.getLength());
     }
 
     private void applyState() {
