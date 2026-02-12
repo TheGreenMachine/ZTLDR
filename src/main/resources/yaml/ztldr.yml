@@ -42,11 +42,16 @@ subsystems:
     climber:
         devices:
             climberFlipMotor:
-                deviceType: TalonFX
                 id: 16
+                deviceType: TalonFX
+                neutralMode: Brake
                 motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
+            stowerMotor:
+                id: 16
+                deviceType: TalonFX
+                neutralMode: Brake
+                motorRotation: Clockwise_Positive
+                motionMagicExpo:
                     expoKV: 0.05
                     expoKA: 0.04
             linearMotor:
@@ -57,7 +62,14 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
-
+        constants:
+            climbPositionStow: 0
+            climbPositionUnstow: 3
+            climbPositionL1: 5
+            climbPositionL2: 7
+            climbPositionL3: 10
+            stowerPositionStow: 1
+            stowerPositionUnstow: 100
     indexer:
         devices:
             indexerMotor:
