@@ -54,6 +54,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private static final Translation3d SHOOTER_OFFSET = new Translation3d(0, 0, 22); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
     private static final double CALIBRATION_THRESHOLD = 10.0; //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
     private static final Rotation2d CALIBRATION_POSITION_ARC_ANGLE = Rotation2d.fromRotations(.75); //should always be less than 1 rotation //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+    private static final Rotation2d ROTATION_OFFSET_FROM_CALIBRATION_ZERO = Rotation2d.fromDegrees(70); //as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
 
     //CALIBRATION
     private Double[] calibrationPositions = new Double[]{null, null};
@@ -237,9 +238,15 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void setRotationAngle(double wantedAngleDegrees) {
-        double rotations = wantedAngleDegrees * MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE;
+        double rotations = (wantedAngleDegrees + ROTATION_OFFSET_FROM_CALIBRATION_ZERO.getDegrees()) * MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE;
+
+        rotations = wrapMotorRotations(rotations);
 
         if(calibrationPositions[0] != null && calibrationPositions[1] != null){
+            if (calibrationPositions[0] > rotations || calibrationPositions[1] < rotations){
+                GreenLogger.log("Wanted Shooter rotation is out of bounds of the calibrated positions");
+            }
+
             double output = MathUtil.clamp(rotations, calibrationPositions[0], calibrationPositions[1]);
 
             rotationAngleMotor.setControl(positionControl.withPosition(output));
