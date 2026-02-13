@@ -1,38 +1,33 @@
 defaultAuto: "Simple S"
 targetMap:
-    0.0:
-        angle: 35.0
-        velocity: 0.07
-    0.5:
-        angle: 31.0
-        velocity: 0.09
-    1.0:
-        angle: 33.0
-        velocity: 0.12
-    1.5:
-        angle: 32.0
-        velocity: 0.11
-    2.0:
-        angle: 31.0
-        velocity: 0.14
-    2.5:
-        angle: 36.0
-        velocity: 0.10
-    3.0:
-        angle: 37.0
-        velocity: 0.12
-    3.5:
-        angle: 40.0
-        velocity: 0.15
-    4.0:
-        angle: 38.0
-        velocity: 0.17
-    4.5:
-        angle: 39.0
-        velocity: 0.16
-    5.0:
-        angle: 42.0
-        velocity: 0.19
+    47:
+        angle: 25.0
+        topMotorVelocity: 17
+        bottomMotorVelocity: 10
+    100:
+        angle: 25.0
+        topMotorVelocity: 27
+        bottomMotorVelocity: 20
+    135:
+        angle: 25.0
+        topMotorVelocity: 37
+        bottomMotorVelocity: 30
+    160:
+        angle: 25.0
+        topMotorVelocity: 47
+        bottomMotorVelocity: 40
+    220:
+        angle: 25.0
+        topMotorVelocity: 57
+        bottomMotorVelocity: 50
+    338:
+        angle: 25.0
+        topMotorVelocity: 67
+        bottomMotorVelocity: 60
+    420:
+        angle: 25.0
+        topMotorVelocity: 77
+        bottomMotorVelocity: 70
 subsystems:
     intake:
         devices:
