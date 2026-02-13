@@ -127,6 +127,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         networkTable = NetworkTableInstance.getDefault().getTable("");
         turretFieldPose = networkTable.getDoubleArrayTopic("Field/Turret").publish();
         SmartDashboard.putData("Shooter Incline", launchMech);
+        currentRotationPosition = rotationAngleMotor.getMotorPosition();
     }
 
     public void periodic() {
