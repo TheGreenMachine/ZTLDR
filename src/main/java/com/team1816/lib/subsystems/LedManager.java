@@ -19,30 +19,22 @@ import static com.team1816.lib.Singleton.pubsub;
 
 public class LedManager extends SubsystemBase implements ITestableSubsystem {
 
-    public static class RobotLEDStatusEvent extends PubSubConsumer<RobotLEDStatus>{}
-    public static class RobotLEDStateEvent extends PubSubConsumer<LEDControlState>{}
-
     public static final String NAME = "ledManager";
-
     private static final int MAX = (int) factory.getConstant(NAME, "maxLevel", 255);
     private static final int LED_COUNT = (int) factory.getConstant(NAME, "ledCount", 8);
     private static final SolidColor SOLID_COLOR = new SolidColor(0, LED_COUNT + 8);
-
+    private final int period = 500; // ms
+    private final IPhoenix6 candle = factory.getDevice(NAME, "drgb");
+    private final IPhoenix6 canifier = factory.getDevice(NAME, "argb");
     private boolean blinkLedOn = false;
     private boolean outputsChanged = false;
-
     private int ledR;
     private int ledG;
     private int ledB;
-
-    private final int period = 500; // ms
     private long lastWriteTime = System.currentTimeMillis();
     private LEDControlState controlState = LEDControlState.SOLID;
     private RobotLEDStatus lastStatus = RobotLEDStatus.OFF;
     private StatusCode lastStatusCode;
-
-    private final IPhoenix6 candle = factory.getDevice(NAME, "drgb");
-    private final IPhoenix6 canifier = factory.getDevice(NAME, "argb");
 
     public LedManager() {
         var ledStatus = pubsub.GetEvent(RobotLEDStatusEvent.class);
@@ -52,7 +44,7 @@ public class LedManager extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void StateChanged(LEDControlState ledControlState) {
-        if(ledControlState != controlState) {
+        if (ledControlState != controlState) {
             controlState = ledControlState;
             outputsChanged = true;
             GreenLogger.log("LED Changed: " + controlState.name());
@@ -60,19 +52,10 @@ public class LedManager extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void setStatus(RobotLEDStatus robotLEDStatus) {
-        if(robotLEDStatus != lastStatus) {
+        if (robotLEDStatus != lastStatus) {
             lastStatus = robotLEDStatus;
             setLedColor(robotLEDStatus.red, robotLEDStatus.green, robotLEDStatus.blue);
         }
-    }
-
-    /**`
-     * Base enum for LED states
-     */
-    public enum LEDControlState {
-        FAST_BLINK,
-        BLINK,
-        SOLID,
     }
 
     private void setLedColor(int r, int g, int b) {
@@ -86,13 +69,13 @@ public class LedManager extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void writeToLed(int r, int g, int b) {
-        SOLID_COLOR.Color = new RGBWColor(r,g,b);
+        SOLID_COLOR.Color = new RGBWColor(r, g, b);
         lastStatusCode = candle.setControl(SOLID_COLOR);
         // special handling for Phoenix6 5 and ghosting to prevent cluttering up IPhoenix6 interface
         if (canifier instanceof CANifierImpl) {
-            ((CANifierImpl)canifier).setLEDOutput(r / 255.0, CANifier.LEDChannel.LEDChannelB);
-            ((CANifierImpl)canifier).setLEDOutput(g / 255.0, CANifier.LEDChannel.LEDChannelA);
-            ((CANifierImpl)canifier).setLEDOutput(b / 255.0, CANifier.LEDChannel.LEDChannelC);
+            ((CANifierImpl) canifier).setLEDOutput(r / 255.0, CANifier.LEDChannel.LEDChannelB);
+            ((CANifierImpl) canifier).setLEDOutput(g / 255.0, CANifier.LEDChannel.LEDChannelA);
+            ((CANifierImpl) canifier).setLEDOutput(b / 255.0, CANifier.LEDChannel.LEDChannelC);
         }
     }
 
@@ -130,28 +113,38 @@ public class LedManager extends SubsystemBase implements ITestableSubsystem {
             boolean passed = true;
         };
         var group = new SequentialCommandGroup();
-        group.addCommands(runOnce(()->{
+        group.addCommands(runOnce(() -> {
             GreenLogger.log("Testing " + NAME);
             controlState = LEDControlState.SOLID;
             setLedColor(MAX, 0, 0); // set red
             ref.passed = ref.passed && lastStatusCode == StatusCode.OK;
         }));
         group.addCommands(new WaitCommand(1.5));
-        group.addCommands(runOnce(()->{
+        group.addCommands(runOnce(() -> {
             setLedColor(0, MAX, 0); // set green
             ref.passed = ref.passed && lastStatusCode == StatusCode.OK;
         }));
         group.addCommands(new WaitCommand(1.5));
-        group.addCommands(runOnce(()->{
+        group.addCommands(runOnce(() -> {
             setLedColor(0, 0, MAX); // set blue
             ref.passed = ref.passed && lastStatusCode == StatusCode.OK;
         }));
         group.addCommands(new WaitCommand(1.5));
-        group.addCommands(runOnce(()->{
+        group.addCommands(runOnce(() -> {
             pubsub.GetEvent(SubsystemTestCommand.TestResult.class).Publish(ref.passed);
             GreenLogger.log("Testing " + NAME + " passed: " + ref.passed);
         }));
         return group;
+    }
+
+    /**
+     * `
+     * Base enum for LED states
+     */
+    public enum LEDControlState {
+        FAST_BLINK,
+        BLINK,
+        SOLID,
     }
 
     /**
@@ -177,5 +170,11 @@ public class LedManager extends SubsystemBase implements ITestableSubsystem {
             this.blue = b;
         }
 
+    }
+
+    public static class RobotLEDStatusEvent extends PubSubConsumer<RobotLEDStatus> {
+    }
+
+    public static class RobotLEDStateEvent extends PubSubConsumer<LEDControlState> {
     }
 }

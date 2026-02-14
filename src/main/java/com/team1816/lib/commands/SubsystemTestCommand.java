@@ -15,7 +15,6 @@ public class SubsystemTestCommand extends GreenCommand {
     private final LedManager.RobotLEDStatusEvent robotStatusEvent = pubsub.GetEvent(LedManager.RobotLEDStatusEvent.class);
     private final LedManager.RobotLEDStateEvent robotStateEvent = pubsub.GetEvent(LedManager.RobotLEDStateEvent.class);
     private final SequentialCommandGroup group = new SequentialCommandGroup();
-    public static class TestResult extends PubSubConsumer<Boolean> {}
     private boolean passed = true;
 
     @Override
@@ -25,16 +24,16 @@ public class SubsystemTestCommand extends GreenCommand {
         // blink leds to warn humans of movement
         robotStateEvent.Publish(LedManager.LEDControlState.BLINK);
         group.addCommands(new WaitCommand(3));
-        group.addCommands(runOnce(()->{
+        group.addCommands(runOnce(() -> {
             robotStateEvent.Publish(LedManager.LEDControlState.SOLID);
         }));
         // add all the substem tests to a sequential group
         for (ITestableSubsystem sys : Singleton.getSubSystems()) {
             var cmd = sys.TestSubsystem();
             // if a subsystem has a command add it
-            if(cmd != null) group.addCommands(cmd);
+            if (cmd != null) group.addCommands(cmd);
         }
-        group.addCommands(runOnce(()->{
+        group.addCommands(runOnce(() -> {
             if (passed) {
                 GreenLogger.log("ALL SYSTEMS PASSED");
                 robotStatusEvent.Publish(LedManager.RobotLEDStatus.ENABLED);
@@ -49,5 +48,8 @@ public class SubsystemTestCommand extends GreenCommand {
 
     private void TestResult(Boolean testPassed) {
         passed = passed && testPassed;
+    }
+
+    public static class TestResult extends PubSubConsumer<Boolean> {
     }
 }

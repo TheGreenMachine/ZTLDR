@@ -18,52 +18,13 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     private final IMotor intake = (IMotor) factory.getDevice(NAME, "intakeMotor");
     private final IMotor flipper = (IMotor) factory.getDevice(NAME, "flipperMotor");
-
-    private VelocityVoltage velocityControl = new VelocityVoltage(0);
-    private PositionVoltage positionControl = new PositionVoltage(0);
-    private INTAKE_STATE wantedState = INTAKE_STATE.INTAKE_UP;
-
     public double currentVoltage = 0;
     public double currentPosition = 0;
-
     public double currentFlipperAngle = 67;
+    private final VelocityVoltage velocityControl = new VelocityVoltage(0);
+    private final PositionVoltage positionControl = new PositionVoltage(0);
+    private INTAKE_STATE wantedState = INTAKE_STATE.INTAKE_UP;
     private Instant descentStart = Instant.now();
-
-    public enum INTAKE_STATE {
-        INTAKE_IN(
-            factory.getConstant(NAME, "inSpeed", 10, true),
-            factory.getConstant(NAME, "inAngle", 10, true)
-        ),
-        INTAKE_OUT(
-            factory.getConstant(NAME, "outSpeed", -10, true),
-            factory.getConstant(NAME, "outAngle", 225, true)
-        ),
-        INTAKE_DOWN(
-            0,
-            factory.getConstant(NAME, "downAngle", 225, true)
-        ),
-        INTAKE_UP(
-            0,
-            factory.getConstant(NAME, "upAngle", 45, true)
-        ),
-        IDLING( //ASK INTAKE WHAT THE DEFAULT IS
-            0,
-            factory.getConstant(NAME, "idleAngle", 45, true)
-        );
-
-        private final double speed, angle;
-        INTAKE_STATE (double speed, double angle) {
-            this.speed = speed;
-            this.angle = angle;
-        }
-
-        public double getAngle() {
-            return angle;
-        }
-        public double getSpeed() {
-            return speed;
-        }
-    }
 
     public void periodic() {
         readFromHardware();
@@ -71,7 +32,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     }
 
     public void setWantedState(INTAKE_STATE state) {
-        if((state == INTAKE_STATE.INTAKE_IN || state == INTAKE_STATE.INTAKE_OUT) && wantedState == INTAKE_STATE.INTAKE_UP) {
+        if ((state == INTAKE_STATE.INTAKE_IN || state == INTAKE_STATE.INTAKE_OUT) && wantedState == INTAKE_STATE.INTAKE_UP) {
             descentStart = Instant.now();
         }
 
@@ -93,7 +54,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         final Instant currentTime = Instant.now();
 
         return ((currentFlipperAngle > targetAngle - threshold && currentFlipperAngle < targetAngle + threshold)
-            || Duration.between(currentTime, descentStart).toSeconds() <= timeOverride) ;
+            || Duration.between(currentTime, descentStart).toSeconds() <= timeOverride);
     }
 
     private void applyState() {
@@ -118,5 +79,43 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         SmartDashboard.putNumber("Intake Velocity Voltage", wantedSpeed);
 
         intake.setControl(velocityControl.withVelocity(wantedSpeed));
+    }
+
+    public enum INTAKE_STATE {
+        INTAKE_IN(
+            factory.getConstant(NAME, "inSpeed", 10, true),
+            factory.getConstant(NAME, "inAngle", 10, true)
+        ),
+        INTAKE_OUT(
+            factory.getConstant(NAME, "outSpeed", -10, true),
+            factory.getConstant(NAME, "outAngle", 225, true)
+        ),
+        INTAKE_DOWN(
+            0,
+            factory.getConstant(NAME, "downAngle", 225, true)
+        ),
+        INTAKE_UP(
+            0,
+            factory.getConstant(NAME, "upAngle", 45, true)
+        ),
+        IDLING( //ASK INTAKE WHAT THE DEFAULT IS
+            0,
+            factory.getConstant(NAME, "idleAngle", 45, true)
+        );
+
+        private final double speed, angle;
+
+        INTAKE_STATE(double speed, double angle) {
+            this.speed = speed;
+            this.angle = angle;
+        }
+
+        public double getAngle() {
+            return angle;
+        }
+
+        public double getSpeed() {
+            return speed;
+        }
     }
 }

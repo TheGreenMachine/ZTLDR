@@ -15,7 +15,7 @@ public class CanRangeImpl extends CANrange implements IPhoenix6 {
 
     public CanRangeImpl(int deviceId, CANBus canbus) {
         super(deviceId, canbus);
-        if(Robot.isSimulation()){
+        if (Robot.isSimulation()) {
             simState = getSimState();
         }
     }

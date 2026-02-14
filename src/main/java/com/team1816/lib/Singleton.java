@@ -11,35 +11,35 @@ import java.util.HashMap;
 // Used to instantiate singletons.  All subsystems should have a single instance
 public class Singleton {
 
-    private static HashMap<Class<?>, Object> instances = null;
-    private static HashMap<Class<?>, ITestableSubsystem> subSystems = null;
     public static RobotFactory factory = null;
     public static PubSubHandler pubsub = null;
+    private static HashMap<Class<?>, Object> instances = null;
+    private static HashMap<Class<?>, ITestableSubsystem> subSystems = null;
 
     // this is used to reset all instances should only be called in tests or first use.
-    public static void Reset(){
+    public static void Reset() {
         instances = new HashMap<>();
         subSystems = new HashMap<>();
         factory = Singleton.get(RobotFactory.class);
         pubsub = Singleton.get(PubSubHandler.class);
     }
 
-    public static Collection<ITestableSubsystem> getSubSystems(){
-        if(instances == null) Reset();
+    public static Collection<ITestableSubsystem> getSubSystems() {
+        if (instances == null) Reset();
         return subSystems.values();
     }
 
-    public static void registerMock(Object obj){
+    public static void registerMock(Object obj) {
         var clazz = obj.getClass();
         // if we are mocking the robot factory we need to update the static reference
-        if(clazz.getName() == factory.getClass().getName()){
-            factory = (RobotFactory)obj;
+        if (clazz.getName() == factory.getClass().getName()) {
+            factory = (RobotFactory) obj;
         }
         instances.put(clazz, obj);
     }
 
     public static <T> T get(Class<T> type) {
-        if(instances == null) Reset();
+        if (instances == null) Reset();
         if (!instances.containsKey(type)) {
             try {
                 instances.put(type, type.getDeclaredConstructor().newInstance());
@@ -52,7 +52,7 @@ public class Singleton {
     }
 
     public static <T extends ITestableSubsystem> T CreateSubSystem(Class<T> type) {
-        if(instances == null) Reset();
+        if (instances == null) Reset();
         if (subSystems.containsKey(type)) {
             throw new RuntimeException("Subsystem " + type.getName() + " already created you can't have more than one instance");
         }

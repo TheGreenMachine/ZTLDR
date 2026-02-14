@@ -6,11 +6,11 @@ import com.pathplanner.lib.util.FlippingUtil;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import com.team1816.lib.auto.PathfindManager;
 import com.team1816.lib.subsystems.LedManager;
-import com.team1816.lib.subsystems.drivetrain.IDrivetrain;
 import com.team1816.lib.subsystems.drivetrain.Drivetrain;
+import com.team1816.lib.subsystems.drivetrain.IDrivetrain;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
-import com.team1816.season.subsystems.Superstructure;
 import com.team1816.lib.util.GreenLogger;
+import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -20,16 +20,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class BaseRobotContainer {
     public static IDrivetrain drivetrain;
-
+    public static Swerve swerve;
+    public SendableChooser<Command> autoChooser;
     protected Superstructure superstructure;
     protected CommandXboxController driverController = new CommandXboxController(0);
     protected CommandXboxController operatorController = new CommandXboxController(1);
-
-    public SendableChooser<Command> autoChooser;
-    public static Swerve swerve;
-    private boolean poseInitialized;
-
     protected PathfindManager pathfindManager;
+    private boolean poseInitialized;
 
     public void initializeLibSubSystems() {
         Singleton.CreateSubSystem(LedManager.class);
@@ -46,8 +43,8 @@ public class BaseRobotContainer {
         autoChooser.onChange(this::updatePoseOnSelection);
     }
 
-    public void updateInitialPose(){
-        if(poseInitialized || DriverStation.getAlliance().isEmpty()) return;
+    public void updateInitialPose() {
+        if (poseInitialized || DriverStation.getAlliance().isEmpty()) return;
         updatePoseOnSelection(autoChooser.getSelected());
     }
 

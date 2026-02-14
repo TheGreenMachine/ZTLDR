@@ -16,7 +16,7 @@ public class CANCoderImpl extends CANcoder implements IPhoenix6 {
     public CANCoderImpl(int deviceId, CANBus canbus) {
 
         super(deviceId, canbus);
-        if(Robot.isSimulation()){
+        if (Robot.isSimulation()) {
             simState = getSimState();
         }
     }

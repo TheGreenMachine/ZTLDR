@@ -9,9 +9,12 @@ import com.ctre.phoenix6.controls.ControlRequest;
 public interface IPhoenix6 {
     // Common method for setting Control Requests.  i.e. make hardware do things
     StatusCode setControl(ControlRequest request);
+
     // Common method to apply configuration changes
     StatusCode applyConfiguration(ParentConfiguration config, String logPath, boolean logDetails);
+
     // reports if device is on the can bus
     boolean isConnected();
+
     StatusCode setSimSupplyVoltage(double volts);
 }

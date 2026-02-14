@@ -9,7 +9,6 @@ import com.ctre.phoenix6.sim.CANdleSimState;
 import com.team1816.lib.hardware.components.IPhoenix6;
 import com.team1816.lib.util.GreenLogger;
 import com.team1816.season.Robot;
-import edu.wpi.first.wpilibj.RobotController;
 
 public class CANdleImpl extends CANdle implements IPhoenix6 {
 
@@ -18,7 +17,7 @@ public class CANdleImpl extends CANdle implements IPhoenix6 {
     public CANdleImpl(Integer canID, CANBus canBusName) {
 
         super(canID, canBusName);
-        if(Robot.isSimulation()){
+        if (Robot.isSimulation()) {
             simState = getSimState();
         }
     }

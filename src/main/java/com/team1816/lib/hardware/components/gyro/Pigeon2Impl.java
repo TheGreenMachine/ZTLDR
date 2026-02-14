@@ -19,7 +19,7 @@ public class Pigeon2Impl extends Pigeon2 implements IPhoenix6, IGyro {
 
     public Pigeon2Impl(int deviceId, CANBus canbus) {
         super(deviceId, canbus);
-        if(Robot.isSimulation()){
+        if (Robot.isSimulation()) {
             simState = getSimState();
         }
     }
@@ -38,7 +38,7 @@ public class Pigeon2Impl extends Pigeon2 implements IPhoenix6, IGyro {
 
     @Override
     public StatusCode updateYaw(double deg) {
-        if(Robot.isSimulation()){
+        if (Robot.isSimulation()) {
             return simState.setRawYaw(deg);
         }
         return setYaw(deg);

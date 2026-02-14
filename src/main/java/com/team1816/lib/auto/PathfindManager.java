@@ -1,9 +1,9 @@
 package com.team1816.lib.auto;
 
 import com.team1816.lib.Singleton;
+import com.team1816.lib.commands.PathfindToPoseCommand;
 import com.team1816.lib.hardware.factory.RobotFactory;
 import com.team1816.lib.util.GreenLogger;
-import com.team1816.lib.commands.PathfindToPoseCommand;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -12,6 +12,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class PathfindManager {
+    private static DoubleArrayPublisher targetPosePub;
+    private final SendableChooser<PathfindToPoseCommand> commandChooser;
+    private PathfindToPoseCommand currentPathCommand = null;
+
     public PathfindManager() {
         commandChooser = new SendableChooser<>();
         SmartDashboard.putData("Pathfind Target", commandChooser);
@@ -44,17 +48,12 @@ public class PathfindManager {
         factory.getPaths().forEach(this::addPath);
     }
 
-    private final SendableChooser<PathfindToPoseCommand> commandChooser;
-    private PathfindToPoseCommand currentPathCommand = null;
-
-    private static DoubleArrayPublisher targetPosePub;
-
     public void addPath(PathfindToPoseCommand cmd) {
         commandChooser.addOption(cmd.getPathName(), cmd);
     }
 
     public void startPathfinding() {
-        currentPathCommand =  commandChooser.getSelected();
+        currentPathCommand = commandChooser.getSelected();
 
         if (currentPathCommand == null) {
             GreenLogger.log("Attempted to start pathing with no path selected");

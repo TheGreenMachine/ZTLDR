@@ -10,15 +10,14 @@ import java.util.HashMap;
 public class ShooterTableCalculator {
     private final double RESOLUTION = 0.5;
 
-    private RobotFactory robotFactory = Singleton.get(RobotFactory.class);
-    private HashMap<String, AngleVelocityPairConfig> targetMap = robotFactory.getTargetConfig();
+    private final RobotFactory robotFactory = Singleton.get(RobotFactory.class);
+    private final HashMap<String, AngleVelocityPairConfig> targetMap = robotFactory.getTargetConfig();
 
     public Pair<Double, Double> getShooterSetting(double distance) {
         if (distance > 5 || distance < 0) {
             GreenLogger.log("Shooter distance is out of bounds");
             return null;
-        }
-        else if (targetMap.get(String.valueOf(distance)) == null) {
+        } else if (targetMap.get(String.valueOf(distance)) == null) {
             double upperBound = roundToUpperBound(RESOLUTION, distance);
             double lowerBound = roundToLowerBound(RESOLUTION, distance);
             double upperAngle = targetMap.get(String.valueOf(upperBound)).angle;
@@ -33,11 +32,11 @@ public class ShooterTableCalculator {
     }
 
     public double roundToLowerBound(double resolution, double value) {
-        return value-value%resolution;
+        return value - value % resolution;
     }
 
     public double roundToUpperBound(double resolution, double value) {
-        return value-value%resolution+resolution;
+        return value - value % resolution + resolution;
     }
 
 }

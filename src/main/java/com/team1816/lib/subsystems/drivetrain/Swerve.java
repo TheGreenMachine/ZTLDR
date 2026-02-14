@@ -17,16 +17,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDataRefresher, ITestableSubsystem {
 
-    private final IDrivetrain drivetrain;
-    private final CommandXboxController controller;
-    private final SlewRateLimiter xLimiter = new SlewRateLimiter(3);    // forward/back
-    private final SlewRateLimiter yLimiter = new SlewRateLimiter(3);    // strafe
-    private final SlewRateLimiter rotLimiter = new SlewRateLimiter(6);  // rotation
+    private static final double[] poseArray = new double[3];
     private static double maxAngularRate = 0;
-    private SwerveDrivetrain.SwerveDriveState swerveDriveState = new  SwerveDrivetrain.SwerveDriveState();
-
     /* Robot swerve drive state */
     private static StructPublisher<Pose2d> drivePose;
     private static StructPublisher<ChassisSpeeds> driveSpeeds;
@@ -37,8 +32,12 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
     private static DoublePublisher driveOdometryFrequency;
     private static DoubleArrayPublisher fieldPub;
     private static StringPublisher fieldTypePub;
-    private static final double[] poseArray = new double[3];
-
+    private final IDrivetrain drivetrain;
+    private final CommandXboxController controller;
+    private final SlewRateLimiter xLimiter = new SlewRateLimiter(3);    // forward/back
+    private final SlewRateLimiter yLimiter = new SlewRateLimiter(3);    // strafe
+    private final SlewRateLimiter rotLimiter = new SlewRateLimiter(6);  // rotation
+    private SwerveDrivetrain.SwerveDriveState swerveDriveState = new SwerveDrivetrain.SwerveDriveState();
     private ActualState wantedState = ActualState.IDLING;
 
     public Swerve(IDrivetrain drivetrain, CommandXboxController controller) {
@@ -65,10 +64,13 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
         fieldTypePub = netTable.getStringTopic("Field/.type").publish();
     }
 
-    public enum ActualState {
-        MANUAL_DRIVING,
-        AUTOMATIC_DRIVING,
-        IDLING
+    public static void processPose2d(Pose2d pose) {
+        // update Field NOTE: this format is deprecated for advantage scope but no support in simulator yet
+        poseArray[0] = pose.getX();
+        poseArray[1] = pose.getY();
+        poseArray[2] = pose.getRotation().getDegrees();
+        fieldTypePub.set("Field2d");
+        fieldPub.set(poseArray);
     }
 
     @Override
@@ -89,34 +91,34 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
     private SwerveRequest GetSwerverCommand(SwerveRequest.FieldCentric drive) {
 
         // 1. Get raw joystick values (-1.0 to +1.0)
-        double rawX    = -controller.getLeftY();    // forward/back  (negative because forward is usually negative Y)
-        double rawY    = -controller.getLeftX();    // strafe left/right
-        double rawRot  = -controller.getRightX();   // rotation
+        double rawX = -controller.getLeftY();    // forward/back  (negative because forward is usually negative Y)
+        double rawY = -controller.getLeftX();    // strafe left/right
+        double rawRot = -controller.getRightX();   // rotation
 
         // 2. Deadband (remove drift)
-        rawX   = Math.abs(rawX)   < 0.08 ? 0 : rawX;
-        rawY   = Math.abs(rawY)   < 0.08 ? 0 : rawY;
+        rawX = Math.abs(rawX) < 0.08 ? 0 : rawX;
+        rawY = Math.abs(rawY) < 0.08 ? 0 : rawY;
         rawRot = Math.abs(rawRot) < 0.08 ? 0 : rawRot;
 
         // 3. Cube the inputs → insane precision at low speed, full power at full stick
-        double x    = rawX   * rawX   * rawX;
-        double y    = rawY   * rawY   * rawY;
-        double rot  = rawRot * rawRot * rawRot;
+        double x = rawX * rawX * rawX;
+        double y = rawY * rawY * rawY;
+        double rot = rawRot * rawRot * rawRot;
 
         // 4. Slew rate limit → buttery smooth acceleration
-        x   = xLimiter.calculate(x);
-        y   = yLimiter.calculate(y);
+        x = xLimiter.calculate(x);
+        y = yLimiter.calculate(y);
         rot = rotLimiter.calculate(rot);
 
         // 5. Slow mode (right bumper = precision mode)
         if (controller.rightBumper().getAsBoolean()) {
-            x   *= 0.35;
-            y   *= 0.35;
+            x *= 0.35;
+            y *= 0.35;
             rot *= 0.45;
         }
 
-        return drive.withVelocityX(x * drivetrain.maxSpd) // Drive forward with negative Y (forward)
-            .withVelocityY(y * drivetrain.maxSpd) // Drive left with negative X (left)
+        return drive.withVelocityX(x * IDrivetrain.maxSpd) // Drive forward with negative Y (forward)
+            .withVelocityY(y * IDrivetrain.maxSpd) // Drive left with negative X (left)
             .withRotationalRate(rot * maxAngularRate); // Drive counterclockwise with negative X (left)
     }
 
@@ -144,7 +146,7 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
 
     private void processSwerveState() {
         driveSpeeds.set(swerveDriveState.Speeds);
-        if(swerveDriveState.ModuleStates != null) {
+        if (swerveDriveState.ModuleStates != null) {
             driveModuleStates.set(swerveDriveState.ModuleStates);
             driveModuleTargets.set(swerveDriveState.ModuleTargets);
             driveModulePositions.set(swerveDriveState.ModulePositions);
@@ -154,12 +156,9 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
         processPose2d(swerveDriveState.Pose);
     }
 
-    public static void processPose2d(Pose2d pose) {
-        // update Field NOTE: this format is deprecated for advantage scope but no support in simulator yet
-        poseArray[0] = pose.getX();
-        poseArray[1] = pose.getY();
-        poseArray[2] = pose.getRotation().getDegrees();
-        fieldTypePub.set("Field2d");
-        fieldPub.set(poseArray);
+    public enum ActualState {
+        MANUAL_DRIVING,
+        AUTOMATIC_DRIVING,
+        IDLING
     }
 }

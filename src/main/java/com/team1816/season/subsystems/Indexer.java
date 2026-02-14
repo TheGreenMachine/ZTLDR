@@ -12,11 +12,11 @@ import static com.team1816.lib.Singleton.factory;
 public class Indexer extends SubsystemBase implements ITestableSubsystem {
 
     public static final String NAME = "indexer";
-    private final IMotor indexerMotor = (IMotor)factory.getDevice(NAME, "indexerMotor");
-//    private final IMotor indexerMotorTop = (IMotor)factory.getDevice(NAME, "indexerMotorTop"); //May need to implement
+    private final IMotor indexerMotor = (IMotor) factory.getDevice(NAME, "indexerMotor");
+    VelocityVoltage indexReq = new VelocityVoltage(0);
+    //    private final IMotor indexerMotorTop = (IMotor)factory.getDevice(NAME, "indexerMotorTop"); //May need to implement
     private double curPosition;
     private INDEXER_STATE wantedState = INDEXER_STATE.IDLING;
-    VelocityVoltage indexReq = new VelocityVoltage(0);
 
     @Override
     public void periodic() {
@@ -52,14 +52,14 @@ public class Indexer extends SubsystemBase implements ITestableSubsystem {
         SmartDashboard.putString("Indexer state: ", wantedState.toString());
     }
 
+    public void setWantedState(INDEXER_STATE state) {
+        wantedState = state;
+    }
+
     public enum INDEXER_STATE {
         PASSIVE_FEEDING,
         ACTIVE_FEEDING,
         AGITATING,
         IDLING
-    }
-
-    public void setWantedState(INDEXER_STATE state) {
-        wantedState = state;
     }
 }

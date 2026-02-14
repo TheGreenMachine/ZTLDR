@@ -6,12 +6,21 @@ import com.pathplanner.lib.util.FlippingUtil;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import java.util.Optional;
 
 public class PathfindToPoseCommand extends GreenCommand {
+    private final Pose2d targetPose;
+    private final String pathName;
+    private final boolean flippable;
+    private final double targetVelocity;
+    private final PathConstraints constraints;
+    // Used to detect inputs from controller to cancel pathing
+    private final CommandXboxController controller = new CommandXboxController(0);
+    private Command internalCommand;
+
     public PathfindToPoseCommand(String pathName,
                                  Pose2d targetPose,
                                  PathConstraints constraints,
@@ -23,17 +32,6 @@ public class PathfindToPoseCommand extends GreenCommand {
         this.targetVelocity = targetVelocity;
         this.constraints = constraints;
     }
-
-    private Command internalCommand;
-
-    private final Pose2d targetPose;
-    private final String pathName;
-    private final boolean flippable;
-    private final double targetVelocity;
-    private final PathConstraints constraints;
-
-    // Used to detect inputs from controller to cancel pathing
-    private final CommandXboxController controller = new CommandXboxController(0);
 
     @Override
     public void initialize() {
@@ -91,8 +89,8 @@ public class PathfindToPoseCommand extends GreenCommand {
     }
 
     private boolean controllerInputDetected() {
-        return controller.getLeftY()  != 0
-            || controller.getLeftX()  != 0
+        return controller.getLeftY() != 0
+            || controller.getLeftX() != 0
             || controller.getRightX() != 0;
     }
 }

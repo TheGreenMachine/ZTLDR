@@ -87,19 +87,18 @@ public class GreenLogger {
             msg.set(value);
             DataLogManager.log(value);
             Elastic.sendNotification(new Elastic.Notification(Elastic.Notification.NotificationLevel.ERROR, throwable.getClass().getName(), throwable.getMessage(), 15000, 450, -1));
-        } else  if (s instanceof RobotConfig) {
+        } else if (s instanceof RobotConfig config) {
             log("Pathplanner config:");
-            var config = (RobotConfig) s;
-            log(String.format("  Holonomic: %b",config.isHolonomic));
-            log(String.format("  MOI: %f",config.MOI));
-            log(String.format("  massKg: %f",config.massKG));
-            log(String.format("  maxTorqueFriction: %f",config.maxTorqueFriction));
-            log(String.format("  wheelFrictionForce: %f",config.wheelFrictionForce));
-            log(String.format("  maxDriveVelocityMPS: %f",config.moduleConfig.maxDriveVelocityMPS));
-            log(String.format("  driveCurrentLimit: %f",config.moduleConfig.driveCurrentLimit));
-            log(String.format("  wheelRadiusMeters: %f",config.moduleConfig.wheelRadiusMeters));
-            log(String.format("  wheelCOF: %f",config.moduleConfig.wheelCOF));
-            log(String.format("  freeSpeedRadPerSec: %f",config.moduleConfig.driveMotor.freeSpeedRadPerSec));
+            log(String.format("  Holonomic: %b", config.isHolonomic));
+            log(String.format("  MOI: %f", config.MOI));
+            log(String.format("  massKg: %f", config.massKG));
+            log(String.format("  maxTorqueFriction: %f", config.maxTorqueFriction));
+            log(String.format("  wheelFrictionForce: %f", config.wheelFrictionForce));
+            log(String.format("  maxDriveVelocityMPS: %f", config.moduleConfig.maxDriveVelocityMPS));
+            log(String.format("  driveCurrentLimit: %f", config.moduleConfig.driveCurrentLimit));
+            log(String.format("  wheelRadiusMeters: %f", config.moduleConfig.wheelRadiusMeters));
+            log(String.format("  wheelCOF: %f", config.moduleConfig.wheelCOF));
+            log(String.format("  freeSpeedRadPerSec: %f", config.moduleConfig.driveMotor.freeSpeedRadPerSec));
         } else {
             var value = String.valueOf(s);
             msg.set(value);

@@ -36,11 +36,11 @@ import static com.team1816.lib.util.FormatUtils.GetDisplay;
 
 public class RobotFactory {
 
-    private RobotConfiguration config;
-    public boolean RobotIsReal; // Use to detect real or simulation public to override for tests
     public final static int StartingGhostId = 50;
+    public boolean RobotIsReal; // Use to detect real or simulation public to override for tests
+    private RobotConfiguration config;
     private int lastGhostId = StartingGhostId;
-    private HashMap<String, CANBus> canBusMap = new HashMap<>();
+    private final HashMap<String, CANBus> canBusMap = new HashMap<>();
 
     public RobotFactory() {
         RobotIsReal = RobotBase.isReal();
@@ -198,7 +198,7 @@ public class RobotFactory {
         var config = factory.getSubsystemConfig(subsystemName);
         // CTRE swerve cannot use ghosted devices they look for specific types
         // and will die when created, so send nulls instead
-        if(!config.implemented) return null;
+        if (!config.implemented) return null;
         for (var key : config.devices.keySet()) {
             var device = config.devices.get(key);
             if (device.id == id) {
@@ -215,7 +215,7 @@ public class RobotFactory {
         IPhoenix6 devInst = null;
         var bus = subsystemConfig.canBusName;
         if (!subsystemConfig.implemented || deviceConfig.id > StartingGhostId) {
-            GreenLogger.log("Device " +  deviceConfig.name + " not implemented ghosting");
+            GreenLogger.log("Device " + deviceConfig.name + " not implemented ghosting");
             bus = "ghost";
         } else {
             GreenLogger.log("Creating " + deviceConfig.name);
@@ -224,14 +224,14 @@ public class RobotFactory {
         GreenLogger.log("  deviceType: " + deviceConfig.deviceType);
 
         CANBus canbus;
-        if(!canBusMap.containsKey(bus)){
+        if (!canBusMap.containsKey(bus)) {
             canbus = new CANBus(bus);
             canBusMap.put(bus, canbus);
         } else {
             canbus = canBusMap.get(bus);
         }
 
-        if(!subsystemConfig.implemented) return new GhostDevice(deviceConfig.id, canbus);
+        if (!subsystemConfig.implemented) return new GhostDevice(deviceConfig.id, canbus);
 
         switch (deviceConfig.deviceType) {
             case TalonFX -> {
@@ -357,7 +357,7 @@ public class RobotFactory {
         // if we have settings defined in YAML use them otherwise use the CTRE defaults
         if (deviceConfig.remoteSensor != null) {
             switch (deviceConfig.remoteSensor) {
-                case RemoteCANcoder ->  config.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+                case RemoteCANcoder -> config.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
             }
         }
         GreenLogger.log("  remoteSensor: " + config.FeedbackSensorSource);

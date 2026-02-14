@@ -5,9 +5,11 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public interface ITestableSubsystem extends Subsystem {
     // override  this method to test the subsystem
-    default Command TestSubsystem(){
-         return null;
-     }
-    default void readFromHardware() {};
+    default Command TestSubsystem() {
+        return null;
+    }
+
+    default void readFromHardware() {
+    }
 
 }

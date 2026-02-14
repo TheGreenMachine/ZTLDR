@@ -11,11 +11,11 @@ import static com.team1816.lib.Singleton.factory;
 public class Climber extends SubsystemBase implements ITestableSubsystem {
 
     public static final String NAME = "climber";
-    private final IMotor climberFlipMotor = (IMotor)factory.getDevice(NAME, "climberFlipMotor");
-    private final IMotor linearMotor = (IMotor)factory.getDevice(NAME, "linearMotor"); //Build-team had a cool name for this
+    private final IMotor climberFlipMotor = (IMotor) factory.getDevice(NAME, "climberFlipMotor");
+    private final IMotor linearMotor = (IMotor) factory.getDevice(NAME, "linearMotor"); //Build-team had a cool name for this
+    VelocityVoltage climReq = new VelocityVoltage(0);
     private double curPosition;
     private CLIMBER_STATE wantedState = CLIMBER_STATE.IDLING;
-    VelocityVoltage climReq = new VelocityVoltage(0);
 
     @Override
     public void periodic() {
@@ -52,6 +52,10 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
         SmartDashboard.putString("Climber state: ", wantedState.toString());
     }
 
+    public void setWantedState(CLIMBER_STATE wantedState) {
+        this.wantedState = wantedState;
+    }
+
     public enum CLIMBER_STATE {
         IDLING,
         L3_CLIMBING,
@@ -60,9 +64,5 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
         L1_DOWN_CLIMBING
 
 
-    }
-
-    public void setWantedState(CLIMBER_STATE wantedState) {
-        this.wantedState = wantedState;
     }
 }

@@ -6,6 +6,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 
 public interface IGyro extends IPhoenix6 {
     double getGyroYaw();
+
     Rotation2d getRotation2d();
+
     StatusCode updateYaw(double deg);
 }

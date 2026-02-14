@@ -17,16 +17,14 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class Robot extends TimedRobot {
 
-    private RobotContainer robotContainer;
-
-    public Robot() {
-    }
-
-    double periodicLoopTime;
-    private Command autonomousCommand;
     private final PubSubHandler pubsub = Singleton.get(PubSubHandler.class);
     private final LedManager.RobotLEDStatusEvent robotStatusEvent = pubsub.GetEvent(LedManager.RobotLEDStatusEvent.class);
     private final LedManager.RobotLEDStateEvent robotStateEvent = pubsub.GetEvent(LedManager.RobotLEDStateEvent.class);
+    double periodicLoopTime;
+    private RobotContainer robotContainer;
+    private Command autonomousCommand;
+    public Robot() {
+    }
 
     @Override
     public void robotInit() {
@@ -55,7 +53,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        if(robotContainer == null) return;
+        if (robotContainer == null) return;
         robotContainer.updateInitialPose();
     }
 

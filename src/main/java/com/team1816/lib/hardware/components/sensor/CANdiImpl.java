@@ -17,7 +17,7 @@ public class CANdiImpl extends CANdi implements IPhoenix6 {
     public CANdiImpl(Integer canID, CANBus canBusName) {
 
         super(canID, canBusName);
-        if(Robot.isSimulation()){
+        if (Robot.isSimulation()) {
             simState = getSimState();
         }
     }

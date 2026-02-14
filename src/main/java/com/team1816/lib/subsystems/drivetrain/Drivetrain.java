@@ -20,21 +20,19 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 
-
 import static com.team1816.lib.Singleton.factory;
 import static com.team1816.lib.util.FormatUtils.GetDisplay;
 
 public class Drivetrain extends SwerveDrivetrain<CommonTalon, CommonTalon, ParentDevice> implements IDrivetrain {
 
-    SubsystemConfig config = factory.getSubsystemConfig(NAME);
     private static final double SIM_LOOP_PERIOD = 0.005; // 5 ms
-    private double lastSimTime;
-    private boolean fieldCentric;
-
     /**
      * Swerve request to apply during robot-centric path following
      */
     private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds().withDriveRequestType(SwerveModule.DriveRequestType.Velocity);
+    SubsystemConfig config = factory.getSubsystemConfig(NAME);
+    private double lastSimTime;
+    private final boolean fieldCentric;
 
     // Creates the CTRE swerve drivetrain.  The getDeviceById calls are made by the CTRE class and are based
     // on the defined values in the getSwerveModuleConstants
@@ -56,7 +54,7 @@ public class Drivetrain extends SwerveDrivetrain<CommonTalon, CommonTalon, Paren
 
     @Override
     public void setSwerveState(SwerveRequest request) {
-        if(config.implemented)
+        if (config.implemented)
             this.setControl(request);
     }
 

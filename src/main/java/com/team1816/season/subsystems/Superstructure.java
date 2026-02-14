@@ -3,7 +3,6 @@ package com.team1816.season.subsystems;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.Intake;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
-import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -17,106 +16,17 @@ public class Superstructure extends SubsystemBase {
     private final Intake intake;
     private final Indexer indexer;
     private final Climber climber;
-    protected CommandXboxController controller;
-
-    public enum WantedSuperState {
-        DEFAULT,
-        L1_CLIMB,
-        L3_CLIMB,
-        L1_DOWNCLIMB,
-        L3_DOWNCLIMB,
-        IDLE,
-        SNOWBLOWER,
-        STORAGE_INTAKE,
-        STORAGE_SHOOTER
-    }
-
-    public enum ActualSuperState {
-        DEFAULTING,
-        L1_CLIMBING,
-        L3_CLIMBING,
-        L1_DOWNCLIMBING,
-        L3_DOWNCLIMBING,
-        IDLING,
-        SNOWBLOWING,
-        STORAGE_INTAKING,
-        STORAGE_SHOOTING
-    }
-
-    public enum ClimbSide {
-        // TODO: Get these poses from Choreo.
-        LEFT(Pose2d.kZero),
-        RIGHT(Pose2d.kZero);
-
-        private final Pose2d climbPose;
-
-        ClimbSide(Pose2d climbPose) {
-            this.climbPose = climbPose;
-        }
-
-        public Pose2d getClimbPose() {
-            return climbPose;
-        }
-    }
-
-    private enum WantedClimbState {
-        IDLING,
-        L3_CLIMBING,
-        L3_ClIMBING_DOWN,
-        L1_CLIMING,
-        L1_CLIMBING_DOWN
-    }
-
-    public enum WantedShooterState {
-        DISTANCE_ONE,
-        DISTANCE_TWO,
-        DISTANCE_THREE,
-        AUTOMATIC,
-        IDLE
-    }
-
-    public enum WantedGatekeeperState {
-        OPEN,
-        CLOSED
-    }
-
-    public enum WantedSwerveState {
-        AUTOMATIC_DRIVING,
-        MANUAL_DRIVING
-    }
-
-    public enum WantedIntakeState {
-        INTAKING,
-        OUTTAKING,
-        DOWN,
-        UP,
-        IDLING
-    }
-
-    public enum WantedIndexerState {
-        PASSIVE_FEEDING,
-        ACTIVE_FEEDING,
-        AGITATING,
-        IDLING
-    }
-
-    public enum IndexerControlState {
-        OVERRIDING,
-        DEFAULTING
-    }
-
-    protected WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
-    protected ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
-
     public WantedShooterState wantedShooterState = WantedShooterState.IDLE;
     public WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
     public WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
     public WantedIntakeState wantedIntakeState = WantedIntakeState.UP;
     public WantedIndexerState wantedIndexerState = WantedIndexerState.IDLING;
     public IndexerControlState indexerControlState = IndexerControlState.DEFAULTING;
-
     public ClimbSide climbSide = ClimbSide.LEFT;
     public WantedClimbState climbState = WantedClimbState.IDLING;
+    protected CommandXboxController controller;
+    protected WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
+    protected ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
     public Superstructure(Swerve swerve) {
         this.swerve = swerve;
@@ -140,8 +50,7 @@ public class Superstructure extends SubsystemBase {
             case DEFAULT:
                 if (actualSuperState == ActualSuperState.L1_CLIMBING || actualSuperState == ActualSuperState.L1_DOWNCLIMBING) {
                     actualSuperState = ActualSuperState.L1_DOWNCLIMBING;
-                }
-                else {
+                } else {
                     actualSuperState = ActualSuperState.DEFAULTING;
                 }
                 break;
@@ -293,7 +202,6 @@ public class Superstructure extends SubsystemBase {
         //WILL NEED TO ADD MULTIPLE SUBSYSTEMS
     }
 
-
     public void l1Downclimbing() {
         switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L1_CLIMBING_DOWN:
@@ -374,7 +282,7 @@ public class Superstructure extends SubsystemBase {
             case CLOSED -> gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
         }
 
-        switch(wantedSwerveState) {
+        switch (wantedSwerveState) {
             case AUTOMATIC_DRIVING -> swerve.setWantedState(Swerve.ActualState.AUTOMATIC_DRIVING);
             case MANUAL_DRIVING -> swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
         }
@@ -399,12 +307,10 @@ public class Superstructure extends SubsystemBase {
          */
         if (indexerControlState == IndexerControlState.OVERRIDING) {
             indexer.setWantedState(Indexer.INDEXER_STATE.ACTIVE_FEEDING);
-        }
-        else {
+        } else {
             if (wantedIntakeState == WantedIntakeState.INTAKING || wantedGatekeeperState == WantedGatekeeperState.OPEN) {
                 indexer.setWantedState(Indexer.INDEXER_STATE.PASSIVE_FEEDING);
-            }
-            else {
+            } else {
                 indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
             }
         }
@@ -426,7 +332,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void setWantedIntakeState(WantedIntakeState wantedIntakeState) {
-        if(wantedIntakeState == this.wantedIntakeState) {
+        if (wantedIntakeState == this.wantedIntakeState) {
             wantedIntakeState = switch (wantedIntakeState) {
                 case INTAKING, OUTTAKING, DOWN -> WantedIntakeState.DOWN;
                 case UP, IDLING -> WantedIntakeState.UP;
@@ -450,5 +356,91 @@ public class Superstructure extends SubsystemBase {
         setIndexerControlState(IndexerControlState.DEFAULTING);
         setWantedIntakeState(WantedIntakeState.INTAKING);
         setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING);
+    }
+
+    public enum WantedSuperState {
+        DEFAULT,
+        L1_CLIMB,
+        L3_CLIMB,
+        L1_DOWNCLIMB,
+        L3_DOWNCLIMB,
+        IDLE,
+        SNOWBLOWER,
+        STORAGE_INTAKE,
+        STORAGE_SHOOTER
+    }
+
+    public enum ActualSuperState {
+        DEFAULTING,
+        L1_CLIMBING,
+        L3_CLIMBING,
+        L1_DOWNCLIMBING,
+        L3_DOWNCLIMBING,
+        IDLING,
+        SNOWBLOWING,
+        STORAGE_INTAKING,
+        STORAGE_SHOOTING
+    }
+
+    public enum ClimbSide {
+        // TODO: Get these poses from Choreo.
+        LEFT(Pose2d.kZero),
+        RIGHT(Pose2d.kZero);
+
+        private final Pose2d climbPose;
+
+        ClimbSide(Pose2d climbPose) {
+            this.climbPose = climbPose;
+        }
+
+        public Pose2d getClimbPose() {
+            return climbPose;
+        }
+    }
+
+    private enum WantedClimbState {
+        IDLING,
+        L3_CLIMBING,
+        L3_ClIMBING_DOWN,
+        L1_CLIMING,
+        L1_CLIMBING_DOWN
+    }
+
+    public enum WantedShooterState {
+        DISTANCE_ONE,
+        DISTANCE_TWO,
+        DISTANCE_THREE,
+        AUTOMATIC,
+        IDLE
+    }
+
+    public enum WantedGatekeeperState {
+        OPEN,
+        CLOSED
+    }
+
+    public enum WantedSwerveState {
+        AUTOMATIC_DRIVING,
+        MANUAL_DRIVING
+    }
+
+    public enum WantedIntakeState {
+        INTAKING,
+        OUTTAKING,
+        DOWN,
+        UP,
+        IDLING
+    }
+
+    public enum WantedIndexerState {
+        PASSIVE_FEEDING,
+        ACTIVE_FEEDING,
+        AGITATING,
+        IDLING
+    }
+
+    public enum IndexerControlState {
+        OVERRIDING,
+        DEFAULTING
     }
 }

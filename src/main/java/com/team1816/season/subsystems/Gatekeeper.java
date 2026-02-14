@@ -13,13 +13,13 @@ import static com.team1816.lib.Singleton.factory;
 public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
 
     public static final String NAME = "gatekeeper";
-    private final IMotor gatekeeperTopMotor = (IMotor)factory.getDevice(NAME, "gatekeeperTopMotor");
-    private final IMotor gatekeeperBottomMotor = (IMotor)factory.getDevice(NAME, "gatekeeperBottomMotor");
+    private final IMotor gatekeeperTopMotor = (IMotor) factory.getDevice(NAME, "gatekeeperTopMotor");
+    private final IMotor gatekeeperBottomMotor = (IMotor) factory.getDevice(NAME, "gatekeeperBottomMotor");
+    VelocityVoltage indexReq = new VelocityVoltage(0);
     private double curTopPosition;
     private double curBottomPosition;
     private GATEKEEPER_STATE wantedState = GATEKEEPER_STATE.CLOSED;
-    VelocityVoltage indexReq = new VelocityVoltage(0);
-    private VoltageOut voltageControl = new VoltageOut(0);
+    private final VoltageOut voltageControl = new VoltageOut(0);
 
     @Override
     public void periodic() {
@@ -52,11 +52,6 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
         SmartDashboard.putString("Gatekeeper state: ", wantedState.toString());
     }
 
-    public enum GATEKEEPER_STATE {
-        OPEN,
-        CLOSED
-    }
-
     private void setGatekeeperTopVelocity(double wantedVelocity) {
         gatekeeperTopMotor.setControl(voltageControl.withOutput(wantedVelocity));
     }
@@ -67,5 +62,10 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
 
     public void setWantedState(GATEKEEPER_STATE state) {
         wantedState = state;
+    }
+
+    public enum GATEKEEPER_STATE {
+        OPEN,
+        CLOSED
     }
 }
