@@ -4,8 +4,8 @@ import java.util.List;
 
 public class SubsystemDataProcessor implements Runnable {
     public static final int LOOP_TIME = 20;
-    private double timestamp = 0.0;
     private final List<IDataRefresher> dataRefreshers;
+    private double timestamp = 0.0;
 
     public SubsystemDataProcessor(IDataRefresher IODataRefresher) {
         dataRefreshers = List.of(IODataRefresher);

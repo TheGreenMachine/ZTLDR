@@ -18,11 +18,11 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     private final IMotor intake = (IMotor) factory.getDevice(NAME, "intakeMotor");
     private final IMotor flipper = (IMotor) factory.getDevice(NAME, "flipperMotor");
+    private final VelocityVoltage velocityControl = new VelocityVoltage(0);
+    private final PositionVoltage positionControl = new PositionVoltage(0);
     public double currentVoltage = 0;
     public double currentPosition = 0;
     public double currentFlipperAngle = 67;
-    private final VelocityVoltage velocityControl = new VelocityVoltage(0);
-    private final PositionVoltage positionControl = new PositionVoltage(0);
     private INTAKE_STATE wantedState = INTAKE_STATE.INTAKE_UP;
     private Instant descentStart = Instant.now();
 

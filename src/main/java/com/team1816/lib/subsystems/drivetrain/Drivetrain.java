@@ -30,9 +30,9 @@ public class Drivetrain extends SwerveDrivetrain<CommonTalon, CommonTalon, Paren
      * Swerve request to apply during robot-centric path following
      */
     private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds().withDriveRequestType(SwerveModule.DriveRequestType.Velocity);
+    private final boolean fieldCentric;
     SubsystemConfig config = factory.getSubsystemConfig(NAME);
     private double lastSimTime;
-    private final boolean fieldCentric;
 
     // Creates the CTRE swerve drivetrain.  The getDeviceById calls are made by the CTRE class and are based
     // on the defined values in the getSwerveModuleConstants

@@ -37,10 +37,10 @@ import static com.team1816.lib.util.FormatUtils.GetDisplay;
 public class RobotFactory {
 
     public final static int StartingGhostId = 50;
+    private final HashMap<String, CANBus> canBusMap = new HashMap<>();
     public boolean RobotIsReal; // Use to detect real or simulation public to override for tests
     private RobotConfiguration config;
     private int lastGhostId = StartingGhostId;
-    private final HashMap<String, CANBus> canBusMap = new HashMap<>();
 
     public RobotFactory() {
         RobotIsReal = RobotBase.isReal();

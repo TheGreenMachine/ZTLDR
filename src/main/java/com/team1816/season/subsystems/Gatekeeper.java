@@ -15,11 +15,11 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
     public static final String NAME = "gatekeeper";
     private final IMotor gatekeeperTopMotor = (IMotor) factory.getDevice(NAME, "gatekeeperTopMotor");
     private final IMotor gatekeeperBottomMotor = (IMotor) factory.getDevice(NAME, "gatekeeperBottomMotor");
+    private final VoltageOut voltageControl = new VoltageOut(0);
     VelocityVoltage indexReq = new VelocityVoltage(0);
     private double curTopPosition;
     private double curBottomPosition;
     private GATEKEEPER_STATE wantedState = GATEKEEPER_STATE.CLOSED;
-    private final VoltageOut voltageControl = new VoltageOut(0);
 
     @Override
     public void periodic() {
