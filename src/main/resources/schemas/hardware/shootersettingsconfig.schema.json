@@ -1,0 +1,35 @@
+{
+    "type": "object",
+    "title": "Shooter Settings Config",
+    "additionalProperties": false,
+    "properties": {
+        "distances": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        },
+        "angles": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        },
+        "powers": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        }
+    },
+    "anyOf": [
+        {
+            "required": [
+                "distances",
+                "angles",
+                "topMotorVelocity",
+                "bottomMotorVelocity"
+            ]
+        }
+    ]
+}
