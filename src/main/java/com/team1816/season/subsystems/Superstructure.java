@@ -1,7 +1,6 @@
 package com.team1816.season.subsystems;
 
 import com.team1816.lib.Singleton;
-import com.team1816.lib.subsystems.Intake;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -60,7 +59,7 @@ public class Superstructure extends SubsystemBase {
         }
     }
 
-    private enum WantedClimbState {
+    public enum WantedClimbState {
         IDLING,
         L3_CLIMBING,
         L3_ClIMBING_DOWN,
@@ -111,6 +110,7 @@ public class Superstructure extends SubsystemBase {
 
     public WantedShooterState wantedShooterState = WantedShooterState.IDLE;
     public WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
+    public WantedClimbState wantedClimbState = WantedClimbState.IDLING;
     public WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
     public WantedIntakeState wantedIntakeState = WantedIntakeState.UP;
     public WantedIndexerState wantedIndexerState = WantedIndexerState.IDLING;
@@ -434,6 +434,8 @@ public class Superstructure extends SubsystemBase {
     public void setWantedGatekeeperState(WantedGatekeeperState gatekeeperState) {
         this.wantedGatekeeperState = gatekeeperState;
     }
+
+    public void setWantedClimberState (WantedClimbState climbState) {this.wantedClimbState = climbState;}
 
     public void setIndexerControlState(IndexerControlState indexerControlState) {
         this.indexerControlState = indexerControlState;

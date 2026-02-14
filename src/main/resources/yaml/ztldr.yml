@@ -162,8 +162,8 @@ subsystems:
                     expoKV: 0.05
                     expoKA: 0.04
         constants:
-            rotationAngleSensorClockwiseLeft: 37
-            rotationAngleSensorClockwiseRight: 38
+            rotationAngleSensorClockwiseLeft: 0
+            rotationAngleSensorClockwiseRight: 1
     gatekeeper:
         devices:
             gatekeeperTopMotor:

@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -62,7 +63,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private static final Rotation2d ROTATION_OFFSET_FROM_CALIBRATION_ZERO = Rotation2d.fromDegrees(70); //as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
 
     //CALIBRATION
-    private Double[] calibrationPositions = new Double[]{null, null};
+    private Double[] calibrationPositions = new Double[]{0.0, 0.0};
 
     //MECHANISMS
     private final NetworkTable networkTable;
@@ -72,7 +73,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public Mechanism2d launchMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
     public MechanismRoot2d launchMechRoot = launchMech.getRoot("Launch Root", 1.5, 0);
     public MechanismLigament2d launchAngleML = launchMechRoot.append(
-        new MechanismLigament2d("Launch Angle", 1, 0));
+        new MechanismLigament2d("Launch Angle", 1.5, 0));
 
     public enum AUTO_AIM_TARGETS{
         // TODO: figure out hub z value
@@ -96,9 +97,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         // TODO: figure out what default angles and velocities should be for manual mode
         CALIBRATING(0,0,0),
         CALIBRATED(0,0,0),
-        DISTANCE_ONE(45, 45, 10),
+        DISTANCE_ONE(3, 45, 10),
         DISTANCE_TWO(45, 90, 20),
-        DISTANCE_THREE(45, 0, 30),
+        DISTANCE_THREE(86, 0, 30),
         AUTOMATIC(-1, -1, -1),
         IDLE(0, 0, 0);
 
@@ -156,7 +157,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         poseArray[2] = rotationAngleMotor.getMotorPosition() / MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE;
         turretFieldPose.set(poseArray);
 
-        launchAngleML.setAngle(launchAngleMotor.getMotorPosition() / MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE);
+        launchAngleML.setAngle(wantedState.getLaunchAngle()); //todo: Will need to change to correspond with motor
+        SmartDashboard.putString("Shooter state: ", wantedState.toString());
     }
 
     private void applyState() {
