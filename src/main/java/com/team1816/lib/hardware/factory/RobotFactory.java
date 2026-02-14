@@ -114,6 +114,7 @@ public class RobotFactory {
 
     public ShooterSettingsConfig getShooterSettingsConfig() {
         if (config.shooterSettings == null) {
+            GreenLogger.log("Couldn't find the shooter settings config");
             return new ShooterSettingsConfig();
         }
         return config.shooterSettings;

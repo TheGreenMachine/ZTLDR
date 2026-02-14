@@ -136,15 +136,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         if (wantedState == SHOOTER_STATE.AUTOMATIC) {
             double distance = launcherTranslation.getDistance(currentTarget.position);
+
             ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator.getShooterDistanceSetting(distance);
             launchAngle = shooterDistanceSetting.getAngle();
             launchPower = shooterDistanceSetting.getPower();
             rotationAngle = Math.tan((launcherTranslation.getY()-currentTarget.position.getY())/(launcherTranslation.getX()-currentTarget.position.getX()));
-
-            SmartDashboard.putNumber("Launch Angle: ", launchAngle);
-            SmartDashboard.putNumber("Launch Power: ", launchPower);
-            SmartDashboard.putNumber("Rotation Angle: ", rotationAngle);
-            SmartDashboard.putNumber("Distance Test: ", distance);
         }
 
         setLaunchAngle(launchAngle);
@@ -152,10 +148,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         setPower(launchPower);
 
         SmartDashboard.putString("Shooter state: ", wantedState.toString());
-
-//        SmartDashboard.putNumber("Launch Angle: ", launchAngle);
-//        SmartDashboard.putNumber("Rotation Angle: ", rotationAngle);
-//        SmartDashboard.putNumber("Launch Velocity: ", launchPower);
+        SmartDashboard.putNumber("Launch Angle: ", launchAngle);
+        SmartDashboard.putNumber("Launch Power: ", launchPower);
+        SmartDashboard.putNumber("Rotation Angle: ", rotationAngle);
     }
 
     public void setWantedState(SHOOTER_STATE state) {

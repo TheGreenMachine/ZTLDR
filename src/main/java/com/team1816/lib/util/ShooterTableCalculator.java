@@ -8,7 +8,7 @@ import static com.team1816.lib.Singleton.factory;
 
 public class ShooterTableCalculator {
 
-    ShotLookup shotLookup;
+    private final ShotLookup shotLookup;
 
     public ShooterTableCalculator() {
         ShooterSettingsConfig shooterSettings = factory.getShooterSettingsConfig();
