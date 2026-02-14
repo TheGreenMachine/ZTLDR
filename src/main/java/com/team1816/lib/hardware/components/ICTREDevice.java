@@ -6,6 +6,7 @@ public interface ICTREDevice extends IPhoenix6 {
         TalonFXS, //cims, bags, etc
         Pigeon2,
         CANdle,
+        CANdi,
         CANifier,
         CANrange,
         CANcoder

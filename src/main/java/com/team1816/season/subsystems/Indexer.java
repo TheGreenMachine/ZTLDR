@@ -52,8 +52,6 @@ public class Indexer extends SubsystemBase implements ITestableSubsystem {
         SmartDashboard.putString("Indexer state: ", wantedState.toString());
     }
 
-
-
     public enum INDEXER_STATE {
         PASSIVE_FEEDING,
         ACTIVE_FEEDING,

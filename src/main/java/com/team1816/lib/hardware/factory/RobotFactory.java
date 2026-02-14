@@ -17,6 +17,7 @@ import com.team1816.lib.hardware.components.led.CANifierImpl;
 import com.team1816.lib.hardware.components.motor.TalonFXImpl;
 import com.team1816.lib.hardware.components.motor.TalonFXSImpl;
 import com.team1816.lib.hardware.components.sensor.CANCoderImpl;
+import com.team1816.lib.hardware.components.sensor.CANdiImpl;
 import com.team1816.lib.hardware.components.sensor.CanRangeImpl;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -246,6 +247,9 @@ public class RobotFactory {
             case CANdle -> {
                 if (devInst == null) devInst = new CANdleImpl(deviceConfig.id, canbus);
             }
+            case CANdi -> {
+                if (devInst == null) devInst = new CANdiImpl(deviceConfig.id, canbus);
+            }
             case CANrange -> {
                 if (devInst == null) devInst = new CanRangeImpl(deviceConfig.id, canbus);
             }
@@ -287,6 +291,9 @@ public class RobotFactory {
             case CANdle -> {
                 parentConfig = new CANdleConfiguration();
             }
+            case CANdi -> {
+                parentConfig = new CANdiConfiguration();
+            }
             case CANrange -> {
                 parentConfig = new CANrangeConfiguration();
             }
@@ -309,9 +316,9 @@ public class RobotFactory {
             case TalonFX -> {
                 var clazz = (TalonFXConfiguration) parentConfig;
                 clazz.MotorOutput = GetMotorOutputConfigs(deviceConfig);
-                clazz.Slot0 = Slot0Configs.from(GetSlotConfigs(subsystemConfig.pidConfig, 0));
-                clazz.Slot1 = Slot1Configs.from(GetSlotConfigs(subsystemConfig.pidConfig, 1));
-                clazz.Slot2 = Slot2Configs.from(GetSlotConfigs(subsystemConfig.pidConfig, 2));
+                clazz.Slot0 = Slot0Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 0));
+                clazz.Slot1 = Slot1Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 1));
+                clazz.Slot2 = Slot2Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 2));
                 clazz.CurrentLimits = GetCurrentConfigs(deviceConfig);
                 clazz.SoftwareLimitSwitch = GetSoftLimitConfigs(deviceConfig);
                 clazz.Feedback = GetFeedbackConfigs(deviceConfig);
@@ -320,9 +327,9 @@ public class RobotFactory {
                 var clazz = (TalonFXSConfiguration) parentConfig;
                 clazz.MotorOutput = GetMotorOutputConfigs(deviceConfig);
                 clazz.Commutation = GetCommunicationConfigs(deviceConfig);
-                clazz.Slot0 = Slot0Configs.from(GetSlotConfigs(subsystemConfig.pidConfig, 0));
-                clazz.Slot1 = Slot1Configs.from(GetSlotConfigs(subsystemConfig.pidConfig, 1));
-                clazz.Slot2 = Slot2Configs.from(GetSlotConfigs(subsystemConfig.pidConfig, 2));
+                clazz.Slot0 = Slot0Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 0));
+                clazz.Slot1 = Slot1Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 1));
+                clazz.Slot2 = Slot2Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 2));
                 clazz.CurrentLimits = GetCurrentConfigs(deviceConfig);
                 clazz.SoftwareLimitSwitch = GetSoftLimitConfigs(deviceConfig);
                 clazz.ExternalFeedback = GetExternalFeedbackConfigs(deviceConfig);
@@ -334,6 +341,9 @@ public class RobotFactory {
                 clazz.CANdleFeatures.StatusLedWhenActive = StatusLedWhenActiveValue.Disabled;
                 clazz.LED.LossOfSignalBehavior = LossOfSignalBehaviorValue.KeepRunning;
                 clazz.LED.StripType = StripTypeValue.BRG;
+            }
+            case CANdi -> {
+                var clazz = (CANdiConfiguration) parentConfig;
             }
             case CANifier -> {
             }

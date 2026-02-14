@@ -52,8 +52,6 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
         SmartDashboard.putString("Gatekeeper state: ", wantedState.toString());
     }
 
-
-
     public enum GATEKEEPER_STATE {
         OPEN,
         CLOSED
