@@ -17,6 +17,7 @@ public class PathfindToPoseCommand extends GreenCommand {
     private final boolean flippable;
     private final double targetVelocity;
     private final PathConstraints constraints;
+
     // Used to detect inputs from controller to cancel pathing
     private final CommandXboxController controller = new CommandXboxController(0);
     private Command internalCommand;
@@ -91,6 +92,7 @@ public class PathfindToPoseCommand extends GreenCommand {
     private boolean controllerInputDetected() {
         return controller.getLeftY() != 0
             || controller.getLeftX() != 0
-            || controller.getRightX() != 0;
+            || controller.getRightX() != 0
+            || controller.getRightY() != 0;
     }
 }

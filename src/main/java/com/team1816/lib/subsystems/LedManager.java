@@ -72,10 +72,10 @@ public class LedManager extends SubsystemBase implements ITestableSubsystem {
         SOLID_COLOR.Color = new RGBWColor(r, g, b);
         lastStatusCode = candle.setControl(SOLID_COLOR);
         // special handling for Phoenix6 5 and ghosting to prevent cluttering up IPhoenix6 interface
-        if (canifier instanceof CANifierImpl) {
-            ((CANifierImpl) canifier).setLEDOutput(r / 255.0, CANifier.LEDChannel.LEDChannelB);
-            ((CANifierImpl) canifier).setLEDOutput(g / 255.0, CANifier.LEDChannel.LEDChannelA);
-            ((CANifierImpl) canifier).setLEDOutput(b / 255.0, CANifier.LEDChannel.LEDChannelC);
+        if (canifier instanceof CANifierImpl impl) {
+            impl.setLEDOutput(r / 255.0, CANifier.LEDChannel.LEDChannelB);
+            impl.setLEDOutput(g / 255.0, CANifier.LEDChannel.LEDChannelA);
+            impl.setLEDOutput(b / 255.0, CANifier.LEDChannel.LEDChannelC);
         }
     }
 

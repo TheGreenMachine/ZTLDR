@@ -7,7 +7,7 @@ import com.ctre.phoenix6.controls.ControlRequest;
 
 public class GhostDevice implements IPhoenix6 {
 
-    private final int Id = 0;
+    private final int id = 0;
 
     public GhostDevice(int deviceID, CANBus canbus) {
 

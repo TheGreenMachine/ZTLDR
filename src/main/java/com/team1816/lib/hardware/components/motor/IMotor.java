@@ -4,13 +4,19 @@ import com.ctre.phoenix6.StatusCode;
 import com.team1816.lib.hardware.components.IPhoenix6;
 
 public interface IMotor extends IPhoenix6 {
-    // method to get the current velocity of rotor in rps
+    /**
+     * @return current velocity of rotor in rotations/sec
+     */
     double getMotorVelocity();
 
-    // method to get the angle of rotor in rotations
+    /**
+     * @return angle of rotor in rotations
+     */
     double getMotorPosition();
 
-    // used to zero the motor position
+    /**
+     * used to zero the motor position
+     */
     void zeroMotorPosition();
 
     StatusCode setSimRotorVelocity(double rps);

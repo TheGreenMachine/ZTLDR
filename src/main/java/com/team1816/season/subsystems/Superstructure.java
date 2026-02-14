@@ -302,9 +302,7 @@ public class Superstructure extends SubsystemBase {
             case IDLING -> indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
         }
 
-        /**
-         * What is this doing???
-         */
+        // What is this doing???
         if (indexerControlState == IndexerControlState.OVERRIDING) {
             indexer.setWantedState(Indexer.INDEXER_STATE.ACTIVE_FEEDING);
         } else {

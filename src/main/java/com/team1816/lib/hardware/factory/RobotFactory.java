@@ -55,7 +55,7 @@ public class RobotFactory {
             config = YamlConfig.loadFrom(this.getClass().getClassLoader().getResourceAsStream("yaml/" + robotName + ".yml")
             );
         } catch (Exception e) {
-            GreenLogger.log("Yaml Config error!" + e.getMessage());
+            GreenLogger.log("Yaml Config error! " + e.getMessage());
         }
     }
 
@@ -75,7 +75,7 @@ public class RobotFactory {
 
     public double getConstant(String name, double defaultVal) {
         if (getConstants() == null || !getConstants().containsKey(name)) {
-            DriverStation.reportWarning("Yaml constants:" + name + " missing", true);
+            DriverStation.reportWarning("Yaml constants: " + name + " missing", true);
             return defaultVal;
         }
         return getConstants().get(name);
@@ -193,7 +193,6 @@ public class RobotFactory {
         return getDevInst(deviceConfig, subsystem, true);
     }
 
-    // Used to get devices by there id  Used by CTRE swerve
     public IPhoenix6 getDeviceById(String subsystemName, int id) {
         var config = factory.getSubsystemConfig(subsystemName);
         // CTRE swerve cannot use ghosted devices they look for specific types
@@ -210,7 +209,9 @@ public class RobotFactory {
         return null;
     }
 
-    // Instantiates device based on the type and applies the configuration
+    /**
+     * Instantiates device based on the type and applies the configuration
+     */
     private IPhoenix6 getDevInst(DeviceConfiguration deviceConfig, SubsystemConfig subsystemConfig, boolean logDetails) {
         IPhoenix6 devInst = null;
         var bus = subsystemConfig.canBusName;
@@ -271,7 +272,9 @@ public class RobotFactory {
         return devInst;
     }
 
-    // Takes YAML Device configuration and creates a CTRE configuration object
+    /**
+     * Takes YAML {@link DeviceConfiguration} and creates a CTRE {@link ParentConfiguration}
+     */
     private ParentConfiguration getCTREConfig(SubsystemConfig subsystemConfig, DeviceConfiguration deviceConfig) {
         ParentConfiguration parentConfig = null;
         switch (deviceConfig.deviceType) {
@@ -444,7 +447,6 @@ public class RobotFactory {
         return config;
     }
 
-    // Slot configs are the PID values
     private SlotConfigs GetSlotConfigs(Map<String, PIDSlotConfiguration> pidConfig, int slot) {
         var config = new SlotConfigs();
         config.SlotNumber = slot;
@@ -473,7 +475,6 @@ public class RobotFactory {
         return config;
     }
 
-    // The Communication configs are used to configure motor type and connections
     private CommutationConfigs GetCommunicationConfigs(DeviceConfiguration deviceConfig) {
         var config = new CommutationConfigs();
         String info = "";
@@ -491,7 +492,6 @@ public class RobotFactory {
         return config;
     }
 
-    // These configurations control the motor inversions and neutral behaviour
     private MotorOutputConfigs GetMotorOutputConfigs(DeviceConfiguration deviceConfig) {
         var config = new MotorOutputConfigs();
         // if we have settings defined in YAML use them otherwise use the CTRE defaults
@@ -508,7 +508,7 @@ public class RobotFactory {
 
     /**
      * Gets CTRE Swerve Modules
-     * See <a href="https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/mechanisms/swerve/swerve-builder-api.html">Swerve Builder</a>
+     * @see <a href="https://v6.docs.ctr-electronics.com/en/latest/docs/api-reference/mechanisms/swerve/swerve-builder-api.html">Swerve Builder</a>
      */
     public SwerveDrivetrainConstants getSwerveDrivetrainConstant(String subsystemName) {
         var config = getSubsystemConfig(subsystemName);
@@ -591,7 +591,9 @@ public class RobotFactory {
         return constants;
     }
 
-    // Logs missing values to kinematics yaml configuration
+    /**
+     * Logs missing values to kinematics yaml configuration
+     */
     private void verifyKinematics(String subsystemName, KinematicsConfig kinematics) {
         if (kinematics == null) {
             var message = subsystemName + " requires kinematics in yaml";
