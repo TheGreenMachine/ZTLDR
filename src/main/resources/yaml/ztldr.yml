@@ -155,12 +155,15 @@ subsystems:
                 deviceType: TalonFX
                 motorType: Minion_JST
                 id: 13
-                motorRotation: Clockwise_Positive
+                motorRotation: Clockwise_Positive #as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped
                 statorCurrentLimit: 60
                 neutralMode: Brake
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+        constants:
+            rotationAngleSensorClockwiseLeft: 37
+            rotationAngleSensorClockwiseRight: 38
     gatekeeper:
         devices:
             gatekeeperTopMotor:

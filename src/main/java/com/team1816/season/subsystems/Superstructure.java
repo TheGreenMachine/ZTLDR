@@ -27,7 +27,8 @@ public class Superstructure extends SubsystemBase {
         IDLE,
         SNOWBLOWER,
         STORAGE_INTAKE,
-        STORAGE_SHOOTER
+        STORAGE_SHOOTER,
+        INDEX_AGITATE
     }
 
     public enum ActualSuperState {
@@ -39,7 +40,8 @@ public class Superstructure extends SubsystemBase {
         IDLING,
         SNOWBLOWING,
         STORAGE_INTAKING,
-        STORAGE_SHOOTING
+        STORAGE_SHOOTING,
+        INDEX_AGITATING
     }
 
     public enum ClimbSide {
@@ -95,7 +97,7 @@ public class Superstructure extends SubsystemBase {
     public enum WantedIndexerState {
         PASSIVE_FEEDING,
         ACTIVE_FEEDING,
-        AGITATING,
+        INDEXER_AGITATING,
         IDLING
     }
 
@@ -165,6 +167,8 @@ public class Superstructure extends SubsystemBase {
             case STORAGE_SHOOTER:
                 actualSuperState = ActualSuperState.STORAGE_SHOOTING;
                 break;
+            case INDEX_AGITATE:
+                actualSuperState = ActualSuperState.INDEX_AGITATING;
             case IDLE:
             default:
                 actualSuperState = ActualSuperState.IDLING;
@@ -198,6 +202,8 @@ public class Superstructure extends SubsystemBase {
                 break;
             case STORAGE_SHOOTING:
                 storageShooting();
+            case INDEX_AGITATING:
+                indexerAgitate();
             case IDLING:
             default:
                 defaulting();
@@ -360,6 +366,14 @@ public class Superstructure extends SubsystemBase {
         }
     }
 
+    private void indexerAgitate() {
+        switch(wantedIndexerState) {
+            case INDEXER_AGITATING, PASSIVE_FEEDING, ACTIVE_FEEDING, IDLING:
+                indexer.setWantedState(Indexer.INDEXER_STATE.AGITATING);
+                break;
+        }
+    }
+
     private void defaulting() {
         switch (wantedShooterState) {
             case DISTANCE_ONE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
@@ -390,7 +404,7 @@ public class Superstructure extends SubsystemBase {
         switch (wantedIndexerState) {
             case PASSIVE_FEEDING -> indexer.setWantedState(Indexer.INDEXER_STATE.PASSIVE_FEEDING);
             case ACTIVE_FEEDING -> indexer.setWantedState(Indexer.INDEXER_STATE.ACTIVE_FEEDING);
-            case AGITATING -> indexer.setWantedState(Indexer.INDEXER_STATE.AGITATING);
+            case INDEXER_AGITATING -> indexer.setWantedState(Indexer.INDEXER_STATE.AGITATING);
             case IDLING -> indexer.setWantedState(Indexer.INDEXER_STATE.IDLING);
         }
 
