@@ -96,7 +96,7 @@ public class Superstructure extends SubsystemBase {
     public enum WantedFeederState {
         PASSIVE_FEEDING,
         ACTIVE_FEEDING,
-        INDEXER_AGITATING,
+        AGITATING,
         IDLING
     }
 
@@ -203,7 +203,7 @@ public class Superstructure extends SubsystemBase {
             case STORAGE_SHOOTING:
                 storageShooting();
             case INDEX_AGITATING:
-                indexerAgitate();
+                agitate();
             case IDLING:
             default:
                 defaulting();
@@ -366,10 +366,10 @@ public class Superstructure extends SubsystemBase {
         }
     }
 
-    private void indexerAgitate() {
-        switch(wantedIndexerState) {
-            case INDEXER_AGITATING, PASSIVE_FEEDING, ACTIVE_FEEDING, IDLING:
-                indexer.setWantedState(Indexer.INDEXER_STATE.AGITATING);
+    private void agitate() {
+        switch(wantedFeederState) {
+            case AGITATING, PASSIVE_FEEDING, ACTIVE_FEEDING, IDLING:
+                feeder.setWantedState(Feeder.FEEDER_STATE.AGITATING);
                 break;
         }
     }
