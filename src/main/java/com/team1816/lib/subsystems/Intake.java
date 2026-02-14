@@ -97,6 +97,18 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void applyState() {
+        switch (wantedState) {
+            case INTAKE_IN:
+                setTurretSpeed(10);
+                break;
+            case INTAKE_OUT:
+                setTurretSpeed(-10);
+                break;
+            default:
+                setTurretSpeed(0);
+                break;
+
+        }
         double intakeSpeed = canSuckOrBlow() ? wantedState.getSpeed() : 0;
         double flipperAngle = wantedState.getAngle();
 
