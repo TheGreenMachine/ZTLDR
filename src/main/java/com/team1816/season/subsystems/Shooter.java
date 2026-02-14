@@ -10,6 +10,7 @@ import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -19,7 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -29,7 +29,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     //CLASS
     String NAME = "shooter";
 
-    private SHOOTER_STATE wantedState = SHOOTER_STATE.CALIBRATING;
+    // Always default this to IDLE, the real default for the shooter is in the superstructure
+    private SHOOTER_STATE wantedState = SHOOTER_STATE.IDLE;
+
+    private boolean isCalibrating;
 
     //MOTORS
     private final IMotor topLaunchMotor = (IMotor) factory.getDevice(NAME, "topLaunchMotor");
@@ -95,8 +98,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public enum SHOOTER_STATE {
         // TODO: figure out what default angles and velocities should be for manual mode
-        CALIBRATING(0,0,0),
-        CALIBRATED(0,0,0),
         DISTANCE_ONE(3, 45, 10),
         DISTANCE_TWO(45, 90, 20),
         DISTANCE_THREE(86, 0, 30),
@@ -134,11 +135,15 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     public void periodic() {
+        SmartDashboard.putString("Is Calibrating: ", "" + isCalibrating);
+        SmartDashboard.putString("Shooter state: ", wantedState.toString());
+
         readFromHardware();
-        if (wantedState != SHOOTER_STATE.CALIBRATING) {
-            applyState();
-        } else {
+
+        if (isCalibrating) {
             calibratePeriodic();
+        } else {
+            applyState();
         }
     }
 
@@ -158,7 +163,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         turretFieldPose.set(poseArray);
 
         launchAngleML.setAngle(wantedState.getLaunchAngle()); //todo: Will need to change to correspond with motor
-        SmartDashboard.putString("Shooter state: ", wantedState.toString());
     }
 
     private void applyState() {
@@ -167,7 +171,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double launchPower = wantedState.getLaunchPower();
 
         if (wantedState == SHOOTER_STATE.AUTOMATIC) {
-            double distance = launcherTranslation.getDistance(currentTarget.position);
+            double distance = launcherTranslation.toTranslation2d().getDistance(currentTarget.position.toTranslation2d());
 
             ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator.getShooterDistanceSetting(distance);
             launchAngle = shooterDistanceSetting.getAngle();
@@ -210,8 +214,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 }
             }
         }
-        if (calibrationPositions[0] != null && calibrationPositions[1] != null && wantedState == SHOOTER_STATE.CALIBRATING){
-            wantedState = SHOOTER_STATE.CALIBRATED;
+        if (calibrationPositions[0] != null && calibrationPositions[1] != null && isCalibrating){
+            isCalibrating = false;
         }
     }
 
