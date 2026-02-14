@@ -135,8 +135,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double launchPower = wantedState.getLaunchPower();
 
         if (wantedState == SHOOTER_STATE.AUTOMATIC) {
-            //double distance = launcherTranslation.getDistance(currentTarget.position);
-            double distance = 60;
+            double distance = launcherTranslation.getDistance(currentTarget.position);
             ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator.getShooterDistanceSetting(distance);
             launchAngle = shooterDistanceSetting.getAngle();
             launchPower = shooterDistanceSetting.getPower();
