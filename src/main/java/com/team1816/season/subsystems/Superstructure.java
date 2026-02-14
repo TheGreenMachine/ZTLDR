@@ -3,7 +3,6 @@ package com.team1816.season.subsystems;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.Intake;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
-import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -108,7 +107,7 @@ public class Superstructure extends SubsystemBase {
     protected WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
     protected ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
-    public WantedShooterState wantedShooterState = WantedShooterState.IDLE;
+    public WantedShooterState wantedShooterState = WantedShooterState.AUTOMATIC;
     public WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
     public WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
     public WantedIntakeState wantedIntakeState = WantedIntakeState.UP;
@@ -363,6 +362,7 @@ public class Superstructure extends SubsystemBase {
             case DISTANCE_ONE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
             case DISTANCE_TWO -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
             case DISTANCE_THREE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
+            case AUTOMATIC -> shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
             case IDLE -> shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
         }
 
