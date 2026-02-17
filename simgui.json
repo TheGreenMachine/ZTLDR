@@ -28,12 +28,23 @@
       "/FMSInfo": "FMSInfo",
       "/Field": "Field2d",
       "/SmartDashboard/Auto Mode": "String Chooser",
+      "/SmartDashboard/Climber": "Mechanism2d",
+      "/SmartDashboard/Intake": "Mechanism2d",
       "/SmartDashboard/PathPlanner": "Alerts",
       "/SmartDashboard/Pathfind Target": "String Chooser",
       "/SmartDashboard/Shooter Incline": "Mechanism2d"
     },
     "windows": {
       "/Field": {
+        "Turret": {
+          "arrowColor": [
+            0.4181083142757416,
+            0.0,
+            0.4901960492134094,
+            255.0
+          ],
+          "style": "Hidden"
+        },
         "bottom": 1914,
         "height": 8.069275856018066,
         "left": 245,
@@ -48,10 +59,28 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/Climber": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Intake": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Shooter Incline": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
     "Retained Values": {
       "open": false
     },
@@ -70,22 +99,18 @@
       }
     },
     "transitory": {
-      "Elastic": {
-        "open": true
-      },
       "Field": {
         "Pose2d##v_/Field/Robot": {
           "open": true
-        },
-        "open": true
+        }
       },
       "GreenLogger": {
         "open": true
       },
-      "Shuffleboard": {
-        "open": true
-      },
       "SmartDashboard": {
+        "Shooter Incline": {
+          "open": true
+        },
         "open": true
       },
       "drivetrain": {
@@ -96,8 +121,7 @@
       "intake": {
         "intakeMotor": {
           "open": true
-        },
-        "open": true
+        }
       },
       "odometry": {
         "open": true
@@ -111,18 +135,6 @@
     }
   },
   "NetworkTables Info": {
-    "Clients": {
-      "open": true
-    },
-    "Server": {
-      "Publishers": {
-        "open": true
-      },
-      "Subscribers": {
-        "open": true
-      },
-      "open": true
-    },
     "visible": true
   }
 }

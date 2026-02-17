@@ -1,38 +1,29 @@
 defaultAuto: "Simple S"
-targetMap:
-    0.0:
-        angle: 35.0
-        velocity: 0.07
-    0.5:
-        angle: 31.0
-        velocity: 0.09
-    1.0:
-        angle: 33.0
-        velocity: 0.12
-    1.5:
-        angle: 32.0
-        velocity: 0.11
-    2.0:
-        angle: 31.0
-        velocity: 0.14
-    2.5:
-        angle: 36.0
-        velocity: 0.10
-    3.0:
-        angle: 37.0
-        velocity: 0.12
-    3.5:
-        angle: 40.0
-        velocity: 0.15
-    4.0:
-        angle: 38.0
-        velocity: 0.17
-    4.5:
-        angle: 39.0
-        velocity: 0.16
-    5.0:
-        angle: 42.0
-        velocity: 0.19
+shooterSettings:
+    distances:
+        - 47
+        - 100
+        - 135
+        - 160
+        - 220
+        - 338
+        - 420
+    angles:
+        - 25
+        - 25
+        - 25
+        - 25
+        - 25
+        - 25
+        - 25
+    powers:
+        - 17
+        - 27
+        - 37
+        - 47
+        - 57
+        - 67
+        - 77
 subsystems:
     intake:
         devices:
@@ -92,9 +83,9 @@ subsystems:
                     expoKV: 0.05
                     expoKA: 0.04
 
-    indexer:
+    feeder:
         devices:
-            indexerMotor:
+            feederMotor:
                 deviceType: TalonFX
                 id: 16
                 motorRotation: Clockwise_Positive
@@ -171,8 +162,8 @@ subsystems:
                     expoKV: 0.05
                     expoKA: 0.04
         constants:
-            rotationAngleSensorClockwiseLeft: 37
-            rotationAngleSensorClockwiseRight: 38
+            rotationAngleSensorClockwiseLeft: 0
+            rotationAngleSensorClockwiseRight: 1
     gatekeeper:
         devices:
             gatekeeperTopMotor:

@@ -5,10 +5,10 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import com.team1816.lib.util.ShooterDistanceSetting;
 import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -39,6 +40,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private VelocityVoltage velocityControl = new VelocityVoltage(0);
     private PositionVoltage positionControl = new PositionVoltage(0);
 
+    //AUTO AIM
+    private AUTO_AIM_TARGETS currentTarget = AUTO_AIM_TARGETS.BLUE_HUB;
+    // TODO: get the launcher position from the vision or whatever
+    Translation3d launcherTranslation = new Translation3d(0,0,0).plus(SHOOTER_OFFSET);
+
     //DEVICES
     private final DigitalInput rotationAngleSensorClockwiseLeft = new DigitalInput((int) factory.getConstant(NAME, "rotationAngleSensorClockwiseLeft", 0));
     private final DigitalInput rotationAngleSensorClockwiseRight = new DigitalInput((int) factory.getConstant(NAME, "rotationAngleSensorClockwiseRight", 0));
@@ -57,11 +63,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private static final Rotation2d ROTATION_OFFSET_FROM_CALIBRATION_ZERO = Rotation2d.fromDegrees(70); //as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
 
     //CALIBRATION
-    private Double[] calibrationPositions = new Double[]{null, null};
-
-    //AUTO AIM
-    private AUTO_AIM_TARGETS currentTarget = AUTO_AIM_TARGETS.BLUE_HUB;
-    Translation3d launcherTranslation = new Translation3d(0,0,0).plus(SHOOTER_OFFSET);
+    private Double[] calibrationPositions = new Double[]{0.0, 0.0};
 
     //MECHANISMS
     private final NetworkTable networkTable;
@@ -71,7 +73,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public Mechanism2d launchMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
     public MechanismRoot2d launchMechRoot = launchMech.getRoot("Launch Root", 1.5, 0);
     public MechanismLigament2d launchAngleML = launchMechRoot.append(
-        new MechanismLigament2d("Launch Angle", 1, 0));
+        new MechanismLigament2d("Launch Angle", 1.5, 0));
 
     public enum AUTO_AIM_TARGETS{
         // TODO: figure out hub z value
@@ -95,9 +97,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         // TODO: figure out what default angles and velocities should be for manual mode
         CALIBRATING(0,0,0),
         CALIBRATED(0,0,0),
-        DISTANCE_ONE(45, 45, 10),
+        DISTANCE_ONE(3, 45, 10),
         DISTANCE_TWO(45, 90, 20),
-        DISTANCE_THREE(45, 0, 30),
+        DISTANCE_THREE(86, 0, 30),
         AUTOMATIC(-1, -1, -1),
         IDLE(0, 0, 0);
 
@@ -118,7 +120,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             return rotationAngle;
         }
 
-        double getLaunchVelocity() {
+        double getLaunchPower() {
             return launchVelocity;
         }
     }
@@ -155,31 +157,32 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         poseArray[2] = rotationAngleMotor.getMotorPosition() / MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE;
         turretFieldPose.set(poseArray);
 
-        launchAngleML.setAngle(launchAngleMotor.getMotorPosition() / MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE);
+        launchAngleML.setAngle(wantedState.getLaunchAngle()); //todo: Will need to change to correspond with motor
+        SmartDashboard.putString("Shooter state: ", wantedState.toString());
     }
 
     private void applyState() {
         double launchAngle = wantedState.getLaunchAngle();
         double rotationAngle = wantedState.getRotationAngle();
-        double launchVelocity = wantedState.getLaunchVelocity();
+        double launchPower = wantedState.getLaunchPower();
 
         if (wantedState == SHOOTER_STATE.AUTOMATIC) {
             double distance = launcherTranslation.getDistance(currentTarget.position);
-            Pair<Double, Double> angleVelocityPair = shooterTableCalculator.getShooterSetting(distance);
-            launchAngle = angleVelocityPair.getFirst();
-            launchVelocity = angleVelocityPair.getSecond();
+
+            ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator.getShooterDistanceSetting(distance);
+            launchAngle = shooterDistanceSetting.getAngle();
+            launchPower = shooterDistanceSetting.getPower();
             rotationAngle = Math.tan((launcherTranslation.getY()-currentTarget.position.getY())/(launcherTranslation.getX()-currentTarget.position.getX()));
         }
 
         setLaunchAngle(launchAngle);
         setRotationAngle(rotationAngle);
-        setVelocity(launchVelocity);
+        setPower(launchPower);
 
         SmartDashboard.putString("Shooter state: ", wantedState.toString());
-
         SmartDashboard.putNumber("Launch Angle: ", launchAngle);
+        SmartDashboard.putNumber("Launch Power: ", launchPower);
         SmartDashboard.putNumber("Rotation Angle: ", rotationAngle);
-        SmartDashboard.putNumber("Launch Velocity: ", launchVelocity);
     }
 
     public void setWantedState(SHOOTER_STATE state) {
@@ -222,7 +225,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 .minus(BaseRobotState.swerveDriveState.Pose.getRotation());
     }
 
-    private void setVelocity(double wantedVelocity) {
+    private void setPower(double wantedVelocity) {
         double output = MathUtil.clamp(wantedVelocity, 0, 100);
 
         topLaunchMotor.setControl(velocityControl.withVelocity(output));

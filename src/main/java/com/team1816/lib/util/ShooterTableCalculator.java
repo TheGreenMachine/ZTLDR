@@ -1,43 +1,37 @@
 package com.team1816.lib.util;
 
-import com.team1816.lib.Singleton;
-import com.team1816.lib.hardware.AngleVelocityPairConfig;
-import com.team1816.lib.hardware.factory.RobotFactory;
-import edu.wpi.first.math.Pair;
+import com.team1816.lib.hardware.ShooterSettingsConfig;
 
-import java.util.HashMap;
+import java.util.List;
+
+import static com.team1816.lib.Singleton.factory;
 
 public class ShooterTableCalculator {
-    private final double RESOLUTION = 0.5;
 
-    private RobotFactory robotFactory = Singleton.get(RobotFactory.class);
-    private HashMap<String, AngleVelocityPairConfig> targetMap = robotFactory.getTargetConfig();
+    private final ShotLookup shotLookup;
 
-    public Pair<Double, Double> getShooterSetting(double distance) {
-        if (distance > 5 || distance < 0) {
-            GreenLogger.log("Shooter distance is out of bounds");
-            return null;
-        }
-        else if (targetMap.get(String.valueOf(distance)) == null) {
-            double upperBound = roundToUpperBound(RESOLUTION, distance);
-            double lowerBound = roundToLowerBound(RESOLUTION, distance);
-            double upperAngle = targetMap.get(String.valueOf(upperBound)).angle;
-            double upperVelocity = targetMap.get(String.valueOf(upperBound)).velocity;
-            double lowerAngle = targetMap.get(String.valueOf(lowerBound)).angle;
-            double lowerVelocity = targetMap.get(String.valueOf(lowerBound)).velocity;
-            double returnAngle = (upperAngle - lowerAngle) / RESOLUTION * (distance - lowerBound) + lowerAngle;
-            double returnVelocity = (upperVelocity - lowerVelocity) / RESOLUTION * (distance - lowerBound) + lowerVelocity;
-            return Pair.of(returnAngle, returnVelocity);
-        }
-        return Pair.of(targetMap.get(String.valueOf(distance)).angle, targetMap.get(String.valueOf(distance)).velocity);
+    public ShooterTableCalculator() {
+        ShooterSettingsConfig shooterSettings = factory.getShooterSettingsConfig();
+
+        List<Double> distances = shooterSettings.distances;
+        List<Double> angles = shooterSettings.angles;
+        List<Double> velocities = shooterSettings.powers;
+
+        double[] distancesArray = distances.stream()
+            .mapToDouble(Double::doubleValue)
+            .toArray();
+        double[] anglesArray = angles.stream()
+            .mapToDouble(Double::doubleValue)
+            .toArray();
+        double[] velocitiesArray = velocities.stream()
+            .mapToDouble(Double::doubleValue)
+            .toArray();
+
+        shotLookup = new ShotLookup(distancesArray, anglesArray, velocitiesArray);
     }
 
-    public double roundToLowerBound(double resolution, double value) {
-        return value-value%resolution;
-    }
-
-    public double roundToUpperBound(double resolution, double value) {
-        return value-value%resolution+resolution;
+    public ShooterDistanceSetting getShooterDistanceSetting(double distance) {
+        return new ShooterDistanceSetting(shotLookup.getAngle(distance), shotLookup.getPower(distance));
     }
 
 }
