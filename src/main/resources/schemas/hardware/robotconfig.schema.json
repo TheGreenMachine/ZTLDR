@@ -18,8 +18,8 @@
             "type": "string",
             "default": ""
         },
-        "targetMap": {
-            "$ref": "targetmap.schema.json"
+        "shooterSettings": {
+            "$ref": "shootersettingsconfig.schema.json"
         },
         "autopathing": {
             "type": "object",
@@ -34,6 +34,7 @@
                 "infrastructure",
                 "constants",
                 "controlboard",
+                "shooterSettings",
                 "autopathing"
             ]
         }
