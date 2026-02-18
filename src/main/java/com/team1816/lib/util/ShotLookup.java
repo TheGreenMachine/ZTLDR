@@ -14,10 +14,18 @@ public class ShotLookup {
     }
 
     public double getAngle(double distance) {
-        return angleInterpolator.value(distance);
+        if (angleInterpolator.isValidPoint(distance)) {
+            return angleInterpolator.value(distance);
+        }
+
+        return 25; // some kind of default that needs to come from yaml - clark
     }
 
     public double getPower(double distance) {
-        return powerInterpolator.value(distance);
+        if (powerInterpolator.isValidPoint(distance)) {
+            return powerInterpolator.value(distance);
+        }
+
+        return 25; // some kind of default that needs to come from yaml - clark
     }
 }
