@@ -169,6 +169,7 @@ public class Superstructure extends SubsystemBase {
                 break;
             case INDEX_AGITATE:
                 actualSuperState = ActualSuperState.INDEX_AGITATING;
+                break;
             case IDLE:
             default:
                 actualSuperState = ActualSuperState.IDLING;
@@ -288,9 +289,9 @@ public class Superstructure extends SubsystemBase {
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 actualSuperState = ActualSuperState.STORAGE_INTAKING;
+                break;
             default:
                 actualSuperState = ActualSuperState.IDLING;
-
         }
     }
 
@@ -408,7 +409,7 @@ public class Superstructure extends SubsystemBase {
             case IDLING -> feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
         }
 
-        /**
+        /*
          * What is this doing???
          */
         if (feederControlState == FeederControlState.OVERRIDING) {
