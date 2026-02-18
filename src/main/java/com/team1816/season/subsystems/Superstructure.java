@@ -439,6 +439,7 @@ public class Superstructure extends SubsystemBase {
     public WantedGatekeeperState getWantedGatekeeperState() {
         return wantedGatekeeperState;
     }
+
     public void setWantedGatekeeperState(WantedGatekeeperState gatekeeperState) {
         this.wantedGatekeeperState = gatekeeperState;
     }
@@ -446,6 +447,7 @@ public class Superstructure extends SubsystemBase {
     public void setFeederControlState(FeederControlState feederControlState) {
         this.feederControlState = feederControlState;
     }
+
     public WantedIntakeState getWantedIntakeState() {
         return wantedIntakeState;
     }
@@ -469,16 +471,12 @@ public class Superstructure extends SubsystemBase {
         this.wantedFeederState = wantedFeederState;
     }
 
-    public WantedSwerveState getWantedSwerveState() {
-        return wantedSwerveState;
+    public WantedClimbState getWantedClimbState() {
+        return wantedClimbState;
     }
 
     public void setWantedSwerveState(WantedSwerveState wantedSwerveState) {
         this.wantedSwerveState = wantedSwerveState;
-    }
-
-    public WantedClimbState getWantedClimbState() {
-        return wantedClimbState;
     }
 
     public void teleopInit() {
