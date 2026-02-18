@@ -3,7 +3,7 @@ package com.team1816.season;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.Singleton;
-import com.team1816.season.subsystems.Indexer;
+import com.team1816.season.subsystems.Feeder;
 import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.wpilibj2.command.Commands;
 
@@ -14,7 +14,7 @@ public class RobotContainer extends BaseRobotContainer {
         // i.e. subsystems that always exist like the drivetrain and path planner
         initializeLibSubSystems();
 
-        Singleton.CreateSubSystem(Indexer.class);
+        Singleton.CreateSubSystem(Feeder.class);
 
         superstructure = new Superstructure(swerve);
 
@@ -62,8 +62,8 @@ public class RobotContainer extends BaseRobotContainer {
         driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.DOWN)));
 
         //operatorController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.UP)));
-        operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.setIndexerControlState(Superstructure.IndexerControlState.OVERRIDING)));
-        operatorController.povDown().onFalse(Commands.runOnce(() -> superstructure.setIndexerControlState(Superstructure.IndexerControlState.DEFAULTING)));
+        operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.setFeederControlState(Superstructure.FeederControlState.OVERRIDING)));
+        operatorController.povDown().onFalse(Commands.runOnce(() -> superstructure.setFeederControlState(Superstructure.FeederControlState.DEFAULTING)));
 
         // controller.leftTrigger().and(controller.rightTrigger().negate()).whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_IN))
         //     .or(controller.rightTrigger().and(controller.leftTrigger().negate()).whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_OUT)))
@@ -92,11 +92,11 @@ public class RobotContainer extends BaseRobotContainer {
         }));
 
         NamedCommands.registerCommand("passiveFeeding", Commands.runOnce(() -> {
-             getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.PASSIVE_FEEDING);
+             getSuperstructure().setWantedFeederState(Superstructure.WantedFeederState.PASSIVE_FEEDING);
         }));
 
         NamedCommands.registerCommand("activeFeeding", Commands.runOnce(() -> {
-             getSuperstructure().setWantedIndexerState(Superstructure.WantedIndexerState.ACTIVE_FEEDING);
+             getSuperstructure().setWantedFeederState(Superstructure.WantedFeederState.ACTIVE_FEEDING);
         }));
 
         NamedCommands.registerCommand("openGatekeeper", Commands.runOnce(() -> {
@@ -114,10 +114,10 @@ public class RobotContainer extends BaseRobotContainer {
         NamedCommands.registerCommand("snowblowing", Commands.runOnce(() -> { //Intake and shoot balls at the same time
              getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER);
         }));
-        NamedCommands.registerCommand("storageShooting", Commands.runOnce(() -> { //Shoots the balls solely in the indexer(Feeder)
+        NamedCommands.registerCommand("storageShooting", Commands.runOnce(() -> { //Shoots the balls solely in the Feeder
              getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.STORAGE_SHOOTER);
         }));
-        NamedCommands.registerCommand("storageIntake", Commands.runOnce(() -> { //Intake balls into the indexer(Feeder) without shooting them
+        NamedCommands.registerCommand("storageIntake", Commands.runOnce(() -> { //Intake balls into the Feeder without shooting them
              getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.STORAGE_INTAKE);
         }));
         NamedCommands.registerCommand("l1Climbing", Commands.runOnce(() -> {

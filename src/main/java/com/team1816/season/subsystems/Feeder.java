@@ -9,13 +9,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.team1816.lib.Singleton.factory;
 
-public class Indexer extends SubsystemBase implements ITestableSubsystem {
+public class Feeder extends SubsystemBase implements ITestableSubsystem {
 
-    public static final String NAME = "indexer";
-    private final IMotor indexerMotor = (IMotor)factory.getDevice(NAME, "indexerMotor");
-//    private final IMotor indexerMotorTop = (IMotor)factory.getDevice(NAME, "indexerMotorTop"); //May need to implement
+    public static final String NAME = "feeder";
+    private final IMotor feederMotor = (IMotor)factory.getDevice(NAME, "feederMotor");
+//    private final IMotor feederMotorTop = (IMotor)factory.getDevice(NAME, "feederMotorTop"); //May need to implement
     private double curPosition;
-    private INDEXER_STATE wantedState = INDEXER_STATE.IDLING;
+    private FEEDER_STATE wantedState = FEEDER_STATE.IDLING;
     VelocityVoltage indexReq = new VelocityVoltage(0);
 
     @Override
@@ -28,7 +28,7 @@ public class Indexer extends SubsystemBase implements ITestableSubsystem {
 
     @Override
     public void readFromHardware() {
-        curPosition = indexerMotor.getMotorPosition();
+        curPosition = feederMotor.getMotorPosition();
     }
 
     private void applyState() {
@@ -49,17 +49,19 @@ public class Indexer extends SubsystemBase implements ITestableSubsystem {
                 break;
         }
 
-        SmartDashboard.putString("Indexer state: ", wantedState.toString());
+        SmartDashboard.putString("Feeder state: ", wantedState.toString());
     }
 
-    public enum INDEXER_STATE {
+
+
+    public enum FEEDER_STATE {
         PASSIVE_FEEDING,
         ACTIVE_FEEDING,
         AGITATING,
         IDLING
     }
 
-    public void setWantedState(INDEXER_STATE state) {
+    public void setWantedState(FEEDER_STATE state) {
         wantedState = state;
     }
 }

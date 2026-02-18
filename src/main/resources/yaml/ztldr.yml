@@ -83,9 +83,9 @@ subsystems:
                     expoKV: 0.05
                     expoKA: 0.04
 
-    indexer:
+    feeder:
         devices:
-            indexerMotor:
+            feederMotor:
                 deviceType: TalonFX
                 id: 16
                 motorRotation: Clockwise_Positive
