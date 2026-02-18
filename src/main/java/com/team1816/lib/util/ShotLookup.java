@@ -19,16 +19,16 @@ public class ShotLookup {
         if (knots.length > 0) {
             if (distance < knots[0]) {
                 // some low end default
-                return 25;
+                return 25; // TODO - Clark
             } else if (distance > knots[knots.length - 1]) {
                 // some high end default
-                return 25;
+                return 25; // TODO - Clark
             } else {
                 return angleInterpolator.value(distance);
             }
         }
 
-        return 25; // some mid default as we don't have data points due to a bad load from yaml
+        return 25; // // TODO - Clark some mid default as we don't have data points due to a bad load from yaml
     }
 
     public double getPower(double distance) {
@@ -37,15 +37,15 @@ public class ShotLookup {
         if (knots.length > 0) {
             if (distance < knots[0]) {
                 // some low end default
-                return 25;
+                return 25; // TODO - Clark
             } else if (distance > knots[knots.length - 1]) {
                 // some high end default
-                return 25;
+                return 25; // TODO - Clark
             } else {
                 return powerInterpolator.value(distance);
             }
         }
 
-        return 25; // some mid default as we don't have data points due to a bad load from yaml
+        return 25; // // TODO - Clark some mid default as we don't have data points due to a bad load from yaml
     }
 }
