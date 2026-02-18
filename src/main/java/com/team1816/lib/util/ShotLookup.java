@@ -14,18 +14,38 @@ public class ShotLookup {
     }
 
     public double getAngle(double distance) {
-        if (angleInterpolator.isValidPoint(distance)) {
-            return angleInterpolator.value(distance);
+        var knots = angleInterpolator.getKnots();
+
+        if (knots.length > 0) {
+            if (distance < knots[0]) {
+                // some low end default
+                return 25;
+            } else if (distance > knots[knots.length - 1]) {
+                // some high end default
+                return 25;
+            } else {
+                return angleInterpolator.value(distance);
+            }
         }
 
-        return 25; // some kind of default that needs to come from yaml - clark
+        return 25; // some mid default as we don't have data points due to a bad load from yaml
     }
 
     public double getPower(double distance) {
-        if (powerInterpolator.isValidPoint(distance)) {
-            return powerInterpolator.value(distance);
+        var knots = powerInterpolator.getKnots();
+
+        if (knots.length > 0) {
+            if (distance < knots[0]) {
+                // some low end default
+                return 25;
+            } else if (distance > knots[knots.length - 1]) {
+                // some high end default
+                return 25;
+            } else {
+                return powerInterpolator.value(distance);
+            }
         }
 
-        return 25; // some kind of default that needs to come from yaml - clark
+        return 25; // some mid default as we don't have data points due to a bad load from yaml
     }
 }
