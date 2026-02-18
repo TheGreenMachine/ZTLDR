@@ -2,6 +2,7 @@ package com.team1816.season.subsystems;
 
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
+import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -68,6 +69,8 @@ public class Superstructure extends SubsystemBase {
     }
 
     public enum WantedShooterState {
+        CALIBRATING,
+        CALIBRATED,
         DISTANCE_ONE,
         DISTANCE_TWO,
         DISTANCE_THREE,
@@ -108,7 +111,7 @@ public class Superstructure extends SubsystemBase {
     protected WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
     protected ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
-    public WantedShooterState wantedShooterState = WantedShooterState.AUTOMATIC;
+    public WantedShooterState wantedShooterState = WantedShooterState.CALIBRATING;
     public WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
     public WantedClimbState wantedClimbState = WantedClimbState.IDLING;
     public WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
@@ -376,6 +379,8 @@ public class Superstructure extends SubsystemBase {
 
     private void defaulting() {
         switch (wantedShooterState) {
+            case CALIBRATING -> {if (shooter.isCalibrated()) {shooter.setWantedState(Shooter.SHOOTER_STATE.CALIBRATED);} else {shooter.setWantedState(Shooter.SHOOTER_STATE.CALIBRATING);}}
+            case CALIBRATED -> {GreenLogger.log("Shooter is calibrated"); shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);}
             case DISTANCE_ONE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
             case DISTANCE_TWO -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
             case DISTANCE_THREE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
@@ -460,9 +465,14 @@ public class Superstructure extends SubsystemBase {
         this.wantedSwerveState = wantedSwerveState;
     }
 
+    public void autonomousInit() {
+        setWantedShooterState(WantedShooterState.AUTOMATIC);
+    }
+
     public void teleopInit() {
         setWantedShooterState(WantedShooterState.AUTOMATIC);
         setWantedGatekeeperState(WantedGatekeeperState.CLOSED);
+        setWantedIndexerState(WantedIndexerState.IDLING);
         setIndexerControlState(IndexerControlState.DEFAULTING);
         setWantedIntakeState(WantedIntakeState.INTAKING);
         setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING);

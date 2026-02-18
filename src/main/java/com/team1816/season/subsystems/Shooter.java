@@ -32,8 +32,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     // Always default this to IDLE, the real default for the shooter is in the superstructure
     private SHOOTER_STATE wantedState = SHOOTER_STATE.IDLE;
 
-    private boolean isCalibrating;
-
     //MOTORS
     private final IMotor topLaunchMotor = (IMotor) factory.getDevice(NAME, "topLaunchMotor");
     private final IMotor bottomLaunchMotor = (IMotor) factory.getDevice(NAME, "bottomLaunchMotor");
@@ -78,6 +76,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public MechanismLigament2d launchAngleML = launchMechRoot.append(
         new MechanismLigament2d("Launch Angle", 1.5, 0));
 
+    private boolean isCalibrated;
+
     public enum AUTO_AIM_TARGETS{
         // TODO: figure out hub z value
         BLUE_HUB(new Translation3d(4.6228, 3.8608, 40)),
@@ -98,6 +98,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public enum SHOOTER_STATE {
         // TODO: figure out what default angles and velocities should be for manual mode
+        CALIBRATING(0, 0, 0),
+        CALIBRATED(0, 0, 0),
         DISTANCE_ONE(factory.getConstant(NAME,"distanceOneLaunchAngle",0), factory.getConstant(NAME,"distanceOneRotationAngle",0), factory.getConstant(NAME,"distanceOneLaunchVelocity",0)),
         DISTANCE_TWO(factory.getConstant(NAME,"distanceTwoLaunchAngle",0), factory.getConstant(NAME,"distanceTwoRotationAngle",0), factory.getConstant(NAME,"distanceTwoLaunchVelocity",0)),
         DISTANCE_THREE(factory.getConstant(NAME,"distanceThreeLaunchAngle",0), factory.getConstant(NAME,"distanceThreeRotationAngle",0), factory.getConstant(NAME,"distanceThreeLaunchVelocity",0)),
@@ -135,12 +137,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     public void periodic() {
-        SmartDashboard.putString("Is Calibrating: ", "" + isCalibrating);
         SmartDashboard.putString("Shooter state: ", wantedState.toString());
 
         readFromHardware();
 
-        if (isCalibrating) {
+        if (wantedState == SHOOTER_STATE.CALIBRATING) {
             calibratePeriodic();
         } else {
             applyState();
@@ -214,8 +215,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 }
             }
         }
-        if (calibrationPositions[0] != null && calibrationPositions[1] != null && isCalibrating){
-            isCalibrating = false;
+        if (calibrationPositions[0] != null && calibrationPositions[1] != null && wantedState == SHOOTER_STATE.CALIBRATING){
+            isCalibrated = true;
         }
     }
 
@@ -270,4 +271,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         return scaledRotations + calibrationPositions[0];
     }
 
+    public boolean isCalibrated() {
+        return isCalibrated;
+    }
 }

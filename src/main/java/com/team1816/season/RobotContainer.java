@@ -6,7 +6,6 @@ import com.team1816.lib.Singleton;
 import com.team1816.season.subsystems.Indexer;
 import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public class RobotContainer extends BaseRobotContainer {
     public RobotContainer() {
@@ -27,6 +26,10 @@ public class RobotContainer extends BaseRobotContainer {
 
     public Superstructure getSuperstructure() {
         return superstructure;
+    }
+
+    public void autonomousInit() {
+        superstructure.autonomousInit();
     }
 
     public void teleopInit() {
@@ -75,7 +78,7 @@ public class RobotContainer extends BaseRobotContainer {
         // controller.leftBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_OUT));
         // controller.rightBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_IN));
     }
-    
+
     public final void registerCommands() {
         /**
          * Individual Subsystem Action (not needed, just here)
