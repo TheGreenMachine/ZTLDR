@@ -108,16 +108,16 @@ public class Superstructure extends SubsystemBase {
     protected WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
     protected ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
-    public WantedShooterState wantedShooterState = WantedShooterState.IDLE;
-    public WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
-    public WantedClimbState wantedClimbState = WantedClimbState.IDLING;
-    public WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
-    public WantedIntakeState wantedIntakeState = WantedIntakeState.UP;
-    public WantedFeederState wantedFeederState = WantedFeederState.IDLING;
-    public FeederControlState feederControlState = FeederControlState.DEFAULTING;
+    private WantedShooterState wantedShooterState = WantedShooterState.IDLE;
+    private WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
+    private WantedClimbState wantedClimbState = WantedClimbState.IDLING;
+    private WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
+    private WantedIntakeState wantedIntakeState = WantedIntakeState.UP;
+    private WantedFeederState wantedFeederState = WantedFeederState.IDLING;
+    private FeederControlState feederControlState = FeederControlState.DEFAULTING;
 
-    public ClimbSide climbSide = ClimbSide.LEFT;
-    public WantedClimbState climbState = WantedClimbState.IDLING;
+    private ClimbSide climbSide = ClimbSide.LEFT;
+    private WantedClimbState climbState = WantedClimbState.IDLING;
 
     public Superstructure(Swerve swerve) {
         this.swerve = swerve;
@@ -426,17 +426,27 @@ public class Superstructure extends SubsystemBase {
         swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
     }
 
+    public WantedShooterState getWantedShooterState() {
+        return wantedShooterState;
+    }
+
     public void setWantedShooterState(WantedShooterState wantedShooterState) {
         this.wantedShooterState = wantedShooterState;
     }
 
     // Add functionality for this in both manual and auto shooter modes
+    public WantedGatekeeperState getWantedGatekeeperState() {
+        return wantedGatekeeperState;
+    }
     public void setWantedGatekeeperState(WantedGatekeeperState gatekeeperState) {
         this.wantedGatekeeperState = gatekeeperState;
     }
 
     public void setFeederControlState(FeederControlState feederControlState) {
         this.feederControlState = feederControlState;
+    }
+    public WantedIntakeState getWantedIntakeState() {
+        return wantedIntakeState;
     }
 
     public void setWantedIntakeState(WantedIntakeState wantedIntakeState) {
@@ -450,12 +460,24 @@ public class Superstructure extends SubsystemBase {
         this.wantedIntakeState = wantedIntakeState;
     }
 
+    public WantedFeederState getWantedFeederState() {
+        return wantedFeederState;
+    }
+
     public void setWantedFeederState(WantedFeederState wantedFeederState) {
         this.wantedFeederState = wantedFeederState;
     }
 
+    public WantedSwerveState getWantedSwerveState() {
+        return wantedSwerveState;
+    }
+
     public void setWantedSwerveState(WantedSwerveState wantedSwerveState) {
         this.wantedSwerveState = wantedSwerveState;
+    }
+
+    public WantedClimbState getWantedClimbState() {
+        return wantedClimbState;
     }
 
     public void teleopInit() {
