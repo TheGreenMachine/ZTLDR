@@ -15,7 +15,8 @@ public class Superstructure extends SubsystemBase {
     private final Intake intake;
     private final Feeder feeder;
     private final Climber climber;
-    protected CommandXboxController controller;
+
+    private CommandXboxController controller;
 
     public enum WantedSuperState {
         DEFAULT,
@@ -105,8 +106,8 @@ public class Superstructure extends SubsystemBase {
         DEFAULTING
     }
 
-    protected WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
-    protected ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
+    private WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
+    private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
     private WantedShooterState wantedShooterState = WantedShooterState.IDLE;
     private WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
@@ -179,7 +180,7 @@ public class Superstructure extends SubsystemBase {
         return actualSuperState;
     }
 
-    protected void applyStates() {
+    private void applyStates() {
         switch (actualSuperState) {
             case DEFAULTING:
                 defaulting();
