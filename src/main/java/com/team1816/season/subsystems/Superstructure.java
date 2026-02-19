@@ -204,8 +204,10 @@ public class Superstructure extends SubsystemBase {
                 break;
             case STORAGE_SHOOTING:
                 storageShooting();
+                break;
             case INDEX_AGITATING:
                 agitate();
+                break;
             case IDLING:
             default:
                 defaulting();
