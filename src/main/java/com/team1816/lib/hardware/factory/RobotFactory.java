@@ -259,33 +259,15 @@ public class RobotFactory {
         if (!subsystemConfig.implemented) return new GhostDevice(deviceConfig.id, canbus);
 
         switch (deviceConfig.deviceType) {
-            case TalonFX -> {
-                if (devInst == null) devInst = new TalonFXImpl(deviceConfig.id, canbus);
-            }
-            case TalonFXS -> {
-                devInst = new TalonFXSImpl(deviceConfig.id, canbus);
-            }
-            case Pigeon2 -> {
-                if (devInst == null) devInst = new Pigeon2Impl(deviceConfig.id, canbus);
-            }
-            case CANdle -> {
-                if (devInst == null) devInst = new CANdleImpl(deviceConfig.id, canbus);
-            }
-            case CANdi -> {
-                if (devInst == null) devInst = new CANdiImpl(deviceConfig.id, canbus);
-            }
-            case CANrange -> {
-                if (devInst == null) devInst = new CanRangeImpl(deviceConfig.id, canbus);
-            }
-            case CANifier -> {
-                if (devInst == null) devInst = new CANifierImpl(deviceConfig.id);
-            }
-            case CANcoder -> {
-                if (devInst == null) devInst = new CANCoderImpl(deviceConfig.id, canbus);
-            }
-            default -> {
-                GreenLogger.log("Device type " + deviceConfig.deviceType + " not implemented");
-            }
+            case TalonFX  -> devInst = new TalonFXImpl(deviceConfig.id, canbus);
+            case TalonFXS -> devInst = new TalonFXSImpl(deviceConfig.id, canbus);
+            case Pigeon2  -> devInst = new Pigeon2Impl(deviceConfig.id, canbus);
+            case CANdle   -> devInst = new CANdleImpl(deviceConfig.id, canbus);
+            case CANdi    -> devInst = new CANdiImpl(deviceConfig.id, canbus);
+            case CANrange -> devInst = new CanRangeImpl(deviceConfig.id, canbus);
+            case CANifier -> devInst = new CANifierImpl(deviceConfig.id);
+            case CANcoder -> devInst = new CANCoderImpl(deviceConfig.id, canbus);
+            default -> GreenLogger.log("Device type " + deviceConfig.deviceType + " not implemented");
         }
         var parentConfig = getCTREConfig(subsystemConfig, deviceConfig);
         if (parentConfig != null) {
