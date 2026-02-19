@@ -37,13 +37,13 @@ import static com.team1816.lib.util.FormatUtils.GetDisplay;
 public class RobotFactory {
 
     private RobotConfiguration config;
-    public boolean RobotIsReal; // Use to detect real or simulation public to override for tests
-    public final static int StartingGhostId = 50;
-    private int lastGhostId = StartingGhostId;
-    private HashMap<String, CANBus> canBusMap = new HashMap<>();
+    public boolean robotIsReal; // Use to detect real or simulation public to override for tests
+    private final static int startingGhostId = 50;
+    private int lastGhostId = startingGhostId;
+    private final Map<String, CANBus> canBusMap = new HashMap<>();
 
     public RobotFactory() {
-        RobotIsReal = RobotBase.isReal();
+        robotIsReal = RobotBase.isReal();
         var robotName = System.getenv("ROBOT_NAME");
         if (robotName == null) {
             GreenLogger.log("ROBOT_NAME environment variable not defined using test yaml");
@@ -52,7 +52,8 @@ public class RobotFactory {
         robotName = robotName.toLowerCase();
         GreenLogger.log("Loading Config for " + robotName);
         try {
-            config = YamlConfig.loadFrom(this.getClass().getClassLoader().getResourceAsStream("yaml/" + robotName + ".yml")
+            config = YamlConfig.loadFrom(
+                this.getClass().getClassLoader().getResourceAsStream("yaml/" + robotName + ".yml")
             );
         } catch (Exception e) {
             GreenLogger.log("Yaml Config error!" + e.getMessage());
@@ -199,7 +200,7 @@ public class RobotFactory {
         var config = factory.getSubsystemConfig(subsystemName);
         // CTRE swerve cannot use ghosted devices they look for specific types
         // and will die when created, so send nulls instead
-        if(!config.implemented) return null;
+        if (!config.implemented) return null;
         for (var key : config.devices.keySet()) {
             var device = config.devices.get(key);
             if (device.id == id) {
@@ -215,8 +216,8 @@ public class RobotFactory {
     private IPhoenix6 getDevInst(DeviceConfiguration deviceConfig, SubsystemConfig subsystemConfig, boolean logDetails) {
         IPhoenix6 devInst = null;
         var bus = subsystemConfig.canBusName;
-        if (!subsystemConfig.implemented || deviceConfig.id > StartingGhostId) {
-            GreenLogger.log("Device " +  deviceConfig.name + " not implemented ghosting");
+        if (!subsystemConfig.implemented || deviceConfig.id > startingGhostId) {
+            GreenLogger.log("Device " + deviceConfig.name + " not implemented ghosting");
             bus = "ghost";
         } else {
             GreenLogger.log("Creating " + deviceConfig.name);
@@ -225,14 +226,14 @@ public class RobotFactory {
         GreenLogger.log("  deviceType: " + deviceConfig.deviceType);
 
         CANBus canbus;
-        if(!canBusMap.containsKey(bus)){
+        if (!canBusMap.containsKey(bus)) {
             canbus = new CANBus(bus);
             canBusMap.put(bus, canbus);
         } else {
             canbus = canBusMap.get(bus);
         }
 
-        if(!subsystemConfig.implemented) return new GhostDevice(deviceConfig.id, canbus);
+        if (!subsystemConfig.implemented) return new GhostDevice(deviceConfig.id, canbus);
 
         switch (deviceConfig.deviceType) {
             case TalonFX -> {
@@ -306,31 +307,31 @@ public class RobotFactory {
         }
         if (parentConfig != null) {
             // Update defaults with yaml values
-            ApplyYamlConfigs(subsystemConfig, deviceConfig, parentConfig);
+            applyYamlConfigs(subsystemConfig, deviceConfig, parentConfig);
         }
         return parentConfig;
     }
 
-    private void ApplyYamlConfigs(SubsystemConfig subsystemConfig, DeviceConfiguration deviceConfig, ParentConfiguration parentConfig) {
+    private void applyYamlConfigs(SubsystemConfig subsystemConfig, DeviceConfiguration deviceConfig, ParentConfiguration parentConfig) {
         switch (deviceConfig.deviceType) {
             case TalonFX -> {
                 var clazz = (TalonFXConfiguration) parentConfig;
-                clazz.MotorOutput = GetMotorOutputConfigs(deviceConfig);
+                clazz.MotorOutput = getMotorOutputConfigs(deviceConfig);
                 clazz.Slot0 = Slot0Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 0));
                 clazz.Slot1 = Slot1Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 1));
                 clazz.Slot2 = Slot2Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 2));
-                clazz.CurrentLimits = GetCurrentConfigs(deviceConfig);
+                clazz.CurrentLimits = getCurrentConfigs(deviceConfig);
                 clazz.SoftwareLimitSwitch = GetSoftLimitConfigs(deviceConfig);
-                clazz.Feedback = GetFeedbackConfigs(deviceConfig);
+                clazz.Feedback = getFeedbackConfigs(deviceConfig);
             }
             case TalonFXS -> {
                 var clazz = (TalonFXSConfiguration) parentConfig;
-                clazz.MotorOutput = GetMotorOutputConfigs(deviceConfig);
-                clazz.Commutation = GetCommunicationConfigs(deviceConfig);
+                clazz.MotorOutput = getMotorOutputConfigs(deviceConfig);
+                clazz.Commutation = getCommunicationConfigs(deviceConfig);
                 clazz.Slot0 = Slot0Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 0));
                 clazz.Slot1 = Slot1Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 1));
                 clazz.Slot2 = Slot2Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 2));
-                clazz.CurrentLimits = GetCurrentConfigs(deviceConfig);
+                clazz.CurrentLimits = getCurrentConfigs(deviceConfig);
                 clazz.SoftwareLimitSwitch = GetSoftLimitConfigs(deviceConfig);
                 clazz.ExternalFeedback = GetExternalFeedbackConfigs(deviceConfig);
             }
@@ -353,12 +354,12 @@ public class RobotFactory {
         }
     }
 
-    private FeedbackConfigs GetFeedbackConfigs(DeviceConfiguration deviceConfig) {
+    private FeedbackConfigs getFeedbackConfigs(DeviceConfiguration deviceConfig) {
         var config = new FeedbackConfigs();
         // if we have settings defined in YAML use them otherwise use the CTRE defaults
         if (deviceConfig.remoteSensor != null) {
             switch (deviceConfig.remoteSensor) {
-                case RemoteCANcoder ->  config.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+                case RemoteCANcoder -> config.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
             }
         }
         GreenLogger.log("  remoteSensor: " + config.FeedbackSensorSource);
@@ -413,7 +414,7 @@ public class RobotFactory {
         return config;
     }
 
-    public CurrentLimitsConfigs GetCurrentConfigs(DeviceConfiguration deviceConfig) {
+    public CurrentLimitsConfigs getCurrentConfigs(DeviceConfiguration deviceConfig) {
         var config = new CurrentLimitsConfigs();
 
         // the defaults for current limits are on from CTRE we want to enforce this.
@@ -475,7 +476,7 @@ public class RobotFactory {
     }
 
     // The Communication configs are used to configure motor type and connections
-    private CommutationConfigs GetCommunicationConfigs(DeviceConfiguration deviceConfig) {
+    private CommutationConfigs getCommunicationConfigs(DeviceConfiguration deviceConfig) {
         var config = new CommutationConfigs();
         String info = "";
         // if we have settings defined in YAML use them otherwise use the CTRE defaults
@@ -493,7 +494,7 @@ public class RobotFactory {
     }
 
     // These configurations control the motor inversions and neutral behaviour
-    private MotorOutputConfigs GetMotorOutputConfigs(DeviceConfiguration deviceConfig) {
+    private MotorOutputConfigs getMotorOutputConfigs(DeviceConfiguration deviceConfig) {
         var config = new MotorOutputConfigs();
         // if we have settings defined in YAML use them otherwise use the CTRE defaults
         if (deviceConfig.motorRotation != null) {
