@@ -570,7 +570,7 @@ public class RobotFactory {
         return lastGhostId;
     }
 
-    public SwerveModuleConstants[] getSwerveModuleConstants(String subsystemName, double maxSpd) {
+    public SwerveModuleConstants<?, ?, ?>[] getSwerveModuleConstants(String subsystemName, double maxSpd) {
         var config = getSubsystemConfig(subsystemName);
         var kinematics = config.kinematics;
         verifyKinematics(subsystemName, kinematics);
