@@ -38,8 +38,7 @@ public class RobotFactory {
 
     private RobotConfiguration config;
     public boolean robotIsReal; // Use to detect real or simulation public to override for tests
-    private final static int startingGhostId = 50;
-    private int lastGhostId = startingGhostId;
+    private static final int startingGhostId = 50;
     private final Map<String, CANBus> canBusMap = new HashMap<>();
 
     /**
@@ -563,11 +562,6 @@ public class RobotFactory {
         constants.CANBusName = config.canBusName;
         constants.Pigeon2Id = config.devices.get("gyro").id;
         return constants;
-    }
-
-    private int getNextGhostId() {
-        lastGhostId++;
-        return lastGhostId;
     }
 
     public SwerveModuleConstants<?, ?, ?>[] getSwerveModuleConstants(String subsystemName, double maxSpd) {
