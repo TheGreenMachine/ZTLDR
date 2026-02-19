@@ -308,9 +308,9 @@ public class RobotFactory {
             case TalonFX -> {
                 var clazz = (TalonFXConfiguration) parentConfig;
                 clazz.MotorOutput = getMotorOutputConfigs(deviceConfig);
-                clazz.Slot0 = Slot0Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 0));
-                clazz.Slot1 = Slot1Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 1));
-                clazz.Slot2 = Slot2Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 2));
+                clazz.Slot0 = Slot0Configs.from(getSlotConfigs(deviceConfig.pidConfig, 0));
+                clazz.Slot1 = Slot1Configs.from(getSlotConfigs(deviceConfig.pidConfig, 1));
+                clazz.Slot2 = Slot2Configs.from(getSlotConfigs(deviceConfig.pidConfig, 2));
                 clazz.CurrentLimits = getCurrentConfigs(deviceConfig);
                 clazz.SoftwareLimitSwitch = getSoftLimitConfigs(deviceConfig);
                 clazz.Feedback = getFeedbackConfigs(deviceConfig);
@@ -319,9 +319,9 @@ public class RobotFactory {
                 var clazz = (TalonFXSConfiguration) parentConfig;
                 clazz.MotorOutput = getMotorOutputConfigs(deviceConfig);
                 clazz.Commutation = getCommunicationConfigs(deviceConfig);
-                clazz.Slot0 = Slot0Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 0));
-                clazz.Slot1 = Slot1Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 1));
-                clazz.Slot2 = Slot2Configs.from(GetSlotConfigs(deviceConfig.pidConfig, 2));
+                clazz.Slot0 = Slot0Configs.from(getSlotConfigs(deviceConfig.pidConfig, 0));
+                clazz.Slot1 = Slot1Configs.from(getSlotConfigs(deviceConfig.pidConfig, 1));
+                clazz.Slot2 = Slot2Configs.from(getSlotConfigs(deviceConfig.pidConfig, 2));
                 clazz.CurrentLimits = getCurrentConfigs(deviceConfig);
                 clazz.SoftwareLimitSwitch = getSoftLimitConfigs(deviceConfig);
                 clazz.ExternalFeedback = getExternalFeedbackConfigs(deviceConfig);
@@ -452,7 +452,7 @@ public class RobotFactory {
     /**
      * Slot configs are the PID values
      */
-    private SlotConfigs GetSlotConfigs(Map<String, PIDSlotConfiguration> pidConfig, int slot) {
+    private SlotConfigs getSlotConfigs(Map<String, PIDSlotConfiguration> pidConfig, int slot) {
         var config = new SlotConfigs();
         config.SlotNumber = slot;
         // if we have settings defined in YAML use them otherwise use the CTRE defaults
@@ -559,10 +559,10 @@ public class RobotFactory {
             if (driveConf == null) {
                 GreenLogger.log("Module Drive Configuration");
                 driveConf = getCTREConfig(config, drive);
-                driveSlot = Slot0Configs.from(GetSlotConfigs(config.drivePID, 0));
+                driveSlot = Slot0Configs.from(getSlotConfigs(config.drivePID, 0));
                 GreenLogger.log("Module Azimuth Configuration");
                 steerConf = getCTREConfig(config, azm);
-                steerSlot = Slot0Configs.from(GetSlotConfigs(config.azimuthPID, 0));
+                steerSlot = Slot0Configs.from(getSlotConfigs(config.azimuthPID, 0));
                 GreenLogger.log("Creating " + config.modules.size() + " Modules");
                 GreenLogger.log(" WheelRadius: " + factory.WheelRadius);
                 GreenLogger.log(" DriveMotorGearRatio: " + factory.DriveMotorGearRatio);
