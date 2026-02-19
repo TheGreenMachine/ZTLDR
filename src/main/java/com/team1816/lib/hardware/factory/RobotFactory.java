@@ -287,30 +287,14 @@ public class RobotFactory {
             case CANifier -> {
                 // this is phoenix 5 there is no config
             }
-            case TalonFX -> {
-                parentConfig = new TalonFXConfiguration();
-            }
-            case TalonFXS -> {
-                parentConfig = new TalonFXSConfiguration();
-            }
-            case Pigeon2 -> {
-                parentConfig = new Pigeon2Configuration();
-            }
-            case CANdle -> {
-                parentConfig = new CANdleConfiguration();
-            }
-            case CANdi -> {
-                parentConfig = new CANdiConfiguration();
-            }
-            case CANrange -> {
-                parentConfig = new CANrangeConfiguration();
-            }
-            case CANcoder -> {
-                parentConfig = new CANcoderConfiguration();
-            }
-            default -> {
-                GreenLogger.log("Unknown CTRE configuration for deviceType: " + deviceConfig.deviceType);
-            }
+            case TalonFX  -> parentConfig = new TalonFXConfiguration();
+            case TalonFXS -> parentConfig = new TalonFXSConfiguration();
+            case Pigeon2  -> parentConfig = new Pigeon2Configuration();
+            case CANdle   -> parentConfig = new CANdleConfiguration();
+            case CANdi    -> parentConfig = new CANdiConfiguration();
+            case CANrange -> parentConfig = new CANrangeConfiguration();
+            case CANcoder -> parentConfig = new CANcoderConfiguration();
+            default -> GreenLogger.log("Unknown CTRE configuration for deviceType: " + deviceConfig.deviceType);
         }
         if (parentConfig != null) {
             // Update defaults with yaml values
