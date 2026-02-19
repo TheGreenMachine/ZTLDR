@@ -196,6 +196,7 @@ public class Superstructure extends SubsystemBase {
                 break;
             case L3_DOWNCLIMBING:
                 l3DownClimbing();
+                break;
             case STORAGE_INTAKING:
                 storageIntaking();
                 break;
