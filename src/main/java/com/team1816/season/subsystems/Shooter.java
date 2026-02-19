@@ -28,7 +28,7 @@ import static com.team1816.lib.Singleton.factory;
 public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     //CLASS
-    String NAME = "shooter";
+    public static final String NAME = "shooter";
 
     private SHOOTER_STATE wantedState = SHOOTER_STATE.CALIBRATING;
 
