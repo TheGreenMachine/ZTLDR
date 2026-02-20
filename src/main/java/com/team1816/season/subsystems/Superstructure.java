@@ -112,6 +112,7 @@ public class Superstructure extends SubsystemBase {
     private WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
     private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
+    // TODO: Add calibration state, maybe as the default here
     private WantedShooterState wantedShooterState = WantedShooterState.IDLE;
     private WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
     private WantedClimbState wantedClimbState = WantedClimbState.IDLING;
@@ -489,7 +490,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void autonomousInit() {
-        setWantedShooterState(WantedShooterState.CALIBRATING);
+        setWantedShooterState(WantedShooterState.AUTOMATIC);
     }
 
     public void teleopInit() {
