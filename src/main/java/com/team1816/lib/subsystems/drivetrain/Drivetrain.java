@@ -83,7 +83,7 @@ public class Drivetrain extends SwerveDrivetrain<CommonTalon, CommonTalon, Paren
 
         var drConf = config.devices.get("flDr");
         var driveMotor = WpiMotorUtil.getMotorConstants(drConf).withReduction(gearing);
-        var moduleConfig = new ModuleConfig(whlRad, maxSpd, cof, driveMotor, factory.GetCurrentConfigs(drConf).StatorCurrentLimit, 1);
+        var moduleConfig = new ModuleConfig(whlRad, maxSpd, cof, driveMotor, factory.getCurrentConfigs(drConf).StatorCurrentLimit, 1);
         // In order of front left, front right, back left, back right
         var kinematics = new SwerveDriveKinematics(this.getModuleLocations());
         var modules = kinematics.getModules();
