@@ -10,6 +10,7 @@ import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
@@ -63,6 +64,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private static final Rotation2d CALIBRATION_POSITION_ARC_ANGLE = Rotation2d.fromRotations(.75); //should always be less than 1 rotation //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
     private static final Rotation2d ROTATION_OFFSET_FROM_CALIBRATION_ZERO = Rotation2d.fromDegrees(70); //as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
 
+    //FIELD DIMENSIONS
+    private static final double HALF_FIELD_WIDTH = 4.035;
+
     //CALIBRATION
     private Double[] calibrationPositions = new Double[]{0.0, 0.0};
 
@@ -79,7 +83,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public enum AUTO_AIM_TARGETS{
         // TODO: figure out hub z value
         BLUE_HUB(new Translation3d(4.6228, 3.8608, 40)),
-        RED_HUB(new Translation3d(11.915394, 3.8608, 40));
+        RED_HUB(new Translation3d(11.915394, 3.8608, 40)),
+        BLUE_LEFT_CORNER(new Translation3d(2, 6.07, 0)),
+        BLUE_RIGHT_CORNER(new Translation3d(2, 2, 0)),
+        RED_LEFT_CORNER(new Translation3d(16.27, 2, 0)),
+        RED_RIGHT_CORNER(new Translation3d(16.27, 6.07, 0));
 
         private Translation3d position;
 
@@ -102,6 +110,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         DISTANCE_TWO(45, 90, 20),
         DISTANCE_THREE(86, 0, 30),
         AUTOMATIC(-1, -1, -1),
+        SNOWBLOWING(-1,-1, -1),
         IDLE(0, 0, 0);
 
         private double launchAngle;
@@ -167,12 +176,34 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double rotationAngle = wantedState.getRotationAngle();
         double launchPower = wantedState.getLaunchPower();
 
-        if (wantedState == SHOOTER_STATE.AUTOMATIC) {
-            setCurrentAutoAimTarget(
-                DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
-                    ? AUTO_AIM_TARGETS.RED_HUB
-                    : AUTO_AIM_TARGETS.BLUE_HUB
-            );
+        if (wantedState == SHOOTER_STATE.AUTOMATIC || wantedState == SHOOTER_STATE.SNOWBLOWING) {
+
+            if (wantedState == SHOOTER_STATE.AUTOMATIC) {
+                if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
+                    setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_HUB);
+                }
+                else {
+                    setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_HUB);
+                }
+            }
+            else {
+                if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
+                    if (launcherTranslation.getX() < HALF_FIELD_WIDTH) {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_LEFT_CORNER);
+                    }
+                    else {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_RIGHT_CORNER);
+                    }
+                }
+                else {
+                    if (launcherTranslation.getX() > HALF_FIELD_WIDTH) {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_LEFT_CORNER);
+                    }
+                    else {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_RIGHT_CORNER);
+                    }
+                }
+            }
 
             double distance = launcherTranslation.getDistance(currentTarget.position);
 
