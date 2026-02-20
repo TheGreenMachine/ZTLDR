@@ -10,16 +10,17 @@ import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -27,9 +28,10 @@ import static com.team1816.lib.Singleton.factory;
 public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     //CLASS
-    String NAME = "shooter";
+    public static final String NAME = "shooter";
 
-    private SHOOTER_STATE wantedState = SHOOTER_STATE.CALIBRATING;
+    // Always default this to IDLE, the real default for the shooter is in the superstructure
+    private SHOOTER_STATE wantedState = SHOOTER_STATE.IDLE;
 
     //MOTORS
     private final IMotor topLaunchMotor = (IMotor) factory.getDevice(NAME, "topLaunchMotor");
@@ -41,7 +43,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private PositionVoltage positionControl = new PositionVoltage(0);
 
     //AUTO AIM
-    private AUTO_AIM_TARGETS currentTarget = AUTO_AIM_TARGETS.BLUE_HUB;
+    private AUTO_AIM_TARGETS currentTarget = AUTO_AIM_TARGETS.RED_HUB;
     // TODO: get the launcher position from the vision or whatever
     Translation3d launcherTranslation = new Translation3d(0,0,0).plus(SHOOTER_OFFSET);
 
@@ -55,12 +57,15 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     boolean rightSensorValue = true;
 
     //CONSTANTS
-    private static final double MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE = 3.5/1; //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-    private static final double MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE = 3.5/1; //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-    private static final Translation3d SHOOTER_OFFSET = new Translation3d(0, 0, 22); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-    private static final double CALIBRATION_THRESHOLD = 10.0; //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-    private static final Rotation2d CALIBRATION_POSITION_ARC_ANGLE = Rotation2d.fromRotations(.75); //should always be less than 1 rotation //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-    private static final Rotation2d ROTATION_OFFSET_FROM_CALIBRATION_ZERO = Rotation2d.fromDegrees(70); //as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+    private static final double MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE = factory.getConstant(NAME, "motorRotationsPerLaunchAngleDegree", 0); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+    private static final double MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE = factory.getConstant(NAME, "motorRotationsPerRotationAngleDegree", 0); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+    private static final Translation3d SHOOTER_OFFSET = new Translation3d(factory.getConstant(NAME, "initialShooterOffsetX",0), factory.getConstant(NAME, "initialShooterOffsetY",0), factory.getConstant(NAME, "initialShooterOffsetZ",0)); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+    private static final double CALIBRATION_THRESHOLD = factory.getConstant(NAME, "calibrationThreshold",10); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+    private static final Rotation2d CALIBRATION_POSITION_ARC_ANGLE = Rotation2d.fromRotations(factory.getConstant(NAME, "calibrationThreshold", 0.75)); //should always be less than 1 rotation //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+    private static final Rotation2d ROTATION_OFFSET_FROM_CALIBRATION_ZERO = Rotation2d.fromDegrees(factory.getConstant(NAME, "rotationOffsetFromCalibrationZero", 70)); //as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+
+    //FIELD DIMENSIONS
+    private static final double HALF_FIELD_WIDTH = 4.035;
 
     //CALIBRATION
     private Double[] calibrationPositions = new Double[]{0.0, 0.0};
@@ -75,10 +80,16 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public MechanismLigament2d launchAngleML = launchMechRoot.append(
         new MechanismLigament2d("Launch Angle", 1.5, 0));
 
+    private boolean isCalibrated;
+
     public enum AUTO_AIM_TARGETS{
         // TODO: figure out hub z value
         BLUE_HUB(new Translation3d(4.6228, 3.8608, 40)),
-        RED_HUB(new Translation3d(11.915394, 3.8608, 40));
+        RED_HUB(new Translation3d(11.915394, 3.8608, 40)),
+        BLUE_LEFT_CORNER(new Translation3d(2, 6.07, 0)),
+        BLUE_RIGHT_CORNER(new Translation3d(2, 2, 0)),
+        RED_LEFT_CORNER(new Translation3d(16.27, 2, 0)),
+        RED_RIGHT_CORNER(new Translation3d(16.27, 6.07, 0));
 
         private Translation3d position;
 
@@ -95,12 +106,13 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public enum SHOOTER_STATE {
         // TODO: figure out what default angles and velocities should be for manual mode
-        CALIBRATING(0,0,0),
-        CALIBRATED(0,0,0),
-        DISTANCE_ONE(3, 45, 10),
-        DISTANCE_TWO(45, 90, 20),
-        DISTANCE_THREE(86, 0, 30),
+        CALIBRATING(0, 0, 0),
+        CALIBRATED(0, 0, 0),
+        DISTANCE_ONE(factory.getConstant(NAME,"distanceOneLaunchAngle",0), factory.getConstant(NAME,"distanceOneRotationAngle",0), factory.getConstant(NAME,"distanceOneLaunchVelocity",0)),
+        DISTANCE_TWO(factory.getConstant(NAME,"distanceTwoLaunchAngle",0), factory.getConstant(NAME,"distanceTwoRotationAngle",0), factory.getConstant(NAME,"distanceTwoLaunchVelocity",0)),
+        DISTANCE_THREE(factory.getConstant(NAME,"distanceThreeLaunchAngle",0), factory.getConstant(NAME,"distanceThreeRotationAngle",0), factory.getConstant(NAME,"distanceThreeLaunchVelocity",0)),
         AUTOMATIC(-1, -1, -1),
+        SNOWBLOWING(-1,-1, -1),
         IDLE(0, 0, 0);
 
         private double launchAngle;
@@ -134,11 +146,14 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     public void periodic() {
+        SmartDashboard.putString("Shooter state: ", wantedState.toString());
+
         readFromHardware();
-        if (wantedState != SHOOTER_STATE.CALIBRATING) {
-            applyState();
-        } else {
+
+        if (wantedState == SHOOTER_STATE.CALIBRATING) {
             calibratePeriodic();
+        } else {
+            applyState();
         }
     }
 
@@ -158,7 +173,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         turretFieldPose.set(poseArray);
 
         launchAngleML.setAngle(wantedState.getLaunchAngle()); //todo: Will need to change to correspond with motor
-        SmartDashboard.putString("Shooter state: ", wantedState.toString());
     }
 
     private void applyState() {
@@ -166,7 +180,35 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double rotationAngle = wantedState.getRotationAngle();
         double launchPower = wantedState.getLaunchPower();
 
-        if (wantedState == SHOOTER_STATE.AUTOMATIC) {
+        if (wantedState == SHOOTER_STATE.AUTOMATIC || wantedState == SHOOTER_STATE.SNOWBLOWING) {
+
+            if (wantedState == SHOOTER_STATE.AUTOMATIC) {
+                if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
+                    setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_HUB);
+                }
+                else {
+                    setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_HUB);
+                }
+            }
+            else {
+                if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
+                    if (launcherTranslation.getX() < HALF_FIELD_WIDTH) {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_LEFT_CORNER);
+                    }
+                    else {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_RIGHT_CORNER);
+                    }
+                }
+                else {
+                    if (launcherTranslation.getX() > HALF_FIELD_WIDTH) {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_LEFT_CORNER);
+                    }
+                    else {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_RIGHT_CORNER);
+                    }
+                }
+            }
+
             double distance = launcherTranslation.getDistance(currentTarget.position);
 
             ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator.getShooterDistanceSetting(distance);
@@ -211,7 +253,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             }
         }
         if (calibrationPositions[0] != null && calibrationPositions[1] != null && wantedState == SHOOTER_STATE.CALIBRATING){
-            wantedState = SHOOTER_STATE.CALIBRATED;
+            isCalibrated = true;
         }
     }
 
@@ -266,4 +308,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         return scaledRotations + calibrationPositions[0];
     }
 
+    public boolean isCalibrated() {
+        return isCalibrated;
+    }
 }
