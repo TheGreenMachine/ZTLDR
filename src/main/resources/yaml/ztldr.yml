@@ -24,6 +24,12 @@ shooterSettings:
         - 57
         - 67
         - 77
+    minimumDefaultAngle: 0 # TODO: SET THIS
+    minimumDefaultPower: 0 # TODO: SET THIS
+    mediumDefaultAngle: 0 # TODO: SET THIS
+    mediumDefaultPower: 0 # TODO: SET THIS
+    maximumDefaultAngle: 0 # TODO: SET THIS
+    maximumDefaultPower: 0 # TODO: SET THIS
 subsystems:
     intake:
         devices:
