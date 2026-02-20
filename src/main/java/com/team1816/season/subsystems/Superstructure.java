@@ -45,21 +45,21 @@ public class Superstructure extends SubsystemBase {
         INDEX_AGITATING
     }
 
-    public enum ClimbSide {
-        // TODO: Get these poses from Choreo.
-        LEFT(Pose2d.kZero),
-        RIGHT(Pose2d.kZero);
-
-        private final Pose2d climbPose;
-
-        ClimbSide(Pose2d climbPose) {
-            this.climbPose = climbPose;
-        }
-
-        public Pose2d getClimbPose() {
-            return climbPose;
-        }
-    }
+//    public enum ClimbSide {
+//        // TODO: Get these poses from Choreo.
+//        LEFT(Pose2d.kZero),
+//        RIGHT(Pose2d.kZero);
+//
+//        private final Pose2d climbPose;
+//
+//        ClimbSide(Pose2d climbPose) {
+//            this.climbPose = climbPose;
+//        }
+//
+//        public Pose2d getClimbPose() {
+//            return climbPose;
+//        }
+//    }
 
     public enum WantedClimbState {
         IDLING,
@@ -122,8 +122,7 @@ public class Superstructure extends SubsystemBase {
     private WantedFeederState wantedFeederState = WantedFeederState.IDLING;
     private FeederControlState feederControlState = FeederControlState.DEFAULTING;
 
-    private ClimbSide climbSide = ClimbSide.LEFT;
-    private WantedClimbState climbState = WantedClimbState.IDLING;
+//    private ClimbSide climbSide = ClimbSide.LEFT;
 
     public Superstructure(Swerve swerve) {
         this.swerve = swerve;
@@ -229,12 +228,12 @@ public class Superstructure extends SubsystemBase {
         return new InstantCommand(() -> setWantedSuperState(superState));
     }
 
-    public void setClimbSide(ClimbSide climbSide) {
-        this.climbSide = climbSide;
-    }
+//    public void setClimbSide(ClimbSide climbSide) {
+//        this.climbSide = climbSide;
+//    }
 
     private void l1Climbing() {
-        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
+        switch (wantedClimbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L1_CLIMING:
                 climber.setWantedState(Climber.CLIMBER_STATE.L1_UP_CLIMBING);
                 intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
@@ -249,7 +248,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void l3Climbing() {
-        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
+        switch (wantedClimbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L3_CLIMBING:
                 climber.setWantedState(Climber.CLIMBER_STATE.L3_UP_CLIMBING);
                 intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
@@ -266,7 +265,6 @@ public class Superstructure extends SubsystemBase {
         switch (wantedIntakeState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case INTAKING:
                 intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
-                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 actualSuperState = ActualSuperState.STORAGE_INTAKING;
@@ -315,7 +313,7 @@ public class Superstructure extends SubsystemBase {
 
 
     public void l1Downclimbing() {
-        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
+        switch (wantedClimbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L1_CLIMBING_DOWN:
                 climber.setWantedState(Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
                 intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN); //WILL NEED TO CONFIDE WITH BUILD FOR ALL WANT STATES FOR THE ACTIONS
@@ -330,7 +328,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void l3DownClimbing() {
-        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
+        switch (wantedClimbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L3_ClIMBING_DOWN:
                 climber.setWantedState(Climber.CLIMBER_STATE.L3_DOWN_CLIMBING);
                 intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
@@ -425,6 +423,14 @@ public class Superstructure extends SubsystemBase {
             case IDLING -> feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
         }
 
+        switch (wantedClimbState) {
+            case IDLING -> climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
+            case L1_CLIMING -> climber.setWantedState(Climber.CLIMBER_STATE.L1_CLIMBING);
+            case L1_CLIMBING_DOWN -> climber.setWantedState(Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
+            case L3_CLIMBING -> climber.setWantedState(Climber.CLIMBER_STATE.L3_CLIMBING);
+            case L3_ClIMBING_DOWN -> climber.setWantedState(Climber.CLIMBER_STATE.L3_DOWN_CLIMBING);
+        }
+
         /*
          * What is this doing???
          */
@@ -462,6 +468,10 @@ public class Superstructure extends SubsystemBase {
 
     public void setFeederControlState(FeederControlState feederControlState) {
         this.feederControlState = feederControlState;
+    }
+
+    public void setWantedClimbState(WantedClimbState climbState) {
+        this.wantedClimbState = climbState;
     }
 
     public WantedIntakeState getWantedIntakeState() {
@@ -504,7 +514,7 @@ public class Superstructure extends SubsystemBase {
         setWantedGatekeeperState(WantedGatekeeperState.CLOSED);
         setWantedFeederState(WantedFeederState.IDLING);
         setFeederControlState(FeederControlState.DEFAULTING);
-        setFeederControlState(FeederControlState.DEFAULTING);
+        setWantedClimbState(WantedClimbState.IDLING);
         setWantedIntakeState(WantedIntakeState.INTAKING);
         setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING);
     }

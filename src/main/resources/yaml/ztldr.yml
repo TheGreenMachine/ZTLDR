@@ -70,6 +70,8 @@ subsystems:
 
             downAngle: 225
             upAngle: 45
+
+            idleAngle: 0
     climber:
         devices:
             flipMotor:

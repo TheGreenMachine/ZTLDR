@@ -97,8 +97,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
                 GreenLogger.log("Climber state: "+wantedState+" is not accounted for in applyState()");
                 break;
         }
-
-        SmartDashboard.putString("Climber state: ", wantedState.toString());
+        SmartDashboard.putNumber("Climber Wanted Position", getWantedLinearPosition(wantedState));
     }
 
     private void setFlipMotor(double position){
@@ -121,7 +120,20 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
         L1_DOWN_CLIMBING
     }
 
+
     public void setWantedState(CLIMBER_STATE wantedState) {
         this.wantedState = wantedState;
+    }
+    public double getWantedLinearPosition(CLIMBER_STATE climberState) {
+        return switch (climberState) {
+            case IDLING -> flipIdling;
+            case L1_UP_CLIMBING -> flipL1UpClimbing;
+            case L1_DOWN_CLIMBING -> flipL1DownClimbing;
+            case L3_UP_CLIMBING -> flipL3UpClimbing;
+            case L3_DOWN_CLIMBING -> flipL3DownClimbing;
+        };
+    }
+    public double getActualLinearPosition() {
+        return linearSlideMotor.getMotorPosition();
     }
 }

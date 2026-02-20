@@ -51,8 +51,8 @@ public class RobotContainer extends BaseRobotContainer {
         driverController.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.setWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)));
         driverController.rightTrigger().onFalse(Commands.runOnce(() -> superstructure.setWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSED)));
 
-        driverController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedShooterState(Superstructure.WantedShooterState.DISTANCE_ONE)));
-        driverController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedShooterState(Superstructure.WantedShooterState.DISTANCE_TWO)));
+        driverController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedClimbState(Superstructure.WantedClimbState.IDLING)));
+        driverController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedClimbState(Superstructure.WantedClimbState.L1_CLIMING)));
         driverController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedShooterState(Superstructure.WantedShooterState.DISTANCE_THREE)));
         driverController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC)));
 
