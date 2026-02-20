@@ -76,6 +76,7 @@ public class Superstructure extends SubsystemBase {
         DISTANCE_TWO,
         DISTANCE_THREE,
         AUTOMATIC,
+        SNOWBLOWING,
         IDLE
     }
 
@@ -305,6 +306,11 @@ public class Superstructure extends SubsystemBase {
 
     public void snowBlowing() {
         //WILL NEED TO ADD MULTIPLE SUBSYSTEMS
+        shooter.setWantedState(Shooter.SHOOTER_STATE.SNOWBLOWING);
+        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
+        feeder.setWantedState(Feeder.FEEDER_STATE.ACTIVE_FEEDING);
+        gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.OPEN);
+        swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
     }
 
 
