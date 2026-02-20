@@ -1,15 +1,19 @@
 package com.team1816.season;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.Singleton;
 import com.team1816.season.subsystems.Indexer;
 import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
 
 public class RobotContainer extends BaseRobotContainer {
-    public RobotContainer() {
+    public RobotContainer() throws IOException, ParseException {
         NamedCommands.registerCommand("InTheZone", new InTheZoneCommand());
         // call the base to initialize library objects
         // i.e. subsystems that always exist like the drivetrain and path planner
