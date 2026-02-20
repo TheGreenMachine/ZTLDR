@@ -95,9 +95,9 @@ public class Superstructure extends SubsystemBase {
     }
 
     public enum WantedFeederState {
-        PASSIVE_FEEDING,
-        ACTIVE_FEEDING,
-        AGITATING,
+        SLOW_FEEDING,
+        FAST_FEEDING,
+        REVERSING,
         IDLING
     }
 
@@ -373,8 +373,8 @@ public class Superstructure extends SubsystemBase {
 
     private void agitate() {
         switch(wantedFeederState) {
-            case AGITATING, PASSIVE_FEEDING, ACTIVE_FEEDING, IDLING:
-                feeder.setWantedState(Feeder.FEEDER_STATE.AGITATING);
+            case REVERSING, SLOW_FEEDING, FAST_FEEDING, IDLING:
+                feeder.setWantedState(Feeder.FEEDER_STATE.REVERSING);
                 break;
         }
     }
@@ -407,9 +407,9 @@ public class Superstructure extends SubsystemBase {
         }
 
         switch (wantedFeederState) {
-            case PASSIVE_FEEDING -> feeder.setWantedState(Feeder.FEEDER_STATE.PASSIVE_FEEDING);
-            case ACTIVE_FEEDING -> feeder.setWantedState(Feeder.FEEDER_STATE.ACTIVE_FEEDING);
-            case AGITATING -> feeder.setWantedState(Feeder.FEEDER_STATE.AGITATING);
+            case SLOW_FEEDING -> feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
+            case FAST_FEEDING -> feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
+            case REVERSING -> feeder.setWantedState(Feeder.FEEDER_STATE.REVERSING);
             case IDLING -> feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
         }
 
@@ -417,11 +417,11 @@ public class Superstructure extends SubsystemBase {
          * What is this doing???
          */
         if (feederControlState == FeederControlState.OVERRIDING) {
-            feeder.setWantedState(Feeder.FEEDER_STATE.ACTIVE_FEEDING);
+            feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
         }
         else {
             if (wantedIntakeState == WantedIntakeState.INTAKING || wantedGatekeeperState == WantedGatekeeperState.OPEN) {
-                feeder.setWantedState(Feeder.FEEDER_STATE.PASSIVE_FEEDING);
+                feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
             }
             else {
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);

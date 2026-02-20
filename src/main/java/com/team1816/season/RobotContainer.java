@@ -74,7 +74,7 @@ public class RobotContainer extends BaseRobotContainer {
         // controller.leftBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_OUT));
         // controller.rightBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_IN));
     }
-    
+
     public final void registerCommands() {
         /**
          * Individual Subsystem Action (not needed, just here)
@@ -88,11 +88,11 @@ public class RobotContainer extends BaseRobotContainer {
         }));
 
         NamedCommands.registerCommand("passiveFeeding", Commands.runOnce(() -> {
-             getSuperstructure().setWantedFeederState(Superstructure.WantedFeederState.PASSIVE_FEEDING);
+             getSuperstructure().setWantedFeederState(Superstructure.WantedFeederState.SLOW_FEEDING);
         }));
 
         NamedCommands.registerCommand("activeFeeding", Commands.runOnce(() -> {
-             getSuperstructure().setWantedFeederState(Superstructure.WantedFeederState.ACTIVE_FEEDING);
+             getSuperstructure().setWantedFeederState(Superstructure.WantedFeederState.FAST_FEEDING);
         }));
 
         NamedCommands.registerCommand("openGatekeeper", Commands.runOnce(() -> {
