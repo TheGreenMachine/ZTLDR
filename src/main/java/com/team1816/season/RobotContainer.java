@@ -13,7 +13,7 @@ import org.json.simple.parser.ParseException;
 import java.io.IOException;
 
 public class RobotContainer extends BaseRobotContainer {
-    public RobotContainer() throws IOException, ParseException {
+    public RobotContainer() {
         NamedCommands.registerCommand("InTheZone", new InTheZoneCommand());
         // call the base to initialize library objects
         // i.e. subsystems that always exist like the drivetrain and path planner
