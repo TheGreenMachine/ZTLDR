@@ -66,7 +66,7 @@ subsystems:
             upAngle: 45
     climber:
         devices:
-            climberFlipMotor:
+            flipMotor:
                 deviceType: TalonFX
                 id: 16
                 motorRotation: Clockwise_Positive
@@ -74,7 +74,7 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
-            linearMotor:
+            linearSlideMotor:
                 deviceType: TalonFX
                 id: 28
                 motorRotation: Clockwise_Positive
@@ -82,10 +82,22 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+        constants:
+            flipIdling: 0
+            flipL3UpClimbing: 0
+            flipL3DownClimbing: 0
+            flipL1UpClimbing: 0
+            flipL1DownClimbing: 0
+
+            linearSlideIdling: 0
+            linearSlideL3UpClimbing: 0
+            linearSlideL3DownClimbing: 0
+            linearSlideL1UpClimbing: 0
+            linearSlideL1DownClimbing: 0
 
     feeder:
         devices:
-            feederMotor:
+            feedMotor:
                 deviceType: TalonFX
                 id: 16
                 motorRotation: Clockwise_Positive
@@ -93,6 +105,11 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+        constants:
+            fastFeeding: 50
+            slowFeeding: 20
+            reversing: -50
+            idling: 0
     shooter:
         devices:
             topLaunchMotor:
@@ -164,9 +181,26 @@ subsystems:
         constants:
             rotationAngleSensorClockwiseLeft: 0
             rotationAngleSensorClockwiseRight: 1
+            motorRotationsPerLaunchAngleDegree: 3.5
+            motorRotationsPerRotationAngleDegree: 3.5
+            initialShooterOffsetX: 0
+            initialShooterOffsetY: 0
+            initialShooterOffsetZ: 22
+            calibrationThreshold: 10
+            calibrationPositionArcAngle: 0.75
+            rotationOffsetFromCalibrationZero: 70
+            distanceOneLaunchAngle: 3
+            distanceOneRotationAngle: 45
+            distanceOneLaunchVelocity: 10
+            distanceTwoLaunchAngle: 45
+            distanceTwoRotationAngle: 90
+            distanceTwoLaunchVelocity: 20
+            distanceThreeLaunchAngle: 86
+            distanceThreeRotationAngle: 0
+            distanceThreeLaunchVelocity: 30
     gatekeeper:
         devices:
-            gatekeeperTopMotor:
+            topMotor:
                 deviceType: TalonFX
                 id: 14
                 motorRotation: Clockwise_Positive
@@ -178,7 +212,7 @@ subsystems:
                     slot0:
                         kP: 0.1
                         kV: 0.1
-            gatekeeperBottomMotor:
+            bottomMotor:
                 deviceType: TalonFX
                 id: 22
                 motorRotation: Clockwise_Positive
@@ -186,6 +220,11 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+        constants:
+            topClosedVelocity: 0
+            topOpenVelocity: 10
+            bottomClosedVelocity: 0
+            bottomOpenVelocity: 5
     ledManager:
         implemented: false
         devices:

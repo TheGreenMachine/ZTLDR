@@ -60,16 +60,6 @@
           "visible": true
         }
       },
-      "/SmartDashboard/Climber": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Intake": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/Shooter Incline": {
         "window": {
           "visible": true
