@@ -18,6 +18,9 @@
             "type": "string",
             "default": ""
         },
+        "shooterSettings": {
+            "$ref": "shootersettingsconfig.schema.json"
+        },
         "autopathing": {
             "type": "object",
             "existingJavaType": "AutopathingConfig"
@@ -31,6 +34,7 @@
                 "infrastructure",
                 "constants",
                 "controlboard",
+                "shooterSettings",
                 "autopathing"
             ]
         }

@@ -19,8 +19,7 @@ import java.util.function.Supplier;
 
 public class GreenLogger {
 
-    @SuppressWarnings("rawtypes")
-    private static final HashMap<LogTopic, Supplier> periodicLogs = new HashMap<>();
+    private static final HashMap<LogTopic, Supplier<?>> periodicLogs = new HashMap<>();
     // using an empty string here to make the logs and live views consistent
     private static final NetworkTable netTable;
     private static final StringPublisher msg;

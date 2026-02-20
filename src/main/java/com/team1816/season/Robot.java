@@ -68,6 +68,7 @@ public class Robot extends TimedRobot {
                 CommandScheduler.getInstance().schedule(autonomousCommand);
             }
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.AUTONOMOUS);
+            robotContainer.autonomousInit();
         } catch (Throwable t) {
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
             GreenLogger.log(t);
