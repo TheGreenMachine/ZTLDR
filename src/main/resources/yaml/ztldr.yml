@@ -183,7 +183,7 @@ subsystems:
             distanceThreeLaunchVelocity: 30
     gatekeeper:
         devices:
-            gatekeeperTopMotor:
+            topMotor:
                 deviceType: TalonFX
                 id: 14
                 motorRotation: Clockwise_Positive
@@ -195,7 +195,7 @@ subsystems:
                     slot0:
                         kP: 0.1
                         kV: 0.1
-            gatekeeperBottomMotor:
+            bottomMotor:
                 deviceType: TalonFX
                 id: 22
                 motorRotation: Clockwise_Positive
@@ -203,6 +203,11 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+        constants:
+            topClosedVelocity: 0
+            topOpenVelocity: 10
+            bottomClosedVelocity: 0
+            bottomOpenVelocity: 5
     ledManager:
         implemented: false
         devices:
