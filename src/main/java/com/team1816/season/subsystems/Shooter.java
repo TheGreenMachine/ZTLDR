@@ -28,7 +28,7 @@ import static com.team1816.lib.Singleton.factory;
 public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     //CLASS
-    private static final String NAME = "shooter";
+    public static final String NAME = "shooter";
 
     // Always default this to IDLE, the real default for the shooter is in the superstructure
     private SHOOTER_STATE wantedState = SHOOTER_STATE.IDLE;
