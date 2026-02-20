@@ -21,7 +21,7 @@ public class RobotFactoryTest {
     @BeforeEach
     public void testInit() {
         factory = Singleton.get(RobotFactory.class);
-        factory.RobotIsReal = false;
+        factory.robotIsReal = false;
     }
 
     @Test
@@ -46,7 +46,7 @@ public class RobotFactoryTest {
 
     @Test
     public void testGetTalonFXlDevice() {
-        factory.RobotIsReal = true;
+        factory.robotIsReal = true;
         var device = factory.getDevice("drivetrain", "leftMain");
         assertNotNull(device);
         assertEquals(TalonFXImpl.class, device.getClass());
@@ -54,7 +54,7 @@ public class RobotFactoryTest {
 
     @Test
     public void testGetTalonFXSlDevice() {
-        factory.RobotIsReal = true;
+        factory.robotIsReal = true;
         var device = factory.getDevice("turret", "turret");
         assertNotNull(device);
         assertEquals(TalonFXSImpl.class, device.getClass());
@@ -62,7 +62,7 @@ public class RobotFactoryTest {
 
     @Test
     public void testGetCANifierDevice() {
-        factory.RobotIsReal = true;
+        factory.robotIsReal = true;
         var device = factory.getDevice("ledManager", "argb");
         assertNotNull(device);
         assertEquals(CANifierImpl.class, device.getClass());
@@ -70,7 +70,7 @@ public class RobotFactoryTest {
 
     @Test
     public void testGetCANdleDevice() {
-        factory.RobotIsReal = true;
+        factory.robotIsReal = true;
         var device = factory.getDevice("ledManager", "drgb");
         assertNotNull(device);
         assertEquals(CANdleImpl.class, device.getClass());
@@ -85,7 +85,7 @@ public class RobotFactoryTest {
 
     @Test
     public void testGetCANRangeDevice() {
-        factory.RobotIsReal = true;
+        factory.robotIsReal = true;
         var device = factory.getDevice("drivetrain", "range");
         assertNotNull(device);
         assertEquals(CanRangeImpl.class, device.getClass());
@@ -93,7 +93,7 @@ public class RobotFactoryTest {
 
     @Test
     public void testGetPigeonDevice() {
-        factory.RobotIsReal = true;
+        factory.robotIsReal = true;
         var device = factory.getDevice("drivetrain", "imu");
         assertNotNull(device);
         assertEquals(Pigeon2Impl.class, device.getClass());
