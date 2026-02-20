@@ -16,6 +16,7 @@ import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -42,7 +43,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private PositionVoltage positionControl = new PositionVoltage(0);
 
     //AUTO AIM
-    private AUTO_AIM_TARGETS currentTarget = AUTO_AIM_TARGETS.BLUE_HUB;
+    private AUTO_AIM_TARGETS currentTarget = AUTO_AIM_TARGETS.RED_HUB;
     // TODO: get the launcher position from the vision or whatever
     Translation3d launcherTranslation = new Translation3d(0,0,0).plus(SHOOTER_OFFSET);
 
@@ -172,7 +173,13 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double launchPower = wantedState.getLaunchPower();
 
         if (wantedState == SHOOTER_STATE.AUTOMATIC) {
-            double distance = launcherTranslation.toTranslation2d().getDistance(currentTarget.position.toTranslation2d());
+            setCurrentAutoAimTarget(
+                DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red
+                    ? AUTO_AIM_TARGETS.RED_HUB
+                    : AUTO_AIM_TARGETS.BLUE_HUB
+            );
+
+            double distance = launcherTranslation.getDistance(currentTarget.position);
 
             ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator.getShooterDistanceSetting(distance);
             launchAngle = shooterDistanceSetting.getAngle();

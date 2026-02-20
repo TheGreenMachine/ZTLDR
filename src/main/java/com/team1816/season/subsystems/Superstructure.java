@@ -16,7 +16,8 @@ public class Superstructure extends SubsystemBase {
     private final Intake intake;
     private final Feeder feeder;
     private final Climber climber;
-    protected CommandXboxController controller;
+
+    private CommandXboxController controller;
 
     public enum WantedSuperState {
         DEFAULT,
@@ -108,19 +109,19 @@ public class Superstructure extends SubsystemBase {
         DEFAULTING
     }
 
-    protected WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
-    protected ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
+    private WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
+    private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
-    public WantedShooterState wantedShooterState = WantedShooterState.CALIBRATING;
-    public WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
-    public WantedClimbState wantedClimbState = WantedClimbState.IDLING;
-    public WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
-    public WantedIntakeState wantedIntakeState = WantedIntakeState.UP;
-    public WantedFeederState wantedFeederState = WantedFeederState.IDLING;
-    public FeederControlState feederControlState = FeederControlState.DEFAULTING;
+    private WantedShooterState wantedShooterState = WantedShooterState.IDLE;
+    private WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
+    private WantedClimbState wantedClimbState = WantedClimbState.IDLING;
+    private WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
+    private WantedIntakeState wantedIntakeState = WantedIntakeState.UP;
+    private WantedFeederState wantedFeederState = WantedFeederState.IDLING;
+    private FeederControlState feederControlState = FeederControlState.DEFAULTING;
 
-    public ClimbSide climbSide = ClimbSide.LEFT;
-    public WantedClimbState climbState = WantedClimbState.IDLING;
+    private ClimbSide climbSide = ClimbSide.LEFT;
+    private WantedClimbState climbState = WantedClimbState.IDLING;
 
     public Superstructure(Swerve swerve) {
         this.swerve = swerve;
@@ -172,6 +173,7 @@ public class Superstructure extends SubsystemBase {
                 break;
             case INDEX_AGITATE:
                 actualSuperState = ActualSuperState.INDEX_AGITATING;
+                break;
             case IDLE:
             default:
                 actualSuperState = ActualSuperState.IDLING;
@@ -181,7 +183,7 @@ public class Superstructure extends SubsystemBase {
         return actualSuperState;
     }
 
-    protected void applyStates() {
+    private void applyStates() {
         switch (actualSuperState) {
             case DEFAULTING:
                 defaulting();
@@ -197,6 +199,7 @@ public class Superstructure extends SubsystemBase {
                 break;
             case L3_DOWNCLIMBING:
                 l3DownClimbing();
+                break;
             case STORAGE_INTAKING:
                 storageIntaking();
                 break;
@@ -205,8 +208,10 @@ public class Superstructure extends SubsystemBase {
                 break;
             case STORAGE_SHOOTING:
                 storageShooting();
+                break;
             case INDEX_AGITATING:
                 agitate();
+                break;
             case IDLING:
             default:
                 defaulting();
@@ -291,9 +296,9 @@ public class Superstructure extends SubsystemBase {
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 actualSuperState = ActualSuperState.STORAGE_INTAKING;
+                break;
             default:
                 actualSuperState = ActualSuperState.IDLING;
-
         }
     }
 
@@ -413,7 +418,7 @@ public class Superstructure extends SubsystemBase {
             case IDLING -> feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
         }
 
-        /**
+        /*
          * What is this doing???
          */
         if (feederControlState == FeederControlState.OVERRIDING) {
@@ -431,17 +436,29 @@ public class Superstructure extends SubsystemBase {
         swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
     }
 
+    public WantedShooterState getWantedShooterState() {
+        return wantedShooterState;
+    }
+
     public void setWantedShooterState(WantedShooterState wantedShooterState) {
         this.wantedShooterState = wantedShooterState;
     }
 
     // Add functionality for this in both manual and auto shooter modes
+    public WantedGatekeeperState getWantedGatekeeperState() {
+        return wantedGatekeeperState;
+    }
+
     public void setWantedGatekeeperState(WantedGatekeeperState gatekeeperState) {
         this.wantedGatekeeperState = gatekeeperState;
     }
 
     public void setFeederControlState(FeederControlState feederControlState) {
         this.feederControlState = feederControlState;
+    }
+
+    public WantedIntakeState getWantedIntakeState() {
+        return wantedIntakeState;
     }
 
     public void setWantedIntakeState(WantedIntakeState wantedIntakeState) {
@@ -455,8 +472,16 @@ public class Superstructure extends SubsystemBase {
         this.wantedIntakeState = wantedIntakeState;
     }
 
+    public WantedFeederState getWantedFeederState() {
+        return wantedFeederState;
+    }
+
     public void setWantedFeederState(WantedFeederState wantedFeederState) {
         this.wantedFeederState = wantedFeederState;
+    }
+
+    public WantedClimbState getWantedClimbState() {
+        return wantedClimbState;
     }
 
     public void setWantedSwerveState(WantedSwerveState wantedSwerveState) {
