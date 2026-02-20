@@ -106,7 +106,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public void readFromHardware() {
         currentPosition = intakeMotor.getMotorPosition();
 
-        intakeAngleML.setAngle(wantedState.getAngle());
+        intakeAngleML.setAngle(wantedState.getAngle()); //todo: line up with actual subsystem & actual motor position
     }
 
     private void applyState() {

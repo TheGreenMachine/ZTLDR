@@ -179,7 +179,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         poseArray[2] = rotationAngleMotor.getMotorPosition() / MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE;
         turretFieldPose.set(poseArray);
 
-        launchAngleML.setAngle(wantedState.getLaunchAngle()); //todo: Will need to change to correspond with motor
+        launchAngleML.setAngle(wantedState.getLaunchAngle()); //todo: line up with actual subsystem & actual motor position
+        SmartDashboard.putString("Shooter state: ", wantedState.toString());
     }
 
     private void applyState() {
