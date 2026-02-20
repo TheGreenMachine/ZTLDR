@@ -235,7 +235,7 @@ public class Superstructure extends SubsystemBase {
     private void l1Climbing() {
         switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L1_CLIMING:
-                climber.setWantedState(Climber.CLIMBER_STATE.L1_CLIMBING);
+                climber.setWantedState(Climber.CLIMBER_STATE.L1_UP_CLIMBING);
                 intake.setWantedState(Intake.INTAKE_STATE.IDLING);
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
@@ -250,7 +250,7 @@ public class Superstructure extends SubsystemBase {
     private void l3Climbing() {
         switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L3_CLIMBING:
-                climber.setWantedState(Climber.CLIMBER_STATE.L3_CLIMBING);
+                climber.setWantedState(Climber.CLIMBER_STATE.L3_UP_CLIMBING);
                 intake.setWantedState(Intake.INTAKE_STATE.IDLING);
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
