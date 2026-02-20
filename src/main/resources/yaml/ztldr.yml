@@ -66,7 +66,7 @@ subsystems:
             upAngle: 45
     climber:
         devices:
-            climberFlipMotor:
+            flipMotor:
                 deviceType: TalonFX
                 id: 16
                 motorRotation: Clockwise_Positive
@@ -74,7 +74,7 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
-            linearMotor:
+            linearSlideMotor:
                 deviceType: TalonFX
                 id: 28
                 motorRotation: Clockwise_Positive
@@ -82,6 +82,18 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+        constants:
+            flipIdling: 0
+            flipL3UpClimbing: 0
+            flipL3DownClimbing: 0
+            flipL1UpClimbing: 0
+            flipL1DownClimbing: 0
+
+            linearSlideIdling: 0
+            linearSlideL3UpClimbing: 0
+            linearSlideL3DownClimbing: 0
+            linearSlideL1UpClimbing: 0
+            linearSlideL1DownClimbing: 0
 
     feeder:
         devices:
