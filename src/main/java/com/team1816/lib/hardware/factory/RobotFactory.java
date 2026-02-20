@@ -322,6 +322,7 @@ public class RobotFactory {
                 clazz.CurrentLimits = GetCurrentConfigs(deviceConfig);
                 clazz.SoftwareLimitSwitch = GetSoftLimitConfigs(deviceConfig);
                 clazz.Feedback = GetFeedbackConfigs(deviceConfig);
+                clazz.MotionMagic = GetMotionMagicConfig(deviceConfig);
             }
             case TalonFXS -> {
                 var clazz = (TalonFXSConfiguration) parentConfig;
@@ -333,6 +334,7 @@ public class RobotFactory {
                 clazz.CurrentLimits = GetCurrentConfigs(deviceConfig);
                 clazz.SoftwareLimitSwitch = GetSoftLimitConfigs(deviceConfig);
                 clazz.ExternalFeedback = GetExternalFeedbackConfigs(deviceConfig);
+                clazz.MotionMagic = GetMotionMagicConfig(deviceConfig);
             }
             case Pigeon2 -> {
             }
@@ -351,6 +353,19 @@ public class RobotFactory {
                 var clazz = (CANrangeConfiguration) parentConfig;
             }
         }
+    }
+
+    private MotionMagicConfigs GetMotionMagicConfig(DeviceConfiguration deviceConfig) {
+        var mMConfig = new MotionMagicConfigs();
+        if (deviceConfig.motionMagic == null) {
+            return mMConfig;
+        }
+        mMConfig.MotionMagicAcceleration = deviceConfig.motionMagic.acceleration;
+        mMConfig.MotionMagicCruiseVelocity = deviceConfig.motionMagic.cruiseVelocity;
+        mMConfig.MotionMagicJerk = deviceConfig.motionMagic.jerk;
+        mMConfig.MotionMagicExpo_kA = deviceConfig.motionMagic.expoKA;
+        mMConfig.MotionMagicExpo_kV = deviceConfig.motionMagic.expoKV;
+        return mMConfig;
     }
 
     private FeedbackConfigs GetFeedbackConfigs(DeviceConfiguration deviceConfig) {
