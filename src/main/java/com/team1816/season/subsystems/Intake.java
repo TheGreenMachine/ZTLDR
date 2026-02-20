@@ -19,23 +19,7 @@ import java.time.Instant;
 import static com.team1816.lib.Singleton.factory;
 
 public class Intake extends SubsystemBase implements ITestableSubsystem {
-
-    static final String NAME = "intake";
-
-    // "factory in enum is BAD" - ethan 2026
-    // that checks in
-    // order is fragile; be mindful of reorganizing
-   static final double[] intakeSpeeds = {
-        factory.getConstant(NAME, "inSpeed", 10, true),
-        factory.getConstant(NAME, "outSpeed", -10, true),
-        0, 0,
-    };
-    static final double[] flipperAngles = {
-        factory.getConstant(NAME, "inAngle", 225, true),
-        factory.getConstant(NAME, "outAngle", 225, true),
-        factory.getConstant(NAME, "downAngle", 225, true),
-        factory.getConstant(NAME, "upAngle", 45, true)
-    };
+    private static final String NAME = "intake";
 
     private static final double GEAR_RATIO = 1;
 
@@ -62,20 +46,43 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         SmartDashboard.putData("Intake", intakeMech);
     }
 
-    public enum INTAKE_STATE {
-        INTAKE_IN(0),
-        INTAKE_OUT(1),
-        INTAKE_DOWN(2),
-        /// Acts as the idle
-        INTAKE_UP(3);
+    private static double inSpeed = factory.getConstant(NAME, "inSpeed", -10, true);
+    private static double inAngle = factory.getConstant(NAME, "inAngle", 255, true);
+    private static double outSpeed = factory.getConstant(NAME, "outSpeed", 10, true);
+    private static double outAngle = factory.getConstant(NAME, "outAngle", 255, true);
+    private static double downAngle = factory.getConstant(NAME, "downAngle", 255, true);
+    private static double upAngle = factory.getConstant(NAME, "upAngle", 45, true);
 
-        private final int index ;
-        INTAKE_STATE (int index) {
-            this.index = index;
+    public enum INTAKE_STATE {
+        INTAKE_IN(
+            inSpeed,
+            inAngle
+        ),
+        INTAKE_OUT(
+            outSpeed,
+            outAngle
+        ),
+        INTAKE_DOWN(
+            0,
+            downAngle
+        ),
+        /// Acts as the idle
+        INTAKE_UP(
+            0,
+            upAngle
+        );
+
+        private final double speed, angle;
+        INTAKE_STATE (double speed, double angle) {
+            this.speed = speed;
+            this.angle = angle;
         }
 
-        public int getIndex() {
-            return index;
+        public double getAngle() {
+            return angle;
+        }
+        public double getSpeed() {
+            return speed;
         }
     }
 
@@ -94,7 +101,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         currentFlipperAngle = (flipperMotor.getMotorPosition() / GEAR_RATIO) * 360;
         currentVoltage = 0;
 
-        intakeAngleML.setAngle(flipperAngles[wantedState.getIndex()]); // maybe use currentFlipperAngle instead
+        intakeAngleML.setAngle(wantedState.getAngle());
     }
 
     private boolean canSuckOrBlow() {
@@ -105,8 +112,8 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void applyState() {
-        double intakeSpeed = canSuckOrBlow() ? intakeSpeeds[wantedState.getIndex()] : 0;
-        double flipperAngle = flipperAngles[wantedState.getIndex()];
+        double intakeSpeed = canSuckOrBlow() ? wantedState.getSpeed() : 0;
+        double flipperAngle = wantedState.getAngle();
 
         setTurretSpeed(intakeSpeed);
         setFlipperAngle(flipperAngle);
