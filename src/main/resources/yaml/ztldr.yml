@@ -164,6 +164,23 @@ subsystems:
         constants:
             rotationAngleSensorClockwiseLeft: 0
             rotationAngleSensorClockwiseRight: 1
+            motorRotationsPerLaunchAngleDegree: 3.5
+            motorRotationsPerRotationAngleDegree: 3.5
+            initialShooterOffsetX: 0
+            initialShooterOffsetY: 0
+            initialShooterOffsetZ: 22
+            calibrationThreshold: 10
+            calibrationPositionArcAngle: 0.75
+            rotationOffsetFromCalibrationZero: 70
+            distanceOneLaunchAngle: 3
+            distanceOneRotationAngle: 45
+            distanceOneLaunchVelocity: 10
+            distanceTwoLaunchAngle: 45
+            distanceTwoRotationAngle: 90
+            distanceTwoLaunchVelocity: 20
+            distanceThreeLaunchAngle: 86
+            distanceThreeRotationAngle: 0
+            distanceThreeLaunchVelocity: 30
     gatekeeper:
         devices:
             gatekeeperTopMotor:
