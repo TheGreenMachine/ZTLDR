@@ -464,14 +464,14 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void autonomousInit() {
-        setWantedShooterState(WantedShooterState.AUTOMATIC);
+        setWantedShooterState(WantedShooterState.CALIBRATING);
     }
 
     public void teleopInit() {
         setWantedShooterState(WantedShooterState.AUTOMATIC);
         setWantedGatekeeperState(WantedGatekeeperState.CLOSED);
-        setWantedIndexerState(WantedIndexerState.IDLING);
-        setIndexerControlState(IndexerControlState.DEFAULTING);
+        setWantedFeederState(WantedFeederState.IDLING);
+        setFeederControlState(FeederControlState.DEFAULTING);
         setFeederControlState(FeederControlState.DEFAULTING);
         setWantedIntakeState(WantedIntakeState.INTAKING);
         setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING);
