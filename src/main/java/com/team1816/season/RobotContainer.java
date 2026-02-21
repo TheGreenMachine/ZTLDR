@@ -38,15 +38,7 @@ public class RobotContainer extends BaseRobotContainer {
     }
 
     private void configureBindings() {
-//        driverController.povDown().onTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.DEFAULT));
-//        driverController.povLeft().onTrue(
-//            Commands.runOnce(() -> superstructure.setClimbSide(Superstructure.ClimbSide.LEFT))
-//                .andThen(superstructure.setStateCommand(Superstructure.WantedSuperState.CLIMB)
-//        ));
-//        driverController.povRight().onTrue(
-//            Commands.runOnce(() -> superstructure.setClimbSide(Superstructure.ClimbSide.RIGHT))
-//                .andThen(superstructure.setStateCommand(Superstructure.WantedSuperState.CLIMB)
-//        ));
+// SNOWBLOWING MODE CONTROLS:
 
         driverController.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.toggleGatekeeper()));
         driverController.rightTrigger().onFalse(Commands.runOnce(() -> superstructure.setWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSED)));
@@ -60,26 +52,12 @@ public class RobotContainer extends BaseRobotContainer {
         driverController.a().onTrue(Commands.runOnce(() -> superstructure.toggleHood()));
         //Agitate button TBD, would be another toggle
 
-//        operatorController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.UP)));
-//        operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.setFeederControlState(Superstructure.FeederControlState.OVERRIDING)));
-//        operatorController.povDown().onFalse(Commands.runOnce(() -> superstructure.setFeederControlState(Superstructure.FeederControlState.DEFAULTING)));
+        //add manual shooter speed adjustments
 
-        // controller.leftTrigger().and(controller.rightTrigger().negate()).whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_IN))
-        //     .or(controller.rightTrigger().and(controller.leftTrigger().negate()).whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_OUT)))
-        //     .or(controller.leftTrigger().and(controller.rightTrigger()).whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_UP)))
-        //     .or(controller.leftTrigger().negate().and(controller.rightTrigger().negate()).whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_UP)));
-//        controller.y().onTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.TURRET_TO_0))
-//            .onFalse(superstructure.setStateCommand(Superstructure.WantedSuperState.TURRET_IDLE));
-//        controller.a().onTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.TURRET_TO_180))
-//            .onFalse(superstructure.setStateCommand(Superstructure.WantedSuperState.TURRET_IDLE));
-        // controller.povUp().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_UP));
-        // controller.povDown().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_DOWN));
-        // controller.leftBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_OUT));
-        // controller.rightBumper().whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_IN));
     }
 
     public final void registerCommands() {
-        /**
+        /*
          * Individual Subsystem Action (not needed, just here)
          */
         NamedCommands.registerCommand("automatedShoot", Commands.runOnce(() -> {
@@ -107,7 +85,7 @@ public class RobotContainer extends BaseRobotContainer {
         }));
 
 
-        /**
+        /*
          * Combined subsystem Actions (will be used)
          */
         NamedCommands.registerCommand("snowblowing", Commands.runOnce(() -> { //Intake and shoot balls at the same time
