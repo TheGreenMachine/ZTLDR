@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         try {
-            GreenLogger.SilenceLoopOverrun(this);
+            GreenLogger.silenceLoopOverrun(this);
             // used to serve elastic dashboards must be port 5800
             WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
             GreenLogger.periodicLog("timings/RobotLoop (ms)", () -> periodicLoopTime);

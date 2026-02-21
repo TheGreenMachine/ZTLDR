@@ -6,24 +6,30 @@ import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.team1816.lib.Singleton.factory;
 
 public class Feeder extends SubsystemBase implements ITestableSubsystem {
-
+    //CLASS
     public static final String NAME = "feeder";
-    private final IMotor feedMotor = (IMotor)factory.getDevice(NAME, "feedMotor");
-    private double currentVelocity;
-    private FEEDER_STATE wantedState = FEEDER_STATE.IDLING;
-    private VelocityVoltage velocityReq = new VelocityVoltage(0);
 
-    //VELOCITY AND POSITION VALUES
-    public final double FEED_VELOCITY_FAST_FEEDING = Singleton.factory.getConstant(NAME, "fastFeeding", 0);
-    public final double FEED_VELOCITY_SLOW_FEEDING = Singleton.factory.getConstant(NAME, "slowFeeding", 0);
-    public final double FEED_VELOCITY_REVERSING = Singleton.factory.getConstant(NAME, "reversing", 0);
-    public final double FEED_VELOCITY_IDLING = Singleton.factory.getConstant(NAME, "idling", 0);
+    private FEEDER_STATE wantedState = FEEDER_STATE.IDLING;
+
+    //MOTORS
+    private final IMotor feedMotor = (IMotor)factory.getDevice(NAME, "feedMotor");
+
+    private final VelocityVoltage velocityReq = new VelocityVoltage(0);
+
+    //YAML VALUES
+    private double fastFeedingVelocity = Singleton.factory.getConstant(NAME, "fastFeeding", 0);
+    private double slowFeedingVelocity = Singleton.factory.getConstant(NAME, "slowFeeding", 0);
+    private double reversingVelocity = Singleton.factory.getConstant(NAME, "reversing", 0);
+    private double idlingVelocity = Singleton.factory.getConstant(NAME, "idling", 0);
+
+    //PHYSICAL SUBSYSTEM DEPENDENT CONSTANTS
+    private static final double MIN_FEED_MOTOR_CLAMP = -80;
+    private static final double MAX_FEED_MOTOR_CLAMP = 80;
 
     @Override
     public void periodic() {
@@ -33,22 +39,21 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
 
     @Override
     public void readFromHardware() {
-        currentVelocity = feedMotor.getMotorVelocity();
     }
 
     private void applyState() {
         switch (wantedState) {
             case SLOW_FEEDING:
-                setFeedVelocity(FEED_VELOCITY_SLOW_FEEDING);
+                setFeedVelocity(slowFeedingVelocity);
                 break;
             case FAST_FEEDING:
-                setFeedVelocity(FEED_VELOCITY_FAST_FEEDING);
+                setFeedVelocity(fastFeedingVelocity);
                 break;
             case REVERSING:
-                setFeedVelocity(FEED_VELOCITY_REVERSING);
+                setFeedVelocity(reversingVelocity);
                 break;
             case IDLING:
-                setFeedVelocity(FEED_VELOCITY_IDLING);
+                setFeedVelocity(idlingVelocity);
                 break;
             default:
                 break;
@@ -58,7 +63,7 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void setFeedVelocity(double feedVelocity){
-        double clampedVelocity = MathUtil.clamp(feedVelocity, -80, 80);
+        double clampedVelocity = MathUtil.clamp(feedVelocity, MIN_FEED_MOTOR_CLAMP, MAX_FEED_MOTOR_CLAMP);
 
         feedMotor.setControl(velocityReq.withVelocity(clampedVelocity));
     }

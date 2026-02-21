@@ -10,12 +10,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static com.team1816.lib.Singleton.factory;
 
 public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
-
+    //CLASS
     public static final String NAME = "gatekeeper";
+
+    private GATEKEEPER_STATE wantedState = GATEKEEPER_STATE.CLOSED;
+
+    //MOTORS
     private final IMotor topMotor = (IMotor)factory.getDevice(NAME, "topMotor");
     private final IMotor bottomMotor = (IMotor)factory.getDevice(NAME, "bottomMotor");
-    private GATEKEEPER_STATE wantedState = GATEKEEPER_STATE.CLOSED;
-    private VelocityVoltage voltageReq = new VelocityVoltage(0);
+
+    private final VelocityVoltage voltageReq = new VelocityVoltage(0);
 
     //YAML VALUES
     private double topClosedVelocity = factory.getConstant(NAME, "topClosedVelocity", 0);
