@@ -2,7 +2,6 @@ package com.team1816.season.subsystems;
 
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
-import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -20,18 +19,8 @@ public class Superstructure extends SubsystemBase {
     private CommandXboxController controller;
 
     public enum WantedSuperState {
-        //OLD STATES TODO: GET RID OF
-        DEFAULT,
-        L1_CLIMB,
-        L3_CLIMB,
-        L1_DOWNCLIMB,
-        L3_DOWNCLIMB,
-        IDLE,
-        SNOWBLOWER,
-        STORAGE_INTAKE,
-        STORAGE_SHOOTER,
-        INDEX_AGITATE,
 
+        DEFAULT,
         SHOOTER_CALIBRATE,
         SHOOTER_AUTOMATIC_HUB,
         SHOOTER_AUTOMATIC_CORNER_1,
@@ -54,12 +43,12 @@ public class Superstructure extends SubsystemBase {
         INTAKE_OUTTAKE,
         GATEKEEPER_ON,
         GATEKEEPER_OFF,
-        CLIMBER_CLIMB_L1,
-        CLIMBER_CLIMB_L3,
-        CLIMBER_CLIMB_DOWN_L1,
-        //DEFAULT,
+        CLIMB_L1,
+        CLIMB_L3,
+        CLIMB_DOWN_L1,
         FEEDER_SLOW,
         FEEDER_FAST,
+        FEEDER_AGITATE,
         HOOD_DROP
 
 
@@ -67,19 +56,9 @@ public class Superstructure extends SubsystemBase {
     }
 
     public enum ActualSuperState {
-        //OLD STATES TODO: GET RID OF
-        DEFAULTING,
-        L1_CLIMBING,
-        L3_CLIMBING,
-        L1_DOWNCLIMBING,
-        L3_DOWNCLIMBING,
-        IDLING,
-        SNOWBLOWING,
-        STORAGE_INTAKING,
-        STORAGE_SHOOTING,
-        INDEX_AGITATING,
 
-        SHOOTER_CALIBRATING,
+        DEFAULTING,
+        SHOOTING_CALIBRATING,
         SHOOTING_AUTOMATIC_HUB,
         SHOOTING_AUTOMATIC_CORNER_1,
         SHOOTING_AUTOMATIC_CORNER_2,
@@ -96,17 +75,17 @@ public class Superstructure extends SubsystemBase {
         SNOWBLOWING_DISTANCE_1,
         SNOWBLOWING_DISTANCE_2,
         SNOWBLOWING_DISTANCE_3,
-        INTAKING_LIFT,
-        INTAKING_DROP,
-        INTAKING_OUTTAKE,
+        INTAKE_LIFTING,
+        INTAKE_DROPPING,
+        INTAKING_OUTTAKING,
         GATEKEEPING_ON,
         GATEKEEPING_OFF,
-        CLIMBING_CLIMB_L1,
-        CLIMBING_CLIMB_L3,
-        CLIMBING_CLIMB_DOWN_L1,
-        //DEFAULTING,
+        CLIMBING_L1,
+        CLIMBING_L3,
+        CLIMBING_DOWN_L1,
         FEEDING_SLOW,
         FEEDING_FAST,
+        FEEDING_AGITATE,
         HOOD_DROPPING
     }
 
@@ -126,41 +105,9 @@ public class Superstructure extends SubsystemBase {
         }
     }
 
-    public enum WantedClimbState {
-        IDLING,
-        L3_CLIMBING,
-        L3_ClIMBING_DOWN,
-        L1_CLIMING,
-        L1_CLIMBING_DOWN
-    }
-
-    public enum WantedShooterState {
-        CALIBRATING,
-        CALIBRATED,
-        DISTANCE_ONE,
-        DISTANCE_TWO,
-        DISTANCE_THREE,
-        AUTOMATIC,
-        SNOWBLOWING,
-        IDLE
-    }
-
-    public enum WantedGatekeeperState {
-        OPEN,
-        CLOSED
-    }
-
     public enum WantedSwerveState {
         AUTOMATIC_DRIVING,
         MANUAL_DRIVING
-    }
-
-    public enum WantedIntakeState {
-        INTAKING,
-        OUTTAKING,
-        DOWN,
-        UP,
-        IDLING
     }
 
     public enum WantedFeederState {
@@ -179,16 +126,16 @@ public class Superstructure extends SubsystemBase {
     private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
     // TODO: Add calibration state, maybe as the default here
-    private WantedShooterState wantedShooterState = WantedShooterState.IDLE;
-    private WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
-    private WantedClimbState wantedClimbState = WantedClimbState.IDLING;
-    private WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
-    private WantedIntakeState wantedIntakeState = WantedIntakeState.UP;
-    private WantedFeederState wantedFeederState = WantedFeederState.IDLING;
-    private FeederControlState feederControlState = FeederControlState.DEFAULTING;
+    private Shooter.SHOOTER_STATE wantedShooterState = Shooter.SHOOTER_STATE.IDLE;
+    private Gatekeeper.GATEKEEPER_STATE wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.CLOSED;
+    private Climber.CLIMBER_STATE wantedClimbState = Climber.CLIMBER_STATE.IDLING;
+    private WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING; //Do we need this??
+    private Intake.INTAKE_STATE wantedIntakeState = Intake.INTAKE_STATE.INTAKE_UP;
+    private Feeder.FEEDER_STATE wantedFeederState = Feeder.FEEDER_STATE.IDLING;
+    private FeederControlState feederControlState = FeederControlState.DEFAULTING; //What to do with this?
+    private Climber.CLIMBER_STATE climbState = Climber.CLIMBER_STATE.IDLING;
 
     private ClimbSide climbSide = ClimbSide.LEFT;
-    private WantedClimbState climbState = WantedClimbState.IDLING;
 
     public Superstructure(Swerve swerve) {
         this.swerve = swerve;
@@ -211,80 +158,72 @@ public class Superstructure extends SubsystemBase {
 
     private ActualSuperState handleStateTransitions() {
         switch (wantedSuperState) {
-            case DEFAULT:
-                if (actualSuperState == ActualSuperState.L1_CLIMBING || actualSuperState == ActualSuperState.L1_DOWNCLIMBING) {
-                    actualSuperState = ActualSuperState.L1_DOWNCLIMBING;
-                }
-                else {
-                    actualSuperState = ActualSuperState.DEFAULTING;
-                }
-                break;
-            case L1_CLIMB:
-                actualSuperState = ActualSuperState.L1_CLIMBING;
-                break;
-            case L3_CLIMB:
-                actualSuperState = ActualSuperState.L3_CLIMBING;
-                break;
-            case L1_DOWNCLIMB:
-                actualSuperState = ActualSuperState.L1_DOWNCLIMBING;
-                break;
-            case L3_DOWNCLIMB:
-                actualSuperState = ActualSuperState.L3_DOWNCLIMBING;
-                break;
-            case SNOWBLOWER:
-                actualSuperState = ActualSuperState.SNOWBLOWING;
-                break;
-            case STORAGE_INTAKE:
-                actualSuperState = ActualSuperState.STORAGE_INTAKING;
-                break;
-            case STORAGE_SHOOTER:
-                actualSuperState = ActualSuperState.STORAGE_SHOOTING;
-                break;
-            case INDEX_AGITATE:
-                actualSuperState = ActualSuperState.INDEX_AGITATING;
-                break;
-            case IDLE:
-            default:
-                actualSuperState = ActualSuperState.IDLING;
-                break;
+            case DEFAULT -> actualSuperState = ActualSuperState.DEFAULTING;
+            case SHOOTER_CALIBRATE -> actualSuperState = ActualSuperState.SHOOTING_CALIBRATING;
+            case SHOOTER_AUTOMATIC_HUB -> actualSuperState = ActualSuperState.SHOOTING_AUTOMATIC_HUB;
+            case SHOOTER_AUTOMATIC_CORNER_1 -> actualSuperState = ActualSuperState.SHOOTING_AUTOMATIC_CORNER_1;
+            case SHOOTER_AUTOMATIC_CORNER_2 -> actualSuperState = ActualSuperState.SHOOTING_AUTOMATIC_CORNER_2;
+            case SHOOTER_AUTOMATIC_CORNER_3 -> actualSuperState = ActualSuperState.SHOOTING_AUTOMATIC_CORNER_3;
+            case SHOOTER_AUTOMATIC_CORNER_4 -> actualSuperState = ActualSuperState.SHOOTING_AUTOMATIC_CORNER_4;
+            case SHOOTER_DISTANCE_1 -> actualSuperState = ActualSuperState.SHOOTING_DISTANCE_1;
+            case SHOOTER_DISTANCE_2 -> actualSuperState = ActualSuperState.SHOOTING_DISTANCE_2;
+            case SHOOTER_DISTANCE_3 -> actualSuperState = ActualSuperState.SHOOTING_DISTANCE_3;
+            case SNOWBLOWER_AUTOMATIC_HUB -> actualSuperState = ActualSuperState.SNOWBLOWING_AUTOMATIC_HUB;
+            case SNOWBLOWER_AUTOMATIC_CORNER_1 -> actualSuperState = ActualSuperState.SNOWBLOWING_AUTOMATIC_CORNER_1;
+            case SNOWBLOWER_AUTOMATIC_CORNER_2 -> actualSuperState = ActualSuperState.SNOWBLOWING_AUTOMATIC_CORNER_2;
+            case SNOWBLOWER_AUTOMATIC_CORNER_3 -> actualSuperState = ActualSuperState.SNOWBLOWING_AUTOMATIC_CORNER_3;
+            case SNOWBLOWER_AUTOMATIC_CORNER_4 -> actualSuperState = ActualSuperState.SNOWBLOWING_AUTOMATIC_CORNER_4;
+            case SNOWBLOWER_DISTANCE_1 -> actualSuperState = ActualSuperState.SNOWBLOWING_DISTANCE_1;
+            case SNOWBLOWER_DISTANCE_2 -> actualSuperState = ActualSuperState.SNOWBLOWING_DISTANCE_2;
+            case SNOWBLOWER_DISTANCE_3 -> actualSuperState = ActualSuperState.SNOWBLOWING_DISTANCE_3;
+            case INTAKE_LIFT -> actualSuperState = ActualSuperState.INTAKE_LIFTING;
+            case INTAKE_DROP -> actualSuperState = ActualSuperState.INTAKE_DROPPING;
+            case INTAKE_OUTTAKE -> actualSuperState = ActualSuperState.INTAKING_OUTTAKING;
+            case GATEKEEPER_ON -> actualSuperState = ActualSuperState.GATEKEEPING_ON;
+            case GATEKEEPER_OFF -> actualSuperState = ActualSuperState.GATEKEEPING_OFF;
+            case CLIMB_L1 -> actualSuperState = ActualSuperState.CLIMBING_L1;
+            case CLIMB_L3 -> actualSuperState = ActualSuperState.CLIMBING_L3;
+            case CLIMB_DOWN_L1 -> actualSuperState = ActualSuperState.CLIMBING_DOWN_L1;
+            case FEEDER_SLOW -> actualSuperState = ActualSuperState.FEEDING_SLOW;
+            case FEEDER_FAST -> actualSuperState = ActualSuperState.FEEDING_FAST;
+            case HOOD_DROP -> actualSuperState = ActualSuperState.HOOD_DROPPING;
         }
+
 
         return actualSuperState;
     }
 
     private void applyStates() {
         switch (actualSuperState) {
-            case DEFAULTING:
-                defaulting();
-                break;
-            case L1_CLIMBING:
-                l1Climbing();
-                break;
-            case L1_DOWNCLIMBING:
-                l1Downclimbing();
-                break;
-            case L3_CLIMBING:
-                l3Climbing();
-                break;
-            case L3_DOWNCLIMBING:
-                l3DownClimbing();
-                break;
-            case STORAGE_INTAKING:
-                storageIntaking();
-                break;
-            case SNOWBLOWING:
-                snowBlowing();
-                break;
-            case STORAGE_SHOOTING:
-                storageShooting();
-                break;
-            case INDEX_AGITATING:
-                agitate();
-                break;
-            case IDLING:
-            default:
-                defaulting();
-                break;
+            case DEFAULTING -> defaulting();
+            case SHOOTING_CALIBRATING -> shootingCalibrating();
+            case SHOOTING_AUTOMATIC_HUB -> shootingAutomaticHub();
+            case SHOOTING_AUTOMATIC_CORNER_1 -> shootingAutomaticCorner1();
+            case SHOOTING_AUTOMATIC_CORNER_2 -> shootingAutomaticCorner2();
+            case SHOOTING_AUTOMATIC_CORNER_3 -> shootingAutomaticCorner3();
+            case SHOOTING_AUTOMATIC_CORNER_4 -> shootingAutomaticCorner4();
+            case SHOOTING_DISTANCE_1 -> shootingDistance1();
+            case SHOOTING_DISTANCE_2 -> shootingDistance2();
+            case SHOOTING_DISTANCE_3 -> shootingDistance3();
+            case SNOWBLOWING_AUTOMATIC_HUB -> snowblowingAutomaticHub();
+            case SNOWBLOWING_AUTOMATIC_CORNER_1 -> snowblowingAutomaticCorner1();
+            case SNOWBLOWING_AUTOMATIC_CORNER_2 -> snowblowingAutomaticCorner2();
+            case SNOWBLOWING_AUTOMATIC_CORNER_3 -> snowblowingAutomaticCorner3();
+            case SNOWBLOWING_AUTOMATIC_CORNER_4 -> snowblowingAutomaticCorner4();
+            case SNOWBLOWING_DISTANCE_1 -> snowblowingDistance1();
+            case SNOWBLOWING_DISTANCE_2 -> snowblowingDistance2();
+            case SNOWBLOWING_DISTANCE_3 -> snowblowingDistance3();
+            case INTAKE_LIFTING -> intakeLifting();
+            case INTAKE_DROPPING -> intakeDropping();
+            case GATEKEEPING_ON -> gatekeepingOn();
+            case GATEKEEPING_OFF -> gatekeeperingOff();
+            case CLIMBING_L1 -> climbingL1();
+            case CLIMBING_L3 -> climbingL3();
+            case CLIMBING_DOWN_L1 -> climbingDownL1();
+            case FEEDING_SLOW -> feedingSlow();
+            case FEEDING_FAST -> feedingFast();
+            case FEEDING_AGITATE -> agitate();
+            case HOOD_DROPPING -> hoodDropping();
         }
     }
 
@@ -295,158 +234,35 @@ public class Superstructure extends SubsystemBase {
     public Command setStateCommand(WantedSuperState superState) {
         return new InstantCommand(() -> setWantedSuperState(superState));
     }
-
-    public void setClimbSide(ClimbSide climbSide) {
-        this.climbSide = climbSide;
+    private void defaulting() {}
+    private void shootingCalibrating() {
+        wantedShooterState = Shooter.SHOOTER_STATE.CALIBRATING;
     }
-
-    private void l1Climbing() {
-        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
-            case L1_CLIMING:
-                climber.setWantedState(Climber.CLIMBER_STATE.L1_UP_CLIMBING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
-                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                actualSuperState = ActualSuperState.L1_CLIMBING;
-                break;
-            default:
-                actualSuperState = ActualSuperState.IDLING;
-
-        }
-    }
-
-    private void l3Climbing() {
-        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
-            case L3_CLIMBING:
-                climber.setWantedState(Climber.CLIMBER_STATE.L3_UP_CLIMBING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
-                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                actualSuperState = ActualSuperState.L3_CLIMBING;
-                break;
-            default:
-                actualSuperState = ActualSuperState.IDLING;
-        }
-    }
-
-    public void storageIntaking() {
-        switch (wantedIntakeState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
-            case INTAKING:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
-                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                actualSuperState = ActualSuperState.STORAGE_INTAKING;
-                break;
-            case OUTTAKING:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
-                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                actualSuperState = ActualSuperState.STORAGE_INTAKING;
-                break;
-            case UP:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
-                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                actualSuperState = ActualSuperState.STORAGE_INTAKING;
-                break;
-            case DOWN:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
-                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                actualSuperState = ActualSuperState.STORAGE_INTAKING;
-                break;
-            case IDLING:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
-                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                actualSuperState = ActualSuperState.STORAGE_INTAKING;
-                break;
-            default:
-                actualSuperState = ActualSuperState.IDLING;
-        }
-    }
-
-    public void snowBlowing() {
-        //WILL NEED TO ADD MULTIPLE SUBSYSTEMS
-        shooter.setWantedState(Shooter.SHOOTER_STATE.SNOWBLOWING);
-        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
-        feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
-        gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.OPEN);
-        swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
-    }
-
-
-    public void l1Downclimbing() {
-        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
-            case L1_CLIMBING_DOWN:
-                climber.setWantedState(Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN); //WILL NEED TO CONFIDE WITH BUILD FOR ALL WANT STATES FOR THE ACTIONS
-                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                actualSuperState = ActualSuperState.L1_DOWNCLIMBING;
-                break;
-            default:
-                actualSuperState = ActualSuperState.IDLING;
-
-        }
-    }
-
-    public void l3DownClimbing() {
-        switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
-            case L3_ClIMBING_DOWN:
-                climber.setWantedState(Climber.CLIMBER_STATE.L3_DOWN_CLIMBING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
-                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                actualSuperState = ActualSuperState.L3_DOWNCLIMBING;
-                break;
-            default:
-                actualSuperState = ActualSuperState.IDLING;
-
-        }
-    }
-
-    private void storageShooting() {
-        switch (wantedShooterState) {
-            case AUTOMATIC:
-                shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
-                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                break;
-            case DISTANCE_ONE:
-                shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
-                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                break;
-            case DISTANCE_TWO:
-                shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
-                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                break;
-            case DISTANCE_THREE:
-                shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
-                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                break;
-            case IDLE:
-                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
-                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                break;
-            default:
-                actualSuperState = ActualSuperState.IDLING;
-        }
-    }
+    private void shootingAutomaticHub() {}
+    private void shootingAutomaticCorner1() {}
+    private void shootingAutomaticCorner2() {}
+    private void shootingAutomaticCorner3() {}
+    private void shootingAutomaticCorner4() {}
+    private void shootingDistance1() {}
+    private void shootingDistance2() {}
+    private void shootingDistance3() {}
+    private void snowblowingAutomaticHub() {}
+    private void snowblowingAutomaticCorner1() {}
+    private void snowblowingAutomaticCorner2() {}
+    private void snowblowingAutomaticCorner3() {}
+    private void snowblowingAutomaticCorner4() {}
+    private void snowblowingDistance1() {}
+    private void snowblowingDistance2() {}
+    private void snowblowingDistance3() {}
+    private void intakeLifting() {}
+    private void intakeDropping() {}
+    private void gatekeepingOn() {}
+    private void gatekeeperingOff() {}
+    private void climbingL1() {}
+    private void climbingL3() {}
+    private void climbingDownL1() {}
+    private void feedingSlow() {}
+    private void feedingFast() {}
 
     private void agitate() {
         switch(wantedFeederState) {
@@ -456,106 +272,15 @@ public class Superstructure extends SubsystemBase {
         }
     }
 
-    private void defaulting() {
-        switch (wantedShooterState) {
-            case CALIBRATING -> {if (shooter.isCalibrated()) {shooter.setWantedState(Shooter.SHOOTER_STATE.CALIBRATED);} else {shooter.setWantedState(Shooter.SHOOTER_STATE.CALIBRATING);}}
-            case CALIBRATED -> {GreenLogger.log("Shooter is calibrated"); shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);}
-            case DISTANCE_ONE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
-            case DISTANCE_TWO -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
-            case DISTANCE_THREE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
-            case AUTOMATIC -> shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
-            case IDLE -> shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
-        }
+    private void hoodDropping() {}
 
-        switch (wantedGatekeeperState) {
-            case OPEN -> gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.OPEN);
-            case CLOSED -> gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
-        }
 
-        switch(wantedSwerveState) {
-            case AUTOMATIC_DRIVING -> swerve.setWantedState(Swerve.ActualState.AUTOMATIC_DRIVING);
-            case MANUAL_DRIVING -> swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
-        }
-
-        switch (wantedIntakeState) {
-            case INTAKING -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
-            case OUTTAKING -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
-            case DOWN -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
-            case UP -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
-
-        }
-
-        switch (wantedFeederState) {
-            case SLOW_FEEDING -> feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
-            case FAST_FEEDING -> feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
-            case REVERSING -> feeder.setWantedState(Feeder.FEEDER_STATE.REVERSING);
-            case IDLING -> feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-        }
-
-        /*
-         * What is this doing???
-         */
-        if (feederControlState == FeederControlState.OVERRIDING) {
-            feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
-        }
-        else {
-            if (wantedIntakeState == WantedIntakeState.INTAKING || wantedGatekeeperState == WantedGatekeeperState.OPEN) {
-                feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
-            }
-            else {
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-            }
-        }
-
-        swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
-    }
-
-    public WantedShooterState getWantedShooterState() {
-        return wantedShooterState;
-    }
-
-    public void setWantedShooterState(WantedShooterState wantedShooterState) {
-        this.wantedShooterState = wantedShooterState;
-    }
-
-    // Add functionality for this in both manual and auto shooter modes
-    public WantedGatekeeperState getWantedGatekeeperState() {
-        return wantedGatekeeperState;
-    }
-
-    public void setWantedGatekeeperState(WantedGatekeeperState gatekeeperState) {
-        this.wantedGatekeeperState = gatekeeperState;
+    public void setClimbSide(ClimbSide climbSide) {
+        this.climbSide = climbSide;
     }
 
     public void setFeederControlState(FeederControlState feederControlState) {
         this.feederControlState = feederControlState;
-    }
-
-    public WantedIntakeState getWantedIntakeState() {
-        return wantedIntakeState;
-    }
-
-    public void setWantedIntakeState(WantedIntakeState wantedIntakeState) {
-        if(wantedIntakeState == this.wantedIntakeState) {
-            wantedIntakeState = switch (wantedIntakeState) {
-                case INTAKING, OUTTAKING, DOWN -> WantedIntakeState.DOWN;
-                case UP, IDLING -> WantedIntakeState.UP;
-            };
-        }
-
-        this.wantedIntakeState = wantedIntakeState;
-    }
-
-    public WantedFeederState getWantedFeederState() {
-        return wantedFeederState;
-    }
-
-    public void setWantedFeederState(WantedFeederState wantedFeederState) {
-        this.wantedFeederState = wantedFeederState;
-    }
-
-    public WantedClimbState getWantedClimbState() {
-        return wantedClimbState;
     }
 
     public void setWantedSwerveState(WantedSwerveState wantedSwerveState) {
@@ -563,16 +288,12 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void autonomousInit() {
-        setWantedShooterState(WantedShooterState.AUTOMATIC);
+
     }
 
     public void teleopInit() {
-        setWantedShooterState(WantedShooterState.AUTOMATIC);
-        setWantedGatekeeperState(WantedGatekeeperState.CLOSED);
-        setWantedFeederState(WantedFeederState.IDLING);
-        setFeederControlState(FeederControlState.DEFAULTING);
-        setFeederControlState(FeederControlState.DEFAULTING);
-        setWantedIntakeState(WantedIntakeState.INTAKING);
-        setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING);
+        setWantedSuperState(WantedSuperState.DEFAULT);
+        setFeederControlState(FeederControlState.DEFAULTING); //Not sure what to do with these two
+        setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING); //<-
     }
 }
