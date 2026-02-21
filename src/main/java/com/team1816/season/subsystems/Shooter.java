@@ -2,6 +2,7 @@ package com.team1816.season.subsystems;
 
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.pathplanner.lib.util.FlippingUtil;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
@@ -65,7 +66,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private static final Rotation2d ROTATION_OFFSET_FROM_CALIBRATION_ZERO = Rotation2d.fromDegrees(factory.getConstant(NAME, "rotationOffsetFromCalibrationZero", 70)); //as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
 
     //FIELD DIMENSIONS
-    private static final double HALF_FIELD_WIDTH = 4.035;
+    private static final double HALF_FIELD_WIDTH = FlippingUtil.fieldSizeY/2;
 
     //CALIBRATION
     private Double[] calibrationPositions = new Double[]{0.0, 0.0};
@@ -192,15 +193,14 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             }
             else {
                 if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
-                    if (launcherTranslation.getX() < HALF_FIELD_WIDTH) {
-                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_LEFT_CORNER);
-                    }
-                    else {
+                    if (launcherTranslation.getY() < HALF_FIELD_WIDTH) {
                         setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_RIGHT_CORNER);
                     }
-                }
-                else {
-                    if (launcherTranslation.getX() > HALF_FIELD_WIDTH) {
+                    else {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_LEFT_CORNER);
+                    }
+                } else {
+                    if (launcherTranslation.getY() < HALF_FIELD_WIDTH) {
                         setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_LEFT_CORNER);
                     }
                     else {
@@ -209,7 +209,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 }
             }
 
-            double distance = launcherTranslation.getDistance(currentTarget.position);
+            double distance = launcherTranslation.toTranslation2d().getDistance(currentTarget.position.toTranslation2d());
 
             ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator.getShooterDistanceSetting(distance);
             launchAngle = shooterDistanceSetting.getAngle();
