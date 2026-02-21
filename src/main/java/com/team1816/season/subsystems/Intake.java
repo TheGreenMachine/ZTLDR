@@ -19,23 +19,23 @@ import java.time.Instant;
 import static com.team1816.lib.Singleton.factory;
 
 public class Intake extends SubsystemBase implements ITestableSubsystem {
-    private static final String NAME = "intake";
+    //CLASS
+    public static final String NAME = "intake";
 
-    private static final double GEAR_RATIO = 1;
+    private INTAKE_STATE wantedState = INTAKE_STATE.INTAKE_UP;
 
+    //MOTORS
     private final IMotor intakeMotor = (IMotor) factory.getDevice(NAME, "intakeMotor");
     private final IMotor flipperMotor = (IMotor) factory.getDevice(NAME, "flipperMotor");
 
-    private VelocityVoltage velocityControl = new VelocityVoltage(0);
-    private PositionVoltage positionControl = new PositionVoltage(0);
-    private INTAKE_STATE wantedState = INTAKE_STATE.INTAKE_UP;
+    private final VelocityVoltage velocityControl = new VelocityVoltage(0);
+    private final PositionVoltage positionControl = new PositionVoltage(0);
 
-    public double currentVoltage = 0;
+    private static final double GEAR_RATIO = 1;
+
+
+    //MECHANISMS
     public double currentPosition = 0;
-
-    public double currentFlipperAngle = 67;
-
-    //MECHANISMS *Need to ask build team for details
     public Mechanism2d intakeMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
     public MechanismRoot2d intakeMechRoot = intakeMech.getRoot("Intake Root", 0, 1);
     public MechanismLigament2d intakeAngleML = intakeMechRoot.append(
@@ -105,21 +105,12 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     @Override
     public void readFromHardware() {
         currentPosition = intakeMotor.getMotorPosition();
-        currentFlipperAngle = (flipperMotor.getMotorPosition() / GEAR_RATIO) * 360;
-        currentVoltage = 0;
 
         intakeAngleML.setAngle(wantedState.getAngle());
     }
 
-    private boolean canSuckOrBlow() {
-        final double targetAngle = 225;
-        final double threshold = 6;
-
-        return ((currentFlipperAngle > targetAngle - threshold && currentFlipperAngle < targetAngle + threshold));
-    }
-
     private void applyState() {
-        double intakeSpeed = canSuckOrBlow() ? wantedState.getSpeed() : 0;
+        double intakeSpeed = wantedState.getSpeed();
         double flipperAngle = wantedState.getAngle();
 
         setTurretSpeed(intakeSpeed);
