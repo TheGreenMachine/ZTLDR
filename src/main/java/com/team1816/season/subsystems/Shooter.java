@@ -188,7 +188,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         if (wantedState == SHOOTER_STATE.AUTOMATIC) {
 
-            if (wantedState == SHOOTER_STATE.AUTOMATIC) {
+            if (wantedState == SHOOTER_STATE.AUTOMATIC) { //Does this work???
                 if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
                     setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_HUB);
                 }

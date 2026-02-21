@@ -2,7 +2,6 @@ package com.team1816.season.subsystems;
 
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
-import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -24,18 +23,12 @@ public class Superstructure extends SubsystemBase {
         DEFAULT,
         SHOOTER_CALIBRATE,
         SHOOTER_AUTOMATIC_HUB,
-        SHOOTER_AUTOMATIC_CORNER_1,
-        SHOOTER_AUTOMATIC_CORNER_2,
-        SHOOTER_AUTOMATIC_CORNER_3,
-        SHOOTER_AUTOMATIC_CORNER_4,
+        SHOOTER_AUTOMATIC_CORNER,
         SHOOTER_DISTANCE_1,
         SHOOTER_DISTANCE_2,
         SHOOTER_DISTANCE_3,
         SNOWBLOWER_AUTOMATIC_HUB,
-        SNOWBLOWER_AUTOMATIC_CORNER_1,
-        SNOWBLOWER_AUTOMATIC_CORNER_2,
-        SNOWBLOWER_AUTOMATIC_CORNER_3,
-        SNOWBLOWER_AUTOMATIC_CORNER_4,
+        SNOWBLOWER_AUTOMATIC_CORNER,
         SNOWBLOWER_DISTANCE_1,
         SNOWBLOWER_DISTANCE_2,
         SNOWBLOWER_DISTANCE_3,
@@ -62,18 +55,12 @@ public class Superstructure extends SubsystemBase {
         DEFAULTING,
         SHOOTING_CALIBRATING,
         SHOOTING_AUTOMATIC_HUB,
-        SHOOTING_AUTOMATIC_CORNER_1,
-        SHOOTING_AUTOMATIC_CORNER_2,
-        SHOOTING_AUTOMATIC_CORNER_3,
-        SHOOTING_AUTOMATIC_CORNER_4,
+        SHOOTING_AUTOMATIC_CORNER,
         SHOOTING_DISTANCE_1,
         SHOOTING_DISTANCE_2,
         SHOOTING_DISTANCE_3,
         SNOWBLOWING_AUTOMATIC_HUB,
-        SNOWBLOWING_AUTOMATIC_CORNER_1,
-        SNOWBLOWING_AUTOMATIC_CORNER_2,
-        SNOWBLOWING_AUTOMATIC_CORNER_3,
-        SNOWBLOWING_AUTOMATIC_CORNER_4,
+        SNOWBLOWING_AUTOMATIC_CORNER,
         SNOWBLOWING_DISTANCE_1,
         SNOWBLOWING_DISTANCE_2,
         SNOWBLOWING_DISTANCE_3,
@@ -164,18 +151,12 @@ public class Superstructure extends SubsystemBase {
             case DEFAULT -> actualSuperState = ActualSuperState.DEFAULTING;
             case SHOOTER_CALIBRATE -> actualSuperState = ActualSuperState.SHOOTING_CALIBRATING;
             case SHOOTER_AUTOMATIC_HUB -> actualSuperState = ActualSuperState.SHOOTING_AUTOMATIC_HUB;
-            case SHOOTER_AUTOMATIC_CORNER_1 -> actualSuperState = ActualSuperState.SHOOTING_AUTOMATIC_CORNER_1;
-            case SHOOTER_AUTOMATIC_CORNER_2 -> actualSuperState = ActualSuperState.SHOOTING_AUTOMATIC_CORNER_2;
-            case SHOOTER_AUTOMATIC_CORNER_3 -> actualSuperState = ActualSuperState.SHOOTING_AUTOMATIC_CORNER_3;
-            case SHOOTER_AUTOMATIC_CORNER_4 -> actualSuperState = ActualSuperState.SHOOTING_AUTOMATIC_CORNER_4;
+            case SHOOTER_AUTOMATIC_CORNER -> actualSuperState = ActualSuperState.SHOOTING_AUTOMATIC_CORNER;
             case SHOOTER_DISTANCE_1 -> actualSuperState = ActualSuperState.SHOOTING_DISTANCE_1;
             case SHOOTER_DISTANCE_2 -> actualSuperState = ActualSuperState.SHOOTING_DISTANCE_2;
             case SHOOTER_DISTANCE_3 -> actualSuperState = ActualSuperState.SHOOTING_DISTANCE_3;
             case SNOWBLOWER_AUTOMATIC_HUB -> actualSuperState = ActualSuperState.SNOWBLOWING_AUTOMATIC_HUB;
-            case SNOWBLOWER_AUTOMATIC_CORNER_1 -> actualSuperState = ActualSuperState.SNOWBLOWING_AUTOMATIC_CORNER_1;
-            case SNOWBLOWER_AUTOMATIC_CORNER_2 -> actualSuperState = ActualSuperState.SNOWBLOWING_AUTOMATIC_CORNER_2;
-            case SNOWBLOWER_AUTOMATIC_CORNER_3 -> actualSuperState = ActualSuperState.SNOWBLOWING_AUTOMATIC_CORNER_3;
-            case SNOWBLOWER_AUTOMATIC_CORNER_4 -> actualSuperState = ActualSuperState.SNOWBLOWING_AUTOMATIC_CORNER_4;
+            case SNOWBLOWER_AUTOMATIC_CORNER -> actualSuperState = ActualSuperState.SNOWBLOWING_AUTOMATIC_CORNER;
             case SNOWBLOWER_DISTANCE_1 -> actualSuperState = ActualSuperState.SNOWBLOWING_DISTANCE_1;
             case SNOWBLOWER_DISTANCE_2 -> actualSuperState = ActualSuperState.SNOWBLOWING_DISTANCE_2;
             case SNOWBLOWER_DISTANCE_3 -> actualSuperState = ActualSuperState.SNOWBLOWING_DISTANCE_3;
@@ -203,18 +184,12 @@ public class Superstructure extends SubsystemBase {
             case DEFAULTING -> defaulting();
             case SHOOTING_CALIBRATING -> shootCalibrating();
             case SHOOTING_AUTOMATIC_HUB -> shootingAutomaticHub();
-            case SHOOTING_AUTOMATIC_CORNER_1 -> shootingAutomaticCorner1();
-            case SHOOTING_AUTOMATIC_CORNER_2 -> shootingAutomaticCorner2();
-            case SHOOTING_AUTOMATIC_CORNER_3 -> shootingAutomaticCorner3();
-            case SHOOTING_AUTOMATIC_CORNER_4 -> shootingAutomaticCorner4();
+            case SHOOTING_AUTOMATIC_CORNER -> shootingAutomaticCorner();
             case SHOOTING_DISTANCE_1 -> shootingDistance1();
             case SHOOTING_DISTANCE_2 -> shootingDistance2();
             case SHOOTING_DISTANCE_3 -> shootingDistance3();
             case SNOWBLOWING_AUTOMATIC_HUB -> snowblowingAutomaticHub();
-            case SNOWBLOWING_AUTOMATIC_CORNER_1 -> snowblowingAutomaticCorner1();
-            case SNOWBLOWING_AUTOMATIC_CORNER_2 -> snowblowingAutomaticCorner2();
-            case SNOWBLOWING_AUTOMATIC_CORNER_3 -> snowblowingAutomaticCorner3();
-            case SNOWBLOWING_AUTOMATIC_CORNER_4 -> snowblowingAutomaticCorner4();
+            case SNOWBLOWING_AUTOMATIC_CORNER -> snowblowingAutomaticCorner();
             case SNOWBLOWING_DISTANCE_1 -> snowblowingDistance1();
             case SNOWBLOWING_DISTANCE_2 -> snowblowingDistance2();
             case SNOWBLOWING_DISTANCE_3 -> snowblowingDistance3();
@@ -267,22 +242,7 @@ public class Superstructure extends SubsystemBase {
         wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
         wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC;  //Figure out how this is going to work
     }
-    private void shootingAutomaticCorner1() {
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC;  //Figure out how this is going to work
-    }
-    private void shootingAutomaticCorner2() {
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC;  //Figure out how this is going to work
-    }
-    private void shootingAutomaticCorner3() {
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC;  //Figure out how this is going to work
-    }
-    private void shootingAutomaticCorner4() {
+    private void shootingAutomaticCorner() {
         wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
         wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
         wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC;  //Figure out how this is going to work
@@ -308,25 +268,7 @@ public class Superstructure extends SubsystemBase {
         wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
         wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC; //Figure out how this is going to work
     }
-    private void snowblowingAutomaticCorner1() {
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC; //Figure out how this is going to work
-    }
-    private void snowblowingAutomaticCorner2() {
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC; //Figure out how this is going to work
-    }
-    private void snowblowingAutomaticCorner3() {
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC; //Figure out how this is going to work
-    }
-    private void snowblowingAutomaticCorner4() {
+    private void snowblowingAutomaticCorner() {
         wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
         wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
         wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;

@@ -85,32 +85,14 @@ public class RobotContainer extends BaseRobotContainer {
              getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB);
         }));
         NamedCommands.registerCommand("automatedCorner1Shooting", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_CORNER_1); //Figure out which corners are which
-        }));
-        NamedCommands.registerCommand("automatedCorner2Shooting", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_CORNER_2); //Figure out which corners are which
-        }));
-        NamedCommands.registerCommand("automatedCorner3Shooting", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_CORNER_3); //Figure out which corners are which
-        }));
-        NamedCommands.registerCommand("automatedCorner4Shooting", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_CORNER_4); //Figure out which corners are which
+            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_CORNER); //Figure out which corners are which
         }));
 
         NamedCommands.registerCommand("automatedHubSnowblowing", Commands.runOnce(() -> {
             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER_AUTOMATIC_HUB);
         }));
         NamedCommands.registerCommand("automatedCorner1Snowblowing", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER_1); //Figure out which corners are which
-        }));
-        NamedCommands.registerCommand("automatedCorner2Snowblowing", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER_2); //Figure out which corners are which
-        }));
-        NamedCommands.registerCommand("automatedCorner3Snowblowing", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER_3); //Figure out which corners are which
-        }));
-        NamedCommands.registerCommand("automatedCorner4Snowblowing", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER_4); //Figure out which corners are which
+            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER); //Figure out which corners are which
         }));
 
         NamedCommands.registerCommand("intaking", Commands.runOnce(() -> {
