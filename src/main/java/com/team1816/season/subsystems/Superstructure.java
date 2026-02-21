@@ -425,9 +425,9 @@ public class Superstructure extends SubsystemBase {
 
         switch (wantedClimbState) {
             case IDLING -> climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-            case L1_CLIMING -> climber.setWantedState(Climber.CLIMBER_STATE.L1_CLIMBING);
+            case L1_CLIMING -> climber.setWantedState(Climber.CLIMBER_STATE.L1_UP_CLIMBING);
             case L1_CLIMBING_DOWN -> climber.setWantedState(Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
-            case L3_CLIMBING -> climber.setWantedState(Climber.CLIMBER_STATE.L3_CLIMBING);
+            case L3_CLIMBING -> climber.setWantedState(Climber.CLIMBER_STATE.L3_UP_CLIMBING);
             case L3_ClIMBING_DOWN -> climber.setWantedState(Climber.CLIMBER_STATE.L3_DOWN_CLIMBING);
         }
 
