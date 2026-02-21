@@ -20,6 +20,7 @@ public class Superstructure extends SubsystemBase {
     private CommandXboxController controller;
 
     public enum WantedSuperState {
+        //OLD STATES TODO: GET RID OF
         DEFAULT,
         L1_CLIMB,
         L3_CLIMB,
@@ -29,10 +30,44 @@ public class Superstructure extends SubsystemBase {
         SNOWBLOWER,
         STORAGE_INTAKE,
         STORAGE_SHOOTER,
-        INDEX_AGITATE
+        INDEX_AGITATE,
+
+        SHOOTER_CALIBRATE,
+        SHOOTER_AUTOMATIC_HUB,
+        SHOOTER_AUTOMATIC_CORNER_1,
+        SHOOTER_AUTOMATIC_CORNER_2,
+        SHOOTER_AUTOMATIC_CORNER_3,
+        SHOOTER_AUTOMATIC_CORNER_4,
+        SHOOTER_DISTANCE_1,
+        SHOOTER_DISTANCE_2,
+        SHOOTER_DISTANCE_3,
+        SNOWBLOWER_AUTOMATIC_HUB,
+        SNOWBLOWER_AUTOMATIC_CORNER_1,
+        SNOWBLOWER_AUTOMATIC_CORNER_2,
+        SNOWBLOWER_AUTOMATIC_CORNER_3,
+        SNOWBLOWER_AUTOMATIC_CORNER_4,
+        SNOWBLOWER_DISTANCE_1,
+        SNOWBLOWER_DISTANCE_2,
+        SNOWBLOWER_DISTANCE_3,
+        INTAKE_LIFT,
+        INTAKE_DROP,
+        INTAKE_OUTTAKE,
+        GATEKEEPER_ON,
+        GATEKEEPER_OFF,
+        CLIMBER_CLIMB_L1,
+        CLIMBER_CLIMB_L3,
+        CLIMBER_CLIMB_DOWN_L1,
+        //DEFAULT,
+        FEEDER_SLOW,
+        FEEDER_FAST,
+        HOOD_DROP
+
+
+
     }
 
     public enum ActualSuperState {
+        //OLD STATES TODO: GET RID OF
         DEFAULTING,
         L1_CLIMBING,
         L3_CLIMBING,
@@ -42,7 +77,37 @@ public class Superstructure extends SubsystemBase {
         SNOWBLOWING,
         STORAGE_INTAKING,
         STORAGE_SHOOTING,
-        INDEX_AGITATING
+        INDEX_AGITATING,
+
+        SHOOTER_CALIBRATING,
+        SHOOTING_AUTOMATIC_HUB,
+        SHOOTING_AUTOMATIC_CORNER_1,
+        SHOOTING_AUTOMATIC_CORNER_2,
+        SHOOTING_AUTOMATIC_CORNER_3,
+        SHOOTING_AUTOMATIC_CORNER_4,
+        SHOOTING_DISTANCE_1,
+        SHOOTING_DISTANCE_2,
+        SHOOTING_DISTANCE_3,
+        SNOWBLOWING_AUTOMATIC_HUB,
+        SNOWBLOWING_AUTOMATIC_CORNER_1,
+        SNOWBLOWING_AUTOMATIC_CORNER_2,
+        SNOWBLOWING_AUTOMATIC_CORNER_3,
+        SNOWBLOWING_AUTOMATIC_CORNER_4,
+        SNOWBLOWING_DISTANCE_1,
+        SNOWBLOWING_DISTANCE_2,
+        SNOWBLOWING_DISTANCE_3,
+        INTAKING_LIFT,
+        INTAKING_DROP,
+        INTAKING_OUTTAKE,
+        GATEKEEPING_ON,
+        GATEKEEPING_OFF,
+        CLIMBING_CLIMB_L1,
+        CLIMBING_CLIMB_L3,
+        CLIMBING_CLIMB_DOWN_L1,
+        //DEFAULTING,
+        FEEDING_SLOW,
+        FEEDING_FAST,
+        HOOD_DROPPING
     }
 
     public enum ClimbSide {
