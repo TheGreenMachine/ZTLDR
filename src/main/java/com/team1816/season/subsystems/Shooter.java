@@ -11,8 +11,8 @@ import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -66,7 +66,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final Rotation2d ROTATION_OFFSET_FROM_CALIBRATION_ZERO;
 
     //FIELD DIMENSIONS
-    private static final double HALF_FIELD_WIDTH = FlippingUtil.fieldSizeY/2;
+    private final double HALF_FIELD_WIDTH = FlippingUtil.fieldSizeY/2;
+    private final double RED_ROBOT_STARTING_LINE = FlippingUtil.fieldSizeX-Units.inchesToMeters(156.61);
+    private final double BLUE_ROBOT_STARTING_LINE = Units.inchesToMeters(156.61);
 
     //CALIBRATION
     private Double[] calibrationPositions = new Double[]{0.0, 0.0};
@@ -194,29 +196,15 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         if (wantedState == SHOOTER_STATE.AUTOMATIC || wantedState == SHOOTER_STATE.SNOWBLOWING) {
 
             if (wantedState == SHOOTER_STATE.AUTOMATIC) {
-                if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
-                    setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_HUB);
+                if (isOnAllianceSide()) {
+                    setHubTarget();
                 }
                 else {
-                    setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_HUB);
+                    setSnowblowerTarget();
                 }
             }
             else {
-                if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
-                    if (launcherTranslation.getY() < HALF_FIELD_WIDTH) {
-                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_RIGHT_CORNER);
-                    }
-                    else {
-                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_LEFT_CORNER);
-                    }
-                } else {
-                    if (launcherTranslation.getY() < HALF_FIELD_WIDTH) {
-                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_LEFT_CORNER);
-                    }
-                    else {
-                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_RIGHT_CORNER);
-                    }
-                }
+                setSnowblowerTarget();
             }
 
             double distance = launcherTranslation.toTranslation2d().getDistance(currentTarget.position.toTranslation2d());
@@ -235,6 +223,33 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         SmartDashboard.putNumber("Launch Angle: ", launchAngle);
         SmartDashboard.putNumber("Launch Power: ", launchPower);
         SmartDashboard.putNumber("Rotation Angle: ", rotationAngle);
+    }
+
+    private void setSnowblowerTarget() {
+        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
+            if (launcherTranslation.getY() > HALF_FIELD_WIDTH) {
+                setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_RIGHT_CORNER);
+            }
+            else {
+                setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_LEFT_CORNER);
+            }
+        } else {
+            if (launcherTranslation.getY() > HALF_FIELD_WIDTH) {
+                setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_LEFT_CORNER);
+            }
+            else {
+                setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_RIGHT_CORNER);
+            }
+        }
+    }
+
+    private void setHubTarget() {
+        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
+            setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_HUB);
+        }
+        else {
+            setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_HUB);
+        }
     }
 
     public void setWantedState(SHOOTER_STATE state) {
@@ -320,5 +335,15 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public boolean isCalibrated() {
         return isCalibrated;
+    }
+
+    private boolean isOnAllianceSide() {
+        double robotX = BaseRobotState.swerveDriveState.Pose.getX();
+        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
+            return robotX > RED_ROBOT_STARTING_LINE;
+        }
+        else {
+            return robotX < BLUE_ROBOT_STARTING_LINE;
+        }
     }
 }
