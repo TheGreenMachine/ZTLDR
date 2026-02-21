@@ -1,5 +1,4 @@
 package com.team1816.season.subsystems;
-import com.team1816.lib.ballisticCalc.BallisticSolution;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 public class BallisitcCalculator {
@@ -17,10 +16,6 @@ public class BallisitcCalculator {
         private Translation3d robotTranslation;
         private Translation2d robotSpeed;
         private Translation3d hubTranslation;
-
-        public BallisticSolution getBallisticSolution(Translation3d launcher, Translation3d target, double velocity) {
-            return new BallisticSolution(0, 0, 0);
-        }
 
         public void getConstants(BallisitcConstants ballistic_Constants, BallisticContraints ballisitc_Constraints) {
             this.ballisticConstants = ballistic_Constants;

@@ -49,7 +49,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     //DEVICES
     private final DigitalInput rotationAngleSensorClockwiseLeft = new DigitalInput((int) factory.getConstant(NAME, "rotationAngleSensorClockwiseLeft", 0));
-    private final DigitalInput rotationAngleSensorClockwiseRight = new DigitalInput((int) factory.getConstant(NAME, "rotationAngleSensorClockwiseRight", 0));
+    private final DigitalInput rotationAngleSensorClockwiseRight = new DigitalInput((int) factory.getConstant(NAME, "rotationAngleSensorClockwiseRight", 1));
 
     //HARDWARE RECORDED VALUES
     double currentRotationPosition;

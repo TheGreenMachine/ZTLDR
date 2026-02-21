@@ -4,8 +4,9 @@ import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.ParentConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
+import com.team1816.lib.hardware.components.motor.IMotor;
 
-public class GhostDevice implements IPhoenix6 {
+public class GhostDevice implements IMotor {
 
     private int Id = 0;
 
@@ -31,5 +32,35 @@ public class GhostDevice implements IPhoenix6 {
     @Override
     public StatusCode setSimSupplyVoltage(double volts) {
         return StatusCode.OK;
+    }
+
+    @Override
+    public double getMotorVelocity() {
+        return 0;
+    }
+
+    @Override
+    public double getMotorPosition() {
+        return 0;
+    }
+
+    @Override
+    public void zeroMotorPosition() {
+
+    }
+
+    @Override
+    public StatusCode setSimRotorVelocity(double rps) {
+        return StatusCode.OK;
+    }
+
+    @Override
+    public StatusCode setSimRotorPosition(double rotations) {
+        return StatusCode.OK;
+    }
+
+    @Override
+    public double getSimMotorVoltage() {
+        return 12;
     }
 }
