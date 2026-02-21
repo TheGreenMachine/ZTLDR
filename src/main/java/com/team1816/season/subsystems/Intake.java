@@ -53,12 +53,12 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         upAngle = factory.getConstant(NAME, "upAngle", 45, true);
     }
 
-    private static double inSpeed = factory.getConstant(NAME, "inSpeed", -10, true);
-    private static double inAngle = factory.getConstant(NAME, "inAngle", 255, true);
-    private static double outSpeed = factory.getConstant(NAME, "outSpeed", 10, true);
-    private static double outAngle = factory.getConstant(NAME, "outAngle", 255, true);
-    private static double downAngle = factory.getConstant(NAME, "downAngle", 255, true);
-    private static double upAngle = factory.getConstant(NAME, "upAngle", 45, true);
+    private static double inSpeed = 0;
+    private static double inAngle = 0;
+    private static double outSpeed = 0;
+    private static double outAngle = 0;
+    private static double downAngle = 0;
+    private static double upAngle = 0;
 
     public enum INTAKE_STATE {
         INTAKE_IN(
