@@ -1,5 +1,4 @@
 package com.team1816.season.subsystems;
-import com.team1816.lib.ballisticCalc.BallisticSolution;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 public class BallisitcCalculator {
