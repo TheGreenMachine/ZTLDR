@@ -44,6 +44,13 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public Intake () {
         super();
         SmartDashboard.putData("Intake", intakeMech);
+
+        inSpeed = factory.getConstant(NAME, "inSpeed", -10, true);
+        inAngle = factory.getConstant(NAME, "inAngle", 255, true);
+        outSpeed = factory.getConstant(NAME, "outSpeed", 10, true);
+        outAngle = factory.getConstant(NAME, "outAngle", 255, true);
+        downAngle = factory.getConstant(NAME, "downAngle", 255, true);
+        upAngle = factory.getConstant(NAME, "upAngle", 45, true);
     }
 
     private static double inSpeed = factory.getConstant(NAME, "inSpeed", -10, true);
