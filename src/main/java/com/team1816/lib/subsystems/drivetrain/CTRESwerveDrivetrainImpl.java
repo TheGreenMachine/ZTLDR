@@ -18,6 +18,7 @@ import com.team1816.lib.hardware.components.motor.WpiMotorUtil;
 import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.SwerveDriveStateStruct;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.numbers.N1;
@@ -58,6 +59,20 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
             (id, bus) -> (CommonTalon) factory.getDeviceById(NAME, id),
             (id, bus) -> (ParentDevice) factory.getDeviceById(NAME, id),
             factory.getSwerveDrivetrainConstant(NAME),
+            // Pass in 0 as the odometryUpdateFrequency to let CTRE just use their defaults.
+            0,
+            // The initial odometryStandardDeviations to use until a call to setStateStdDevs. I
+            // don't know why CTRE calls them to different things, but I'm pretty sure the state
+            // and odometry standard deviations are the same. They represent the pose estimator's
+            // trust in the current state of the odometry estimate, with higher values representing
+            // less trust.
+            VecBuilder.fill(0.1, 0.1, 0.1),
+            // The initial visionStandardDeviations used here will be overwritten any time
+            // addVisionMeasurement is called with visionMeasurementStdDevs, so these initial
+            // values don't actually matter unless we decide not to pass them in with
+            // addVisionMeasurement. They represent the pose estimator's trust in the incoming
+            // vision measurements, with higher values representing less trust.
+            VecBuilder.fill(1, 1, 1),
             factory.getSwerveModuleConstants(NAME, maxSpd)
         );
         //default to filed centric

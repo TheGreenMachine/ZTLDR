@@ -127,6 +127,18 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
         );
     }
 
+    /**
+     * Sets the pose estimator's trust in robot odometry. This might be used to change trust in
+     * odometry after an impact with the wall or traversing a bump.
+     *
+     * @param stateStdDevs Standard deviations of the pose estimate. Increase these numbers to
+     *                     trust your state estimate less. This matrix is in the form [x, y,
+     *                     theta]ᵀ, with units in meters and radians.
+     */
+    public void setStateStdDevs(Matrix<N3, N1> stateStdDevs) {
+        drivetrain.setStateStdDevs(stateStdDevs);
+    }
+
     public void simTeleportRobot(Pose2d pose) {
         drivetrain.simTeleportRobot(pose);
     }
