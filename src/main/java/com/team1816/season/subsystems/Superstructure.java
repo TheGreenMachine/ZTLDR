@@ -53,6 +53,7 @@ public class Superstructure extends SubsystemBase {
         INTAKE_LIFT,
         INTAKE_DROP,
         INTAKE_OUTTAKE,
+        INTAKING,
         GATEKEEPER_ON,
         GATEKEEPER_OFF,
         CLIMBER_CLIMB_L1,
@@ -100,6 +101,7 @@ public class Superstructure extends SubsystemBase {
         INTAKING_LIFT,
         INTAKING_DROP,
         INTAKING_OUTTAKE,
+        INTAKING,
         GATEKEEPING_ON,
         GATEKEEPING_OFF,
         CLIMBING_CLIMB_L1,
@@ -411,26 +413,18 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void toggleGatekeeper(){
-        if (wantedGatekeeperState == WantedGatekeeperState.OPEN){
-            setWantedGatekeeperState(WantedGatekeeperState.CLOSED);
+        if (wantedSuperState == WantedSuperState.GATEKEEPER_ON){
+            setWantedSuperState(WantedSuperState.GATEKEEPER_OFF);
         } else {
-            setWantedGatekeeperState(WantedGatekeeperState.OPEN);
+            setWantedSuperState(WantedSuperState.GATEKEEPER_ON);
         }
     }
 
     public void toggleIntake(){
-        if (wantedIntakeState == WantedIntakeState.INTAKING){
-            setWantedIntakeState(WantedIntakeState.OUTTAKING);
+        if (wantedSuperState == WantedSuperState.INTAKING){
+            setWantedSuperState(WantedSuperState.INTAKE_LIFT);
         } else {
-            setWantedIntakeState(WantedIntakeState.INTAKING);
-        }
-    }
-
-    public void toggleHood(){
-        if (wantedShooterState == WantedShooterState.HOOD_DOWN){
-            setWantedShooterState(WantedShooterState.AUTOMATIC);
-        } else {
-            setWantedShooterState(WantedShooterState.HOOD_DOWN);
+            setWantedSuperState(WantedSuperState.INTAKING);
         }
     }
 
