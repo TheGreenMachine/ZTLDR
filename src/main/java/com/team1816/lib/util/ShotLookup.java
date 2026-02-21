@@ -5,12 +5,19 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
 public class ShotLookup {
     private PolynomialSplineFunction angleInterpolator, powerInterpolator;
+    private double minimumDefaultAngle, minimumDefaultPower, mediumDefaultAngle, mediumDefaultPower, maximumDefaultAngle, maximumDefaultPower;
 
-    public ShotLookup(double[] distances, double[] angles, double[] powers) {
+    public ShotLookup(double[] distances, double[] angles, double[] powers, double minimumDefaultAngle, double minimumDefaultPower, double mediumDefaultAngle, double mediumDefaultPower, double maximumDefaultAngle, double maximumDefaultPower) {
         LinearInterpolator angleLI = new LinearInterpolator();
         LinearInterpolator powerLI = new LinearInterpolator();
         this.angleInterpolator = angleLI.interpolate(distances, angles);
         this.powerInterpolator = powerLI.interpolate(distances, powers);
+        this.minimumDefaultAngle = minimumDefaultAngle;
+        this.minimumDefaultPower = minimumDefaultPower;
+        this.mediumDefaultAngle = mediumDefaultAngle;
+        this.mediumDefaultPower = mediumDefaultPower;
+        this.maximumDefaultAngle = maximumDefaultAngle;
+        this.maximumDefaultPower = maximumDefaultPower;
     }
 
     public double getAngle(double distance) {
@@ -18,17 +25,15 @@ public class ShotLookup {
 
         if (knots.length > 0) {
             if (distance < knots[0]) {
-                // some low end default
-                return 25; // TODO - Clark
+                return minimumDefaultAngle;
             } else if (distance > knots[knots.length - 1]) {
-                // some high end default
-                return 25; // TODO - Clark
+                return maximumDefaultAngle;
             } else {
                 return angleInterpolator.value(distance);
             }
         }
 
-        return 25; // // TODO - Clark some mid default as we don't have data points due to a bad load from yaml
+        return mediumDefaultAngle;
     }
 
     public double getPower(double distance) {
@@ -36,16 +41,14 @@ public class ShotLookup {
 
         if (knots.length > 0) {
             if (distance < knots[0]) {
-                // some low end default
-                return 25; // TODO - Clark
+                return minimumDefaultPower;
             } else if (distance > knots[knots.length - 1]) {
-                // some high end default
-                return 25; // TODO - Clark
+                return maximumDefaultPower;
             } else {
                 return powerInterpolator.value(distance);
             }
         }
 
-        return 25; // // TODO - Clark some mid default as we don't have data points due to a bad load from yaml
+        return mediumDefaultPower;
     }
 }

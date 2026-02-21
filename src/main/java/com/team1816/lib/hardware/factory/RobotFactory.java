@@ -313,7 +313,8 @@ public class RobotFactory {
                 clazz.Slot2 = Slot2Configs.from(getSlotConfigs(deviceConfig.pidConfig, 2));
                 clazz.CurrentLimits = getCurrentConfigs(deviceConfig);
                 clazz.SoftwareLimitSwitch = getSoftLimitConfigs(deviceConfig);
-                clazz.Feedback = getFeedbackConfigs(deviceConfig);
+                clazz.Feedback = GetFeedbackConfigs(deviceConfig);
+                clazz.MotionMagic = GetMotionMagicConfig(deviceConfig);
             }
             case TalonFXS -> {
                 var clazz = (TalonFXSConfiguration) parentConfig;
@@ -325,6 +326,7 @@ public class RobotFactory {
                 clazz.CurrentLimits = getCurrentConfigs(deviceConfig);
                 clazz.SoftwareLimitSwitch = getSoftLimitConfigs(deviceConfig);
                 clazz.ExternalFeedback = getExternalFeedbackConfigs(deviceConfig);
+                clazz.MotionMagic = GetMotionMagicConfig(deviceConfig);
             }
             case Pigeon2 -> {
             }
@@ -348,7 +350,18 @@ public class RobotFactory {
     /**
      * Retrieves {@link FeedbackConfigs} from a particular {@link DeviceConfiguration}. Logs these values.
      */
-    private FeedbackConfigs getFeedbackConfigs(DeviceConfiguration deviceConfig) {
+    private MotionMagicConfigs GetMotionMagicConfig(DeviceConfiguration deviceConfig) {
+        var mMConfig = new MotionMagicConfigs();
+        if (deviceConfig.motionMagic == null) {
+            return mMConfig;
+        }
+
+        mMConfig.MotionMagicExpo_kA = deviceConfig.motionMagic.expoKA;
+        mMConfig.MotionMagicExpo_kV = deviceConfig.motionMagic.expoKV;
+        return mMConfig;
+    }
+
+    private FeedbackConfigs GetFeedbackConfigs(DeviceConfiguration deviceConfig) {
         var config = new FeedbackConfigs();
         // if we have settings defined in YAML use them otherwise use the CTRE defaults
         if (deviceConfig.remoteSensor != null) {

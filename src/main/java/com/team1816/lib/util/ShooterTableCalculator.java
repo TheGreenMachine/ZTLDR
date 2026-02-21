@@ -17,6 +17,13 @@ public class ShooterTableCalculator {
         List<Double> angles = shooterSettings.angles;
         List<Double> velocities = shooterSettings.powers;
 
+        double minimumDefaultAngle = shooterSettings.minimumDefaultAngle;
+        double minimumDefaultPower = shooterSettings.minimumDefaultPower;
+        double mediumDefaultAngle = shooterSettings.mediumDefaultAngle;
+        double mediumDefaultPower = shooterSettings.mediumDefaultPower;
+        double maximumDefaultAngle = shooterSettings.maximumDefaultAngle;
+        double maximumDefaultPower = shooterSettings.maximumDefaultPower;
+
         double[] distancesArray = distances.stream()
             .mapToDouble(Double::doubleValue)
             .toArray();
@@ -27,7 +34,7 @@ public class ShooterTableCalculator {
             .mapToDouble(Double::doubleValue)
             .toArray();
 
-        shotLookup = new ShotLookup(distancesArray, anglesArray, velocitiesArray);
+        shotLookup = new ShotLookup(distancesArray, anglesArray, velocitiesArray, minimumDefaultAngle, minimumDefaultPower, mediumDefaultAngle, mediumDefaultPower, maximumDefaultAngle, maximumDefaultPower);
     }
 
     public ShooterDistanceSetting getShooterDistanceSetting(double distance) {

@@ -15,11 +15,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class GreenLogger {
 
-    private static final HashMap<LogTopic, Supplier<?>> periodicLogs = new HashMap<>();
+    private static final Map<LogTopic, Supplier<?>> periodicLogs = new HashMap<>();
     // using an empty string here to make the logs and live views consistent
     private static final NetworkTable netTable;
     private static final StringPublisher msg;
@@ -40,7 +42,7 @@ public class GreenLogger {
         msg = netTable.getStringTopic("messages").publish();
     }
 
-    public static void SilenceLoopOverrun(Robot robot) {
+    public static void silenceLoopOverrun(Robot robot) {
         // Adjust loop overrun warning timeout
         try {
             Field watchdogField = IterativeRobotBase.class.getDeclaredField("m_watchdog");
@@ -85,25 +87,30 @@ public class GreenLogger {
             var value = stringWriter.toString().replace("\r", "");
             msg.set(value);
             DataLogManager.log(value);
-            Elastic.sendNotification(new Elastic.Notification(Elastic.Notification.NotificationLevel.ERROR, throwable.getClass().getName(), throwable.getMessage(), 15000, 450, -1));
-        } else  if (s instanceof RobotConfig) {
+            logToElastic(throwable.getClass().getName(), throwable.getMessage(), Elastic.Notification.NotificationLevel.ERROR);
+        } else if (s instanceof RobotConfig config) {
             log("Pathplanner config:");
-            var config = (RobotConfig) s;
-            log(String.format("  Holonomic: %b",config.isHolonomic));
-            log(String.format("  MOI: %f",config.MOI));
-            log(String.format("  massKg: %f",config.massKG));
-            log(String.format("  maxTorqueFriction: %f",config.maxTorqueFriction));
-            log(String.format("  wheelFrictionForce: %f",config.wheelFrictionForce));
-            log(String.format("  maxDriveVelocityMPS: %f",config.moduleConfig.maxDriveVelocityMPS));
-            log(String.format("  driveCurrentLimit: %f",config.moduleConfig.driveCurrentLimit));
-            log(String.format("  wheelRadiusMeters: %f",config.moduleConfig.wheelRadiusMeters));
-            log(String.format("  wheelCOF: %f",config.moduleConfig.wheelCOF));
-            log(String.format("  freeSpeedRadPerSec: %f",config.moduleConfig.driveMotor.freeSpeedRadPerSec));
+            log(String.format("  Holonomic: %b", config.isHolonomic));
+            log(String.format("  MOI: %f", config.MOI));
+            log(String.format("  massKg: %f", config.massKG));
+            log(String.format("  maxTorqueFriction: %f", config.maxTorqueFriction));
+            log(String.format("  wheelFrictionForce: %f", config.wheelFrictionForce));
+            log(String.format("  maxDriveVelocityMPS: %f", config.moduleConfig.maxDriveVelocityMPS));
+            log(String.format("  driveCurrentLimit: %f", config.moduleConfig.driveCurrentLimit));
+            log(String.format("  wheelRadiusMeters: %f", config.moduleConfig.wheelRadiusMeters));
+            log(String.format("  wheelCOF: %f", config.moduleConfig.wheelCOF));
+            log(String.format("  freeSpeedRadPerSec: %f", config.moduleConfig.driveMotor.freeSpeedRadPerSec));
         } else {
             var value = String.valueOf(s);
             msg.set(value);
             DataLogManager.log(value);
         }
+    }
+
+    public static void logToElastic(String title, Object content, Elastic.Notification.NotificationLevel elasticNotificationLevel) {
+        String s = Objects.toString(content, "null");
+
+        Elastic.sendNotification(new Elastic.Notification(elasticNotificationLevel, title, s, 15000, 450, -1));
     }
 
     // Will update all registered periodic loggers
