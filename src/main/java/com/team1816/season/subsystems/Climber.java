@@ -17,13 +17,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static com.team1816.lib.Singleton.factory;
 
 public class Climber extends SubsystemBase implements ITestableSubsystem {
-
+    //CLASS
     public static final String NAME = "climber";
+
+    private CLIMBER_STATE wantedState = CLIMBER_STATE.IDLING;
+
+    //MOTORS
     private final IMotor flipMotor = (IMotor)factory.getDevice(NAME, "flipMotor");
     private final IMotor linearSlideMotor = (IMotor)factory.getDevice(NAME, "linearSlideMotor");
-    private double linearSlidePosition;
-    private CLIMBER_STATE wantedState = CLIMBER_STATE.IDLING;
-    private PositionVoltage positionReq = new PositionVoltage(0);
+
+    private final PositionVoltage positionReq = new PositionVoltage(0);
 
     //YAML VALUES
     private double flipIdling = factory.getConstant(NAME, "flipIdling", 0);
@@ -44,10 +47,12 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     private static final double MAX_LINEAR_SLIDE_MOTOR_CLAMP = 100;
     private static final double MIN_LINEAR_SLIDE_MOTOR_CLAMP = 0;
 
-    public Mechanism2d climberMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
-    public MechanismRoot2d climberMechRoot = climberMech.getRoot("Climber Root", 1,0);
-    public MechanismLigament2d climberArm = climberMechRoot.append(new MechanismLigament2d("Climber Lift", 1, 70));
-    public MechanismLigament2d linearSlide = climberMechRoot.append(new MechanismLigament2d("Linear Slide", 0, 0, 10, new Color8Bit(Color.kPurple)));
+    //MECHANISMS
+    private double linearSlidePosition;
+    private final Mechanism2d climberMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
+    private final MechanismRoot2d climberMechRoot = climberMech.getRoot("Climber Root", 1,0);
+    private final MechanismLigament2d climberArm = climberMechRoot.append(new MechanismLigament2d("Climber Lift", 1, 70));
+    private final MechanismLigament2d linearSlide = climberMechRoot.append(new MechanismLigament2d("Linear Slide", 0, 0, 10, new Color8Bit(Color.kPurple)));
 
     public Climber () {
         super();
