@@ -45,7 +45,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     //AUTO AIM
     private AUTO_AIM_TARGETS currentTarget = AUTO_AIM_TARGETS.RED_HUB;
     // TODO: get the launcher position from the vision or whatever
-    Translation3d launcherTranslation = new Translation3d(0,0,0).plus(SHOOTER_OFFSET);
+    Translation3d launcherTranslation;
 
     //DEVICES
     private final DigitalInput rotationAngleSensorClockwiseLeft = new DigitalInput((int) factory.getConstant(NAME, "rotationAngleSensorClockwiseLeft", 0));
@@ -57,12 +57,12 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     boolean rightSensorValue = true;
 
     //CONSTANTS
-    private static final double MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE = factory.getConstant(NAME, "motorRotationsPerLaunchAngleDegree", 0); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-    private static final double MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE = factory.getConstant(NAME, "motorRotationsPerRotationAngleDegree", 0); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-    private static final Translation3d SHOOTER_OFFSET = new Translation3d(factory.getConstant(NAME, "initialShooterOffsetX",0), factory.getConstant(NAME, "initialShooterOffsetY",0), factory.getConstant(NAME, "initialShooterOffsetZ",0)); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-    private static final double CALIBRATION_THRESHOLD = factory.getConstant(NAME, "calibrationThreshold",10); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-    private static final Rotation2d CALIBRATION_POSITION_ARC_ANGLE = Rotation2d.fromRotations(factory.getConstant(NAME, "calibrationThreshold", 0.75)); //should always be less than 1 rotation //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-    private static final Rotation2d ROTATION_OFFSET_FROM_CALIBRATION_ZERO = Rotation2d.fromDegrees(factory.getConstant(NAME, "rotationOffsetFromCalibrationZero", 70)); //as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+    private final double MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE;
+    private final double MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE;
+    private final Translation3d SHOOTER_OFFSET;
+    private final double CALIBRATION_THRESHOLD;
+    private final Rotation2d CALIBRATION_POSITION_ARC_ANGLE;
+    private final Rotation2d ROTATION_OFFSET_FROM_CALIBRATION_ZERO;
 
     //FIELD DIMENSIONS
     private static final double HALF_FIELD_WIDTH = 4.035;
@@ -139,6 +139,16 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public Shooter(){
         super();
+
+        MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE = factory.getConstant(NAME, "motorRotationsPerLaunchAngleDegree", 0); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+        MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE = factory.getConstant(NAME, "motorRotationsPerRotationAngleDegree", 0); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+        SHOOTER_OFFSET = new Translation3d(factory.getConstant(NAME, "initialShooterOffsetX",0), factory.getConstant(NAME, "initialShooterOffsetY",0), factory.getConstant(NAME, "initialShooterOffsetZ",0)); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+        CALIBRATION_THRESHOLD = factory.getConstant(NAME, "calibrationThreshold",10); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+        CALIBRATION_POSITION_ARC_ANGLE = Rotation2d.fromRotations(factory.getConstant(NAME, "calibrationThreshold", 0.75)); //should always be less than 1 rotation //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+        ROTATION_OFFSET_FROM_CALIBRATION_ZERO = Rotation2d.fromDegrees(factory.getConstant(NAME, "rotationOffsetFromCalibrationZero", 70)); //as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+
+        launcherTranslation = new Translation3d(0,0,0).plus(SHOOTER_OFFSET);
+
         networkTable = NetworkTableInstance.getDefault().getTable("");
         turretFieldPose = networkTable.getDoubleArrayTopic("Field/Turret").publish();
         SmartDashboard.putData("Shooter Incline", launchMech);
