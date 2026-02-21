@@ -40,7 +40,8 @@ public class Superstructure extends SubsystemBase {
         SNOWBLOWER_DISTANCE_3,
         INTAKE_LIFT,
         INTAKE_DROP,
-        INTAKE_OUTTAKE,
+        INTAKE,
+        OUTTAKE,
         GATEKEEPER_ON,
         GATEKEEPER_OFF,
         CLIMB_L1,
@@ -49,7 +50,7 @@ public class Superstructure extends SubsystemBase {
         FEEDER_SLOW,
         FEEDER_FAST,
         FEEDER_AGITATE,
-        HOOD_DROP
+        DROP_HEIGHT
 
 
 
@@ -77,7 +78,8 @@ public class Superstructure extends SubsystemBase {
         SNOWBLOWING_DISTANCE_3,
         INTAKE_LIFTING,
         INTAKE_DROPPING,
-        INTAKING_OUTTAKING,
+        INTAKING,
+        OUTTAKING,
         GATEKEEPING_ON,
         GATEKEEPING_OFF,
         CLIMBING_L1,
@@ -85,8 +87,8 @@ public class Superstructure extends SubsystemBase {
         CLIMBING_DOWN_L1,
         FEEDING_SLOW,
         FEEDING_FAST,
-        FEEDING_AGITATE,
-        HOOD_DROPPING
+        FEEDING_AGITATING,
+        DROPPING_HEIGHT
     }
 
     public enum ClimbSide {
@@ -178,7 +180,8 @@ public class Superstructure extends SubsystemBase {
             case SNOWBLOWER_DISTANCE_3 -> actualSuperState = ActualSuperState.SNOWBLOWING_DISTANCE_3;
             case INTAKE_LIFT -> actualSuperState = ActualSuperState.INTAKE_LIFTING;
             case INTAKE_DROP -> actualSuperState = ActualSuperState.INTAKE_DROPPING;
-            case INTAKE_OUTTAKE -> actualSuperState = ActualSuperState.INTAKING_OUTTAKING;
+            case INTAKE -> actualSuperState = ActualSuperState.INTAKING;
+            case OUTTAKE -> actualSuperState = ActualSuperState.OUTTAKING;
             case GATEKEEPER_ON -> actualSuperState = ActualSuperState.GATEKEEPING_ON;
             case GATEKEEPER_OFF -> actualSuperState = ActualSuperState.GATEKEEPING_OFF;
             case CLIMB_L1 -> actualSuperState = ActualSuperState.CLIMBING_L1;
@@ -186,7 +189,8 @@ public class Superstructure extends SubsystemBase {
             case CLIMB_DOWN_L1 -> actualSuperState = ActualSuperState.CLIMBING_DOWN_L1;
             case FEEDER_SLOW -> actualSuperState = ActualSuperState.FEEDING_SLOW;
             case FEEDER_FAST -> actualSuperState = ActualSuperState.FEEDING_FAST;
-            case HOOD_DROP -> actualSuperState = ActualSuperState.HOOD_DROPPING;
+            case FEEDER_AGITATE -> actualSuperState = ActualSuperState.FEEDING_AGITATING;
+            case DROP_HEIGHT -> actualSuperState = ActualSuperState.DROPPING_HEIGHT;
         }
 
 
@@ -196,7 +200,7 @@ public class Superstructure extends SubsystemBase {
     private void applyStates() {
         switch (actualSuperState) {
             case DEFAULTING -> defaulting();
-            case SHOOTING_CALIBRATING -> shootingCalibrating();
+            case SHOOTING_CALIBRATING -> shootCalibrating();
             case SHOOTING_AUTOMATIC_HUB -> shootingAutomaticHub();
             case SHOOTING_AUTOMATIC_CORNER_1 -> shootingAutomaticCorner1();
             case SHOOTING_AUTOMATIC_CORNER_2 -> shootingAutomaticCorner2();
@@ -215,6 +219,8 @@ public class Superstructure extends SubsystemBase {
             case SNOWBLOWING_DISTANCE_3 -> snowblowingDistance3();
             case INTAKE_LIFTING -> intakeLifting();
             case INTAKE_DROPPING -> intakeDropping();
+            case INTAKING -> intaking();
+            case OUTTAKING -> outtaking();
             case GATEKEEPING_ON -> gatekeepingOn();
             case GATEKEEPING_OFF -> gatekeeperingOff();
             case CLIMBING_L1 -> climbingL1();
@@ -222,8 +228,8 @@ public class Superstructure extends SubsystemBase {
             case CLIMBING_DOWN_L1 -> climbingDownL1();
             case FEEDING_SLOW -> feedingSlow();
             case FEEDING_FAST -> feedingFast();
-            case FEEDING_AGITATE -> agitate();
-            case HOOD_DROPPING -> hoodDropping();
+            case FEEDING_AGITATING -> agitate();
+            case DROPPING_HEIGHT -> droppingHeight();
         }
     }
 
@@ -235,35 +241,144 @@ public class Superstructure extends SubsystemBase {
         return new InstantCommand(() -> setWantedSuperState(superState));
     }
     private void defaulting() {}
-    private void shootingCalibrating() {
+    private void shootCalibrating() {
         wantedShooterState = Shooter.SHOOTER_STATE.CALIBRATING;
     }
-    private void shootingAutomaticHub() {}
-    private void shootingAutomaticCorner1() {}
-    private void shootingAutomaticCorner2() {}
-    private void shootingAutomaticCorner3() {}
-    private void shootingAutomaticCorner4() {}
-    private void shootingDistance1() {}
-    private void shootingDistance2() {}
-    private void shootingDistance3() {}
-    private void snowblowingAutomaticHub() {}
-    private void snowblowingAutomaticCorner1() {}
-    private void snowblowingAutomaticCorner2() {}
-    private void snowblowingAutomaticCorner3() {}
-    private void snowblowingAutomaticCorner4() {}
-    private void snowblowingDistance1() {}
-    private void snowblowingDistance2() {}
-    private void snowblowingDistance3() {}
-    private void intakeLifting() {}
-    private void intakeDropping() {}
-    private void gatekeepingOn() {}
-    private void gatekeeperingOff() {}
-    private void climbingL1() {}
-    private void climbingL3() {}
-    private void climbingDownL1() {}
-    private void feedingSlow() {}
-    private void feedingFast() {}
-
+    private void shootingAutomaticHub() {
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC;  //Figure out how this is going to work
+    }
+    private void shootingAutomaticCorner1() {
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC;  //Figure out how this is going to work
+    }
+    private void shootingAutomaticCorner2() {
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC;  //Figure out how this is going to work
+    }
+    private void shootingAutomaticCorner3() {
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC;  //Figure out how this is going to work
+    }
+    private void shootingAutomaticCorner4() {
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC;  //Figure out how this is going to work
+    }
+    private void shootingDistance1() {
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedShooterState = Shooter.SHOOTER_STATE.DISTANCE_ONE;
+    }
+    private void shootingDistance2() {
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedShooterState = Shooter.SHOOTER_STATE.DISTANCE_TWO;
+    }
+    private void shootingDistance3() {
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedShooterState = Shooter.SHOOTER_STATE.DISTANCE_THREE;
+    }
+    private void snowblowingAutomaticHub() {
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC; //Figure out how this is going to work
+    }
+    private void snowblowingAutomaticCorner1() {
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC; //Figure out how this is going to work
+    }
+    private void snowblowingAutomaticCorner2() {
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC; //Figure out how this is going to work
+    }
+    private void snowblowingAutomaticCorner3() {
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC; //Figure out how this is going to work
+    }
+    private void snowblowingAutomaticCorner4() {
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC; //Figure out how this is going to work
+    }
+    private void snowblowingDistance1() {
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedShooterState = Shooter.SHOOTER_STATE.DISTANCE_ONE;
+    }
+    private void snowblowingDistance2() {
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedShooterState = Shooter.SHOOTER_STATE.DISTANCE_TWO;
+    }
+    private void snowblowingDistance3() {
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        wantedShooterState = Shooter.SHOOTER_STATE.DISTANCE_THREE;
+    }
+    private void intakeLifting() {
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_UP;
+    }
+    private void intakeDropping() {
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_DOWN;
+    }
+    private void intaking() {
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
+    }
+    private void outtaking() {
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.CLOSED; //Is this okay?
+        wantedFeederState = Feeder.FEEDER_STATE.REVERSING;
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_OUT;
+    }
+    private void gatekeepingOn() {
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+    }
+    private void gatekeeperingOff() {
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.CLOSED;
+    }
+    private void climbingL1() {
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_DOWN; //Will need to ask build team about this
+        wantedFeederState = Feeder.FEEDER_STATE.IDLING;
+        wantedShooterState = Shooter.SHOOTER_STATE.IDLE;
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.CLOSED;
+        wantedClimbState = Climber.CLIMBER_STATE.L1_UP_CLIMBING;
+    }
+    private void climbingL3() {
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_DOWN; //Will need to ask build team about this
+        wantedFeederState = Feeder.FEEDER_STATE.IDLING;
+        wantedShooterState = Shooter.SHOOTER_STATE.IDLE;
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.CLOSED;
+        wantedClimbState = Climber.CLIMBER_STATE.L3_UP_CLIMBING;
+    }
+    private void climbingDownL1() {
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_DOWN; //Will need to ask build team about this
+        wantedFeederState = Feeder.FEEDER_STATE.IDLING;
+        wantedShooterState = Shooter.SHOOTER_STATE.IDLE;
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.CLOSED;
+        wantedClimbState = Climber.CLIMBER_STATE.L1_DOWN_CLIMBING;
+    }
+    private void feedingSlow() {
+        wantedFeederState = Feeder.FEEDER_STATE.SLOW_FEEDING;
+    }
+    private void feedingFast() {
+        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+    }
     private void agitate() {
         switch(wantedFeederState) {
             case REVERSING, SLOW_FEEDING, FAST_FEEDING, IDLING:
@@ -271,8 +386,11 @@ public class Superstructure extends SubsystemBase {
                 break;
         }
     }
-
-    private void hoodDropping() {}
+    private void droppingHeight() {
+        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.CLOSED;
+        wantedShooterState = Shooter.SHOOTER_STATE.IDLE; //Will this work??
+        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_DOWN;
+    }
 
 
     public void setClimbSide(ClimbSide climbSide) {
@@ -292,8 +410,8 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void teleopInit() {
-        setWantedSuperState(WantedSuperState.DEFAULT);
-        setFeederControlState(FeederControlState.DEFAULTING); //Not sure what to do with these two
-        setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING); //<-
+        setWantedSuperState(WantedSuperState.DEFAULT); //We're doing this twice...
+        setFeederControlState(FeederControlState.DEFAULTING); //Not sure what to do with this
+        setWantedSwerveState(WantedSwerveState.MANUAL_DRIVING); //<-ditto
     }
 }
