@@ -1,12 +1,21 @@
 package com.team1816.lib;
 
+import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 public abstract class BaseRobot extends TimedRobot {
     private final BaseRobotContainer baseRobotContainer;
 
+    /**
+     * A Field2d to display the pose of the robot to the drive team on the Elastic dashboard.
+     */
+    private final Field2d field = new Field2d();
+
     protected BaseRobot() {
         baseRobotContainer = createRobotContainer();
+
+        GreenLogger.periodicLog("Field", () -> field);
 
         // The loop time in seconds for adding the vision measurements to the drivetrain pose
         // estimate. For comparison, the main robot periodic loop time is 0.02 seconds (20
@@ -19,6 +28,12 @@ public abstract class BaseRobot extends TimedRobot {
             baseRobotContainer::addVisionMeasurementsToDrivetrain,
             addVisionMeasurementsLoopTimeSeconds
         );
+    }
+
+    @Override
+    public void robotPeriodic() {
+        // Update the pose of the robot on the field.
+        field.setRobotPose(BaseRobotState.robotPose);
     }
 
     /**

@@ -1,13 +1,12 @@
 package com.team1816.lib.subsystems;
 
+import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.sensor.Camera;
 import com.team1816.season.Robot;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -241,7 +240,18 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
 
     @Override
     public void simulationPeriodic() {
-        visionSim.update(new Pose2d(0.5, 4, Rotation2d.kZero)); //TODO: make this use the raw odometry pose/"actual" sim pose
+        // Update the vision sim with the simulated "actual" robot pose to use as the location that
+        // the simulated cameras will simulate seeing from. This pose will show up under the name
+        // "Robot" on the vision field. Note that this is different from the "Robot" on the other
+        // field, which is the final pose estimate combining odometry and vision data (the
+        // "combinedPoseEstimate" on the vision field).
+        visionSim.update(BaseRobotState.simActualOrRawOdometryPose);
+
+        // Update the combined odometry and vision pose estimate on the vision field. This should
+        // match the robot pose shown on the other field.
+        visionSim.getDebugField().getObject("combinedPoseEstimate").setPose(BaseRobotState.robotPose);
+
+        // Update the vision field with individual camera data.
         for (Camera camera : cameras) {
             camera.updateCameraOnSimField(visionSim);
         }

@@ -1,5 +1,6 @@
 package com.team1816.lib.util;
 
+import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.pathplanner.lib.config.RobotConfig;
 import com.team1816.season.Robot;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -69,6 +70,10 @@ public class GreenLogger {
      * {@link Pose2d}, or various other WPILib classes), please use {@link #periodicLog(String,
      * Supplier, Struct)} to specify the {@link Struct} type.
      * <p>
+     * For {@link NTSendable}s, the supplier should always return a reference to the same object,
+     * since it will only be called once and then logs will be updated based on that {@link
+     * NTSendable}'s internal state.
+     * <p>
      * If you are logging a {@link List}, please use {@link #periodicLogList(String, Supplier,
      * Class)} or {@link #periodicLogList(String, Supplier, Class, Struct)}.
      *
@@ -94,6 +99,10 @@ public class GreenLogger {
      * {@link String}s, {@link StructSerializable} classes (if the {@link Struct} is passed in, see
      * above), and {@link NTSendable}s. Anything else passed in will be logged as a {@link String}.
      * <p>
+     * For {@link NTSendable}s, the supplier should always return a reference to the same object,
+     * since it will only be called once and then logs will be updated based on that {@link
+     * NTSendable}'s internal state.
+     * <p>
      * If you are logging a {@link List}, please use {@link #periodicLogList(String, Supplier,
      * Class)} or {@link #periodicLogList(String, Supplier, Class, Struct)}.
      *
@@ -104,6 +113,36 @@ public class GreenLogger {
      */
     public static <T> void periodicLog(String name, Supplier<T> supplier, Struct<T> struct) {
         T result = supplier.get();
+
+        if (
+            (
+                result instanceof StructSerializable
+                    // Treat SwerveDriveStates as StructSerializable because we created a custom
+                    // Struct implementation for them.
+                    || result instanceof SwerveDrivetrain.SwerveDriveState
+            ) && struct == null
+        ) {
+            // Warn if the Struct type was not supplied for a StructSerializable object. If the
+            // Struct is not supplied, it will just be logged as a string, not allowing for full
+            // structured data viewing and usage in AdvantageScope.
+            GreenLogger.log(
+                "Periodic logging for StructSerializable " + result.getClass().getSimpleName()
+                    + " with name " + name + " did not supply Struct. Please supply the Struct "
+                    + "type for proper logging of StructSerializable objects."
+            );
+        }
+
+        if (result instanceof List) {
+            // Warn if the periodicLogList method was not used for a List. If periodicLogList is
+            // not used to supply the type held by the List, it will just be logged as a string,
+            // not allowing for full list viewing and usage in AdvantageScope.
+            GreenLogger.log(
+                "Periodic logging for a List with name " + name + " did not use the "
+                    + "periodicLogList method to supply the type held by the list. Please use "
+                    + "periodicLogList for proper logging of Lists."
+            );
+        }
+
         Publisher pub;
         if (result instanceof Double) {
             pub = netTable.getDoubleTopic(name).publish();
@@ -113,13 +152,27 @@ public class GreenLogger {
             pub = netTable.getBooleanTopic(name).publish();
         } else if (result instanceof Float) {
             pub = netTable.getFloatTopic(name).publish();
-        } else if (result instanceof StructSerializable && struct != null) {
+        } else if (
+            (
+                result instanceof StructSerializable
+                    // Allow SwerveDriveStates as structs even though they are not technically
+                    // StructSerializable because we created a custom Struct implementation for
+                    // them.
+                    || result instanceof SwerveDrivetrain.SwerveDriveState
+            ) && struct != null
+        ) {
             pub = netTable.getStructTopic(name, struct).publish();
         } else if (result instanceof NTSendable) {
+            // For NTSendables, log using the SmartDashboard. This will automatically hand periodic
+            // updating based on the NTSendable's internal state. Note that this will not work
+            // properly if the result of the supplier changes after the initial call.
+            SmartDashboard.putData(name, (NTSendable) result);
+            // The publisher is null for NTSendables, since we use the SmartDashboard instead.
             pub = null;
         } else {
             pub = netTable.getStringTopic(name).publish();
         }
+
         periodicLogs.put(new LogTopic(pub), supplier);
     }
 
@@ -192,6 +245,24 @@ public class GreenLogger {
     public static <T> void periodicLogList(
         String name, Supplier<List<T>> supplier, Class<T> type, Struct<T> struct
     ) {
+        if (
+            (
+                StructSerializable.class.isAssignableFrom(type)
+                    // Treat SwerveDriveStates as StructSerializable because we created a custom
+                    // Struct implementation for them.
+                    || SwerveDrivetrain.SwerveDriveState.class.isAssignableFrom(type)
+            ) && struct == null
+        ) {
+            // Warn if the Struct type was not supplied for a List of StructSerializable objects.
+            // If the Struct is not supplied, it will just be logged as a list of strings, not
+            // allowing for full structured data viewing and usage in AdvantageScope.
+            GreenLogger.log(
+                "Periodic logging for List of StructSerializable " + type.getSimpleName() + "s"
+                    + " with name " + name + " did not supply Struct. Please supply the Struct "
+                    + "type for proper logging of StructSerializable objects."
+            );
+        }
+
         Publisher pub;
         if (Double.class.isAssignableFrom(type)) {
             pub = netTable.getDoubleArrayTopic(name).publish();
@@ -201,11 +272,20 @@ public class GreenLogger {
             pub = netTable.getBooleanArrayTopic(name).publish();
         } else if (Float.class.isAssignableFrom(type)) {
             pub = netTable.getFloatArrayTopic(name).publish();
-        } else if (StructSerializable.class.isAssignableFrom(type) && struct != null) {
+        } else if (
+            (
+                StructSerializable.class.isAssignableFrom(type)
+                    // Allow SwerveDriveStates as structs even though they are not technically
+                    // StructSerializable because we created a custom Struct implementation for
+                    // them.
+                    || SwerveDrivetrain.SwerveDriveState.class.isAssignableFrom(type)
+            ) && struct != null
+        ) {
             pub = netTable.getStructArrayTopic(name, struct).publish();
         } else {
             pub = netTable.getStringArrayTopic(name).publish();
         }
+
         periodicLogs.put(new LogTopic(pub), supplier);
     }
 
@@ -305,10 +385,12 @@ public class GreenLogger {
             } else if (entry.Publisher instanceof StructArrayPublisher) {
                 var value = ((List) supplier.get()).toArray();
                 ((StructArrayPublisher) entry.Publisher).set(value);
-            } else if (entry.Publisher == null) {
-                var value = (NTSendable) supplier.get();
-                SmartDashboard.putData(value);
-            } else {
+            } else if (
+                // Would be null if this was logging an NTSendable, which handle their own periodic
+                // updating, so we don't need to do anything.
+                entry.Publisher != null
+            ) {
+                // Default to logging as a string
                 var value = String.valueOf(supplier.get());
                 ((StringPublisher) entry.Publisher).set(value);
             }

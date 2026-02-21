@@ -95,6 +95,7 @@ public class Robot extends BaseRobot {
 
     @Override
     public void robotPeriodic() {
+        super.robotPeriodic();
         try {
             Threads.setCurrentThreadPriority(true, 99);
             double start = HALUtil.getFPGATime();

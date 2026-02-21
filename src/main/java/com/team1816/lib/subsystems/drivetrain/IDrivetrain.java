@@ -19,7 +19,7 @@ public interface IDrivetrain extends ITestableSubsystem {
     SubsystemConfig config = factory.getSubsystemConfig(NAME);
     double massKG = config.kinematics.robotMass;
     double whlRad = config.kinematics.wheelRadius;
-    double maxSpd = (config.kinematics.maxDriveRPS / config.kinematics.driveGearing) * 2 * Math.PI * config.kinematics.wheelRadius;;
+    double maxSpd = (config.kinematics.maxDriveRPS / config.kinematics.driveGearing) * 2 * Math.PI * config.kinematics.wheelRadius;
     double cof = config.kinematics.wheelCOF;
     double gearing = config.kinematics.driveGearing;
     double wheelCircumference = 2 * Math.PI * whlRad;
@@ -36,7 +36,22 @@ public interface IDrivetrain extends ITestableSubsystem {
 
     void resetPose(Pose2d pose);
 
-    SwerveDrivetrain.SwerveDriveState getState();
+    /**
+     * Teleport the simulated "actual" position of the robot used as the source of truth for
+     * simulation to the specified pose. This is used to simulate the robot shifting on the field
+     * in a way that wheel odometry does not account for (essentially simulating wheel slippage or
+     * other pose loss), in order to test how vision localization corrects for this disruption.
+     *
+     * @param pose The pose to teleport the sim actual position to.
+     */
+    void simTeleportRobot(Pose2d pose);
+
+    /**
+     * Set up periodic logging for the drivetrain under the specified path.
+     *
+     * @param logPath The path to log values under.
+     */
+    void setUpPeriodicLogging(String logPath);
 
     default void setSwerveState(SwerveRequest request) {}
 

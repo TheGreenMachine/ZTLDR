@@ -12,12 +12,14 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.controllers.PathFollowingController;
+import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.SubsystemConfig;
 import com.team1816.lib.hardware.components.motor.WpiMotorUtil;
 import com.team1816.lib.util.GreenLogger;
+import com.team1816.lib.util.SwerveDriveStateStruct;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -34,6 +36,15 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
     private static final double SIM_LOOP_PERIOD = 0.005; // 5 ms
     private double lastSimTime;
     private boolean fieldCentric;
+    /**
+     * An odometry object representing the "actual" position of the robot in the sim, or the raw
+     * odometry (without vision estimates) on the real robot. These are the same thing because the
+     * sim actual position is intended to be used by vision as the place the cameras simulate
+     * seeing from to create simulated camera frames, meaning that it should be a pre-vision
+     * position used as the source of truth during simulation, while the raw odometry position is
+     * just supposed to be the pre-vision position estimate of the real robot.
+     */
+    private final SwerveDriveOdometry simActualOdometryOrRawOdometry;
 
     /**
      * Swerve request to apply during robot-centric path following
@@ -54,6 +65,24 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
         GreenLogger.log("FieldCentric: " + fieldCentric);
 
         configureAutoBuilder();
+
+        simActualOdometryOrRawOdometry = new SwerveDriveOdometry(
+            getKinematics(), getState().RawHeading, getState().ModulePositions
+        );
+
+        // Register a lambda to be updated whenever CTRE's odometry thread runs and updates the
+        // SwerveDriveState. This updates the robotPose and robotSpeeds in the BaseRobotState
+        // and updates the sim actual odometry/raw odometry to make it is always a vision-less
+        // version of the SwerveDrivetrain's pose estimate.
+        registerTelemetry(state -> {
+            BaseRobotState.robotPose = state.Pose;
+            BaseRobotState.robotSpeeds = state.Speeds;
+
+            simActualOdometryOrRawOdometry.update(state.RawHeading, state.ModulePositions);
+            BaseRobotState.simActualOrRawOdometryPose = simActualOdometryOrRawOdometry
+                .getPoseMeters();
+        });
+
         if (Utils.isSimulation()) {
             startSimThread();
         }
@@ -62,6 +91,39 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
     @Override
     public void setSwerveState(SwerveRequest request) {
         this.setControl(request);
+    }
+
+    @Override
+    public void resetPose(Pose2d pose) {
+        simActualOdometryOrRawOdometry.resetPose(pose);
+        super.resetPose(pose);
+    }
+
+    @Override
+    public void simTeleportRobot(Pose2d pose) {
+        if (Utils.isSimulation()) {
+            simActualOdometryOrRawOdometry.resetPose(pose);
+        }
+        else {
+            GreenLogger.log(
+                "Unfortunately, the robot cannot teleport in real life. We are still working on " +
+                    "that feature."
+            );
+        }
+    }
+
+    @Override
+    public void setUpPeriodicLogging(String logPath) {
+        GreenLogger.periodicLog(
+            logPath + "Swerve Drive State",
+            this::getStateCopy,
+            new SwerveDriveStateStruct(getModules().length)
+        );
+        GreenLogger.periodicLog(
+            logPath + "Sim Actual or Raw Odometry Pose",
+            () -> BaseRobotState.simActualOrRawOdometryPose,
+            Pose2d.struct
+        );
     }
 
     @Override
@@ -89,12 +151,11 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
         var driveMotor = WpiMotorUtil.getMotorConstants(drConf).withReduction(gearing);
         var moduleConfig = new ModuleConfig(whlRad, maxSpd, cof, driveMotor, factory.GetCurrentConfigs(drConf).StatorCurrentLimit, 1);
         // In order of front left, front right, back left, back right
-        var kinematics = new SwerveDriveKinematics(this.getModuleLocations());
-        var modules = kinematics.getModules();
+        var moduleLocations = this.getModuleLocations();
         RobotConfig robotConfig;
         PathFollowingController pathFollowingController;
 
-        robotConfig = new RobotConfig(massKG, MOI, moduleConfig, modules);
+        robotConfig = new RobotConfig(massKG, MOI, moduleConfig, moduleLocations);
         var tranKp = factory.getConstant(NAME, "translationKp", 5);
         var rotKp = factory.getConstant(NAME, "rotationKp", 5);
         GreenLogger.log(
