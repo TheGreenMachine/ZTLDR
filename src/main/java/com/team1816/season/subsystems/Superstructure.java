@@ -2,6 +2,7 @@ package com.team1816.season.subsystems;
 
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
+import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -240,7 +241,24 @@ public class Superstructure extends SubsystemBase {
     public Command setStateCommand(WantedSuperState superState) {
         return new InstantCommand(() -> setWantedSuperState(superState));
     }
-    private void defaulting() {}
+    private void defaulting() {
+        /*
+         * What is this doing???
+         */
+        if (feederControlState == FeederControlState.OVERRIDING) {
+            feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
+        }
+        else {
+            if (wantedIntakeState == Intake.INTAKE_STATE.INTAKE_IN || wantedGatekeeperState == Gatekeeper.GATEKEEPER_STATE.OPEN) {
+                feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
+            }
+            else {
+                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
+            }
+        }
+
+        swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
+    }
     private void shootCalibrating() {
         wantedShooterState = Shooter.SHOOTER_STATE.CALIBRATING;
     }
