@@ -360,9 +360,7 @@ public class RobotFactory {
         if (deviceConfig.motionMagic == null) {
             return mMConfig;
         }
-        mMConfig.MotionMagicAcceleration = deviceConfig.motionMagic.acceleration;
-        mMConfig.MotionMagicCruiseVelocity = deviceConfig.motionMagic.cruiseVelocity;
-        mMConfig.MotionMagicJerk = deviceConfig.motionMagic.jerk;
+
         mMConfig.MotionMagicExpo_kA = deviceConfig.motionMagic.expoKA;
         mMConfig.MotionMagicExpo_kV = deviceConfig.motionMagic.expoKV;
         return mMConfig;
