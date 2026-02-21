@@ -20,6 +20,24 @@
             "items": {
                 "type": "number"
             }
+        },
+        "minimumDefaultAngle": {
+            "type": "number"
+        },
+        "minimumDefaultPower": {
+            "type": "number"
+        },
+        "mediumDefaultAngle": {
+            "type": "number"
+        },
+        "mediumDefaultPower": {
+            "type": "number"
+        },
+        "maximumDefaultAngle": {
+            "type": "number"
+        },
+        "maximumDefaultPower": {
+            "type": "number"
         }
     },
     "anyOf": [
