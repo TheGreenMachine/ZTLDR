@@ -4,6 +4,8 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import edu.wpi.first.math.MathUsageId;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -17,12 +19,12 @@ import java.time.Instant;
 import static com.team1816.lib.Singleton.factory;
 
 public class Intake extends SubsystemBase implements ITestableSubsystem {
-    static final String NAME = "intake";
+    private static final String NAME = "intake";
 
     private static final double GEAR_RATIO = 1;
 
-    private final IMotor intake = (IMotor) factory.getDevice(NAME, "intakeMotor");
-    private final IMotor flipper = (IMotor) factory.getDevice(NAME, "flipperMotor");
+    private final IMotor intakeMotor = (IMotor) factory.getDevice(NAME, "intakeMotor");
+    private final IMotor flipperMotor = (IMotor) factory.getDevice(NAME, "flipperMotor");
 
     private VelocityVoltage velocityControl = new VelocityVoltage(0);
     private PositionVoltage positionControl = new PositionVoltage(0);
@@ -32,7 +34,6 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public double currentPosition = 0;
 
     public double currentFlipperAngle = 67;
-    private Instant descentStart = Instant.now();
 
     //MECHANISMS *Need to ask build team for details
     public Mechanism2d intakeMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
@@ -43,28 +44,39 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public Intake () {
         super();
         SmartDashboard.putData("Intake", intakeMech);
+
+        inSpeed = factory.getConstant(NAME, "inSpeed", -10, true);
+        inAngle = factory.getConstant(NAME, "inAngle", 255, true);
+        outSpeed = factory.getConstant(NAME, "outSpeed", 10, true);
+        outAngle = factory.getConstant(NAME, "outAngle", 255, true);
+        downAngle = factory.getConstant(NAME, "downAngle", 255, true);
+        upAngle = factory.getConstant(NAME, "upAngle", 45, true);
     }
+
+    private static double inSpeed = 0;
+    private static double inAngle = 0;
+    private static double outSpeed = 0;
+    private static double outAngle = 0;
+    private static double downAngle = 0;
+    private static double upAngle = 0;
 
     public enum INTAKE_STATE {
         INTAKE_IN(
-            factory.getConstant(NAME, "inSpeed", 10, true),
-            factory.getConstant(NAME, "inAngle", 10, true)
+            inSpeed,
+            inAngle
         ),
         INTAKE_OUT(
-            factory.getConstant(NAME, "outSpeed", -10, true),
-            factory.getConstant(NAME, "outAngle", 225, true)
+            outSpeed,
+            outAngle
         ),
         INTAKE_DOWN(
             0,
-            factory.getConstant(NAME, "downAngle", 225, true)
+            downAngle
         ),
+        /// Acts as the idle
         INTAKE_UP(
             0,
-            factory.getConstant(NAME, "upAngle", 45, true)
-        ),
-        IDLING( //ASK INTAKE WHAT THE DEFAULT IS
-            0,
-            factory.getConstant(NAME, "idleAngle", 90, true)
+            upAngle
         );
 
         private final double speed, angle;
@@ -87,17 +99,13 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     }
 
     public void setWantedState(INTAKE_STATE state) {
-        if((state == INTAKE_STATE.INTAKE_IN || state == INTAKE_STATE.INTAKE_OUT) && wantedState == INTAKE_STATE.INTAKE_UP) {
-            descentStart = Instant.now();
-        }
-
         this.wantedState = state;
     }
 
     @Override
     public void readFromHardware() {
-        currentPosition = intake.getMotorPosition();
-        currentFlipperAngle = (flipper.getMotorPosition() / GEAR_RATIO) * 360;
+        currentPosition = intakeMotor.getMotorPosition();
+        currentFlipperAngle = (flipperMotor.getMotorPosition() / GEAR_RATIO) * 360;
         currentVoltage = 0;
 
         intakeAngleML.setAngle(wantedState.getAngle());
@@ -107,26 +115,10 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         final double targetAngle = 225;
         final double threshold = 6;
 
-        final long timeOverride = 4;
-        final Instant currentTime = Instant.now();
-
-        return ((currentFlipperAngle > targetAngle - threshold && currentFlipperAngle < targetAngle + threshold)
-            || Duration.between(currentTime, descentStart).toSeconds() <= timeOverride) ;
+        return ((currentFlipperAngle > targetAngle - threshold && currentFlipperAngle < targetAngle + threshold));
     }
 
     private void applyState() {
-        switch (wantedState) {
-            case INTAKE_IN:
-                setTurretSpeed(10);
-                break;
-            case INTAKE_OUT:
-                setTurretSpeed(-10);
-                break;
-            default:
-                setTurretSpeed(0);
-                break;
-
-        }
         double intakeSpeed = canSuckOrBlow() ? wantedState.getSpeed() : 0;
         double flipperAngle = wantedState.getAngle();
 
@@ -141,12 +133,16 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public void setFlipperAngle(double wantedAngle) {
         double rotations = (wantedAngle / 360.0) * GEAR_RATIO;
 
-        flipper.setControl(positionControl.withPosition(rotations));
+        rotations = MathUtil.clamp(rotations, -6000, 7000);
+
+        flipperMotor.setControl(positionControl.withPosition(rotations));
     }
 
     public void setTurretSpeed(double wantedSpeed) {
         SmartDashboard.putNumber("Intake Velocity Voltage", wantedSpeed);
 
-        intake.setControl(velocityControl.withVelocity(wantedSpeed));
+        wantedSpeed = MathUtil.clamp(wantedSpeed, -6000, 7000);
+
+        intakeMotor.setControl(velocityControl.withVelocity(wantedSpeed));
     }
 }
