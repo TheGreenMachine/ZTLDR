@@ -113,6 +113,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         DISTANCE_THREE(factory.getConstant(NAME,"distanceThreeLaunchAngle",0), factory.getConstant(NAME,"distanceThreeRotationAngle",0), factory.getConstant(NAME,"distanceThreeLaunchVelocity",0)),
         AUTOMATIC(-1, -1, -1),
         SNOWBLOWING(-1,-1, -1),
+        HOOD_DOWN(0, 0, 0), //values need to be updated to the lowered position
         IDLE(0, 0, 0);
 
         private double launchAngle;

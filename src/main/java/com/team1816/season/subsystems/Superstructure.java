@@ -1,5 +1,6 @@
 package com.team1816.season.subsystems;
 
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
@@ -29,6 +30,7 @@ public class Superstructure extends SubsystemBase {
         SNOWBLOWER,
         STORAGE_INTAKE,
         STORAGE_SHOOTER,
+        HOOD_DOWN,
         INDEX_AGITATE
     }
 
@@ -42,6 +44,7 @@ public class Superstructure extends SubsystemBase {
         SNOWBLOWING,
         STORAGE_INTAKING,
         STORAGE_SHOOTING,
+        HOOD_DOWN,
         INDEX_AGITATING
     }
 
@@ -77,6 +80,7 @@ public class Superstructure extends SubsystemBase {
         DISTANCE_THREE,
         AUTOMATIC,
         SNOWBLOWING,
+        HOOD_DOWN,
         IDLE
     }
 
@@ -173,6 +177,9 @@ public class Superstructure extends SubsystemBase {
             case STORAGE_SHOOTER:
                 actualSuperState = ActualSuperState.STORAGE_SHOOTING;
                 break;
+            case HOOD_DOWN:
+                actualSuperState = ActualSuperState.HOOD_DOWN;
+                break;
             case INDEX_AGITATE:
                 actualSuperState = ActualSuperState.INDEX_AGITATING;
                 break;
@@ -210,6 +217,9 @@ public class Superstructure extends SubsystemBase {
                 break;
             case STORAGE_SHOOTING:
                 storageShooting();
+                break;
+            case HOOD_DOWN:
+                hoodDown();
                 break;
             case INDEX_AGITATING:
                 agitate();
@@ -344,6 +354,30 @@ public class Superstructure extends SubsystemBase {
         }
     }
 
+    public void toggleGatekeeper(){
+        if (wantedGatekeeperState == WantedGatekeeperState.OPEN){
+            setWantedGatekeeperState(WantedGatekeeperState.CLOSED);
+        } else {
+            setWantedGatekeeperState(WantedGatekeeperState.OPEN);
+        }
+    }
+
+    public void toggleIntake(){
+        if (wantedIntakeState == WantedIntakeState.INTAKING){
+            setWantedIntakeState(WantedIntakeState.OUTTAKING);
+        } else {
+            setWantedIntakeState(WantedIntakeState.INTAKING);
+        }
+    }
+
+    public void toggleHood(){
+        if (wantedShooterState == WantedShooterState.HOOD_DOWN){
+            setWantedShooterState(WantedShooterState.AUTOMATIC);
+        } else {
+            setWantedShooterState(WantedShooterState.HOOD_DOWN);
+        }
+    }
+
     private void storageShooting() {
         switch (wantedShooterState) {
             case AUTOMATIC:
@@ -381,6 +415,14 @@ public class Superstructure extends SubsystemBase {
         }
     }
 
+    private void hoodDown() {
+        switch(wantedShooterState) {
+            case HOOD_DOWN:
+                shooter.setWantedState(Shooter.SHOOTER_STATE.HOOD_DOWN);
+                break;
+        }
+    }
+
     private void agitate() {
         switch(wantedFeederState) {
             case REVERSING, SLOW_FEEDING, FAST_FEEDING, IDLING:
@@ -397,6 +439,7 @@ public class Superstructure extends SubsystemBase {
             case DISTANCE_TWO -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
             case DISTANCE_THREE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
             case AUTOMATIC -> shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
+            case HOOD_DOWN -> shooter.setWantedState(Shooter.SHOOTER_STATE.HOOD_DOWN);
             case IDLE -> shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
         }
 

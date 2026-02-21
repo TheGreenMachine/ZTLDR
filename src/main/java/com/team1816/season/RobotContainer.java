@@ -48,22 +48,21 @@ public class RobotContainer extends BaseRobotContainer {
 //                .andThen(superstructure.setStateCommand(Superstructure.WantedSuperState.CLIMB)
 //        ));
 
-        driverController.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.setWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)));
+        driverController.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.toggleGatekeeper()));
         driverController.rightTrigger().onFalse(Commands.runOnce(() -> superstructure.setWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSED)));
 
-        driverController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedShooterState(Superstructure.WantedShooterState.DISTANCE_ONE)));
-        driverController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedShooterState(Superstructure.WantedShooterState.DISTANCE_TWO)));
-        driverController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedShooterState(Superstructure.WantedShooterState.DISTANCE_THREE)));
-        driverController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC)));
+        driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setWantedShooterState(Superstructure.WantedShooterState.DISTANCE_ONE)));
+        driverController.povRight().onTrue(Commands.runOnce(() -> superstructure.setWantedShooterState(Superstructure.WantedShooterState.DISTANCE_TWO)));
+        driverController.povLeft().onTrue(Commands.runOnce(() -> superstructure.setWantedShooterState(Superstructure.WantedShooterState.DISTANCE_THREE)));
+        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.setWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC)));
 
-        driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.INTAKING)));
-        driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.OUTTAKING)));
-        driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.UP)));
-        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.DOWN)));
+        driverController.b().onTrue(Commands.runOnce(() -> superstructure.toggleIntake()));
+        driverController.a().onTrue(Commands.runOnce(() -> superstructure.toggleHood()));
+        //Agitate button TBD, would be another toggle
 
-        //operatorController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.UP)));
-        operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.setFeederControlState(Superstructure.FeederControlState.OVERRIDING)));
-        operatorController.povDown().onFalse(Commands.runOnce(() -> superstructure.setFeederControlState(Superstructure.FeederControlState.DEFAULTING)));
+//        operatorController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedIntakeState(Superstructure.WantedIntakeState.UP)));
+//        operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.setFeederControlState(Superstructure.FeederControlState.OVERRIDING)));
+//        operatorController.povDown().onFalse(Commands.runOnce(() -> superstructure.setFeederControlState(Superstructure.FeederControlState.DEFAULTING)));
 
         // controller.leftTrigger().and(controller.rightTrigger().negate()).whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_IN))
         //     .or(controller.rightTrigger().and(controller.leftTrigger().negate()).whileTrue(superstructure.setStateCommand(Superstructure.WantedSuperState.INTAKE_OUT)))
