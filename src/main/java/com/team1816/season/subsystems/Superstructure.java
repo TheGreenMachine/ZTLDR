@@ -276,6 +276,12 @@ public class Superstructure extends SubsystemBase {
         wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
         wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
         wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC;  //Figure out how this is going to work
+
+        /*
+        oneMethodToRuleThemAll(Gatekeeper.GATEKEEPER_STATE.OPEN, Feeder.FEEDER_STATE.FAST_FEEDING,
+            Shooter.SHOOTER_STATE.AUTOMATIC, Intake.INTAKE_STATE.INTAKE_IN, Climber.CLIMBER_STATE.IDLING,
+            Swerve.ActualState.MANUAL_DRIVING);
+         */
     }
     private void shootingAutomaticCorner() {
         wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
