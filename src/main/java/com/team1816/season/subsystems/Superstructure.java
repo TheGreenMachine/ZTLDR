@@ -201,8 +201,10 @@ public class Superstructure extends SubsystemBase {
 
     @Override
     public void periodic() {
-
+        GreenLogger.log("Wanted Superstate " + wantedSuperState);
         actualSuperState = handleStateTransitions();
+
+        GreenLogger.log("Actual Superstate " + actualSuperState);
 
         applyStates();
     }

@@ -4,6 +4,7 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -59,7 +60,7 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
                 break;
         }
 
-        SmartDashboard.putString("Feeder state: ", wantedState.toString());
+        GreenLogger.log("Feeder state: " + wantedState.toString());
     }
 
     private void setFeedVelocity(double feedVelocity){

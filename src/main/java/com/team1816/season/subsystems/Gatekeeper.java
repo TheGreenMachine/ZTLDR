@@ -3,6 +3,7 @@ package com.team1816.season.subsystems;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -58,7 +59,7 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
                 break;
         }
 
-        SmartDashboard.putString("Gatekeeper state: ", wantedState.toString());
+        GreenLogger.log("Gatekeeper state: " + wantedState.toString());
     }
 
     public enum GATEKEEPER_STATE {

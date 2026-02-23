@@ -4,6 +4,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -102,9 +103,9 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         setTurretSpeed(intakeSpeed);
         setFlipperAngle(flipperAngle);
 
-        SmartDashboard.putString("Intake state: ", wantedState.toString());
-        SmartDashboard.putNumber("Intake speed: ", intakeSpeed);
-        SmartDashboard.putNumber("Flipper angle: ", flipperAngle);
+        GreenLogger.log("Intake state: " + wantedState.toString());
+        GreenLogger.log("Intake speed: " + intakeSpeed);
+        GreenLogger.log("Intake angle: " + flipperAngle);
     }
 
     public void setFlipperAngle(double wantedAngle) {
@@ -116,8 +117,6 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     }
 
     public void setTurretSpeed(double wantedSpeed) {
-        SmartDashboard.putNumber("Intake Velocity Voltage", wantedSpeed);
-
         wantedSpeed = MathUtil.clamp(wantedSpeed, -6000, 7000);
 
         intakeMotor.setControl(velocityControl.withVelocity(wantedSpeed));

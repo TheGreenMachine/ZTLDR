@@ -98,7 +98,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
                 break;
         }
 
-        SmartDashboard.putString("Climber state: ", wantedState.toString());
+        GreenLogger.log("Climber state: " + wantedState.toString());
     }
 
     private void setFlipMotor(double position){
