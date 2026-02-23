@@ -248,6 +248,15 @@ public class Superstructure extends SubsystemBase {
     public void setWantedSuperState(WantedSuperState superState) {
         this.wantedSuperState = superState;
     }
+    private void setWantedSubsystemStates(Intake.INTAKE_STATE intakeState, Feeder.FEEDER_STATE feederState,
+                                          Gatekeeper.GATEKEEPER_STATE gatekeeperState, Shooter.SHOOTER_STATE shooterState,
+                                          Climber.CLIMBER_STATE climbState)  {
+        this.wantedIntakeState = intakeState;
+        this.wantedFeederState = feederState;
+        this.wantedGatekeeperState = gatekeeperState;
+        this.wantedShooterState = shooterState;
+        this.wantedClimbState = climbState;
+    }
 
     public Command setStateCommand(WantedSuperState superState) {
         return new InstantCommand(() -> setWantedSuperState(superState));
@@ -271,127 +280,124 @@ public class Superstructure extends SubsystemBase {
         swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
     }
     private void shootCalibrating() {
-        wantedShooterState = Shooter.SHOOTER_STATE.CALIBRATING;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_UP, Feeder.FEEDER_STATE.IDLING,
+                                 Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.CALIBRATING,
+                                 Climber.CLIMBER_STATE.IDLING);
     }
     private void shootingAutomaticHub() {
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC;  //Figure out how this is going to work
-
-        /*
-        oneMethodToRuleThemAll(Gatekeeper.GATEKEEPER_STATE.OPEN, Feeder.FEEDER_STATE.FAST_FEEDING,
-            Shooter.SHOOTER_STATE.AUTOMATIC, Intake.INTAKE_STATE.INTAKE_IN, Climber.CLIMBER_STATE.IDLING,
-            Swerve.ActualState.MANUAL_DRIVING);
-         */
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_UP, Feeder.FEEDER_STATE.FAST_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.OPEN, Shooter.SHOOTER_STATE.AUTOMATIC,
+            Climber.CLIMBER_STATE.IDLING); //Figure out how auto shooter is going to work
     }
     private void shootingAutomaticCorner() {
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC;  //Figure out how this is going to work
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_UP, Feeder.FEEDER_STATE.FAST_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.OPEN, Shooter.SHOOTER_STATE.AUTOMATIC,
+            Climber.CLIMBER_STATE.IDLING); //Figure out how auto shooter is going to work
     }
     private void shootingDistance1() {
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedShooterState = Shooter.SHOOTER_STATE.DISTANCE_ONE;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_UP, Feeder.FEEDER_STATE.FAST_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.OPEN, Shooter.SHOOTER_STATE.DISTANCE_ONE,
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void shootingDistance2() {
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedShooterState = Shooter.SHOOTER_STATE.DISTANCE_TWO;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_UP, Feeder.FEEDER_STATE.FAST_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.OPEN, Shooter.SHOOTER_STATE.DISTANCE_TWO,
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void shootingDistance3() {
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedShooterState = Shooter.SHOOTER_STATE.DISTANCE_THREE;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_UP, Feeder.FEEDER_STATE.FAST_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.OPEN, Shooter.SHOOTER_STATE.DISTANCE_THREE,
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void snowblowingAutomaticHub() {
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC; //Figure out how this is going to work
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN, Feeder.FEEDER_STATE.FAST_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.OPEN, Shooter.SHOOTER_STATE.AUTOMATIC,
+            Climber.CLIMBER_STATE.IDLING); //Figure out how auto shooter is going to work
     }
     private void snowblowingAutomaticCorner() {
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedShooterState = Shooter.SHOOTER_STATE.AUTOMATIC; //Figure out how this is going to work
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN, Feeder.FEEDER_STATE.FAST_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.OPEN, Shooter.SHOOTER_STATE.AUTOMATIC,
+            Climber.CLIMBER_STATE.IDLING); //Figure out how auto shooter is going to work
     }
     private void snowblowingDistance1() {
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedShooterState = Shooter.SHOOTER_STATE.DISTANCE_ONE;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN, Feeder.FEEDER_STATE.FAST_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.OPEN, Shooter.SHOOTER_STATE.DISTANCE_ONE,
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void snowblowingDistance2() {
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedShooterState = Shooter.SHOOTER_STATE.DISTANCE_TWO;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN, Feeder.FEEDER_STATE.FAST_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.OPEN, Shooter.SHOOTER_STATE.DISTANCE_TWO,
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void snowblowingDistance3() {
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
-        wantedShooterState = Shooter.SHOOTER_STATE.DISTANCE_THREE;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN, Feeder.FEEDER_STATE.FAST_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.OPEN, Shooter.SHOOTER_STATE.DISTANCE_THREE,
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void intakeLifting() {
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_UP;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_UP, Feeder.FEEDER_STATE.SLOW_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE, //Would we want the shooter aiming constantly??
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void intakeDropping() {
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_DOWN;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_DOWN, Feeder.FEEDER_STATE.SLOW_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void intaking() {
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_IN;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN, Feeder.FEEDER_STATE.SLOW_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void outtaking() {
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.CLOSED; //Is this okay?
-        wantedFeederState = Feeder.FEEDER_STATE.REVERSING;
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_OUT;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_OUT, Feeder.FEEDER_STATE.SLOW_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void gatekeepingOn() {
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.OPEN;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_UP, Feeder.FEEDER_STATE.SLOW_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.OPEN, Shooter.SHOOTER_STATE.IDLE,
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void gatekeeperingOff() {
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.CLOSED;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_UP, Feeder.FEEDER_STATE.SLOW_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void climbingL1() {
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_DOWN; //Will need to ask build team about this
-        wantedFeederState = Feeder.FEEDER_STATE.IDLING;
-        wantedShooterState = Shooter.SHOOTER_STATE.IDLE;
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.CLOSED;
-        wantedClimbState = Climber.CLIMBER_STATE.L1_UP_CLIMBING;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_DOWN, Feeder.FEEDER_STATE.SLOW_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
+            Climber.CLIMBER_STATE.L1_UP_CLIMBING);
     }
     private void climbingL3() {
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_DOWN; //Will need to ask build team about this
-        wantedFeederState = Feeder.FEEDER_STATE.IDLING;
-        wantedShooterState = Shooter.SHOOTER_STATE.IDLE;
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.CLOSED;
-        wantedClimbState = Climber.CLIMBER_STATE.L3_UP_CLIMBING;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_DOWN, Feeder.FEEDER_STATE.SLOW_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
+            Climber.CLIMBER_STATE.L3_UP_CLIMBING);
     }
     private void climbingDownL1() {
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_DOWN; //Will need to ask build team about this
-        wantedFeederState = Feeder.FEEDER_STATE.IDLING;
-        wantedShooterState = Shooter.SHOOTER_STATE.IDLE;
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.CLOSED;
-        wantedClimbState = Climber.CLIMBER_STATE.L1_DOWN_CLIMBING;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_DOWN, Feeder.FEEDER_STATE.SLOW_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
+            Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
     }
     private void feedingSlow() {
-        wantedFeederState = Feeder.FEEDER_STATE.SLOW_FEEDING;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_UP, Feeder.FEEDER_STATE.SLOW_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void feedingFast() {
-        wantedFeederState = Feeder.FEEDER_STATE.FAST_FEEDING;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_UP, Feeder.FEEDER_STATE.FAST_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void agitate() {
-        switch(wantedFeederState) {
-            case REVERSING, SLOW_FEEDING, FAST_FEEDING, IDLING:
-                feeder.setWantedState(Feeder.FEEDER_STATE.REVERSING);
-                break;
-        }
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_UP, Feeder.FEEDER_STATE.SLOW_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
+            Climber.CLIMBER_STATE.IDLING);
     }
     private void droppingHeight() {
-        wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.CLOSED;
-        wantedShooterState = Shooter.SHOOTER_STATE.IDLE; //Will this work??
-        wantedIntakeState = Intake.INTAKE_STATE.INTAKE_DOWN;
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_DOWN, Feeder.FEEDER_STATE.SLOW_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
+            Climber.CLIMBER_STATE.IDLING);
     }
 
 
