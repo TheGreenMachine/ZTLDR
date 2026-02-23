@@ -22,12 +22,6 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
 
     private final VelocityVoltage velocityReq = new VelocityVoltage(0);
 
-    //YAML VALUES
-    private double fastFeedingVelocity = Singleton.factory.getConstant(NAME, "fastFeeding", 0);
-    private double slowFeedingVelocity = Singleton.factory.getConstant(NAME, "slowFeeding", 0);
-    private double reversingVelocity = Singleton.factory.getConstant(NAME, "reversing", 0);
-    private double idlingVelocity = Singleton.factory.getConstant(NAME, "idling", 0);
-
     //PHYSICAL SUBSYSTEM DEPENDENT CONSTANTS
     private static final double MIN_FEED_MOTOR_CLAMP = -80;
     private static final double MAX_FEED_MOTOR_CLAMP = 80;
@@ -42,23 +36,14 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
     public void readFromHardware() {
     }
 
+    public void adjustCurrentFeedMotorSetPoint(double adjustValue){
+        wantedState.adjustFeedMotorValue(adjustValue);
+
+        GreenLogger.log(NAME+"/feedMotor/"+wantedState.name()+"_adjusted_value/"+wantedState.getFeedMotorValue());
+    }
+
     private void applyState() {
-        switch (wantedState) {
-            case SLOW_FEEDING:
-                setFeedVelocity(slowFeedingVelocity);
-                break;
-            case FAST_FEEDING:
-                setFeedVelocity(fastFeedingVelocity);
-                break;
-            case REVERSING:
-                setFeedVelocity(reversingVelocity);
-                break;
-            case IDLING:
-                setFeedVelocity(idlingVelocity);
-                break;
-            default:
-                break;
-        }
+        setFeedVelocity(wantedState.getFeedMotorValue());
 
         GreenLogger.log("Feeder state: " + wantedState.toString());
     }
@@ -69,14 +54,28 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
         feedMotor.setControl(velocityReq.withVelocity(clampedVelocity));
     }
 
-    public enum FEEDER_STATE {
-        SLOW_FEEDING,
-        FAST_FEEDING,
-        REVERSING,
-        IDLING
-    }
-
     public void setWantedState(FEEDER_STATE state) {
         wantedState = state;
+    }
+
+    public enum FEEDER_STATE {
+        SLOW_FEEDING(factory.getConstant(NAME, "fastFeeding", 0)),
+        FAST_FEEDING(factory.getConstant(NAME, "slowFeeding", 0)),
+        REVERSING(factory.getConstant(NAME, "reversing", 0)),
+        IDLING(factory.getConstant(NAME, "idling", 0));
+
+        private double feedMotorValue;
+
+        FEEDER_STATE (double feedMotorValue){
+            this.feedMotorValue = feedMotorValue;
+        }
+
+        private void adjustFeedMotorValue(double adjustValue) {
+            this.feedMotorValue += adjustValue;
+        }
+
+        public double getFeedMotorValue() {
+            return feedMotorValue;
+        }
     }
 }
