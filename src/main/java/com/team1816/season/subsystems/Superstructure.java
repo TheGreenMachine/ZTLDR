@@ -4,6 +4,7 @@ import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -31,6 +32,7 @@ public class Superstructure extends SubsystemBase {
         STORAGE_INTAKE,
         STORAGE_SHOOTER,
         INDEX_AGITATE,
+        INITIALIZING,
 
         SHOOTER_CALIBRATE,
         SHOOTER_AUTOMATIC_HUB,
@@ -78,6 +80,7 @@ public class Superstructure extends SubsystemBase {
         STORAGE_INTAKING,
         STORAGE_SHOOTING,
         INDEX_AGITATING,
+        INITIALIZING,
 
         SHOOTER_CALIBRATING,
         SHOOTING_AUTOMATIC_HUB,
@@ -136,7 +139,6 @@ public class Superstructure extends SubsystemBase {
 
     public enum WantedShooterState {
         CALIBRATING,
-        CALIBRATED,
         DISTANCE_ONE,
         DISTANCE_TWO,
         DISTANCE_THREE,
@@ -175,10 +177,9 @@ public class Superstructure extends SubsystemBase {
         DEFAULTING
     }
 
-    private WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
+    private WantedSuperState wantedSuperState = WantedSuperState.INITIALIZING;
     private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
-    // TODO: Add calibration state, maybe as the default here
     private WantedShooterState wantedShooterState = WantedShooterState.IDLE;
     private WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSED;
     private WantedClimbState wantedClimbState = WantedClimbState.IDLING;
@@ -243,6 +244,9 @@ public class Superstructure extends SubsystemBase {
             case INDEX_AGITATE:
                 actualSuperState = ActualSuperState.INDEX_AGITATING;
                 break;
+            case INITIALIZING:
+                actualSuperState = ActualSuperState.INITIALIZING;
+                break;
             case IDLE:
             default:
                 actualSuperState = ActualSuperState.IDLING;
@@ -281,6 +285,8 @@ public class Superstructure extends SubsystemBase {
             case INDEX_AGITATING:
                 agitate();
                 break;
+            case INITIALIZING:
+                initializing();
             case IDLING:
             default:
                 defaulting();
@@ -456,10 +462,16 @@ public class Superstructure extends SubsystemBase {
         }
     }
 
+    private void initializing() {
+        setWantedShooterState(WantedShooterState.CALIBRATING);
+        if (shooter.isCalibrated()) {
+            setWantedSuperState(WantedSuperState.DEFAULT);
+        }
+    }
+
     private void defaulting() {
         switch (wantedShooterState) {
-            case CALIBRATING -> {if (shooter.isCalibrated()) {shooter.setWantedState(Shooter.SHOOTER_STATE.CALIBRATED);} else {shooter.setWantedState(Shooter.SHOOTER_STATE.CALIBRATING);}}
-            case CALIBRATED -> {GreenLogger.log("Shooter is calibrated"); shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);}
+            case CALIBRATING -> shooter.setWantedState(Shooter.SHOOTER_STATE.CALIBRATING);
             case DISTANCE_ONE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
             case DISTANCE_TWO -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
             case DISTANCE_THREE -> shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);

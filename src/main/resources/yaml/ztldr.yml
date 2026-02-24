@@ -204,6 +204,7 @@ subsystems:
             distanceThreeLaunchAngle: 86
             distanceThreeRotationAngle: 0
             distanceThreeLaunchVelocity: 30
+            distanceBetweenBeamBreaks: 0 # TODO: Set this
     gatekeeper:
         devices:
             topMotor:
