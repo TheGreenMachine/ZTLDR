@@ -61,7 +61,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final double MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE;
     private final double MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE;
     private final Translation3d SHOOTER_OFFSET;
-    private final double CALIBRATION_THRESHOLD;
     private final Rotation2d CALIBRATION_POSITION_ARC_ANGLE;
     private final Rotation2d ROTATION_OFFSET_FROM_CALIBRATION_ZERO;
     private final double HALF_FIELD_WIDTH = FlippingUtil.fieldSizeY/2;
@@ -143,7 +142,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE = factory.getConstant(NAME, "motorRotationsPerLaunchAngleDegree", 0); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
         MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE = factory.getConstant(NAME, "motorRotationsPerRotationAngleDegree", 0); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
         SHOOTER_OFFSET = new Translation3d(factory.getConstant(NAME, "initialShooterOffsetX",0), factory.getConstant(NAME, "initialShooterOffsetY",0), factory.getConstant(NAME, "initialShooterOffsetZ",0)); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-        CALIBRATION_THRESHOLD = factory.getConstant(NAME, "calibrationThreshold",10); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
         CALIBRATION_POSITION_ARC_ANGLE = Rotation2d.fromRotations(factory.getConstant(NAME, "calibrationPositionArcAngle", 0.75)); //should always be less than 1 rotation //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
         ROTATION_OFFSET_FROM_CALIBRATION_ZERO = Rotation2d.fromDegrees(factory.getConstant(NAME, "rotationOffsetFromCalibrationZero", 70)); //as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
         DISTANCE_BETWEEN_BEAM_BREAKS = factory.getConstant(NAME,"distanceBetweenBeamBreaks",0);
