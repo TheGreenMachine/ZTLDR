@@ -100,6 +100,8 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         this.wantedState = state;
     }
 
+    public boolean isIntaking() { return (wantedState == INTAKE_STATE.INTAKE_IN); }
+
     public enum INTAKE_STATE {
         INTAKE_IN(factory.getConstant(NAME, "inSpeed", -10, true), factory.getConstant(NAME, "inAngle", 255, true)),
         INTAKE_OUT(factory.getConstant(NAME, "outSpeed", 10, true), factory.getConstant(NAME, "outAngle", 255, true)),
