@@ -8,6 +8,9 @@ import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 public class RobotContainer extends BaseRobotContainer {
+
+    private ControllerMode currentControllerMode;
+
     public RobotContainer() {
         NamedCommands.registerCommand("InTheZone", new InTheZoneCommand());
         // call the base to initialize library objects
@@ -37,32 +40,49 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.teleopInit();
     }
 
+    public enum ControllerMode {
+        CLIMBING,
+        SNOWBLOWING,
+        MANUAL
+    }
+
     private void configureBindings() {
-// SNOWBLOWING MODE CONTROLS:
-
-        driverController.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.toggleGatekeeper()));
-
-        driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
-        driverController.povRight().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
-        driverController.povLeft().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
-        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB)));
-
-        driverController.b().onTrue(Commands.runOnce(() -> superstructure.toggleIntake()));
-        driverController.y().onTrue(Commands.runOnce(() -> superstructure.toggleIntakeDeployment()));
-        //Hood down/up TBD, may be an automated movement
-        //Agitate button TBD on use
-        driverController.x().onTrue(Commands.runOnce(() -> superstructure.toggleAgitate()));
 
 
-        //add manual shooter speed adjustments
+        switch (currentControllerMode) {
+            case SNOWBLOWING -> {
+                driverController.start().onTrue(Commands.runOnce(() -> setCurrentControllerMode(ControllerMode.CLIMBING)));
 
-// CLIMBING MODE CONTROLS:
+                driverController.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.toggleGatekeeper()));
 
-//        driverController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMBER_CLIMB_L3)));
-//        driverController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMBER_CLIMB_L1)));
-//        driverController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMBER_CLIMB_DOWN_L1)));
+                driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
+                driverController.povRight().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
+                driverController.povLeft().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
+                driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB)));
 
-        //add manual climber up/down adjustments and the extend/retract adjustments
+                driverController.b().onTrue(Commands.runOnce(() -> superstructure.toggleIntake()));
+                driverController.y().onTrue(Commands.runOnce(() -> superstructure.toggleIntakeDeployment()));
+                //Hood down/up TBD, may be an automated movement
+                driverController.x().onTrue(Commands.runOnce(() -> superstructure.toggleAgitate()));
+                //add manual shooter speed adjustments
+            }
+            case CLIMBING -> {
+                driverController.back().onTrue(Commands.runOnce(() -> setCurrentControllerMode(ControllerMode.SNOWBLOWING)));
+
+                driverController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMB_L3)));
+                driverController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMB_L1)));
+                driverController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMB_DOWN_L1)));
+
+                //add manual climber up/down adjustments and the extend/retract adjustments
+            }
+            //manual mode
+        }
+
+    }
+
+    private void setCurrentControllerMode(ControllerMode wantedControllerMode){
+        currentControllerMode = wantedControllerMode;
+        configureBindings();
     }
 
     public final void registerCommands() {
