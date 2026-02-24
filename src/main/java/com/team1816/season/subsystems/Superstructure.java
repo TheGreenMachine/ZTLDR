@@ -412,6 +412,39 @@ public class Superstructure extends SubsystemBase {
             Climber.CLIMBER_STATE.IDLING);
     }
 
+    public void toggleGatekeeper(){
+        if (wantedSuperState == WantedSuperState.GATEKEEPER_ON){
+            setWantedSuperState(WantedSuperState.GATEKEEPER_OFF);
+        } else {
+            setWantedSuperState(WantedSuperState.GATEKEEPER_ON);
+        }
+    }
+
+    public void toggleIntake(){
+        if (wantedSuperState == WantedSuperState.INTAKE){
+            setWantedSuperState(WantedSuperState.OUTTAKE);
+        } else {
+            setWantedSuperState(WantedSuperState.INTAKE);
+        }
+    }
+
+    public void toggleIntakeDeployment(){
+        if (wantedSuperState == WantedSuperState.INTAKE_LIFT){
+            setWantedSuperState(WantedSuperState.INTAKE_DROP);
+        } else {
+            setWantedSuperState(WantedSuperState.INTAKE_LIFT);
+        }
+    }
+
+    public void toggleAgitate(){
+        if (wantedSuperState == WantedSuperState.FEEDER_AGITATE){
+            setWantedSuperState(WantedSuperState.FEEDER_SLOW);
+        } else {
+            setWantedSuperState(WantedSuperState.FEEDER_AGITATE);
+        }
+    }
+
+
 
     public void setClimbSide(ClimbSide climbSide) {
         this.climbSide = climbSide;

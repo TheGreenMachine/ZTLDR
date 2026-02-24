@@ -48,8 +48,11 @@ public class RobotContainer extends BaseRobotContainer {
         driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB)));
 
         driverController.b().onTrue(Commands.runOnce(() -> superstructure.toggleIntake()));
-        //Toggle hood down/up TBD, may be an automated movement
-        //Agitate button TBD, would be another toggle
+        driverController.y().onTrue(Commands.runOnce(() -> superstructure.toggleIntakeDeployment()));
+        //Hood down/up TBD, may be an automated movement
+        //Agitate button TBD on use
+        driverController.x().onTrue(Commands.runOnce(() -> superstructure.toggleAgitate()));
+
 
         //add manual shooter speed adjustments
 
