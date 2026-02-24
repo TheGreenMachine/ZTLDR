@@ -24,7 +24,7 @@ public class Superstructure extends SubsystemBase {
     public enum WantedSuperState {
         DEFAULT,
 
-        SHOOTER_CALIBRATE,
+        INITIALIZING,
 
         SHOOTER_AUTOMATIC_HUB,
 
@@ -54,7 +54,7 @@ public class Superstructure extends SubsystemBase {
     public enum ActualSuperState {
         DEFAULTING,
 
-        SHOOTING_CALIBRATING,
+        INITIALIZING,
 
         SHOOTING_AUTOMATIC_HUB,
 
@@ -107,8 +107,8 @@ public class Superstructure extends SubsystemBase {
         DEFAULTING
     }
 
-    private WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
-    private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
+    private WantedSuperState wantedSuperState = WantedSuperState.INITIALIZING;
+    private ActualSuperState actualSuperState = ActualSuperState.INITIALIZING;
 
     // TODO: Add calibration state, maybe as the default here
 
@@ -142,7 +142,7 @@ public class Superstructure extends SubsystemBase {
         switch (wantedSuperState) {
             case DEFAULT -> actualSuperState = ActualSuperState.DEFAULTING;
 
-            case SHOOTER_CALIBRATE -> actualSuperState = ActualSuperState.SHOOTING_CALIBRATING;
+            case INITIALIZING -> actualSuperState = ActualSuperState.INITIALIZING;
 
             case SHOOTER_AUTOMATIC_HUB -> actualSuperState = ActualSuperState.SHOOTING_AUTOMATIC_HUB;
 
@@ -175,7 +175,7 @@ public class Superstructure extends SubsystemBase {
         switch (actualSuperState) {
             case DEFAULTING -> defaulting();
 
-            case SHOOTING_CALIBRATING -> shootCalibrating();
+            case INITIALIZING -> initializing();
 
             case SHOOTING_AUTOMATIC_HUB -> shootingAutomaticHub();
 
@@ -228,8 +228,11 @@ public class Superstructure extends SubsystemBase {
         swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
     }
 
-    private void shootCalibrating() {
+    private void initializing() {
         shooter.setWantedState(Shooter.SHOOTER_STATE.CALIBRATING);
+        if (shooter.isCalibrated()) {
+            setWantedSuperState(WantedSuperState.DEFAULT);
+        }
     }
 
     private void shootingAutomaticHub() {
@@ -334,7 +337,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void autonomousInit() {
-            //What is supposed to be here???
+        //What is supposed to be here???
     }
 
     public void teleopInit() {
