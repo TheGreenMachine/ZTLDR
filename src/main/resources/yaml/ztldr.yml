@@ -112,10 +112,10 @@ subsystems:
                     expoKV: 0.05
                     expoKA: 0.04
         constants:
-            fastFeeding: 50
-            slowFeeding: 20
-            reversing: -50
-            idling: 0
+            feedFastFeeding: 50
+            feedSlowFeeding: 20
+            feedReversing: -50
+            feedIdling: 0
     shooter:
         devices:
             topLaunchMotor:
