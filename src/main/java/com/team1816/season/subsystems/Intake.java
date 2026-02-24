@@ -82,6 +82,10 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.log("Intake state: " + wantedState.toString());
         GreenLogger.log("Intake speed: " + intakeSpeed);
         GreenLogger.log("Intake angle: " + flipperAngle);
+
+        SmartDashboard.putString("Intake state: ", wantedState.toString());
+        SmartDashboard.putNumber("Intake speed: ", intakeSpeed);
+        SmartDashboard.putNumber("Intake angle: ", flipperAngle);
     }
 
     private void setIntakeSpeed(double velocity) {
@@ -99,6 +103,10 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public void setWantedState(INTAKE_STATE state) {
         this.wantedState = state;
     }
+
+    public boolean isIntaking() { return (wantedState == INTAKE_STATE.INTAKE_IN); }
+
+    public boolean isOutaking() { return (wantedState == INTAKE_STATE.INTAKE_OUT); }
 
     public enum INTAKE_STATE {
         INTAKE_IN(factory.getConstant(NAME, "inSpeed", -10, true), factory.getConstant(NAME, "inAngle", 255, true)),

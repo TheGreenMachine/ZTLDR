@@ -46,6 +46,8 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
         setFeedVelocity(wantedState.getFeedMotorValue());
 
         GreenLogger.log("Feeder state: " + wantedState.toString());
+
+        SmartDashboard.putString("Feeder state: ", wantedState.toString());
     }
 
     private void setFeedVelocity(double feedVelocity){
