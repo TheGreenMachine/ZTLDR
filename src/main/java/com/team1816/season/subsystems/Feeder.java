@@ -60,16 +60,16 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
 
     public enum FEEDER_STATE {
         SLOW_FEEDING(
-            factory.getConstant(NAME, "feedFastFeeding", 0)
+            factory.getConstant(NAME, "feedSlowFeedingVelocity", 0)
         ),
         FAST_FEEDING(
-            factory.getConstant(NAME, "feedSlowFeeding", 0)
+            factory.getConstant(NAME, "feedFastFeedingVelocity", 0)
         ),
         REVERSING(
-            factory.getConstant(NAME, "feedReversing", 0)
+            factory.getConstant(NAME, "feedReversingVelocity", 0)
         ),
         IDLING(
-            factory.getConstant(NAME, "feedIdling", 0)
+            factory.getConstant(NAME, "feedIdlingVelocity", 0)
         );
 
         private double feedMotorValue;

@@ -75,12 +75,12 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
 
     public enum GATEKEEPER_STATE {
         OPEN(
-            factory.getConstant(NAME, "topClosedVelocity", 0),
-            factory.getConstant(NAME, "bottomClosedVelocity", 0)
-        ),
-        CLOSED(
             factory.getConstant(NAME, "topOpenVelocity", 0),
             factory.getConstant(NAME, "bottomOpenVelocity", 0)
+        ),
+        CLOSED(
+            factory.getConstant(NAME, "topClosedVelocity", 0),
+            factory.getConstant(NAME, "bottomClosedVelocity", 0)
         );
 
         private double topMotorValue, bottomMotorValue;

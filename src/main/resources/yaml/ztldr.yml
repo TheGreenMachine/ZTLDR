@@ -61,15 +61,14 @@ subsystems:
                     kI: 0
                     kD: 0.240234
         constants: # TODO: all of these
-            intakeChannel: 7
-            outSpeed: 10
-            outAngle: 255
+            intakeIdlingStowedVelocity: 0
+            flipperIdlingStowedPosition: 0
 
-            inSpeed: -10
-            inAngle: 255
+            intakeIdlingDeployedVelocity: 0
+            flipperIdlingDeployedPosition: 10
 
-            downAngle: 225
-            upAngle: 45
+            intakeIntakeVelocity: 10
+            flipperIntakePosition: 10
     climber:
         devices:
             flipMotor:
@@ -89,17 +88,17 @@ subsystems:
                     expoKV: 0.05
                     expoKA: 0.04
         constants:
-            flipIdling: 0
-            flipL3UpClimbing: 0
-            flipL3DownClimbing: 0
-            flipL1UpClimbing: 0
-            flipL1DownClimbing: 0
+            flipIdlingPosition: 0
+            flipL3UpClimbingPosition: 0
+            flipL3DownClimbingPosition: 0
+            flipL1UpClimbingPosition: 0
+            flipL1DownClimbingPosition: 0
 
-            linearSlideIdling: 0
-            linearSlideL3UpClimbing: 0
-            linearSlideL3DownClimbing: 0
-            linearSlideL1UpClimbing: 0
-            linearSlideL1DownClimbing: 0
+            linearSlideIdlingPosition: 0
+            linearSlideL3UpClimbingPosition: 0
+            linearSlideL3DownClimbingPosition: 0
+            linearSlideL1UpClimbingPosition: 0
+            linearSlideL1DownClimbingPosition: 0
 
     feeder:
         devices:
@@ -112,10 +111,10 @@ subsystems:
                     expoKV: 0.05
                     expoKA: 0.04
         constants:
-            feedFastFeeding: 50
-            feedSlowFeeding: 20
-            feedReversing: -50
-            feedIdling: 0
+            feedFastFeedingVelocity: 50
+            feedSlowFeedingVelocity: 20
+            feedReversingVelocity: -50
+            feedIdlingVelocity: 0
     shooter:
         devices:
             topLaunchMotor:

@@ -157,7 +157,6 @@ public class Superstructure extends SubsystemBase {
 
     public enum WantedIntakeState {
         INTAKING,
-        OUTTAKING,
         DOWN,
         UP,
         IDLING
@@ -304,7 +303,7 @@ public class Superstructure extends SubsystemBase {
         switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L1_CLIMING:
                 climber.setWantedState(Climber.CLIMBER_STATE.L1_UP_CLIMBING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING_STOWED);
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 actualSuperState = ActualSuperState.L1_CLIMBING;
@@ -319,7 +318,7 @@ public class Superstructure extends SubsystemBase {
         switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L3_CLIMBING:
                 climber.setWantedState(Climber.CLIMBER_STATE.L3_UP_CLIMBING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING_STOWED);
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 actualSuperState = ActualSuperState.L3_CLIMBING;
@@ -332,35 +331,28 @@ public class Superstructure extends SubsystemBase {
     public void storageIntaking() {
         switch (wantedIntakeState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case INTAKING:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
-                climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-                actualSuperState = ActualSuperState.STORAGE_INTAKING;
-                break;
-            case OUTTAKING:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
+                intake.setWantedState(Intake.INTAKE_STATE.INTAKE);
                 climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 actualSuperState = ActualSuperState.STORAGE_INTAKING;
                 break;
             case UP:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING_STOWED);
                 climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 actualSuperState = ActualSuperState.STORAGE_INTAKING;
                 break;
             case DOWN:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING_DEPLOYED);
                 climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 actualSuperState = ActualSuperState.STORAGE_INTAKING;
                 break;
             case IDLING:
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING_STOWED);
                 climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
@@ -374,7 +366,7 @@ public class Superstructure extends SubsystemBase {
     public void snowBlowing() {
         //WILL NEED TO ADD MULTIPLE SUBSYSTEMS
         shooter.setWantedState(Shooter.SHOOTER_STATE.SNOWBLOWING);
-        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
+        intake.setWantedState(Intake.INTAKE_STATE.INTAKE);
         feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
         gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.OPEN);
         swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
@@ -385,7 +377,7 @@ public class Superstructure extends SubsystemBase {
         switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L1_CLIMBING_DOWN:
                 climber.setWantedState(Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN); //WILL NEED TO CONFIDE WITH BUILD FOR ALL WANT STATES FOR THE ACTIONS
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING_DEPLOYED); //WILL NEED TO CONFIDE WITH BUILD FOR ALL WANT STATES FOR THE ACTIONS
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 actualSuperState = ActualSuperState.L1_DOWNCLIMBING;
@@ -400,7 +392,7 @@ public class Superstructure extends SubsystemBase {
         switch (climbState) { //WILL PROBABLY WORK DIFFERENTLY, JUST A BASIS FOR NOW
             case L3_ClIMBING_DOWN:
                 climber.setWantedState(Climber.CLIMBER_STATE.L3_DOWN_CLIMBING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING_DEPLOYED);
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 actualSuperState = ActualSuperState.L3_DOWNCLIMBING;
@@ -416,31 +408,31 @@ public class Superstructure extends SubsystemBase {
             case AUTOMATIC:
                 shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
                 climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING_STOWED);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 break;
             case DISTANCE_ONE:
                 shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
                 climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING_STOWED);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 break;
             case DISTANCE_TWO:
                 shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
                 climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING_STOWED);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 break;
             case DISTANCE_THREE:
                 shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
                 climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING_STOWED);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 break;
             case IDLE:
                 shooter.setWantedState(Shooter.SHOOTER_STATE.IDLE);
                 climber.setWantedState(Climber.CLIMBER_STATE.IDLING);
-                intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+                intake.setWantedState(Intake.INTAKE_STATE.IDLING_STOWED);
                 feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
                 break;
             default:
@@ -478,10 +470,9 @@ public class Superstructure extends SubsystemBase {
         }
 
         switch (wantedIntakeState) {
-            case INTAKING -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
-            case OUTTAKING -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
-            case DOWN -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
-            case UP -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+            case INTAKING -> intake.setWantedState(Intake.INTAKE_STATE.INTAKE);
+            case DOWN -> intake.setWantedState(Intake.INTAKE_STATE.IDLING_DEPLOYED);
+            case UP -> intake.setWantedState(Intake.INTAKE_STATE.IDLING_STOWED);
 
         }
 
@@ -538,7 +529,7 @@ public class Superstructure extends SubsystemBase {
     public void setWantedIntakeState(WantedIntakeState wantedIntakeState) {
         if(wantedIntakeState == this.wantedIntakeState) {
             wantedIntakeState = switch (wantedIntakeState) {
-                case INTAKING, OUTTAKING, DOWN -> WantedIntakeState.DOWN;
+                case INTAKING, DOWN -> WantedIntakeState.DOWN;
                 case UP, IDLING -> WantedIntakeState.UP;
             };
         }
