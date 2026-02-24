@@ -6,8 +6,6 @@ import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -197,7 +195,7 @@ public class Superstructure extends SubsystemBase {
             case OUTTAKING -> outtaking();
 
             case GATEKEEPING_ON -> gatekeepingOn();
-            case GATEKEEPING_OFF -> gatekeeperingOff();
+            case GATEKEEPING_OFF -> gatekeepingOff();
 
             case CLIMBING_L1 -> climbingL1();
             case CLIMBING_L3 -> climbingL3();
@@ -297,7 +295,7 @@ public class Superstructure extends SubsystemBase {
         actualSuperState = ActualSuperState.DEFAULTING;
     }
 
-    private void gatekeeperingOff() {
+    private void gatekeepingOff() {
         gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
 
         if (intake.isIntaking()) {
@@ -328,7 +326,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void droppingHeight() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_DOWN, Feeder.FEEDER_STATE.SLOW_FEEDING,
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_UP, Feeder.FEEDER_STATE.SLOW_FEEDING,
             Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
             Climber.CLIMBER_STATE.IDLING);
     }
