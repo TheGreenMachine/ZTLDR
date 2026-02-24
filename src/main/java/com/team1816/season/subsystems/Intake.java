@@ -102,20 +102,20 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     public enum INTAKE_STATE {
         INTAKE_IN(
-            factory.getConstant(NAME, "inSpeed", -10, true),
-            factory.getConstant(NAME, "inAngle", 255, true)
+            factory.getConstant(NAME, "inSpeed", 0, true),
+            factory.getConstant(NAME, "inAngle", 0, true)
         ),
         INTAKE_OUT(
-            factory.getConstant(NAME, "outSpeed", 10, true),
-            factory.getConstant(NAME, "outAngle", 255, true)),
+            factory.getConstant(NAME, "outSpeed", 0, true),
+            factory.getConstant(NAME, "outAngle", 0, true)),
         INTAKE_DOWN(
             0,
-            factory.getConstant(NAME, "downAngle", 255, true)
+            factory.getConstant(NAME, "downAngle", 0, true)
         ),
         // Acts as the idle
         INTAKE_UP(
             0,
-            factory.getConstant(NAME, "upAngle", 45, true)
+            factory.getConstant(NAME, "upAngle", 0, true)
         );
 
         private double intakeMotorValue, flipperMotorValue;
