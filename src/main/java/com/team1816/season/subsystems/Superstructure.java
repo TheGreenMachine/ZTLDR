@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
+//Some wantedStates are still here since they're tied to aspects of the code I don't 100% understand(ClimbSide & FeederControl) -Ishwaq
 public class Superstructure extends SubsystemBase {
     private final Swerve swerve;
     private final Shooter shooter;
@@ -128,14 +129,9 @@ public class Superstructure extends SubsystemBase {
     private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
     // TODO: Add calibration state, maybe as the default here
-    private Shooter.SHOOTER_STATE wantedShooterState = Shooter.SHOOTER_STATE.IDLE;
-    private Gatekeeper.GATEKEEPER_STATE wantedGatekeeperState = Gatekeeper.GATEKEEPER_STATE.CLOSED;
-    private Climber.CLIMBER_STATE wantedClimbState = Climber.CLIMBER_STATE.IDLING;
+
     private WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING; //Do we need this??
-    private Intake.INTAKE_STATE wantedIntakeState = Intake.INTAKE_STATE.INTAKE_UP;
-    private Feeder.FEEDER_STATE wantedFeederState = Feeder.FEEDER_STATE.IDLING;
     private FeederControlState feederControlState = FeederControlState.DEFAULTING; //What to do with this?
-    private Climber.CLIMBER_STATE climbState = Climber.CLIMBER_STATE.IDLING;
 
     private ClimbSide climbSide = ClimbSide.LEFT;
 
@@ -251,11 +247,11 @@ public class Superstructure extends SubsystemBase {
     private void setWantedSubsystemStates(Intake.INTAKE_STATE intakeState, Feeder.FEEDER_STATE feederState,
                                           Gatekeeper.GATEKEEPER_STATE gatekeeperState, Shooter.SHOOTER_STATE shooterState,
                                           Climber.CLIMBER_STATE climbState)  {
-        this.wantedIntakeState = intakeState;
-        this.wantedFeederState = feederState;
-        this.wantedGatekeeperState = gatekeeperState;
-        this.wantedShooterState = shooterState;
-        this.wantedClimbState = climbState;
+        intake.setWantedState(intakeState);
+        feeder.setWantedState(feederState);
+        gatekeeper.setWantedState(gatekeeperState);
+        shooter.setWantedState(shooterState);
+        climber.setWantedState(climbState);
     }
 
     public Command setStateCommand(WantedSuperState superState) {
@@ -267,14 +263,6 @@ public class Superstructure extends SubsystemBase {
          */
         if (feederControlState == FeederControlState.OVERRIDING) {
             feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
-        }
-        else {
-            if (wantedIntakeState == Intake.INTAKE_STATE.INTAKE_IN || wantedGatekeeperState == Gatekeeper.GATEKEEPER_STATE.OPEN) {
-                feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
-            }
-            else {
-                feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-            }
         }
 
         swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
