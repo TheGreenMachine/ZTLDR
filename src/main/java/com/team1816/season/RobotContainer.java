@@ -63,51 +63,43 @@ public class RobotContainer extends BaseRobotContainer {
     }
 
     public final void registerCommands() {
-        /*
-         * Individual Subsystem Action (not needed, just here)
-         */
-        NamedCommands.registerCommand("automatedShoot", Commands.runOnce(() -> {
-             getSuperstructure().setWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC);
+        NamedCommands.registerCommand("automatedHubShooting", Commands.runOnce(() -> {
+             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB);
+        }));
+        NamedCommands.registerCommand("automatedCorner1Shooting", Commands.runOnce(() -> {
+            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_CORNER); //Figure out which corners are which
         }));
 
-        NamedCommands.registerCommand("intake", Commands.runOnce(() -> {
-             getSuperstructure().setWantedIntakeState(Superstructure.WantedIntakeState.INTAKING);
+        NamedCommands.registerCommand("automatedHubSnowblowing", Commands.runOnce(() -> {
+            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER_AUTOMATIC_HUB);
+        }));
+        NamedCommands.registerCommand("automatedCorner1Snowblowing", Commands.runOnce(() -> {
+            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER); //Figure out which corners are which
         }));
 
-        NamedCommands.registerCommand("passiveFeeding", Commands.runOnce(() -> {
-             getSuperstructure().setWantedFeederState(Superstructure.WantedFeederState.SLOW_FEEDING);
+        NamedCommands.registerCommand("intaking", Commands.runOnce(() -> {
+             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.INTAKE);
         }));
 
-        NamedCommands.registerCommand("activeFeeding", Commands.runOnce(() -> {
-             getSuperstructure().setWantedFeederState(Superstructure.WantedFeederState.FAST_FEEDING);
+        NamedCommands.registerCommand("slowFeeding", Commands.runOnce(() -> {
+             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.FEEDER_SLOW);
+        }));
+        NamedCommands.registerCommand("fastFeeding", Commands.runOnce(() -> {
+            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.FEEDER_FAST);
         }));
 
         NamedCommands.registerCommand("openGatekeeper", Commands.runOnce(() -> {
-             getSuperstructure().setWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
+            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_ON);
         }));
 
         NamedCommands.registerCommand("closeGatekeeper", Commands.runOnce(() -> {
-             getSuperstructure().setWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSED);
-        }));
-
-
-        /*
-         * Combined subsystem Actions (will be used)
-         */
-        NamedCommands.registerCommand("snowblowing", Commands.runOnce(() -> { //Intake and shoot balls at the same time
-             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER);
-        }));
-        NamedCommands.registerCommand("storageShooting", Commands.runOnce(() -> { //Shoots the balls solely in the Feeder
-             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.STORAGE_SHOOTER);
-        }));
-        NamedCommands.registerCommand("storageIntake", Commands.runOnce(() -> { //Intake balls into the Feeder without shooting them
-             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.STORAGE_INTAKE);
+            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_OFF);
         }));
         NamedCommands.registerCommand("l1Climbing", Commands.runOnce(() -> {
-             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.L1_CLIMB);
+            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.CLIMB_L1);
         }));
-        NamedCommands.registerCommand("idling", Commands.runOnce(() -> {
-             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.IDLE);
+        NamedCommands.registerCommand("defaulting", Commands.runOnce(() -> {
+            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
         }));
     }
 }

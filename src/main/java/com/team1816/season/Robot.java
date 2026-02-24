@@ -119,6 +119,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopExit() {
-        robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.IDLE);
+        robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
     }
 }

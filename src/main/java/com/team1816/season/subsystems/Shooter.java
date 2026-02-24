@@ -110,7 +110,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         DISTANCE_THREE(factory.getConstant(NAME,"distanceThreeLaunchAngle",0), factory.getConstant(NAME,"distanceThreeRotationAngle",0), factory.getConstant(NAME,"distanceThreeLaunchVelocity",0)),
         AUTOMATIC(-1, -1, -1),
         SNOWBLOWING(-1,-1, -1),
-        HOOD_DOWN(0, 0, 0), //values need to be updated to the lowered position
         IDLE(0, 0, 0);
 
         private double launchAngle;
@@ -142,7 +141,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE = factory.getConstant(NAME, "motorRotationsPerRotationAngleDegree", 0); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
         SHOOTER_OFFSET = new Translation3d(factory.getConstant(NAME, "initialShooterOffsetX",0), factory.getConstant(NAME, "initialShooterOffsetY",0), factory.getConstant(NAME, "initialShooterOffsetZ",0)); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
         CALIBRATION_THRESHOLD = factory.getConstant(NAME, "calibrationThreshold",10); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-        CALIBRATION_POSITION_ARC_ANGLE = Rotation2d.fromRotations(factory.getConstant(NAME, "calibrationThreshold", 0.75)); //should always be less than 1 rotation //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+        CALIBRATION_POSITION_ARC_ANGLE = Rotation2d.fromRotations(factory.getConstant(NAME, "calibrationPositionArcAngle", 0.75)); //should always be less than 1 rotation //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
         ROTATION_OFFSET_FROM_CALIBRATION_ZERO = Rotation2d.fromDegrees(factory.getConstant(NAME, "rotationOffsetFromCalibrationZero", 70)); //as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
 
         launcherTranslation = new Translation3d(0,0,0).plus(SHOOTER_OFFSET);
@@ -188,9 +187,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double rotationAngle = wantedState.getRotationAngle();
         double launchPower = wantedState.getLaunchPower();
 
-        if (wantedState == SHOOTER_STATE.AUTOMATIC || wantedState == SHOOTER_STATE.SNOWBLOWING) {
+        if (wantedState == SHOOTER_STATE.AUTOMATIC) {
 
-            if (wantedState == SHOOTER_STATE.AUTOMATIC) {
+            if (wantedState == SHOOTER_STATE.AUTOMATIC) { //Does this work???
                 if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
                     setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_HUB);
                 }
@@ -228,10 +227,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         setRotationAngle(rotationAngle);
         setPower(launchPower);
 
-        SmartDashboard.putString("Shooter state: ", wantedState.toString());
-        SmartDashboard.putNumber("Launch Angle: ", launchAngle);
-        SmartDashboard.putNumber("Launch Power: ", launchPower);
-        SmartDashboard.putNumber("Rotation Angle: ", rotationAngle);
+        GreenLogger.log("Shooter state: " + wantedState.toString());
+        GreenLogger.log("Launch Angle: " + launchAngle);
+        GreenLogger.log("Launch Power: " + launchPower);
+        GreenLogger.log("Rotation Angle: " + rotationAngle);
     }
 
     public void setWantedState(SHOOTER_STATE state) {

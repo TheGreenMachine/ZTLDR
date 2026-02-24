@@ -3,6 +3,7 @@ package com.team1816.season.subsystems;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,12 +22,6 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
 
     private final VelocityVoltage voltageReq = new VelocityVoltage(0);
 
-    //YAML VALUES
-    private double topClosedVelocity = factory.getConstant(NAME, "topClosedVelocity", 0);
-    private double topOpenVelocity = factory.getConstant(NAME, "topOpenVelocity", 0);
-    private double bottomClosedVelocity = factory.getConstant(NAME, "bottomClosedVelocity", 0);
-    private double bottomOpenVelocity = factory.getConstant(NAME, "bottomOpenVelocity", 0);
-
     //PHYSICAL SUBSYSTEM DEPENDENT CONSTANTS
     private static final double MIN_TOP_MOTOR_CLAMP = 0;
     private static final double MAX_TOP_MOTOR_CLAMP = 80;
@@ -43,27 +38,23 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
     public void readFromHardware() {
     }
 
-    private void applyState() {
-        switch (wantedState) {
-            case OPEN:
-                // TODO: Add correct velocity
-                setTopVelocity(topOpenVelocity);
-                setBottomVelocity(bottomOpenVelocity);
-                break;
-            case CLOSED:
-                setTopVelocity(topClosedVelocity);
-                setBottomVelocity(bottomClosedVelocity);
-                break;
-            default:
-                break;
-        }
+    public void adjustCurrentTopMotorSetPoint(double adjustValue){
+        wantedState.adjustTopMotorValue(adjustValue);
 
-        SmartDashboard.putString("Gatekeeper state: ", wantedState.toString());
+        GreenLogger.log(NAME+"/topMotor/"+wantedState.name()+"_adjusted_value/"+wantedState.getTopMotorValue());
     }
 
-    public enum GATEKEEPER_STATE {
-        OPEN,
-        CLOSED
+    public void adjustCurrentBottomMotorSetPoint(double adjustValue){
+        wantedState.adjustBottomMotorValue(adjustValue);
+
+        GreenLogger.log(NAME+"/bottomMotor/"+wantedState.name()+"_adjusted_value/"+wantedState.getBottomMotorValue());
+    }
+
+    private void applyState() {
+        setTopVelocity(wantedState.getTopMotorValue());
+        setBottomVelocity(wantedState.getBottomMotorValue());
+
+        GreenLogger.log("Gatekeeper state: " + wantedState.toString());
     }
 
     private void setTopVelocity(double velocity) {
@@ -80,5 +71,33 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
 
     public void setWantedState(GATEKEEPER_STATE state) {
         wantedState = state;
+    }
+
+    public enum GATEKEEPER_STATE {
+        OPEN(factory.getConstant(NAME, "topClosedVelocity", 0), factory.getConstant(NAME, "bottomClosedVelocity", 0)),
+        CLOSED(factory.getConstant(NAME, "topOpenVelocity", 0), factory.getConstant(NAME, "bottomOpenVelocity", 0));
+
+        private double topMotorValue, bottomMotorValue;
+
+        GATEKEEPER_STATE(double topMotorValue, double bottomMotorValue){
+            this.topMotorValue = topMotorValue;
+            this.bottomMotorValue = bottomMotorValue;
+        }
+
+        private void adjustTopMotorValue(double adjustValue) {
+            this.topMotorValue = adjustValue;
+        }
+
+        private void adjustBottomMotorValue(double adjustValue) {
+            this.bottomMotorValue += adjustValue;
+        }
+
+        public double getTopMotorValue() {
+            return topMotorValue;
+        }
+
+        public double getBottomMotorValue() {
+            return bottomMotorValue;
+        }
     }
 }
