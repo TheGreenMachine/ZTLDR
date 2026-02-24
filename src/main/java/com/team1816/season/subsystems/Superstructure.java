@@ -204,7 +204,13 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void setWantedSuperState(WantedSuperState superState) {
-        this.wantedSuperState = superState;
+        if ((superState == WantedSuperState.INTAKE) && intake.isIntaking()) {
+            this.wantedSuperState = WantedSuperState.INTAKE_IDLE;
+        } else if ((superState == WantedSuperState.OUTTAKE) && intake.isOutaking()) {
+            this.wantedSuperState = WantedSuperState.INTAKE_IDLE;
+        } else {
+            this.wantedSuperState = superState;
+        }
     }
 
     private void setWantedSubsystemStates(Intake.INTAKE_STATE intakeState, Feeder.FEEDER_STATE feederState,

@@ -230,6 +230,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.log("Launch Angle: " + launchAngle);
         GreenLogger.log("Launch Power: " + launchPower);
         GreenLogger.log("Rotation Angle: " + rotationAngle);
+
+        SmartDashboard.putString("Shooter state: ", wantedState.toString());
+        SmartDashboard.putNumber("Launch Angle: ", launchAngle);
+        SmartDashboard.putNumber("Launch Power: ", launchPower);
+        SmartDashboard.putNumber("Rotation Angle: ", rotationAngle);
     }
 
     public void setWantedState(SHOOTER_STATE state) {

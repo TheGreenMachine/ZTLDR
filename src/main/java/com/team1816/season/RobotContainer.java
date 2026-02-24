@@ -14,8 +14,6 @@ public class RobotContainer extends BaseRobotContainer {
         // i.e. subsystems that always exist like the drivetrain and path planner
         initializeLibSubSystems();
 
-        Singleton.CreateSubSystem(Feeder.class);
-
         superstructure = new Superstructure(swerve);
 
         initializeAutonomous();
@@ -44,18 +42,16 @@ public class RobotContainer extends BaseRobotContainer {
 
         //Would want the auto-targeting to be a toggle between hub & cornerX(Decided automatically by default)
 
-        driverController.leftTrigger().and(driverController.rightTrigger().negate()).whileTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE)))
-            .or(driverController.rightTrigger().and(driverController.leftTrigger().negate()).whileTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.OUTTAKE))))
-            .or(driverController.leftTrigger().and(driverController.rightTrigger()).whileTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_IDLE))))
-            .or(driverController.leftTrigger().negate().and(driverController.rightTrigger().negate()).whileTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_IDLE))));
+        driverController.leftBumper().and(driverController.rightBumper().negate()).whileTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE)))
+            .or(driverController.rightBumper().and(driverController.leftBumper().negate()).whileTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.OUTTAKE))));
+
+        operatorController.povUp().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_LIFT)));
+        operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_DROP)));
 
         operatorController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
         operatorController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
         operatorController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
         operatorController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB)));
-
-        operatorController.povUp().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_LIFT)));
-        operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_DROP)));
     }
 
     public final void registerCommands() {
