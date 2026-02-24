@@ -94,11 +94,26 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     }
 
     public enum CLIMBER_STATE {
-        IDLING(factory.getConstant(NAME, "flipIdling", 0), factory.getConstant(NAME, "linearSlideIdling", 0)),
-        L3_UP_CLIMBING(factory.getConstant(NAME, "flipL3UpClimbing", 0), factory.getConstant(NAME, "linearSlideL3UpClimbing", 0)),
-        L3_DOWN_CLIMBING(factory.getConstant(NAME, "flipL3DownClimbing", 0), factory.getConstant(NAME, "linearSlideL3DownClimbing", 0)),
-        L1_UP_CLIMBING(factory.getConstant(NAME, "flipL1UpClimbing", 0), factory.getConstant(NAME, "linearSlideL1UpClimbing", 0)),
-        L1_DOWN_CLIMBING(factory.getConstant(NAME, "flipL1DownClimbing", 0), factory.getConstant(NAME, "linearSlideL1DownClimbing", 0));
+        IDLING(
+            factory.getConstant(NAME, "flipIdling", 0),
+            factory.getConstant(NAME, "linearSlideIdling", 0)
+        ),
+        L3_UP_CLIMBING(
+            factory.getConstant(NAME, "flipL3UpClimbing", 0),
+            factory.getConstant(NAME, "linearSlideL3UpClimbing", 0)
+        ),
+        L3_DOWN_CLIMBING(
+            factory.getConstant(NAME, "flipL3DownClimbing", 0),
+            factory.getConstant(NAME, "linearSlideL3DownClimbing", 0)
+        ),
+        L1_UP_CLIMBING(
+            factory.getConstant(NAME, "flipL1UpClimbing", 0),
+            factory.getConstant(NAME, "linearSlideL1UpClimbing", 0)
+        ),
+        L1_DOWN_CLIMBING(
+            factory.getConstant(NAME, "flipL1DownClimbing", 0),
+            factory.getConstant(NAME, "linearSlideL1DownClimbing", 0)
+        );
 
         private double flipMotorValue, linearSlideMotorValue;
 
