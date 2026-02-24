@@ -3,12 +3,15 @@ package com.team1816.lib.subsystems;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.sensor.Camera;
 import com.team1816.season.Robot;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonPoseEstimator;
@@ -78,12 +81,57 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      */
     public List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> getVisionEstimatedPosesWithStdDevs() {
         List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> posesWithStdDevs = new ArrayList<>();
+
         for (Camera camera : aprilTagCameras) {
             for (EstimatedRobotPose estimatedRobotPose : camera.getEstimatedRobotPosesFromAllUnreadResults()) {
-                Matrix<N3, N1> standardDeviations = calculateEstimationStandardDeviations(estimatedRobotPose);
-                posesWithStdDevs.add(Pair.of(estimatedRobotPose, standardDeviations));
+                Pose2d visionEstimatedPose2d = estimatedRobotPose.estimatedPose.toPose2d();
+
+                // Only add the vision measurement to the list to return if it is within the
+                // distance and angle thresholds from the current pose estimate. This is to filter
+                // out unreasonable estimates caused by pose ambiguity (see here:
+                // https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/3D-tracking.html#ambiguity
+                // ).
+
+                // The maximum distance a vision pose estimate can be from the current robot pose
+                // estimate to allow the vision estimate to be used.
+                final double visionEstimateDistanceThresholdMeters = 1.0;
+                // The maximum difference the angle of a vision pose estimate can be from the angle
+                // of the current robot pose estimate to allow the vision estimate to be used.
+                final double visionEstimateAngleThresholdRadians = Units.degreesToRadians(15.0);
+
+                if (
+                    // If we don't currently have an accurate pose estimate, we can't use current
+                    // pose estimate to throw out far off vision estimates, so we'll just add the
+                    // vision estimate to the list no matter where it is.
+                    !BaseRobotState.hasAccuratePoseEstimate
+                        || (
+                            // Check if the vision estimate is within the distance threshold of the
+                            // current pose estimate.
+                            visionEstimatedPose2d.getTranslation().getDistance(
+                                BaseRobotState.robotPose.getTranslation()
+                            ) < visionEstimateDistanceThresholdMeters
+                                // Check if the vision estimate is within the angle threshold of
+                                // the current pose estimate. Get the absolute value of the
+                                // difference between the angles constrained from -pi radians to pi
+                                // radians to find the positive shortest difference.
+                                && Math.abs(
+                                    MathUtil.angleModulus(
+                                        visionEstimatedPose2d.getRotation()
+                                            .minus(BaseRobotState.robotPose.getRotation())
+                                            .getRadians()
+                                    )
+                                ) < visionEstimateAngleThresholdRadians
+                        )
+                ) {
+                    Matrix<N3, N1> standardDeviations = calculateEstimationStandardDeviations(estimatedRobotPose);
+                    posesWithStdDevs.add(Pair.of(estimatedRobotPose, standardDeviations));
+                    // Tell the camera what the standard deviations for its latest estimate were,
+                    // for logging purposes.
+                    camera.latestVisionStdDevs = standardDeviations;
+                }
             }
         }
+
         return posesWithStdDevs;
     }
 
@@ -98,14 +146,6 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      * deviations also depends on the state standard deviations of the estimation class, as more
      * trust in the current state of the estimate means that relatively it will trust the vision
      * estimates less.
-     * <p>
-     * CTRE recommends typically only adding vision measurements to your estimator if they are
-     * within one meter or so of the current pose estimate to eliminate unreasonable results caused
-     * by <a href="https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/3D-tracking.html#ambiguity">
-     * pose ambiguity</a>. Measurements with rotations significantly off from the current estimate
-     * should probably also be thrown out. This method intentionally does <i>not</i> handle
-     * rejecting estimates in these cases to allow for cases where the current estimate may not be
-     * reasonable enough to compare to, so this should be handled in season specific code.
      * <p>
      * Due to the "close enough," heuristic nature of this algorithm, the standard deviations
      * returned likely do not reflect statistically correct standard deviations of the estimate.

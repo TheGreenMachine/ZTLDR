@@ -16,6 +16,22 @@ public class BaseRobotState {
     public static ChassisSpeeds robotSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
     /**
+     * The tilt of the robot relative to the field, in radians. Measured as the angle between a
+     * vector pointing up in the field reference frame and a vector pointing up in the robot
+     * reference frame.
+     */
+    public static double robotTiltRadians = 0.0;
+
+    /**
+     * If the {@link #robotPose} is believed to be an accurate estimate of the robot's pose on the
+     * field. This might be set to false if, for instance, the robot goes over a bump, causing it
+     * to lose wheel odometry position, and hasn't yet had enough good vision frames to reestablish
+     * its pose. Other cases might be if we leave the ground while climbing, or if we had to use a
+     * default auto without the correct starting pose.
+     */
+    public static boolean hasAccuratePoseEstimate = true;
+
+    /**
      * If you are trying to get the pose of the robot on the field, you probably want to use the
      * robotPose. Only use this if you know what you are doing.
      * <p>

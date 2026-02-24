@@ -2,9 +2,14 @@ package com.team1816.lib.hardware.components.sensor;
 
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.util.GreenLogger;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -61,6 +66,10 @@ public class Camera {
      * vision estimates and odometry data.
      */
     private Pose3d latestPoseEstimate = Pose3d.kZero;
+    /**
+     * The latest vision standard deviations from this camera, for logging purposes.
+     */
+    public Matrix<N3, N1> latestVisionStdDevs = VecBuilder.fill(0.0, 0.0, 0.0);
 
     /**
      * Constructs a {@link Camera} with the specified configuration values.
@@ -230,9 +239,20 @@ public class Camera {
      * @param logPath The path to log values under.
      */
     public void setUpPeriodicLogging(String logPath) {
-        GreenLogger.periodicLogList(logPath + "Seen AprilTag Poses", () -> seenAprilTagPoses, Pose3d.class, Pose3d.struct);
-        GreenLogger.periodicLogList(logPath + "Seen AprilTag IDs", () -> seenAprilTagIDs, Integer.class);
-        GreenLogger.periodicLog(logPath + "Latest Pose Estimate", () -> latestPoseEstimate, Pose3d.struct);
+        GreenLogger.periodicLogList(
+            logPath + "Seen AprilTag Poses", () -> seenAprilTagPoses, Pose3d.class, Pose3d.struct
+        );
+        GreenLogger.periodicLogList(
+            logPath + "Seen AprilTag IDs", () -> seenAprilTagIDs, Integer.class
+        );
+        GreenLogger.periodicLog(
+            logPath + "Latest Pose Estimate", () -> latestPoseEstimate, Pose3d.struct
+        );
+        GreenLogger.periodicLog(
+            logPath + "Latest Vision Standard Deviations",
+            () -> latestVisionStdDevs,
+            Matrix.getStruct(Nat.N3(), Nat.N1())
+        );
     }
 
     /**

@@ -6,17 +6,9 @@ import com.team1816.lib.subsystems.Intake;
 import com.team1816.lib.subsystems.Turret;
 import com.team1816.lib.subsystems.Vision;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import org.photonvision.EstimatedRobotPose;
-
-import java.util.List;
 
 public class Superstructure extends BaseSuperstructure {
     private final Turret turret;
@@ -57,6 +49,7 @@ public class Superstructure extends BaseSuperstructure {
 
     @Override
     public void periodic() {
+        super.periodic();
 //        boolean l = controller.leftBumper().getAsBoolean();
 //        boolean r = controller.rightBumper().getAsBoolean();
 //
@@ -153,22 +146,5 @@ public class Superstructure extends BaseSuperstructure {
         Command commandToReturn = new InstantCommand(() -> setWantedSuperState(superState));
 
         return commandToReturn;
-    }
-
-    // TODO: Override this to handle going over the bump case.
-    @Override
-    public void addVisionMeasurementsToDrivetrain() {
-        List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> visionMeasurements = vision
-            .getVisionEstimatedPosesWithStdDevs();
-
-        for (Pair<EstimatedRobotPose, Matrix<N3, N1>> visionMeasurement : visionMeasurements) {
-            Pose2d visionEstimatedPose = visionMeasurement.getFirst().estimatedPose.toPose2d();
-
-            swerve.addVisionMeasurement(
-                visionEstimatedPose,
-                visionMeasurement.getFirst().timestampSeconds,
-                visionMeasurement.getSecond()
-            );
-        }
     }
 }

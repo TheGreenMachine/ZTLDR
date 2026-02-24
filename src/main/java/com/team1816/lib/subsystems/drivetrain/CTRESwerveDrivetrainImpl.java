@@ -18,8 +18,10 @@ import com.team1816.lib.hardware.components.motor.WpiMotorUtil;
 import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.SwerveDriveStateStruct;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -27,7 +29,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 
-
+import static com.team1816.lib.BaseConstants.DrivetrainConstants;
 import static com.team1816.lib.Singleton.factory;
 import static com.team1816.lib.util.FormatUtils.GetDisplay;
 
@@ -48,6 +50,11 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
     private final SwerveDriveOdometry simActualOdometryOrRawOdometry;
 
     /**
+     * The latest state standard deviations sent to the pose estimator, for logging purposes.
+     */
+    private Matrix<N3, N1> latestStateStdDevs = DrivetrainConstants.defaultStateStdDevs;
+
+    /**
      * Swerve request to apply during robot-centric path following
      */
     private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds().withDriveRequestType(SwerveModule.DriveRequestType.Velocity);
@@ -62,11 +69,11 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
             // Pass in 0 as the odometryUpdateFrequency to let CTRE just use their defaults.
             0,
             // The initial odometryStandardDeviations to use until a call to setStateStdDevs. I
-            // don't know why CTRE calls them to different things, but I'm pretty sure the state
+            // don't know why CTRE calls them two different things, but I'm pretty sure the state
             // and odometry standard deviations are the same. They represent the pose estimator's
             // trust in the current state of the odometry estimate, with higher values representing
             // less trust.
-            VecBuilder.fill(0.1, 0.1, 0.1),
+            DrivetrainConstants.defaultStateStdDevs,
             // The initial visionStandardDeviations used here will be overwritten any time
             // addVisionMeasurement is called with visionMeasurementStdDevs, so these initial
             // values don't actually matter unless we decide not to pass them in with
@@ -86,12 +93,13 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
         );
 
         // Register a lambda to be updated whenever CTRE's odometry thread runs and updates the
-        // SwerveDriveState. This updates the robotPose and robotSpeeds in the BaseRobotState
-        // and updates the sim actual odometry/raw odometry to make it is always a vision-less
-        // version of the SwerveDrivetrain's pose estimate.
+        // SwerveDriveState. This updates the BaseRobotState and updates the sim actual odometry/
+        // raw odometry to make it is always a vision-less version of the SwerveDrivetrain's pose
+        // estimate.
         registerTelemetry(state -> {
             BaseRobotState.robotPose = state.Pose;
             BaseRobotState.robotSpeeds = state.Speeds;
+            BaseRobotState.robotTiltRadians = getTiltRadians();
 
             simActualOdometryOrRawOdometry.update(state.RawHeading, state.ModulePositions);
             BaseRobotState.simActualOrRawOdometryPose = simActualOdometryOrRawOdometry
@@ -112,6 +120,12 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
     public void resetPose(Pose2d pose) {
         simActualOdometryOrRawOdometry.resetPose(pose);
         super.resetPose(pose);
+    }
+
+    @Override
+    public void setStateStdDevs(Matrix<N3, N1> stateStdDevs) {
+        latestStateStdDevs = stateStdDevs;
+        super.setStateStdDevs(stateStdDevs);
     }
 
     @Override
@@ -138,6 +152,19 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
             logPath + "Sim Actual or Raw Odometry Pose",
             () -> BaseRobotState.simActualOrRawOdometryPose,
             Pose2d.struct
+        );
+        GreenLogger.periodicLog(
+            logPath + "Robot Tilt (radians)",
+            () -> BaseRobotState.robotTiltRadians
+        );
+        GreenLogger.periodicLog(
+            logPath + "Latest State Standard Deviations",
+            () -> latestStateStdDevs,
+            Matrix.getStruct(Nat.N3(), Nat.N1())
+        );
+        GreenLogger.periodicLog(
+            logPath + "Has Accurate Pose Estimate",
+            () -> BaseRobotState.hasAccuratePoseEstimate
         );
     }
 
@@ -244,5 +271,46 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
             Utils.fpgaToCurrentTime(timestampSeconds),
             visionMeasurementStdDevs
         );
+    }
+
+    /**
+     * Gets the tilt of the robot relative to the field, in radians.
+     *
+     * @return The tilt of the robot relative to the field, in radians.
+     */
+    private double getTiltRadians() {
+        // This method is ultimately trying to find the angle between a vector pointing up in the
+        // field reference frame and a vector pointing up in the robot reference frame, as this
+        // will tell us how tilted the robot is relative to the field. The vector pointing up in
+        // the robot reference frame means the same thing as a vector pointing along the robot's
+        // z-axis.
+
+        // We start by getting the Rotation3d of the robot from CTRE.
+        Rotation3d rotation = getRotation3d();
+
+        // The toMatrix method on the Rotation3d gets a rotation matrix representation of the
+        // rotation. This represents the unit vectors for the x, y, and z axes, in the field
+        // reference frame. For instance, the first column in the matrix represents the unit vector
+        // of the x-axis in the field coordinate frame, with the value in the first row and first
+        // column being the x component of this x-axis vector.
+        Matrix<N3, N3> rotationMatrix = rotation.toMatrix();
+
+        // By calling the zero-indexed method get(2, 2), we get the z component of the z-axis unit
+        // vector.
+        double zComponent = rotationMatrix.get(2, 2);
+
+        // A bit of trigonometry tells us that our angle will be the inverse cosine of the z
+        // component of the robot's z-axis.
+        //
+        //                 |\ <- theta = Angle between the robot z-axis and the field z-axis
+        //                 | \
+        //                 |  \         cos(theta) = a/h = z component/1 = z component
+        //                 |   \        theta = arccos(z component)
+        //                 |    \
+        // a = z component |     \ h = Robot z-axis unit vector = 1 (because it's a unit vector)
+        //                 |      \
+        //                 |_______\
+        //
+        return Math.acos(zComponent);
     }
 }
