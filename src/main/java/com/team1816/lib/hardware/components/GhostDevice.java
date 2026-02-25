@@ -32,4 +32,7 @@ public class GhostDevice implements IPhoenix6 {
     public StatusCode setSimSupplyVoltage(double volts) {
         return StatusCode.OK;
     }
+
+    @Override
+    public boolean hasDeviceCrashed() { return  false; }
 }

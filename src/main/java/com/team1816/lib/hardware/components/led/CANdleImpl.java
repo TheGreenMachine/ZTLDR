@@ -34,4 +34,6 @@ public class CANdleImpl extends CANdle implements IPhoenix6 {
         return simState.setSupplyVoltage(volts);
     }
 
+    @Override
+    public boolean hasDeviceCrashed() { return getStickyFault_BootDuringEnable().getValue(); }
 }
