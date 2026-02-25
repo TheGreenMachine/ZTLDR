@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TopGateToFuel_copy1"
+            "pathName": "TopGateToFuel"
           }
         }
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": "Choreo Autos",
   "choreoAuto": true
 }
