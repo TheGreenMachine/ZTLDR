@@ -15,6 +15,7 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
     public static final String NAME = "gatekeeper";
 
     private GATEKEEPER_STATE wantedState = GATEKEEPER_STATE.CLOSED;
+    private GATEKEEPER_STATE previousWantedState = GATEKEEPER_STATE.CLOSED;
 
     //MOTORS
     private final IMotor topMotor = (IMotor)factory.getDevice(NAME, "topMotor");
@@ -54,8 +55,11 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
         setTopVelocity(wantedState.getTopMotorValue());
         setBottomVelocity(wantedState.getBottomMotorValue());
 
-        GreenLogger.log("Gatekeeper state: " + wantedState.toString());
-        SmartDashboard.putString("Gatekeeper state: ", wantedState.toString());
+        if (wantedState != previousWantedState) {
+            GreenLogger.log("Gatekeeper state: " + wantedState.toString());
+            SmartDashboard.putString("Gatekeeper state: ", wantedState.toString());
+            previousWantedState = wantedState;
+        }
     }
 
     private void setTopVelocity(double velocity) {

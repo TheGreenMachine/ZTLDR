@@ -109,6 +109,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     private WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
+    private WantedSuperState previousWantedSuperState = WantedSuperState.DEFAULT;
     private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
     // TODO: Add calibration state, maybe as the default here
@@ -129,14 +130,16 @@ public class Superstructure extends SubsystemBase {
 
     @Override
     public void periodic() {
-        GreenLogger.log("Wanted Superstate " + wantedSuperState);
         actualSuperState = handleStateTransitions();
-
-        GreenLogger.log("Actual Superstate " + actualSuperState);
 
         applyStates();
 
-        SmartDashboard.putString("Super state: ", wantedSuperState.toString());
+        if (wantedSuperState != previousWantedSuperState) {
+            GreenLogger.log("Wanted Superstate " + wantedSuperState);
+            GreenLogger.log("Actual Superstate " + actualSuperState);
+            SmartDashboard.putString("Super state: ", wantedSuperState.toString());
+            previousWantedSuperState = wantedSuperState;
+        }
     }
 
     private ActualSuperState handleStateTransitions() {

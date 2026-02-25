@@ -16,6 +16,7 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
     public static final String NAME = "feeder";
 
     private FEEDER_STATE wantedState = FEEDER_STATE.IDLING;
+    private FEEDER_STATE previousWantedState = FEEDER_STATE.IDLING;
 
     //MOTORS
     private final IMotor feedMotor = (IMotor)factory.getDevice(NAME, "feedMotor");
@@ -45,9 +46,11 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
     private void applyState() {
         setFeedVelocity(wantedState.getFeedMotorValue());
 
-        GreenLogger.log("Feeder state: " + wantedState.toString());
-
-        SmartDashboard.putString("Feeder state: ", wantedState.toString());
+        if (wantedState != previousWantedState) {
+            GreenLogger.log("Feeder state: " + wantedState.toString());
+            SmartDashboard.putString("Feeder state: ", wantedState.toString());
+            previousWantedState = wantedState;
+        }
     }
 
     private void setFeedVelocity(double feedVelocity){
