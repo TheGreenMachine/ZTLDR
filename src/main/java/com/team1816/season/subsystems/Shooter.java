@@ -160,6 +160,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public void periodic() {
         readFromHardware();
 
+        if (rotationAngleMotor.hasDeviceCrashed()) {
+            isCalibrated = false;
+        }
+
         if (!isCalibrated) {
             calibratePeriodic();
         } else {
