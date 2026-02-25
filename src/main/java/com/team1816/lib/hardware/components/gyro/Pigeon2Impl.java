@@ -48,4 +48,7 @@ public class Pigeon2Impl extends Pigeon2 implements IPhoenix6, IGyro {
     public StatusCode setSimSupplyVoltage(double volts) {
         return simState.setSupplyVoltage(volts);
     }
+
+    @Override
+    public boolean hasDeviceCrashed() { return  getStickyFault_BootDuringEnable().getValue(); }
 }
