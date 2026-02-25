@@ -188,7 +188,7 @@ public class Camera {
 
     /**
      * Updates the field on the passed in {@link VisionSystemSim} with the most recent single-frame
-     * pose estimation from this camera.
+     * pose estimate from this camera.
      * <p>
      * If this is a physical camera being used with the sim, this also updates the visible targets
      * and camera position for this camera. This is necessary because PhotonVision does not
@@ -200,7 +200,7 @@ public class Camera {
     public void updateCameraOnSimField(VisionSystemSim sim) {
         Field2d simField = sim.getDebugField();
 
-        simField.getObject(name + "/visionPoseEstimation").setPose(latestPoseEstimate.toPose2d());
+        simField.getObject(name + "/visionPoseEstimate").setPose(latestPoseEstimate.toPose2d());
 
         // For using physical cameras with the simulation, PhotonVision will not automatically add
         // the visible target poses or camera positions to the sim field, so we have to add them

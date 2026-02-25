@@ -74,8 +74,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
     /**
      * Gets all {@link EstimatedRobotPose}s that have not yet been returned by calls to this method
      * from all AprilTag cameras. Estimates are in {@link Pair}s with the standard deviations for
-     * the estimate calculated by {@link #calculateEstimationStandardDeviations(EstimatedRobotPose)
-     * }.
+     * the estimate calculated by {@link #calculateEstimateStandardDeviations(EstimatedRobotPose)}.
      *
      * @return All unread vision pose estimates with corresponding standard deviations.
      */
@@ -123,7 +122,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                                 ) < visionEstimateAngleThresholdRadians
                         )
                 ) {
-                    Matrix<N3, N1> standardDeviations = calculateEstimationStandardDeviations(estimatedRobotPose);
+                    Matrix<N3, N1> standardDeviations = calculateEstimateStandardDeviations(estimatedRobotPose);
                     posesWithStdDevs.add(Pair.of(estimatedRobotPose, standardDeviations));
                     // Tell the camera what the standard deviations for its latest estimate were,
                     // for logging purposes.
@@ -186,11 +185,11 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      *
      * @param estimatedRobotPose The {@link EstimatedRobotPose} from a {@link PhotonPoseEstimator}
      *                           to calculate standard deviations for.
-     * @return The calculated standard deviations for the vision pose estimation (x position in
+     * @return The calculated standard deviations for the vision pose estimate (x position in
      * meters, y position in meters, and heading in radians, although the units are somewhat
      * ambiguous).
      */
-    private Matrix<N3, N1> calculateEstimationStandardDeviations(EstimatedRobotPose estimatedRobotPose) {
+    private Matrix<N3, N1> calculateEstimateStandardDeviations(EstimatedRobotPose estimatedRobotPose) {
         PhotonPoseEstimator.PoseStrategy strategy = estimatedRobotPose.strategy;
 
         // If we didn't use a multi-tag strategy. This would happen if we only saw one tag, or
@@ -207,7 +206,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 Optional<Pose3d> tagPose = aprilTagFieldLayout.getTagPose(target.getFiducialId());
 
                 // Theoretically the tag pose could be empty if it saw a tag that isn't in the
-                // layout. It couldn't have given us an estimation unless there was at least one
+                // layout. It couldn't have given us an estimate unless there was at least one
                 // valid tag, so we can just ignore any invalid ones.
                 if (tagPose.isEmpty()) continue;
 

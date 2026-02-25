@@ -87,7 +87,7 @@
           ],
           "style": "Hidden"
         },
-        "exampleCamera/visionPoseEstimation": {
+        "exampleCamera/visionPoseEstimate": {
           "arrowColor": [
             0.0,
             1.0,
@@ -105,7 +105,7 @@
         },
         "height": 8.051901817321777,
         "left": 534,
-        "maybeRealCamera/visionPoseEstimation": {
+        "maybeRealCamera/visionPoseEstimate": {
           "arrowColor": [
             0.0,
             0.49803921580314636,
@@ -121,7 +121,7 @@
           ],
           "weight": 3.0
         },
-        "physicalCameraUsedWithSim/visionPoseEstimation": {
+        "physicalCameraUsedWithSim/visionPoseEstimate": {
           "arrowColor": [
             0.0,
             0.0,
