@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 public class RobotContainer extends BaseRobotContainer {
 
-    private ControllerMode currentControllerMode;
+//    private ControllerMode currentControllerMode;
 
     public RobotContainer() {
         NamedCommands.registerCommand("InTheZone", new InTheZoneCommand());
@@ -40,57 +40,58 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.teleopInit();
     }
 
-    public enum ControllerMode {
-        CLIMBING,
-        SNOWBLOWING,
-    }
+//    public enum ControllerMode {
+//        CLIMBING,
+//        SNOWBLOWING,
+//    }
 
     private void configureBindings() {
 
+        driverController.rightTrigger().whileTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_ON)));
+        driverController.rightTrigger().onFalse(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_OFF)));
 
-        switch (currentControllerMode) {
-            case SNOWBLOWING -> {
-                driverController.start().onTrue(Commands.runOnce(() -> setCurrentControllerMode(ControllerMode.CLIMBING)));
+        //one or the other, depends on drive team:
+        driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
+        driverController.povRight().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
+        driverController.povLeft().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
+        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.shootingAutomatic()));
 
-                driverController.rightTrigger().whileTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_ON)));
-                driverController.rightTrigger().onFalse(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_OFF)));
+        operatorController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
+        operatorController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
+        operatorController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
+        operatorController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB)));
 
-                //one or the other, depends on drive team:
-                driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
-                driverController.povRight().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
-                driverController.povLeft().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
-                driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.shootingAutomatic()));
-
-                operatorController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
-                operatorController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
-                operatorController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
-                operatorController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB)));
-
-                driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_DROP)));
-                driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_LIFT)));
+        driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_DROP)));
+        driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_LIFT)));
 
 
-                //agitate button TBD
-                //add manual shooter speed adjustments
-            }
-            case CLIMBING -> {
-                driverController.back().onTrue(Commands.runOnce(() -> setCurrentControllerMode(ControllerMode.SNOWBLOWING)));
+        //agitate button TBD
+        //add manual shooter speed adjustments
 
-                driverController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMB_L3)));
-                driverController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMB_L1)));
-                driverController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMB_DOWN_L1)));
 
-                //add manual climber up/down adjustments and the extend/retract adjustments
-            }
-            //manual mode?
-        }
+//        switch (currentControllerMode) {
+//            case SNOWBLOWING -> {
+//                driverController.start().onTrue(Commands.runOnce(() -> setCurrentControllerMode(ControllerMode.CLIMBING)));
+//
+//            }
+//            case CLIMBING -> {
+//                driverController.back().onTrue(Commands.runOnce(() -> setCurrentControllerMode(ControllerMode.SNOWBLOWING)));
+//
+//                driverController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMB_L3)));
+//                driverController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMB_L1)));
+//                driverController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMB_DOWN_L1)));
+//
+//                //add manual climber up/down adjustments and the extend/retract adjustments
+//            }
+//            //manual mode?
+//        }
 
     }
 
-    private void setCurrentControllerMode(ControllerMode wantedControllerMode){
-        currentControllerMode = wantedControllerMode;
-        configureBindings();
-    }
+//    private void setCurrentControllerMode(ControllerMode wantedControllerMode){
+//        currentControllerMode = wantedControllerMode;
+//        configureBindings();
+//    }
 
     public final void registerCommands() {
         NamedCommands.registerCommand("automatedHubShooting", Commands.runOnce(() -> {
