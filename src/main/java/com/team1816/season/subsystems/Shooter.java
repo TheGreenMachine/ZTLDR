@@ -42,6 +42,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final IMotor rotationAngleMotor = (IMotor) factory.getDevice(NAME, "rotationAngleMotor");
 
     private final VelocityVoltage velocityControl = new VelocityVoltage(0);
+    private VelocityVoltage rotationVelocityControl = new VelocityVoltage(0);
     private final PositionVoltage positionControl = new PositionVoltage(0);
 
     //AUTO AIM
@@ -71,7 +72,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     //CALIBRATION
     private Double[] calibrationPositions = new Double[]{0.0, 0.0};
-    private boolean isCalibrated;
+    private boolean isCalibrated = false;
+    private boolean rotatingRight = false;
 
     //MECHANISMS
     private final NetworkTable networkTable;
@@ -156,11 +158,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     public void periodic() {
-        SmartDashboard.putString("Shooter state: ", wantedState.toString());
-
         readFromHardware();
 
-        if (wantedState == SHOOTER_STATE.CALIBRATING) {
+        if (!isCalibrated) {
             calibratePeriodic();
         } else {
             applyState();
@@ -254,16 +254,20 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private void calibratePeriodic(){
         // TODO: figure out which sensor value is a lower number of ticks and change left/right
+        if (!rotatingRight) {
+            rotationAngleMotor.setControl(rotationVelocityControl.withVelocity(.2));
+            rotatingRight = true;
+        }
+
+        if (!rightSensorValue) {
+            rotationAngleMotor.setControl(rotationVelocityControl.withVelocity(.1));
+        }
+
         if (!leftSensorValue) {
+            rotationAngleMotor.setControl(rotationVelocityControl.withVelocity(0));
             double currentMotorPosition = rotationAngleMotor.getMotorPosition();
             leftLimit = currentMotorPosition;
             rightLimit = currentMotorPosition + DISTANCE_BETWEEN_BEAM_BREAKS;
-            isCalibrated = true;
-        }
-        if (!rightSensorValue) {
-            double currentMotorPosition = rotationAngleMotor.getMotorPosition();
-            leftLimit = currentMotorPosition - DISTANCE_BETWEEN_BEAM_BREAKS;
-            rightLimit = currentMotorPosition;
             isCalibrated = true;
         }
     }
