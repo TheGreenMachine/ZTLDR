@@ -14,4 +14,5 @@ public interface IPhoenix6 {
     // reports if device is on the can bus
     boolean isConnected();
     StatusCode setSimSupplyVoltage(double volts);
+    boolean hasDeviceCrashed();
 }

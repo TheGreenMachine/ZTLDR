@@ -33,4 +33,6 @@ public class CANdiImpl extends CANdi implements IPhoenix6 {
         return simState.setSupplyVoltage(volts);
     }
 
+    @Override
+    public boolean hasDeviceCrashed() { return getStickyFault_BootDuringEnable().getValue(); }
 }
