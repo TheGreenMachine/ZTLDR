@@ -21,6 +21,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     public static final String NAME = "climber";
 
     private CLIMBER_STATE wantedState = CLIMBER_STATE.IDLING;
+    private CLIMBER_STATE previousWantedState = CLIMBER_STATE.IDLING;
 
     //MOTORS
     private final IMotor flipMotor = (IMotor)factory.getDevice(NAME, "flipMotor");
@@ -74,7 +75,10 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
         setFlipMotor(wantedState.getFlipMotorValue());
         setLinearSlideMotor(wantedState.getLinearSlideMotorValue());
 
-        GreenLogger.log("Climber state: " + wantedState.toString());
+        if (wantedState != previousWantedState) {
+            GreenLogger.log("Climber state: " + wantedState.toString());
+            previousWantedState = wantedState;
+        }
     }
 
     private void setFlipMotor(double position){

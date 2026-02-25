@@ -32,6 +32,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public static final String NAME = "shooter";
 
     private SHOOTER_STATE wantedState = SHOOTER_STATE.IDLE;
+    private SHOOTER_STATE previousWantedState = SHOOTER_STATE.IDLE;
 
     //MOTORS
     private final IMotor topLaunchMotor = (IMotor) factory.getDevice(NAME, "topLaunchMotor");
@@ -226,15 +227,18 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         setRotationAngle(rotationAngle);
         setPower(launchPower);
 
-        GreenLogger.log("Shooter state: " + wantedState.toString());
-        GreenLogger.log("Launch Angle: " + launchAngle);
-        GreenLogger.log("Launch Power: " + launchPower);
-        GreenLogger.log("Rotation Angle: " + rotationAngle);
+        if (wantedState != previousWantedState) {
+            GreenLogger.log("Shooter state: " + wantedState.toString());
+            GreenLogger.log("Launch Angle: " + launchAngle);
+            GreenLogger.log("Launch Power: " + launchPower);
+            GreenLogger.log("Rotation Angle: " + rotationAngle);
 
-        SmartDashboard.putString("Shooter state: ", wantedState.toString());
-        SmartDashboard.putNumber("Launch Angle: ", launchAngle);
-        SmartDashboard.putNumber("Launch Power: ", launchPower);
-        SmartDashboard.putNumber("Rotation Angle: ", rotationAngle);
+            SmartDashboard.putString("Shooter state: ", wantedState.toString());
+            SmartDashboard.putNumber("Launch Angle: ", launchAngle);
+            SmartDashboard.putNumber("Launch Power: ", launchPower);
+            SmartDashboard.putNumber("Rotation Angle: ", rotationAngle);
+            previousWantedState = wantedState;
+        }
     }
 
     public void setWantedState(SHOOTER_STATE state) {
