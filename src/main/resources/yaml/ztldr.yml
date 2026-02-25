@@ -68,7 +68,7 @@ subsystems:
             inSpeed: -10
             inAngle: 255
 
-            downAngle: 225
+            downAngle: 255
             upAngle: 45
     climber:
         devices:

@@ -111,7 +111,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         DISTANCE_TWO(factory.getConstant(NAME,"distanceTwoLaunchAngle",0), factory.getConstant(NAME,"distanceTwoRotationAngle",0), factory.getConstant(NAME,"distanceTwoLaunchVelocity",0)),
         DISTANCE_THREE(factory.getConstant(NAME,"distanceThreeLaunchAngle",0), factory.getConstant(NAME,"distanceThreeRotationAngle",0), factory.getConstant(NAME,"distanceThreeLaunchVelocity",0)),
         AUTOMATIC(-1, -1, -1),
-        SNOWBLOWING(-1,-1, -1),
+        SNOWBLOWING(-1, -1, -1),
         IDLE(0, 0, 0);
 
         private double launchAngle;
@@ -244,7 +244,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void calibratePeriodic(){
-        // TODO: figure out which sensor value is a lower number of ticks
+        // TODO: figure out which sensor value is a lower number of ticks and change left/right
         if (!leftSensorValue) {
             double currentMotorPosition = rotationAngleMotor.getMotorPosition();
             leftLimit = currentMotorPosition;
