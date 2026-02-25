@@ -109,7 +109,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         DISTANCE_TWO(factory.getConstant(NAME,"distanceTwoLaunchAngle",0), factory.getConstant(NAME,"distanceTwoRotationAngle",0), factory.getConstant(NAME,"distanceTwoLaunchVelocity",0)),
         DISTANCE_THREE(factory.getConstant(NAME,"distanceThreeLaunchAngle",0), factory.getConstant(NAME,"distanceThreeRotationAngle",0), factory.getConstant(NAME,"distanceThreeLaunchVelocity",0)),
         AUTOMATIC(-1, -1, -1),
-        SNOWBLOWING(-1,-1, -1),
+        SNOWBLOWING(-1, -1, -1),
         IDLE(0, 0, 0);
 
         private double launchAngle;
@@ -187,9 +187,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double rotationAngle = wantedState.getRotationAngle();
         double launchPower = wantedState.getLaunchPower();
 
-        if (wantedState == SHOOTER_STATE.AUTOMATIC || wantedState == SHOOTER_STATE.SNOWBLOWING) {
-
-            if (wantedState == SHOOTER_STATE.AUTOMATIC) {
+        if ((wantedState == SHOOTER_STATE.AUTOMATIC) || (wantedState == SHOOTER_STATE.SNOWBLOWING)) {
+            if (wantedState == SHOOTER_STATE.AUTOMATIC) { //Does this work???
                 if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
                     setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_HUB);
                 }
@@ -226,6 +225,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         setLaunchAngle(launchAngle);
         setRotationAngle(rotationAngle);
         setPower(launchPower);
+
+        GreenLogger.log("Shooter state: " + wantedState.toString());
+        GreenLogger.log("Launch Angle: " + launchAngle);
+        GreenLogger.log("Launch Power: " + launchPower);
+        GreenLogger.log("Rotation Angle: " + rotationAngle);
 
         SmartDashboard.putString("Shooter state: ", wantedState.toString());
         SmartDashboard.putNumber("Launch Angle: ", launchAngle);
