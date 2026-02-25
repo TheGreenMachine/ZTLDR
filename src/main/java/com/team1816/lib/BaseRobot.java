@@ -20,7 +20,7 @@ public abstract class BaseRobot extends TimedRobot {
         // The loop time in seconds for adding the vision measurements to the drivetrain pose
         // estimate. For comparison, the main robot periodic loop time is 0.02 seconds (20
         // milliseconds).
-        final double addVisionMeasurementsLoopTimeSeconds = 0.005;
+        final double addVisionMeasurementsLoopTimeSeconds = 0.004;
         // Add a periodic method to add the vision measurements to the drivetrain pose estimate
         // faster than the main robot loop to make sure we always have the most up-to-date pose
         // estimate.

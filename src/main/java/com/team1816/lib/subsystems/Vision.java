@@ -226,7 +226,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
             // If the tag (or best tag if there were multiple) was too far away or the ambiguity
             // (see https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/3D-tracking.html#ambiguity)
             // was too high, we don't trust this estimate at all.
-            if (closestDistance > 4 || lowestAmbiguity > 0.2) {
+            if (closestDistance > 6 || lowestAmbiguity > 0.2) {
                 return VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
             }
 
