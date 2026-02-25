@@ -30,4 +30,7 @@ public class CANCoderImpl extends CANcoder implements IPhoenix6 {
     public StatusCode setSimSupplyVoltage(double volts) {
         return simState.setSupplyVoltage(volts);
     }
+
+    @Override
+    public boolean hasDeviceCrashed() { return getStickyFault_BootDuringEnable().getValue(); }
 }

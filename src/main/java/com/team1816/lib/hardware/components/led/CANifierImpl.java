@@ -1,6 +1,7 @@
 package com.team1816.lib.hardware.components.led;
 
 import com.ctre.phoenix.CANifier;
+import com.ctre.phoenix.CANifierStickyFaults;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.ParentConfiguration;
 import com.ctre.phoenix6.controls.ControlRequest;
@@ -32,4 +33,6 @@ public class CANifierImpl extends CANifier implements IPhoenix6 {
         return StatusCode.OK;
     }
 
+    @Override
+    public boolean hasDeviceCrashed() { return false; }
 }

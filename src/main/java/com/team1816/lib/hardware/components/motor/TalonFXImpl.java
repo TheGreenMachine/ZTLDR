@@ -57,9 +57,10 @@ public class TalonFXImpl extends TalonFX implements ICTREDevice, IMotor {
     }
 
     @Override
-    public double getMotorPosition() {
-        return getPosition().getValueAsDouble();
-    }
+    public double getMotorPosition() {  return getPosition().getValueAsDouble(); }
+
+    @Override
+    public boolean hasDeviceCrashed() { return getStickyFault_BootDuringEnable().getValue(); }
 
     @Override
     public void zeroMotorPosition() {
