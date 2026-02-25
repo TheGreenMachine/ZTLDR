@@ -322,13 +322,14 @@ subsystems:
                 azimuth: brAz
         drivePID:
             slot0:
-                kP: 0.4
-                kI: 0
-                kD: 0.0008
-                kV: 0.115
+                kP: 100
+                kI: 1
+                kD: 0
+                kV: 0.129
+                kS: 0.05
         azimuthPID:
             slot0:
-                kP: 75
+                kP: 100
                 kD: 0.5
                 kV: 2.66
                 kS: 0.1
@@ -340,7 +341,7 @@ subsystems:
             robotMass: 74.088 # kg
             wheelRadius: .04935 # meters
             maxDriveRPS: 90 # measured motor max speed rps
-            maxAngularRate: .75 # rad/sec
+            maxAngularRate: 8.285 # rad/sec
             wheelCOF: 1.7
         constants:
             translationKp: 3

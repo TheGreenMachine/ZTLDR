@@ -5,39 +5,48 @@
     "properties": {
         "distances": {
             "type": "array",
+            "default": 0,
             "items": {
                 "type": "number"
             }
         },
         "angles": {
             "type": "array",
+            "default": 0,
             "items": {
                 "type": "number"
             }
         },
         "powers": {
             "type": "array",
+            "default": 0,
             "items": {
                 "type": "number"
             }
         },
         "minimumDefaultAngle": {
-            "type": "number"
+            "type": "number",
+            "default": 0
         },
         "minimumDefaultPower": {
-            "type": "number"
+            "type": "number",
+            "default": 0
         },
         "mediumDefaultAngle": {
-            "type": "number"
+            "type": "number",
+            "default": 0
         },
         "mediumDefaultPower": {
-            "type": "number"
+            "type": "number",
+            "default": 0
         },
         "maximumDefaultAngle": {
-            "type": "number"
+            "type": "number",
+            "default": 0
         },
         "maximumDefaultPower": {
-            "type": "number"
+            "type": "number",
+            "default": 0
         }
     },
     "anyOf": [
