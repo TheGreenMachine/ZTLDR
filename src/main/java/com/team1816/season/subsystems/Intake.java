@@ -20,6 +20,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public static final String NAME = "intake";
 
     private INTAKE_STATE wantedState = INTAKE_STATE.INTAKE_UP;
+    private INTAKE_STATE previousWantedState = INTAKE_STATE.INTAKE_UP;
 
     //MOTORS
     private final IMotor intakeMotor = (IMotor) factory.getDevice(NAME, "intakeMotor");
@@ -79,13 +80,16 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         setIntakeSpeed(wantedState.getIntakeMotorValue());
         setFlipperAngle(wantedState.getFlipperMotorValue());
 
-        GreenLogger.log("Intake state: " + wantedState.toString());
-        GreenLogger.log("Intake speed: " + intakeSpeed);
-        GreenLogger.log("Intake angle: " + flipperAngle);
+        if (wantedState != previousWantedState) {
+            GreenLogger.log("Intake state: " + wantedState.toString());
+            GreenLogger.log("Intake speed: " + intakeSpeed);
+            GreenLogger.log("Intake angle: " + flipperAngle);
 
-        SmartDashboard.putString("Intake state: ", wantedState.toString());
-        SmartDashboard.putNumber("Intake speed: ", intakeSpeed);
-        SmartDashboard.putNumber("Intake angle: ", flipperAngle);
+            SmartDashboard.putString("Intake state: ", wantedState.toString());
+            SmartDashboard.putNumber("Intake speed: ", intakeSpeed);
+            SmartDashboard.putNumber("Intake angle: ", flipperAngle);
+            previousWantedState = wantedState;
+        }
     }
 
     private void setIntakeSpeed(double velocity) {
