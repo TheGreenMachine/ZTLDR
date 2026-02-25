@@ -59,7 +59,7 @@ public class RobotContainer extends BaseRobotContainer {
                 driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
                 driverController.povRight().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
                 driverController.povLeft().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
-                driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB)));
+                driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.shootingAutomatic()));
 
                 operatorController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
                 operatorController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));

@@ -1,5 +1,6 @@
 package com.team1816.season.subsystems;
 
+import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
@@ -342,5 +343,13 @@ public class Superstructure extends SubsystemBase {
         intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
         feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
         shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
+    }
+
+    public void shootingAutomatic() {  //the shooter position to automatically shoot at hub or corner depending on location
+        if (BaseRobotState.swerveDriveState.Pose.getX() >  5) {  //TODO: account for color and fix the number
+            setWantedSuperState(WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER);
+        } else {
+            setWantedSuperState(WantedSuperState.SHOOTER_AUTOMATIC_HUB);
+        }
     }
 }
