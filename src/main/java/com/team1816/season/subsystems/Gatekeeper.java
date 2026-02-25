@@ -55,6 +55,7 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
         setBottomVelocity(wantedState.getBottomMotorValue());
 
         GreenLogger.log("Gatekeeper state: " + wantedState.toString());
+        SmartDashboard.putString("Gatekeeper state: ", wantedState.toString());
     }
 
     private void setTopVelocity(double velocity) {

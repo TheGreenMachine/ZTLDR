@@ -43,7 +43,6 @@ public class RobotContainer extends BaseRobotContainer {
     public enum ControllerMode {
         CLIMBING,
         SNOWBLOWING,
-        MANUAL
     }
 
     private void configureBindings() {
@@ -53,17 +52,25 @@ public class RobotContainer extends BaseRobotContainer {
             case SNOWBLOWING -> {
                 driverController.start().onTrue(Commands.runOnce(() -> setCurrentControllerMode(ControllerMode.CLIMBING)));
 
-                driverController.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.toggleGatekeeper()));
+                driverController.rightTrigger().whileTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_ON)));
+                driverController.rightTrigger().onFalse(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_OFF)));
 
+                //one or the other, depends on drive team:
                 driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
                 driverController.povRight().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
                 driverController.povLeft().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
                 driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB)));
 
-                driverController.b().onTrue(Commands.runOnce(() -> superstructure.toggleIntake()));
-                driverController.y().onTrue(Commands.runOnce(() -> superstructure.toggleIntakeDeployment()));
-                //Hood down/up TBD, may be an automated movement
-                driverController.x().onTrue(Commands.runOnce(() -> superstructure.toggleAgitate()));
+                operatorController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
+                operatorController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
+                operatorController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
+                operatorController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB)));
+
+                driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_DROP)));
+                driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_LIFT)));
+
+
+                //agitate button TBD
                 //add manual shooter speed adjustments
             }
             case CLIMBING -> {
@@ -75,7 +82,7 @@ public class RobotContainer extends BaseRobotContainer {
 
                 //add manual climber up/down adjustments and the extend/retract adjustments
             }
-            //manual mode
+            //manual mode?
         }
 
     }
@@ -90,11 +97,11 @@ public class RobotContainer extends BaseRobotContainer {
              getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB);
         }));
         NamedCommands.registerCommand("automatedCorner1Shooting", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_CORNER); //Figure out which corners are which
+            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER); //Figure out which corners are which
         }));
 
         NamedCommands.registerCommand("automatedHubSnowblowing", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER_AUTOMATIC_HUB);
+            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB);
         }));
         NamedCommands.registerCommand("automatedCorner1Snowblowing", Commands.runOnce(() -> {
             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER); //Figure out which corners are which
@@ -104,6 +111,7 @@ public class RobotContainer extends BaseRobotContainer {
              getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.INTAKE);
         }));
 
+        /*
         NamedCommands.registerCommand("slowFeeding", Commands.runOnce(() -> {
              getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.FEEDER_SLOW);
         }));
@@ -111,6 +119,7 @@ public class RobotContainer extends BaseRobotContainer {
             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.FEEDER_FAST);
         }));
 
+         */
         NamedCommands.registerCommand("openGatekeeper", Commands.runOnce(() -> {
             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_ON);
         }));
