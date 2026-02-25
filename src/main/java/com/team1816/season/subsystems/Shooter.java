@@ -244,7 +244,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void calibratePeriodic(){
-        // TODO: figure out which sensor value is a lower number of ticks
+        // TODO: figure out which sensor value is a lower number of ticks and change left/right
         if (!leftSensorValue) {
             double currentMotorPosition = rotationAngleMotor.getMotorPosition();
             leftLimit = currentMotorPosition;
