@@ -21,25 +21,13 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     public static final String NAME = "climber";
 
     private CLIMBER_STATE wantedState = CLIMBER_STATE.IDLING;
+    private CLIMBER_STATE previousWantedState = CLIMBER_STATE.IDLING;
 
     //MOTORS
     private final IMotor flipMotor = (IMotor)factory.getDevice(NAME, "flipMotor");
     private final IMotor linearSlideMotor = (IMotor)factory.getDevice(NAME, "linearSlideMotor");
 
     private final PositionVoltage positionReq = new PositionVoltage(0);
-
-    //YAML VALUES
-    private double flipIdling = factory.getConstant(NAME, "flipIdling", 0);
-    private double flipL3UpClimbing = factory.getConstant(NAME, "flipL3UpClimbing", 0);
-    private double flipL3DownClimbing = factory.getConstant(NAME, "flipL3DownClimbing", 0);
-    private double flipL1UpClimbing = factory.getConstant(NAME, "flipL1UpClimbing", 0);
-    private double flipL1DownClimbing = factory.getConstant(NAME, "flipL1DownClimbing", 0);
-
-    private double linearSlideIdling = factory.getConstant(NAME, "linearSlideIdling", 0);
-    private double linearSlideL3UpClimbing = factory.getConstant(NAME, "linearSlideL3UpClimbing", 0);
-    private double linearSlideL3DownClimbing = factory.getConstant(NAME, "linearSlideL3DownClimbing", 0);
-    private double linearSlideL1UpClimbing = factory.getConstant(NAME, "linearSlideL1UpClimbing", 0);
-    private double linearSlideL1DownClimbing = factory.getConstant(NAME, "linearSlideL1DownClimbing", 0);
 
     //PHYSICAL SUBSYSTEM DEPENDENT CONSTANTS
     private static final double MAX_FLIP_MOTOR_CLAMP = 100;
@@ -71,34 +59,26 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
         linearSlide.setLength(linearSlidePosition/(MAX_LINEAR_SLIDE_MOTOR_CLAMP-MIN_LINEAR_SLIDE_MOTOR_CLAMP));
     }
 
-    private void applyState() {
-        switch (wantedState) {
-            case IDLING:
-                setFlipMotor(flipIdling);
-                setLinearSlideMotor(linearSlideIdling);
-                break;
-            case L3_UP_CLIMBING:
-                setFlipMotor(flipL3UpClimbing);
-                setLinearSlideMotor(linearSlideL3UpClimbing);
-                break;
-            case L3_DOWN_CLIMBING:
-                setFlipMotor(flipL3DownClimbing);
-                setLinearSlideMotor(linearSlideL3DownClimbing);
-                break;
-            case L1_UP_CLIMBING:
-                setFlipMotor(flipL1UpClimbing);
-                setLinearSlideMotor(linearSlideL1UpClimbing);
-                break;
-            case L1_DOWN_CLIMBING:
-                setFlipMotor(flipL1DownClimbing);
-                setLinearSlideMotor(linearSlideL1DownClimbing);
-                break;
-            default:
-                GreenLogger.log("Climber state: "+wantedState+" is not accounted for in applyState()");
-                break;
-        }
+    public void adjustCurrentFlipMotorSetPoint(double adjustValue){
+        wantedState.adjustFlipMotorValue(adjustValue);
 
-        SmartDashboard.putString("Climber state: ", wantedState.toString());
+        GreenLogger.log(NAME+"/flipMotor/"+wantedState.name()+"_adjusted_value/"+wantedState.getFlipMotorValue());
+    }
+
+    public void adjustCurrentLinearSlideMotorSetPoint(double adjustValue){
+        wantedState.adjustLinearSlideMotorValue(adjustValue);
+
+        GreenLogger.log(NAME+"/linearSlideMotor/"+wantedState.name()+"_adjusted_value/"+wantedState.getFlipMotorValue());
+    }
+
+    private void applyState() {
+        setFlipMotor(wantedState.getFlipMotorValue());
+        setLinearSlideMotor(wantedState.getLinearSlideMotorValue());
+
+        if (wantedState != previousWantedState) {
+            GreenLogger.log("Climber state: " + wantedState.toString());
+            previousWantedState = wantedState;
+        }
     }
 
     private void setFlipMotor(double position){
@@ -113,15 +93,38 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
         linearSlideMotor.setControl(positionReq.withPosition(clampedPosition));
     }
 
-    public enum CLIMBER_STATE {
-        IDLING,
-        L3_UP_CLIMBING,
-        L3_DOWN_CLIMBING,
-        L1_UP_CLIMBING,
-        L1_DOWN_CLIMBING
-    }
-
     public void setWantedState(CLIMBER_STATE wantedState) {
         this.wantedState = wantedState;
+    }
+
+    public enum CLIMBER_STATE {
+        IDLING(factory.getConstant(NAME, "flipIdling", 0), factory.getConstant(NAME, "linearSlideIdling", 0)),
+        L3_UP_CLIMBING(factory.getConstant(NAME, "flipL3UpClimbing", 0), factory.getConstant(NAME, "linearSlideL3UpClimbing", 0)),
+        L3_DOWN_CLIMBING(factory.getConstant(NAME, "flipL3DownClimbing", 0), factory.getConstant(NAME, "linearSlideL3DownClimbing", 0)),
+        L1_UP_CLIMBING(factory.getConstant(NAME, "flipL1UpClimbing", 0), factory.getConstant(NAME, "linearSlideL1UpClimbing", 0)),
+        L1_DOWN_CLIMBING(factory.getConstant(NAME, "flipL1DownClimbing", 0), factory.getConstant(NAME, "linearSlideL1DownClimbing", 0));
+
+        private double flipMotorValue, linearSlideMotorValue;
+
+        CLIMBER_STATE (double flipMotorValue, double linearSlideMotorValue){
+            this.flipMotorValue = flipMotorValue;
+            this.linearSlideMotorValue = linearSlideMotorValue;
+        }
+
+        private void adjustFlipMotorValue(double adjustValue) {
+            this.flipMotorValue += adjustValue;
+        }
+
+        private void adjustLinearSlideMotorValue(double adjustValue) {
+            this.linearSlideMotorValue += adjustValue;
+        }
+
+        public double getFlipMotorValue() {
+            return flipMotorValue;
+        }
+
+        public double getLinearSlideMotorValue() {
+            return linearSlideMotorValue;
+        }
     }
 }
