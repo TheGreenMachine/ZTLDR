@@ -62,6 +62,8 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         try {
+            // Ensure pose is always initialized before scheduling auto
+            robotContainer.forceUpdatePose();
             autonomousCommand = robotContainer.autoChooser.getSelected();
             // schedule the autonomous command
             if (autonomousCommand != null) {
