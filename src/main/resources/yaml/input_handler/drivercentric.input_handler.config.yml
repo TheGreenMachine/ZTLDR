@@ -31,13 +31,14 @@ operator:
   rumble: true
   buttonpad:
     y:
-buttonboard:
-  upLeft: increaseRampPivotOffset
-  upRight: decreaseCoralArmPivotOffset
-  up: increaseElevatorPivotOffset
-  center: decreaseElevatorPivotOffset
-  left: decreaseRampPivotOffset
-  right: increaseCoralArmPivotOffset
-  downLeft:
-  down: dislodgeCoral
+buttonBoard:
+  topLeft: increaseRampPivotOffset
+  topRight: decreaseCoralArmPivotOffset
+  topCenter: increaseElevatorPivotOffset
+  middleCenter: decreaseElevatorPivotOffset
+  middleLeft: decreaseRampPivotOffset
+  middleRight: increaseCoralArmPivotOffset
+  bottomLeft:
+  bottomCenter: dislodgeCoral
+  bottomRight:
 demoMode: false
