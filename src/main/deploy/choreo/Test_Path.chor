@@ -38,8 +38,8 @@
  "config":{
   "frontLeft":{
    "x":{
-    "exp":"11 in",
-    "val":0.2794
+    "exp":"0.302 m",
+    "val":0.302
    },
    "y":{
     "exp":"11 in",
@@ -57,32 +57,32 @@
    }
   },
   "mass":{
-   "exp":"60 lbs",
-   "val":27.2155422
+   "exp":"74.088 lbs",
+   "val":33.60575150856
   },
   "inertia":{
    "exp":"6 kg m ^ 2",
    "val":6.0
   },
   "gearing":{
-   "exp":"6.5",
-   "val":6.5
+   "exp":"6.03",
+   "val":6.03
   },
   "radius":{
-   "exp":"2 in",
+   "exp":"0.0508 m",
    "val":0.0508
   },
   "vmax":{
-   "exp":"4000 RPM",
-   "val":418.87902047863906
+   "exp":"3000 RPM",
+   "val":314.1592653589793
   },
   "tmax":{
-   "exp":"0.2 N * m",
-   "val":0.2
+   "exp":"2 N * m",
+   "val":2.0
   },
   "cof":{
-   "exp":"1.5",
-   "val":1.5
+   "exp":"1.7",
+   "val":1.7
   },
   "bumper":{
    "front":{

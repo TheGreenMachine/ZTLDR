@@ -323,7 +323,7 @@ subsystems:
         drivePID:
             slot0:
                 kP: 0.7
-                kI: 0.5
+                kI: 0
                 kD: 0.01
                 kV: 0.129
                 kS: 0.05
