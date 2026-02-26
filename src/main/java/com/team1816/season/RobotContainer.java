@@ -84,6 +84,9 @@ public class RobotContainer extends BaseRobotContainer {
 //            //manual mode?
 //        }
 
+
+        //todo: We need this button press to take precedent & override driver inputs
+        operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.DUCK)));
     }
 
 //    private void setCurrentControllerMode(ControllerMode wantedControllerMode){
