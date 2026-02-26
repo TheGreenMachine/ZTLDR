@@ -19,6 +19,7 @@ public class Superstructure extends SubsystemBase {
     private final Feeder feeder;
     private final Climber climber;
     private final PerimeterMath perimeterMath = new PerimeterMath();
+    private final boolean wantAutomatedDucking = false; //todo: Put wantAutomatedDucking to be in yaml
 
     private CommandXboxController controller;
 
@@ -175,7 +176,7 @@ public class Superstructure extends SubsystemBase {
 
             case DUCK -> actualSuperState = ActualSuperState.DUCKING;
         }
-        if(perimeterMath.isInsidePerimeter()) {  //DOES KEEP THE WANTED STATE THE SAME
+        if(wantAutomatedDucking && perimeterMath.isInsidePerimeter()) {  //DOES KEEP THE WANTED STATE THE SAME
             actualSuperState = ActualSuperState.DUCKING;
         }
         return actualSuperState;
