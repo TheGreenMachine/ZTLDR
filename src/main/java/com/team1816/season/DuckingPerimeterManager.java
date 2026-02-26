@@ -4,7 +4,7 @@ import com.team1816.lib.BaseRobotState;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
-public class DuckingPerimeterManagement {
+public class DuckingPerimeterManager {
     private final Translation2d upperLeftCorner = new Translation2d(0, 5); //Need to set
     private final Translation2d lowerRightCorner = new Translation2d(5,0);
     private final Rectangle2d perimeter = new Rectangle2d(upperLeftCorner, lowerRightCorner);

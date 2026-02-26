@@ -4,7 +4,7 @@ import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
-import com.team1816.season.DuckingPerimeterManagement;
+import com.team1816.season.DuckingPerimeterManager;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,7 +18,7 @@ public class Superstructure extends SubsystemBase {
     private final Intake intake;
     private final Feeder feeder;
     private final Climber climber;
-    private final DuckingPerimeterManagement duckingPerimeterManagement = new DuckingPerimeterManagement();
+    private final DuckingPerimeterManager duckingPerimeterManager = new DuckingPerimeterManager();
     private final boolean wantAutomatedDucking = false; //todo: Put wantAutomatedDucking to be in yaml
 
     private CommandXboxController controller;
@@ -142,7 +142,6 @@ public class Superstructure extends SubsystemBase {
             SmartDashboard.putString("Super state: ", wantedSuperState.toString());
             previousWantedSuperState = wantedSuperState;
         }
-        SmartDashboard.putBoolean("Is inside Perimeter: ", perimeterMath.checkIfInsidePerimeter());
 
         actualSuperState = handleStateTransitions();
 
@@ -177,7 +176,7 @@ public class Superstructure extends SubsystemBase {
 
             case DUCK -> actualSuperState = ActualSuperState.DUCKING;
         }
-        if(wantAutomatedDucking && duckingPerimeterManagement.isInsidePerimeter()) {  //DOES KEEP THE WANTED STATE THE SAME
+        if(wantAutomatedDucking && duckingPerimeterManager.isInsidePerimeter()) {  //DOES KEEP THE WANTED STATE THE SAME
             actualSuperState = ActualSuperState.DUCKING;
         }
         return actualSuperState;
