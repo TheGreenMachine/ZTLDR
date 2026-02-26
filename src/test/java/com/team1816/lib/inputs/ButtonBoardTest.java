@@ -44,7 +44,7 @@ class ButtonBoardTest {
         buttonBoard = new ButtonBoard(TEST_PORT);
         commandButtonBoard = new CommandButtonBoard(buttonBoard);
 
-        /*Creates a new simulation tied to buttonBoard which allows tests to programmatically press and release buttons.
+        /* Creates a new simulation tied to buttonBoard which allows tests to programmatically press and release buttons.
         Then pushes initial state to Driver Station sim. */
         sim = new GenericHIDSim(buttonBoard);
         sim.notifyNewData();
