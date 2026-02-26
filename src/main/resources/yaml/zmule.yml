@@ -338,7 +338,7 @@ subsystems:
             steerGearing: 26.0909
             wheelbaseLength: .60325 # meters
             wheelbaseWidth: .60325 # meters
-            robotMass: 33.57 # kg (74 lbs)
+            robotMass: 27.216 # kg (60 lbs)
             wheelRadius: .04935 # meters
             maxDriveRPS: 50 # measured motor max speed rps
             maxAngularRate: 8.285 # rad/sec
