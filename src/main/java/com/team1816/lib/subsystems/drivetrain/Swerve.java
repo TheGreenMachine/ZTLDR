@@ -50,8 +50,6 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
         // setup teleop drivetrain command
         maxAngularRate = RotationsPerSecond.of(kinematics.maxAngularRate).in(RadiansPerSecond);
 
-        SubsystemDataProcessor.createAndStartSubsystemDataProcessor(this);
-
         NetworkTable netTable;
         netTable = NetworkTableInstance.getDefault().getTable("");
         driveSpeeds = netTable.getStructTopic(IDrivetrain.NAME + "/Speeds", ChassisSpeeds.struct).publish();
@@ -63,6 +61,8 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
         // name must be Robot for elastic to show as robot in UI
         fieldPub = netTable.getDoubleArrayTopic("Field/Robot").publish();
         fieldTypePub = netTable.getStringTopic("Field/.type").publish();
+
+        SubsystemDataProcessor.createAndStartSubsystemDataProcessor(this);
     }
 
     public enum ActualState {
