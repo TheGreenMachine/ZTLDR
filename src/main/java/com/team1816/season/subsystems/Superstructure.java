@@ -19,7 +19,7 @@ public class Superstructure extends SubsystemBase {
     private final Feeder feeder;
     private final Climber climber;
     private final DuckingPerimeterManager duckingPerimeterManager = new DuckingPerimeterManager();
-    private final boolean wantAutomatedDucking = false; //todo: Put wantAutomatedDucking to be in yaml
+    private final boolean wantAutomatedDucking = true; //todo: Put wantAutomatedDucking to be in yaml
 
     private CommandXboxController controller;
 
@@ -131,7 +131,9 @@ public class Superstructure extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("Is inside Perimeter: ", duckingPerimeterManagement.checkIfInsidePerimeter());
+        SmartDashboard.putBoolean("Is inside Perimeter: ", duckingPerimeterManager.checkIfInsidePerimeter());
+        SmartDashboard.putString("Wanted Super state: ", wantedSuperState.toString());
+        SmartDashboard.putString("Actual Super state: ", actualSuperState.toString());
         actualSuperState = handleStateTransitions();
 
         applyStates();
@@ -139,7 +141,6 @@ public class Superstructure extends SubsystemBase {
         if (wantedSuperState != previousWantedSuperState) {
             GreenLogger.log("Wanted Superstate " + wantedSuperState);
             GreenLogger.log("Actual Superstate " + actualSuperState);
-            SmartDashboard.putString("Super state: ", wantedSuperState.toString());
             previousWantedSuperState = wantedSuperState;
         }
 
