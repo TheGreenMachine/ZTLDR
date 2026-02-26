@@ -85,5 +85,8 @@ public class TalonFXSImpl extends TalonFXS implements ICTREDevice, IMotor {
     public StatusCode setSimRotorPosition(double rotations) {
         return simState.setRawRotorPosition(rotations);
     }
+
+    @Override
+    public boolean hasDeviceCrashed() { return getStickyFault_BootDuringEnable().getValue(); }
 }
 

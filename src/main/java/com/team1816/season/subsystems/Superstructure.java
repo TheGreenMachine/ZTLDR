@@ -1,5 +1,6 @@
 package com.team1816.season.subsystems;
 
+import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
@@ -108,6 +109,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     private WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
+    private WantedSuperState previousWantedSuperState = WantedSuperState.DEFAULT;
     private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
     // TODO: Add calibration state, maybe as the default here
@@ -128,14 +130,16 @@ public class Superstructure extends SubsystemBase {
 
     @Override
     public void periodic() {
-        GreenLogger.log("Wanted Superstate " + wantedSuperState);
         actualSuperState = handleStateTransitions();
-
-        GreenLogger.log("Actual Superstate " + actualSuperState);
 
         applyStates();
 
-        SmartDashboard.putString("Super state: ", wantedSuperState.toString());
+        if (wantedSuperState != previousWantedSuperState) {
+            GreenLogger.log("Wanted Superstate " + wantedSuperState);
+            GreenLogger.log("Actual Superstate " + actualSuperState);
+            SmartDashboard.putString("Super state: ", wantedSuperState.toString());
+            previousWantedSuperState = wantedSuperState;
+        }
     }
 
     private ActualSuperState handleStateTransitions() {
@@ -342,5 +346,13 @@ public class Superstructure extends SubsystemBase {
         intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
         feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
         shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
+    }
+
+    public void shootingAutomatic() {  //the shooter position to automatically shoot at hub or corner depending on location
+        if (BaseRobotState.swerveDriveState.Pose.getX() >  5) {  //TODO: account for color and fix the number
+            setWantedSuperState(WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER);
+        } else {
+            setWantedSuperState(WantedSuperState.SHOOTER_AUTOMATIC_HUB);
+        }
     }
 }

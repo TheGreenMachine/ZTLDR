@@ -63,4 +63,7 @@ public class GhostDevice implements IMotor {
     public double getSimMotorVoltage() {
         return 12;
     }
+
+    @Override
+    public boolean hasDeviceCrashed() { return  false; }
 }

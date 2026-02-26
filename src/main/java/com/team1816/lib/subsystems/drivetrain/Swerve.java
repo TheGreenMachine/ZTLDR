@@ -110,7 +110,7 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
         rot = rotLimiter.calculate(rot);
 
         // 5. Slow mode (right bumper = precision mode)
-        if (controller.rightBumper().getAsBoolean()) {
+        if (controller.leftTrigger().getAsBoolean()) {
             x   *= 0.35;
             y   *= 0.35;
             rot *= 0.45;
