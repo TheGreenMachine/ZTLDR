@@ -324,7 +324,7 @@ subsystems:
             slot0:
                 kP: 0.7
                 kI: 0.5
-                kD: 0
+                kD: 0.01
                 kV: 0.129
                 kS: 0.05
         azimuthPID:
