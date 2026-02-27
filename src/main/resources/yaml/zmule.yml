@@ -322,9 +322,9 @@ subsystems:
                 azimuth: brAz
         drivePID:
             slot0:
-                kP: 2.0
-                kI: 0
-                kD: 0.02
+                kP: 0.3
+                kI: 0.6
+                kD: 0
                 kV: 0.129
                 kS: 0.05
         azimuthPID:
@@ -344,8 +344,9 @@ subsystems:
             maxAngularRate: 8.285 # rad/sec
             wheelCOF: 1.7
         constants:
-            translationKp: 3
-            rotationKp: 3
+            translationKp: 5
+            rotationKp: 4
+            rotationKd: 1
 
 autopathing:
     paths:

@@ -91,17 +91,23 @@ public class Drivetrain extends SwerveDrivetrain<CommonTalon, CommonTalon, Paren
         PathFollowingController pathFollowingController;
 
         robotConfig = new RobotConfig(massKG, MOI, moduleConfig, modules);
-        var tranKp = factory.getConstant(NAME, "translationKp", 5);
-        var rotKp = factory.getConstant(NAME, "rotationKp", 5);
+        var tranKp = factory.getConstant(NAME, "translationKp", 5.0);
+        //var tranKd = factory.getConstant(NAME, "translationKd", 0.2);
+        var rotKp = factory.getConstant(NAME, "rotationKp", 5.0);
+        var rotKd = factory.getConstant(NAME, "rotationKd", 0.2);
         GreenLogger.log(
             "translationKp:" + GetDisplay(tranKp) +
                 " rotationKp:" + GetDisplay(rotKp)
         );
+        var transPID = new PIDConstants(tranKp, 0, 0);
+        var rotPID = new PIDConstants(rotKp, 0, rotKd);
+        GreenLogger.log("transPID", transPID);
+        GreenLogger.log("rotPID", rotPID);
         pathFollowingController = new PPHolonomicDriveController(
             // PID constants for translation
-            new PIDConstants(tranKp, 0, 0),
+            transPID,
             // PID constants for rotation
-            new PIDConstants(rotKp, 0, 0),
+            rotPID,
             // Period
             .02
         );
