@@ -19,7 +19,7 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
     private FEEDER_STATE previousWantedState = FEEDER_STATE.IDLING;
 
     //MOTORS
-    private final IMotor feedMotor = (IMotor)factory.getDevice(NAME, "feedMotor");
+    private final IMotor feedMotor;
 
     private final VelocityVoltage velocityReq = new VelocityVoltage(0);
 
@@ -27,6 +27,9 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
     private static final double MIN_FEED_MOTOR_CLAMP = -80;
     private static final double MAX_FEED_MOTOR_CLAMP = 80;
 
+    public Feeder () {
+        feedMotor = (IMotor)factory.getDevice(NAME, "feedMotor");
+    }
     @Override
     public void periodic() {
         readFromHardware();
