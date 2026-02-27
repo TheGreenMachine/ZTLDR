@@ -19,8 +19,7 @@ public class Superstructure extends SubsystemBase {
     private final Feeder feeder;
     private final Climber climber;
     private final DuckingPerimeterManager duckingPerimeterManager = new DuckingPerimeterManager();
-    private final boolean wantAutomatedDucking = true; //todo: Put wantAutomatedDucking to be in yaml
-
+    public boolean wantAutomatedDucking = true; //<-WHERE YOU TO TURN OFF THE MECHANISM
     private CommandXboxController controller;
 
     public enum WantedSuperState {
