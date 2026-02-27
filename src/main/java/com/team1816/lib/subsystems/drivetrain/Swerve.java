@@ -5,6 +5,7 @@ import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.SubsystemDataProcessor;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -12,6 +13,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -40,6 +42,7 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
     private static final double[] poseArray = new double[3];
 
     private ActualState wantedState = ActualState.IDLING;
+    private ActualState previousWantedState = ActualState.IDLING;
 
     public Swerve(IDrivetrain drivetrain, CommandXboxController controller) {
         this.drivetrain = drivetrain;
@@ -135,6 +138,12 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
             default:
                 drivetrain.setSwerveState(new SwerveRequest.Idle());
                 break;
+        }
+
+        if (wantedState != previousWantedState) {
+            GreenLogger.log("Swerve state: " + wantedState.toString());
+            SmartDashboard.putString("Swerve state: ", wantedState.toString());
+            previousWantedState = wantedState;
         }
     }
 
