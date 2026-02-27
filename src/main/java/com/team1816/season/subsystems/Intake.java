@@ -23,8 +23,8 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     private INTAKE_STATE previousWantedState = INTAKE_STATE.INTAKE_UP;
 
     //MOTORS
-    private final IMotor intakeMotor = (IMotor) factory.getDevice(NAME, "intakeMotor");
-    private final IMotor flipperMotor = (IMotor) factory.getDevice(NAME, "flipperMotor");
+    private final IMotor intakeMotor;
+    private final IMotor flipperMotor;
 
     private final VelocityVoltage velocityControl = new VelocityVoltage(0);
     private final PositionVoltage positionControl = new PositionVoltage(0);
@@ -46,6 +46,8 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public Intake () {
         super();
         SmartDashboard.putData("Intake", intakeMech);
+        intakeMotor = (IMotor) factory.getDevice(NAME, "intakeMotor");
+        flipperMotor = (IMotor) factory.getDevice(NAME, "flipperMotor");
     }
 
     @Override

@@ -35,10 +35,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private SHOOTER_STATE previousWantedState = SHOOTER_STATE.IDLE;
 
     //MOTORS
-    private final IMotor topLaunchMotor = (IMotor) factory.getDevice(NAME, "topLaunchMotor");
-    private final IMotor bottomLaunchMotor = (IMotor) factory.getDevice(NAME, "bottomLaunchMotor");
-    private final IMotor launchAngleMotor = (IMotor) factory.getDevice(NAME, "launchAngleMotor");
-    private final IMotor rotationAngleMotor = (IMotor) factory.getDevice(NAME, "rotationAngleMotor");
+    private final IMotor topLaunchMotor;
+    private final IMotor bottomLaunchMotor;
+    private final IMotor launchAngleMotor;
+    private final IMotor rotationAngleMotor;
 
     private final VelocityVoltage velocityControl = new VelocityVoltage(0);
     private final PositionVoltage positionControl = new PositionVoltage(0);
@@ -137,6 +137,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public Shooter(){
         super();
+
+        topLaunchMotor = (IMotor) factory.getDevice(NAME, "topLaunchMotor");
+        bottomLaunchMotor = (IMotor) factory.getDevice(NAME, "bottomLaunchMotor");
+        launchAngleMotor = (IMotor) factory.getDevice(NAME, "launchAngleMotor");
+        rotationAngleMotor = (IMotor) factory.getDevice(NAME, "rotationAngleMotor");
 
         MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE = factory.getConstant(NAME, "motorRotationsPerLaunchAngleDegree", 0); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
         MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE = factory.getConstant(NAME, "motorRotationsPerRotationAngleDegree", 0); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.

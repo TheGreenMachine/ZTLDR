@@ -24,8 +24,8 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     private CLIMBER_STATE previousWantedState = CLIMBER_STATE.IDLING;
 
     //MOTORS
-    private final IMotor flipMotor = (IMotor)factory.getDevice(NAME, "flipMotor");
-    private final IMotor linearSlideMotor = (IMotor)factory.getDevice(NAME, "linearSlideMotor");
+    private final IMotor flipMotor;
+    private final IMotor linearSlideMotor;
 
     private final PositionVoltage positionReq = new PositionVoltage(0);
 
@@ -45,6 +45,9 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     public Climber () {
         super();
         SmartDashboard.putData("Climber", climberMech);
+
+        flipMotor = (IMotor)factory.getDevice(NAME, "flipMotor");
+        linearSlideMotor = (IMotor)factory.getDevice(NAME, "linearSlideMotor");
     }
 
     @Override
