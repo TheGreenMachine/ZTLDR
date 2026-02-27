@@ -345,9 +345,9 @@ subsystems:
             wheelCOF: 1.7
         constants:
             translationKp: 3
-            rotationKp: 4
-            rotationKi: 0.2
-            rotationKd: 0.4
+            rotationKp: 5
+            rotationKi: 0.02
+            rotationKd: 0.8
 
 autopathing:
     paths:
