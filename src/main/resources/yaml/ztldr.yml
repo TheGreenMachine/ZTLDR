@@ -182,31 +182,21 @@ subsystems:
             rotationKp: 3
     vision:
         cameras:
-            zmuleFrontCamera:
-                photonVisionUIName: Arducam_OV9281_USB_Camera
+            exampleCamera:
+                photonVisionUIName: UI Name
                 robotToCamera:
-                    xInches: 10.25
+                    xInches: 0
                     yInches: 0
-                    zInches: 9.5
+                    zInches: 24
                     rollDegrees: 0
                     pitchDegrees: 0
                     yawDegrees: 0
                 detectionType: APRIL_TAG
-#            exampleCamera:
-#                photonVisionUIName: UI Name
-#                robotToCamera:
-#                    xInches: 0
-#                    yInches: 0
-#                    zInches: 24
-#                    rollDegrees: 0
-#                    pitchDegrees: 0
-#                    yawDegrees: 0
-#                detectionType: APRIL_TAG
-#                simCameraProperties: # TODO: split this into the actual values needed for simulating the camera
-#            physicalCameraUsedWithSim:
-#                photonVisionUIName: HD_Pro_Webcam_C920
-#                robotToCamera:
-#                    zInches: 24
-#                detectionType: APRIL_TAG
-#                simCameraProperties: # See above camera
-#                simulateWithPhysicalCamera: true
+                simCameraProperties: # TODO: split this into the actual values needed for simulating the camera
+            physicalCameraUsedWithSim:
+                photonVisionUIName: Logi_C270_HD_WebCam
+                robotToCamera:
+                    zInches: 24
+                detectionType: APRIL_TAG
+                simCameraProperties: # See above camera
+                simulateWithPhysicalCamera: true

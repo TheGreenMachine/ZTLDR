@@ -137,6 +137,26 @@
           ],
           "weight": 3.0
         },
+        "physicalCams/cameras": {
+          "arrowColor": [
+            0.0,
+            0.0,
+            1.0,
+            255.0
+          ],
+          "arrowSize": 19,
+          "arrowWeight": 3.0,
+          "color": [
+            0.0,
+            0.0,
+            1.0,
+            255.0
+          ],
+          "style": "Hidden"
+        },
+        "physicalCams/visibleTargetPoses": {
+          "image": "C:\\Users\\henry\\ZTLDR\\field_images\\visible-vision-target.png"
+        },
         "right": 3466,
         "top": 291,
         "visibleTargetPoses": {

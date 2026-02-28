@@ -290,6 +290,11 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
         // match the robot pose shown on the other field.
         visionSim.getDebugField().getObject("combinedPoseEstimate").setPose(BaseRobotState.robotPose);
 
+        // Clear the visibleTargetPoses and camera poses on the vision sim field for the physical
+        // sim cameras before we add the new poses.
+        visionSim.getDebugField().getObject("physicalCams/visibleTargetPoses").setPoses();
+        visionSim.getDebugField().getObject("physicalCams/cameras").setPoses();
+
         // Update the vision field with individual camera data.
         for (Camera camera : cameras) {
             camera.updateCameraOnSimField(visionSim);

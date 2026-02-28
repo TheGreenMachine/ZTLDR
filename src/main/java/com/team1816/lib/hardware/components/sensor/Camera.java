@@ -210,11 +210,10 @@ public class Camera {
         // positions in the simulation for it at all.
         if (simulateWithPhysicalCamera) {
             // For some reason there is not a method to just add new positions to a Field2d under a
-            // name without clearing the old ones, so we have to get the current poses
-            // automatically added by PhotonVision from the PhotonCameraSims, add our poses from
-            // the physical cameras to that list, and then set the poses on the field to the
-            // combined list.
-            List<Pose2d> visibleTargetPoses = simField.getObject("visibleTargetPoses").getPoses();
+            // name without clearing the old ones, so we have to get the current poses that the
+            // other physical sim cameras added, add our poses from this camera to that list, and
+            // then set the poses on the field to the combined list.
+            List<Pose2d> visibleTargetPoses = simField.getObject("physicalCams/visibleTargetPoses").getPoses();
             visibleTargetPoses.addAll(
                 // Get a list of Pose2ds from the list of AprilTag Pose3ds.
                 // This won't behave in exactly the same way as the cameras with a PhotonCameraSim
@@ -225,11 +224,11 @@ public class Camera {
                 // not important.
                 seenAprilTagPoses.stream().map(Pose3d::toPose2d).toList()
             );
-            simField.getObject("visibleTargetPoses").setPoses(visibleTargetPoses);
+            simField.getObject("physicalCams/visibleTargetPoses").setPoses(visibleTargetPoses);
 
-            List<Pose2d> cameras = simField.getObject("cameras").getPoses();
+            List<Pose2d> cameras = simField.getObject("physicalCams/cameras").getPoses();
             cameras.add(sim.getRobotPose().plus(robotToCamera).toPose2d());
-            simField.getObject("cameras").setPoses(cameras);
+            simField.getObject("physicalCams/cameras").setPoses(cameras);
         }
     }
 
