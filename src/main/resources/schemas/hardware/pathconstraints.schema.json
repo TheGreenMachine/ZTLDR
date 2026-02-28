@@ -1,0 +1,33 @@
+{
+    "type": "object",
+    "title": "Path Constraints Config",
+    "additionalProperties": false,
+    "properties": {
+        "maxVelocity": {
+            "type": "number",
+            "description": "maximum velocity in m/s"
+        },
+        "maxAccel": {
+            "type": "number",
+            "description": "maximum acceleration in m/s²"
+        },
+        "maxAngularVelocity": {
+            "type": "number",
+            "description": "maximum angular velocity in degrees/s"
+        },
+        "maxAngularAccel": {
+            "type": "number",
+            "description": "maximum angular acceleration in degrees/s²"
+        }
+    },
+    "anyOf": [
+        {
+            "required": [
+                "maxVelocity",
+                "maxAccel",
+                "maxAngularVelocity",
+                "maxAngularAccel"
+            ]
+        }
+    ]
+}

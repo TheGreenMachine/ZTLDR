@@ -13,16 +13,35 @@ subsystems:
                 remoteOffest: .484
                 forwardSoftLimit: .33
                 reversSoftLimit: -.33
-        pidConfig:
-            slot0:
-                kP: 48.046920
-                kI: 0
-                kD: 0.240234
+            flipperMotor:
+                id: 3
+                deviceType: TalonFXS
+                motorType: Brushed_DC
+                neutralMode: Brake
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 20
+                remoteSensor: PulseWidth
+                remoteOffest: .484
+                forwardSoftLimit: .33
+                reversSoftLimit: -.33
+            pidConfig:
+                slot0:
+                    kP: 48.046920
+                    kI: 0
+                    kD: 0.240234
         constants: # TODO: all of these
             intakeChannel: 7
+            outSpeed: 10
+            outAngle: 255
+
+            inSpeed: -10
+            inAngle: 255
+
+            downAngle: 225
+            upAngle: 45
     climber:
         devices:
-            climberMotor:
+            climberFlipMotor:
                 deviceType: TalonFX
                 id: 16
                 motorRotation: Clockwise_Positive
@@ -30,6 +49,15 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+            linearMotor:
+                deviceType: TalonFX
+                id: 28
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+
     indexer:
         devices:
             indexerMotor:
@@ -42,7 +70,19 @@ subsystems:
                     expoKA: 0.04
     shooter:
         devices:
-            shooterMotor:
+            topLaunchMotor:
+                deviceType: TalonFX
+                id: 15
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+                pidConfig:
+                    slot0:
+                        kP: 1
+                        kV: 0.135
+            bottomLaunchMotor:
                 deviceType: TalonFX
                 id: 16
                 motorRotation: Clockwise_Positive
@@ -50,28 +90,79 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
-    turret:
-        devices:
-            turretMotor:
-                id: 0
-                deviceType: TalonFXS
-                motorType: Minion_JST
-                neutralMode: Brake
-                motorRotation: Clockwise_Positive
-                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
+                pidConfig:
+                    slot0:
+                        kP: 0.1
+                        kV: 0.1
+            launchAngleMotor:
+                deviceType: TalonFX
+                motorType: NEO550_JST
+                remoteSensor: RemoteCANcoder
                 remoteSensorId: 1
-            turretCoder:
+                id: 39
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                remoteOffset: 0.002
+                forwardSoftLimit: 0.085
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+                pidConfig:
+                    slot0:
+                        kP: 100
+                        kD: 1
+                        kS: 1
+            launchAngleCoder:
                 id: 1
                 deviceType: CANcoder
-        pidConfig:
-            slot0:
-                kP: 48.046920
-                kI: 0
-                kD: 0.240234
+                shooterMotorLower:
+                # TODO: Change numbers if necessary
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+                pidConfig:
+                    slot0:
+                        kP: 1
+                        kV: 0.135
+            rotationAngleMotor:
+                deviceType: TalonFX
+                motorType: Minion_JST
+                id: 13
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                neutralMode: Brake
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+    gatekeeper:
+        devices:
+            gatekeeperTopMotor:
+                deviceType: TalonFX
+                id: 14
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
+                pidConfig:
+                    slot0:
+                        kP: 0.1
+                        kV: 0.1
+            gatekeeperBottomMotor:
+                deviceType: TalonFX
+                id: 22
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 60
+                motionMagic:
+                    expoKV: 0.05
+                    expoKA: 0.04
     ledManager:
+        implemented: false
         devices:
             argb:
-                id: 12
+                id: -1
                 deviceType: CANifier
             drgb:
                 id: 10
@@ -192,21 +283,16 @@ subsystems:
                     pitchDegrees: 0
                     yawDegrees: 0
                 detectionType: APRIL_TAG
-#            exampleCamera:
-#                photonVisionUIName: UI Name
-#                robotToCamera:
-#                    xInches: 0
-#                    yInches: 0
-#                    zInches: 24
-#                    rollDegrees: 0
-#                    pitchDegrees: 0
-#                    yawDegrees: 0
-#                detectionType: APRIL_TAG
-#                simCameraProperties: # TODO: split this into the actual values needed for simulating the camera
-#            physicalCameraUsedWithSim:
-#                photonVisionUIName: HD_Pro_Webcam_C920
-#                robotToCamera:
-#                    zInches: 24
-#                detectionType: APRIL_TAG
-#                simCameraProperties: # See above camera
-#                simulateWithPhysicalCamera: true
+
+autopathing:
+    paths:
+        ethan:
+            x: 3.50
+            y: 1.50
+            rotation: 156.00
+            flippable: false
+    constraints:
+        maxVelocity: 3.00
+        maxAccel: 3.00
+        maxAngularVelocity: 540.000
+        maxAngularAccel: 720.000

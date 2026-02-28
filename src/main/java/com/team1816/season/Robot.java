@@ -27,7 +27,7 @@ public class Robot extends BaseRobot {
     @Override
     public void robotInit() {
         try {
-            GreenLogger.SilenceLoopOverrun(this);
+            GreenLogger.silenceLoopOverrun(this);
             // used to serve elastic dashboards must be port 5800
             WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
             GreenLogger.periodicLog("timings/RobotLoop (ms)", () -> periodicLoopTime);
@@ -62,6 +62,7 @@ public class Robot extends BaseRobot {
                 CommandScheduler.getInstance().schedule(autonomousCommand);
             }
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.AUTONOMOUS);
+            robotContainer.autonomousInit();
         } catch (Throwable t) {
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
             GreenLogger.log(t);
@@ -75,7 +76,8 @@ public class Robot extends BaseRobot {
                 autonomousCommand.cancel();
             }
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ENABLED);
-            robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.TELEOP_DRIVE);
+            robotContainer.teleopInit();
+            //robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
             Elastic.selectTab("Teleoperated");
         } catch (Throwable t) {
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
@@ -112,7 +114,7 @@ public class Robot extends BaseRobot {
 
     @Override
     public void teleopExit() {
-        robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.TELEOP_IDLE);
+        robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
     }
 
     @Override

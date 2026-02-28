@@ -5,12 +5,14 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.hardware.factory.RobotFactory;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -29,7 +31,8 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     private final SlewRateLimiter rotLimiter = new SlewRateLimiter(6);  // rotation
     private static double maxAngularRate = 0;
 
-    private SWERVE_STATE wantedState = SWERVE_STATE.SWERVE_IDLE;
+    private ActualState wantedState = ActualState.IDLING;
+    private ActualState previousWantedState = ActualState.IDLING;
 
     public Swerve(CommandXboxController controller) {
         // TODO: This Singleton.get stuff is a temporary workaround until I fix a bug with the
@@ -45,9 +48,10 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
         maxAngularRate = RotationsPerSecond.of(kinematics.maxAngularRate).in(RadiansPerSecond);
     }
 
-    public enum SWERVE_STATE {
-        SWERVE_DRIVE,
-        SWERVE_IDLE
+    public enum ActualState {
+        MANUAL_DRIVING,
+        AUTOMATIC_DRIVING,
+        IDLING
     }
 
     @Override
@@ -79,7 +83,7 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
         rot = rotLimiter.calculate(rot);
 
         // 5. Slow mode (right bumper = precision mode)
-        if (controller.rightBumper().getAsBoolean()) {
+        if (controller.leftTrigger().getAsBoolean()) {
             x   *= 0.35;
             y   *= 0.35;
             rot *= 0.45;
@@ -92,19 +96,29 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
 
     private void applyStates() {
         switch (wantedState) {
-            case SWERVE_DRIVE:
+            case MANUAL_DRIVING:
                 SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
                     .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
                 drivetrain.setSwerveState(GetSwerverCommand(drive));
                 break;
-            case SWERVE_IDLE:
+            case AUTOMATIC_DRIVING:
+                // TODO: something here, idk
+                break;
+            case IDLING:
+                break;
             default:
                 drivetrain.setSwerveState(new SwerveRequest.Idle());
                 break;
         }
+
+        if (wantedState != previousWantedState) {
+            GreenLogger.log("Swerve state: " + wantedState.toString());
+            SmartDashboard.putString("Swerve state: ", wantedState.toString());
+            previousWantedState = wantedState;
+        }
     }
 
-    public void setWantedState(SWERVE_STATE state) {
+    public void setWantedState(ActualState state) {
         this.wantedState = state;
     }
 

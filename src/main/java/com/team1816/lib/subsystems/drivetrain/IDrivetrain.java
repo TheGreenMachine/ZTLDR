@@ -26,6 +26,8 @@ public interface IDrivetrain extends ITestableSubsystem {
     // this is an approximation assumes mass is evenly spread over robot
     double MOI = (massKG * config.kinematics.wheelbaseWidth * config.kinematics.wheelbaseWidth + config.kinematics.wheelbaseLength * config.kinematics.wheelbaseLength) / 12;
 
+    boolean isAllowedToPathPlannerPath = false;
+
     // Gets configuration for kinematics
     default KinematicsConfig getKinematicsConfig() {
         return config.kinematics;

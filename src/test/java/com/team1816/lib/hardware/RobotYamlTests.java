@@ -8,7 +8,7 @@ public class RobotYamlTests {
 
     @Test
     public void pidYamlTest() {
-        var config = loadConfig("K9");
+        var config = loadConfig("k9");
         var drive = config.subsystems.get("drivetrain");
         assertNotNull(drive);
         var pid = drive.pidConfig.get("slot0");
@@ -18,7 +18,7 @@ public class RobotYamlTests {
 
     @Test
     public void K9LoadTest() {
-        loadConfig("K9");
+        loadConfig("k9");
     }
 
     private RobotConfiguration loadConfig(String configName) {

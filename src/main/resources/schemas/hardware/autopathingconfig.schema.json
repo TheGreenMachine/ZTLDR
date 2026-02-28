@@ -1,0 +1,21 @@
+{
+    "type": "object",
+    "title": "Autopathing Config",
+    "properties": {
+        "paths": {
+            "type": "object",
+            "existingJavaType": "java.util.Map<String,PathConfig>"
+        },
+        "constraints": {
+            "$ref": "pathconstraints.schema.json"
+        }
+    },
+    "anyOf": [
+        {
+            "required": [
+                "paths",
+                "constraints"
+            ]
+        }
+    ]
+}
