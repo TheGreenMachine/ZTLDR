@@ -344,10 +344,10 @@ subsystems:
             maxAngularRate: 8.285 # rad/sec
             wheelCOF: 1.7
         constants:
-            translationKp: 3
-            rotationKp: 5
-            rotationKi: 0.02
-            rotationKd: 0.8
+            translationKp: 4
+            rotationKp: 3
+            rotationKi: 0
+            rotationKd: 0
 
 autopathing:
     paths:
