@@ -31,8 +31,6 @@ public interface IDrivetrain extends ITestableSubsystem {
         return config.kinematics;
     }
 
-    boolean IsFieldCentric();
-
     void resetPose(Pose2d pose);
 
     /**
@@ -53,29 +51,6 @@ public interface IDrivetrain extends ITestableSubsystem {
     void setUpPeriodicLogging(String logPath);
 
     default void setSwerveState(SwerveRequest request) {}
-
-    // Converts meters to rotations using defined wheel circumference
-    // set useGearing to true to account for gearing
-    default double metersToRotations(double meters, boolean useGearing) {
-        if (useGearing) {
-            return meters / wheelCircumference * gearing;
-        }
-        return meters / wheelCircumference;
-    }
-
-    // Converts rotations to meters using defined wheel circumference
-    // set useGearing to true to account for gearing
-    default double rotationsToMeters(double rotations, boolean useGearing) {
-        if (useGearing) {
-            return rotations / gearing * wheelCircumference;
-        }
-        return rotations * wheelCircumference;
-    }
-
-    // returns a velocity clamped to the configured maximum
-    default double clampVelocity(double velocity) {
-        return Math.min(Math.max(velocity, -maxSpd), maxSpd);
-    }
 
     /**
      * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate

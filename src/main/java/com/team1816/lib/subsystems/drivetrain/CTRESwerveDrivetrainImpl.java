@@ -4,6 +4,7 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.traits.CommonTalon;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
+import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -61,11 +62,17 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
 
     // Creates the CTRE swerve drivetrain.  The getDeviceById calls are made by the CTRE class and are based
     // on the defined values in the getSwerveModuleConstants
-    public CTRESwerveDrivetrainImpl() {
-        super((id, bus) -> (CommonTalon) factory.getDeviceById(NAME, id),
-            (id, bus) -> (CommonTalon) factory.getDeviceById(NAME, id),
-            (id, bus) -> (ParentDevice) factory.getDeviceById(NAME, id),
-            factory.getSwerveDrivetrainConstant(NAME),
+    public CTRESwerveDrivetrainImpl(
+        DeviceConstructor<CommonTalon> driveMotorConstructor,
+        DeviceConstructor<CommonTalon> steerMotorConstructor,
+        DeviceConstructor<ParentDevice> encoderConstructor,
+        SwerveDrivetrainConstants drivetrainConstants
+    ) {
+        super(
+            driveMotorConstructor,
+            steerMotorConstructor,
+            encoderConstructor,
+            drivetrainConstants,
             // Pass in 0 as the odometryUpdateFrequency to let CTRE just use their defaults.
             0,
             // The initial odometryStandardDeviations to use until a call to setStateStdDevs. I
@@ -82,9 +89,6 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
             VecBuilder.fill(1, 1, 1),
             factory.getSwerveModuleConstants(NAME, maxSpd)
         );
-        //default to filed centric
-        fieldCentric = factory.getConstant(NAME, "fieldCentric", 1) == 1;
-        GreenLogger.log("FieldCentric: " + fieldCentric);
 
         configureAutoBuilder();
 
@@ -166,11 +170,6 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
             logPath + "Has Accurate Pose Estimate",
             () -> BaseRobotState.hasAccuratePoseEstimate
         );
-    }
-
-    @Override
-    public boolean IsFieldCentric() {
-        return fieldCentric;
     }
 
     private void startSimThread() {

@@ -3,6 +3,7 @@ package com.team1816.lib.subsystems.drivetrain;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.team1816.lib.Singleton;
+import com.team1816.lib.hardware.factory.RobotFactory;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -13,11 +14,15 @@ import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
+import static com.team1816.lib.Singleton.factory;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 public class Swerve extends SubsystemBase implements ITestableSubsystem {
 
-    private final IDrivetrain drivetrain = Singleton.CreateSubSystem(CTRESwerveDrivetrainImpl.class);
+    private final String NAME = "drivetrain";
+
+    private final IDrivetrain drivetrain;
+
     private final CommandXboxController controller;
     private final SlewRateLimiter xLimiter = new SlewRateLimiter(3);    // forward/back
     private final SlewRateLimiter yLimiter = new SlewRateLimiter(3);    // strafe
@@ -27,7 +32,11 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     private SWERVE_STATE wantedState = SWERVE_STATE.SWERVE_IDLE;
 
     public Swerve(CommandXboxController controller) {
-        drivetrain.setUpPeriodicLogging(IDrivetrain.NAME + "/");
+        // TODO: This Singleton.get stuff is a temporary workaround until I fix a bug with the
+        //  static factory member from the Singleton not initializing properly for the first
+        //  subsystem that is created.
+        drivetrain = Singleton.get(RobotFactory.class).getSwerveDrivetrain(NAME);
+
         this.controller = controller;
         var kinematics = drivetrain.getKinematicsConfig();
         // Note that X is defined as forward according to WPILib convention,

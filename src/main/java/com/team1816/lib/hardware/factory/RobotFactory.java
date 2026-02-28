@@ -2,6 +2,8 @@ package com.team1816.lib.hardware.factory;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.*;
+import com.ctre.phoenix6.hardware.ParentDevice;
+import com.ctre.phoenix6.hardware.traits.CommonTalon;
 import com.ctre.phoenix6.signals.*;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -16,6 +18,8 @@ import com.team1816.lib.hardware.components.motor.TalonFXSImpl;
 import com.team1816.lib.hardware.components.sensor.CANCoderImpl;
 import com.team1816.lib.hardware.components.sensor.Camera;
 import com.team1816.lib.hardware.components.sensor.CanRangeImpl;
+import com.team1816.lib.subsystems.drivetrain.CTRESwerveDrivetrainImpl;
+import com.team1816.lib.subsystems.drivetrain.IDrivetrain;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -217,6 +221,26 @@ public class RobotFactory {
         }
 
         return cameras;
+    }
+
+    /**
+     * Constructs a swerve drivetrain from the YAML configuration for the provided subsystem.
+     *
+     * @param subsystemName The name of the subsystem in the YAML configuration file.
+     * @return The swerve drivetrain for the provided subsystem.
+     */
+    public IDrivetrain getSwerveDrivetrain(String subsystemName) {
+        IDrivetrain swerveDrivetrain = new CTRESwerveDrivetrainImpl(
+            (id, bus) -> (CommonTalon) factory.getDeviceById(subsystemName, id),
+            (id, bus) -> (CommonTalon) factory.getDeviceById(subsystemName, id),
+            (id, bus) -> (ParentDevice) factory.getDeviceById(subsystemName, id),
+            factory.getSwerveDrivetrainConstant(subsystemName)
+        );
+
+        String logPath = subsystemName + "/" + "swerveDrivetrain" + "/";
+        swerveDrivetrain.setUpPeriodicLogging(logPath);
+
+        return swerveDrivetrain;
     }
 
     // Used to get devices by there id  Used by CTRE swerve
