@@ -39,7 +39,6 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
     SubsystemConfig config = factory.getSubsystemConfig(NAME);
     private static final double SIM_LOOP_PERIOD = 0.005; // 5 ms
     private double lastSimTime;
-    private boolean fieldCentric;
     /**
      * An odometry object representing the "actual" position of the robot in the sim, or the raw
      * odometry (without vision estimates) on the real robot. These are the same thing because the
@@ -197,17 +196,24 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
         PathFollowingController pathFollowingController;
 
         robotConfig = new RobotConfig(massKG, MOI, moduleConfig, moduleLocations);
-        var tranKp = factory.getConstant(NAME, "translationKp", 5);
-        var rotKp = factory.getConstant(NAME, "rotationKp", 5);
+        var tranKp = factory.getConstant(NAME, "translationKp", 5.0);
+        //var tranKd = factory.getConstant(NAME, "translationKd", 0.2);
+        var rotKp = factory.getConstant(NAME, "rotationKp", 5.0);
+        var rotKi = factory.getConstant(NAME, "rotationKi", 0);
+        var rotKd = factory.getConstant(NAME, "rotationKd", 0);
         GreenLogger.log(
             "translationKp:" + GetDisplay(tranKp) +
                 " rotationKp:" + GetDisplay(rotKp)
         );
+        var transPID = new PIDConstants(tranKp, 0, 0);
+        var rotPID = new PIDConstants(rotKp, rotKi, rotKd);
+        GreenLogger.log("transPID", transPID);
+        GreenLogger.log("rotPID", rotPID);
         pathFollowingController = new PPHolonomicDriveController(
             // PID constants for translation
-            new PIDConstants(tranKp, 0, 0),
+            transPID,
             // PID constants for rotation
-            new PIDConstants(rotKp, 0, 0),
+            rotPID,
             // Period
             .02
         );
