@@ -1,5 +1,6 @@
 package com.team1816.season.subsystems;
 
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.pathplanner.lib.util.FlippingUtil;
@@ -11,13 +12,13 @@ import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -41,6 +42,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final IMotor rotationAngleMotor = (IMotor) factory.getDevice(NAME, "rotationAngleMotor");
 
     private final VelocityVoltage velocityControl = new VelocityVoltage(0);
+    private VelocityVoltage rotationVelocityControl = new VelocityVoltage(0);
     private final PositionVoltage positionControl = new PositionVoltage(0);
 
     //AUTO AIM
@@ -61,14 +63,18 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final double MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE;
     private final double MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE;
     private final Translation3d SHOOTER_OFFSET;
-    private final double CALIBRATION_THRESHOLD;
-    private final Rotation2d CALIBRATION_POSITION_ARC_ANGLE;
-    private final Rotation2d ROTATION_OFFSET_FROM_CALIBRATION_ZERO;
-    private static final double HALF_FIELD_WIDTH = FlippingUtil.fieldSizeY/2;
+    private final double HALF_FIELD_WIDTH = FlippingUtil.fieldSizeY/2;
 
     //CALIBRATION
-    private Double[] calibrationPositions = new Double[]{0.0, 0.0};
-    private boolean isCalibrated;
+    private final double FAST_CALIBRATION_SPEED = .2;
+    private final double SLOW_CALIBRATION_SPEED = .1;
+    private final double EXTRA_SLOW_CALIBRATION_SPEED = .05;
+    private final double CALIBRATION_STALL_SECONDS = .5;
+    private final double ONE_TURRET_ROTATION = 1;
+    private double initialCalibrationTimestamp = -1;
+    private CALIBRATION_STATE calibrationState;
+    private double rotationAngleMotorOffsetRotations;
+    private final DutyCycleOut dutyCycleOutRequest = new DutyCycleOut(0);
 
     //MECHANISMS
     private final NetworkTable networkTable;
@@ -105,7 +111,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public enum SHOOTER_STATE {
         // TODO: figure out what default angles and velocities should be for manual mode
         CALIBRATING(0, 0, 0),
-        CALIBRATED(0, 0, 0),
         DISTANCE_ONE(factory.getConstant(NAME,"distanceOneLaunchAngle",0), factory.getConstant(NAME,"distanceOneRotationAngle",0), factory.getConstant(NAME,"distanceOneLaunchVelocity",0)),
         DISTANCE_TWO(factory.getConstant(NAME,"distanceTwoLaunchAngle",0), factory.getConstant(NAME,"distanceTwoRotationAngle",0), factory.getConstant(NAME,"distanceTwoLaunchVelocity",0)),
         DISTANCE_THREE(factory.getConstant(NAME,"distanceThreeLaunchAngle",0), factory.getConstant(NAME,"distanceThreeRotationAngle",0), factory.getConstant(NAME,"distanceThreeLaunchVelocity",0)),
@@ -135,17 +140,21 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         }
     }
 
+    public enum CALIBRATION_STATE {
+        CALIBRATING,
+        CALIBRATED
+    }
+
     public Shooter(){
         super();
 
         MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE = factory.getConstant(NAME, "motorRotationsPerLaunchAngleDegree", 0); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
         MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE = factory.getConstant(NAME, "motorRotationsPerRotationAngleDegree", 0); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
         SHOOTER_OFFSET = new Translation3d(factory.getConstant(NAME, "initialShooterOffsetX",0), factory.getConstant(NAME, "initialShooterOffsetY",0), factory.getConstant(NAME, "initialShooterOffsetZ",0)); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-        CALIBRATION_THRESHOLD = factory.getConstant(NAME, "calibrationThreshold",10); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-        CALIBRATION_POSITION_ARC_ANGLE = Rotation2d.fromRotations(factory.getConstant(NAME, "calibrationPositionArcAngle", 0.75)); //should always be less than 1 rotation //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
-        ROTATION_OFFSET_FROM_CALIBRATION_ZERO = Rotation2d.fromDegrees(factory.getConstant(NAME, "rotationOffsetFromCalibrationZero", 70)); //as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
 
         launcherTranslation = new Translation3d(0,0,0).plus(SHOOTER_OFFSET);
+
+        calibrationState = CALIBRATION_STATE.CALIBRATING;
 
         networkTable = NetworkTableInstance.getDefault().getTable("");
         turretFieldPose = networkTable.getDoubleArrayTopic("Field/Turret").publish();
@@ -154,11 +163,13 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     public void periodic() {
-        SmartDashboard.putString("Shooter state: ", wantedState.toString());
-
         readFromHardware();
 
-        if (wantedState == SHOOTER_STATE.CALIBRATING) {
+        if (rotationAngleMotor.hasDeviceCrashed()) {
+            calibrationState = CALIBRATION_STATE.CALIBRATING;
+        }
+
+        if (!(calibrationState == CALIBRATION_STATE.CALIBRATED)) {
             calibratePeriodic();
         } else {
             applyState();
@@ -188,8 +199,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double rotationAngle = wantedState.getRotationAngle();
         double launchPower = wantedState.getLaunchPower();
 
-        if ((wantedState == SHOOTER_STATE.AUTOMATIC) || (wantedState == SHOOTER_STATE.SNOWBLOWING)) {
-            if (wantedState == SHOOTER_STATE.AUTOMATIC) { //Does this work???
+        if (wantedState == SHOOTER_STATE.AUTOMATIC || wantedState == SHOOTER_STATE.SNOWBLOWING) {
+
+            if (wantedState == SHOOTER_STATE.AUTOMATIC) {
                 if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
                     setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_HUB);
                 }
@@ -250,24 +262,22 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void calibratePeriodic(){
-        if (!rightSensorValue && !leftSensorValue){
-            if (java.util.Arrays.stream(calibrationPositions).filter(java.util.Objects::nonNull).noneMatch(rotation -> Math.abs(rotation - currentRotationPosition) <= CALIBRATION_THRESHOLD)) {
-                if (calibrationPositions[0] == null) {
-                    calibrationPositions[0] = currentRotationPosition;
-                } else if (calibrationPositions[1] == null) {
-                    calibrationPositions[1] = currentRotationPosition;
-                    if (calibrationPositions[0] > calibrationPositions[1]){
-                        double temp = calibrationPositions[0];
-                        calibrationPositions[0] = calibrationPositions[1];
-                        calibrationPositions[1] = temp;
-                    }
-                } else {
-                    GreenLogger.log("Shooter.calibrate() has logged more calibration positions than expected");
+        // TODO: figure out if left, right, and clockwise are used correctly
+        if (calibrationState == CALIBRATION_STATE.CALIBRATING) {
+            if (!rightSensorValue && !leftSensorValue) {
+                rotationAngleMotor.setControl(dutyCycleOutRequest.withOutput(EXTRA_SLOW_CALIBRATION_SPEED));
+                if (initialCalibrationTimestamp == -1) {
+                    initialCalibrationTimestamp = Timer.getFPGATimestamp();
+                }
+                else if (Timer.getFPGATimestamp() - initialCalibrationTimestamp > CALIBRATION_STALL_SECONDS) {
+                    rotationAngleMotorOffsetRotations = rotationAngleMotor.getMotorPosition();
+                    calibrationState = CALIBRATION_STATE.CALIBRATED;
                 }
             }
-        }
-        if (calibrationPositions[0] != null && calibrationPositions[1] != null && wantedState == SHOOTER_STATE.CALIBRATING){
-            isCalibrated = true;
+            else {
+                initialCalibrationTimestamp = -1;
+                rotationAngleMotor.setControl(dutyCycleOutRequest.withOutput(leftSensorValue ? FAST_CALIBRATION_SPEED : SLOW_CALIBRATION_SPEED));
+            }
         }
     }
 
@@ -297,16 +307,17 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void setRotationAngle(double wantedAngleDegrees) {
-        double rotations = (wantedAngleDegrees + ROTATION_OFFSET_FROM_CALIBRATION_ZERO.getDegrees()) * MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE;
+        double rotations = wantedAngleDegrees  * MOTOR_ROTATIONS_PER_ROTATION_ANGLE_DEGREE + rotationAngleMotorOffsetRotations;
 
         rotations = wrapMotorRotations(rotations);
 
-        if(calibrationPositions[0] != null && calibrationPositions[1] != null){
-            if (calibrationPositions[0] > rotations || calibrationPositions[1] < rotations){
+        if(calibrationState == CALIBRATION_STATE.CALIBRATED){
+            // TODO: fix this based on if left or right is lower
+            if (rotations < rotationAngleMotorOffsetRotations || rotations > rotationAngleMotorOffsetRotations + ONE_TURRET_ROTATION){
                 GreenLogger.log("Wanted Shooter rotation is out of bounds of the calibrated positions");
             }
 
-            double output = MathUtil.clamp(rotations, calibrationPositions[0], calibrationPositions[1]);
+            double output = MathUtil.clamp(rotations, rotationAngleMotorOffsetRotations, rotationAngleMotorOffsetRotations + ONE_TURRET_ROTATION);
 
             rotationAngleMotor.setControl(positionControl.withPosition(output));
         } else {
@@ -316,13 +327,12 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     //this method technically causes inoptimal behavior in turret dead zones, but it shouldn't matter bc
     private double wrapMotorRotations(double rotations) {
-        double scale = (calibrationPositions[1] - calibrationPositions[0]) / CALIBRATION_POSITION_ARC_ANGLE.getRotations();
-        double scaledRotations = (rotations - calibrationPositions[0]) % scale;
+        double scaledRotations = (rotations - rotationAngleMotorOffsetRotations) % ONE_TURRET_ROTATION;
 
-        return scaledRotations + calibrationPositions[0];
+        return scaledRotations + rotationAngleMotorOffsetRotations;
     }
 
     public boolean isCalibrated() {
-        return isCalibrated;
+        return calibrationState == CALIBRATION_STATE.CALIBRATED;
     }
 }
