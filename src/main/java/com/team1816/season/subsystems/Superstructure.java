@@ -107,9 +107,9 @@ public class Superstructure extends SubsystemBase {
         DEFAULTING
     }
 
-    private WantedSuperState wantedSuperState = WantedSuperState.INITIALIZING;
-    private WantedSuperState previousWantedSuperState = WantedSuperState.INITIALIZING;
-    private ActualSuperState actualSuperState = ActualSuperState.INITIALIZING;
+    private WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
+    private WantedSuperState previousWantedSuperState = WantedSuperState.DEFAULT;
+    private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
     private WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING; //Do we need this??
     private FeederControlState feederControlState = FeederControlState.DEFAULTING; //What to do with this?
