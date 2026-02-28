@@ -351,14 +351,24 @@ subsystems:
     vision:
         cameras:
             zmuleFrontCamera:
-                photonVisionUIName: Arducam_OV9281_USB_Camera
+                photonVisionUIName: Camera-Front
                 robotToCamera:
                     xInches: 10.25
                     yInches: 0
-                    zInches: 9.5
+                    zInches: 9.375
                     rollDegrees: 0
                     pitchDegrees: 0
                     yawDegrees: 0
+                detectionType: APRIL_TAG
+            zmuleRightCamera:
+                photonVisionUIName: Camera-Right
+                robotToCamera:
+                    xInches: 0
+                    yInches: -8.75
+                    zInches: 8.375
+                    rollDegrees: 0
+                    pitchDegrees: 0
+                    yawDegrees: -90
                 detectionType: APRIL_TAG
 
 autopathing:
