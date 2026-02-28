@@ -116,6 +116,7 @@ public class Superstructure extends SubsystemBase {
 
     private WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING; //Do we need this??
     private FeederControlState feederControlState = FeederControlState.DEFAULTING; //What to do with this?
+    private boolean isAutonomous = false;
 
     private ClimbSide climbSide = ClimbSide.LEFT;
 
@@ -228,8 +229,10 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void defaulting() {
-        // don't change any states, just leave us in manual drive for now
-        swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
+        // During auto, let PathPlanner have sole control of the drivetrain
+        if (!isAutonomous) {
+            swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
+        }
     }
 
     private void shootCalibrating() {
@@ -338,10 +341,12 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void autonomousInit() {
-            //What is supposed to be here???
+        isAutonomous = true;
+        swerve.setWantedState(Swerve.ActualState.IDLING);
     }
 
     public void teleopInit() {
+        isAutonomous = false;
         swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
         intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
         feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
