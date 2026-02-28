@@ -56,6 +56,8 @@ public class Robot extends BaseRobot {
     @Override
     public void autonomousInit() {
         try {
+            // Ensure pose is always initialized before scheduling auto
+            robotContainer.forceUpdatePose();
             autonomousCommand = robotContainer.autoChooser.getSelected();
             // schedule the autonomous command
             if (autonomousCommand != null) {

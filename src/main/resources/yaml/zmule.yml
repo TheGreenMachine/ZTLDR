@@ -1,6 +1,33 @@
 defaultAuto: "Simple S"
+shooterSettings:
+
+    distances:
+        - 47
+        - 100
+        - 135
+        - 160
+        - 220
+        - 338
+        - 420
+    angles:
+        - 25
+        - 25
+        - 25
+        - 25
+        - 25
+        - 25
+        - 25
+    powers:
+        - 17
+        - 27
+        - 37
+        - 47
+        - 57
+        - 67
+        - 77
 subsystems:
     intake:
+        implemented: false
         devices:
             intakeMotor:
                 id: 2
@@ -40,8 +67,9 @@ subsystems:
             downAngle: 225
             upAngle: 45
     climber:
+        implemented: false
         devices:
-            climberFlipMotor:
+            flipMotor:
                 deviceType: TalonFX
                 id: 16
                 motorRotation: Clockwise_Positive
@@ -49,7 +77,7 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
-            linearMotor:
+            linearSlideMotor:
                 deviceType: TalonFX
                 id: 28
                 motorRotation: Clockwise_Positive
@@ -57,10 +85,23 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+        constants:
+            flipIdling: 0
+            flipL3UpClimbing: 0
+            flipL3DownClimbing: 0
+            flipL1UpClimbing: 0
+            flipL1DownClimbing: 0
 
-    indexer:
+            linearSlideIdling: 0
+            linearSlideL3UpClimbing: 0
+            linearSlideL3DownClimbing: 0
+            linearSlideL1UpClimbing: 0
+            linearSlideL1DownClimbing: 0
+
+    feeder:
+        implemented: false
         devices:
-            indexerMotor:
+            feedMotor:
                 deviceType: TalonFX
                 id: 16
                 motorRotation: Clockwise_Positive
@@ -68,7 +109,13 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+        constants:
+            fastFeeding: 50
+            slowFeeding: 20
+            reversing: -50
+            idling: 0
     shooter:
+        implemented: false
         devices:
             topLaunchMotor:
                 deviceType: TalonFX
@@ -130,15 +177,36 @@ subsystems:
                 deviceType: TalonFX
                 motorType: Minion_JST
                 id: 13
-                motorRotation: Clockwise_Positive
+                motorRotation: Clockwise_Positive #as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped
                 statorCurrentLimit: 60
                 neutralMode: Brake
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+        constants:
+            rotationAngleSensorClockwiseLeft: 0
+            rotationAngleSensorClockwiseRight: 1
+            motorRotationsPerLaunchAngleDegree: 3.5
+            motorRotationsPerRotationAngleDegree: 3.5
+            initialShooterOffsetX: 0
+            initialShooterOffsetY: 0
+            initialShooterOffsetZ: 22
+            calibrationThreshold: 10
+            calibrationPositionArcAngle: 0.75
+            rotationOffsetFromCalibrationZero: 70
+            distanceOneLaunchAngle: 3
+            distanceOneRotationAngle: 45
+            distanceOneLaunchVelocity: 10
+            distanceTwoLaunchAngle: 45
+            distanceTwoRotationAngle: 90
+            distanceTwoLaunchVelocity: 20
+            distanceThreeLaunchAngle: 86
+            distanceThreeRotationAngle: 0
+            distanceThreeLaunchVelocity: 30
     gatekeeper:
+        implemented: false
         devices:
-            gatekeeperTopMotor:
+            topMotor:
                 deviceType: TalonFX
                 id: 14
                 motorRotation: Clockwise_Positive
@@ -150,7 +218,7 @@ subsystems:
                     slot0:
                         kP: 0.1
                         kV: 0.1
-            gatekeeperBottomMotor:
+            bottomMotor:
                 deviceType: TalonFX
                 id: 22
                 motorRotation: Clockwise_Positive
@@ -158,7 +226,13 @@ subsystems:
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
+        constants:
+            topClosedVelocity: 0
+            topOpenVelocity: 10
+            bottomClosedVelocity: 0
+            bottomOpenVelocity: 5
     ledManager:
+
         implemented: false
         devices:
             argb:
@@ -250,11 +324,12 @@ subsystems:
             slot0:
                 kP: 0.4
                 kI: 0
-                kD: 0.0008
-                kV: 0.115
+                kD: 0
+                kV: 0.13
+                kS: 0.06
         azimuthPID:
             slot0:
-                kP: 75
+                kP: 100
                 kD: 0.5
                 kV: 2.66
                 kS: 0.1
@@ -263,14 +338,16 @@ subsystems:
             steerGearing: 26.0909
             wheelbaseLength: .60325 # meters
             wheelbaseWidth: .60325 # meters
-            robotMass: 74.088 # kg
+            robotMass: 27.216 # kg (60 lbs)
             wheelRadius: .04935 # meters
-            maxDriveRPS: 90 # measured motor max speed rps
-            maxAngularRate: .75 # rad/sec
+            maxDriveRPS: 98 # measured motor max speed rps
+            maxAngularRate: 8.285 # rad/sec
             wheelCOF: 1.7
         constants:
-            translationKp: 3
+            translationKp: 4
             rotationKp: 3
+            rotationKi: 0
+            rotationKd: 0
     vision:
         cameras:
             zmuleFrontCamera:

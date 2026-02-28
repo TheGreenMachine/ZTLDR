@@ -23,8 +23,9 @@ public interface IDrivetrain extends ITestableSubsystem {
     double gearing = config.kinematics.driveGearing;
     double wheelCircumference = 2 * Math.PI * whlRad;
 
-    // this is an approximation assumes mass is evenly spread over robot
-    double MOI = (massKG * config.kinematics.wheelbaseWidth * config.kinematics.wheelbaseWidth + config.kinematics.wheelbaseLength * config.kinematics.wheelbaseLength) / 12;
+    // MOI = mass * (width^2 + length^2) / 12, with 1.5x multiplier to account for
+    // concentrated perimeter mass (swerve modules, bumpers, battery)
+    double MOI = 1.5 * massKG * (config.kinematics.wheelbaseWidth * config.kinematics.wheelbaseWidth + config.kinematics.wheelbaseLength * config.kinematics.wheelbaseLength) / 12;
 
     boolean isAllowedToPathPlannerPath = false;
 

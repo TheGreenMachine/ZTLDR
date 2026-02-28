@@ -1,6 +1,7 @@
 package com.team1816.lib.util;
 
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
+import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.team1816.season.Robot;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
+
+import static com.team1816.lib.util.FormatUtils.GetDisplay;
 
 public class GreenLogger {
 
@@ -400,5 +403,12 @@ public class GreenLogger {
                 ((StringPublisher) entry.Publisher).set(value);
             }
         }
+    }
+
+    public static void log(String key, PIDConstants pid) {
+        GreenLogger.log("  " + key +
+            " - kP:" + GetDisplay(pid.kP) +
+            " kI:" + GetDisplay(pid.kI) +
+            " kD:" + GetDisplay(pid.kD));
     }
 }

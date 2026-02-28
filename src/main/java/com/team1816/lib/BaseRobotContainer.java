@@ -50,6 +50,14 @@ public abstract class BaseRobotContainer {
 
     public void updateInitialPose(){
         if(poseInitialized || DriverStation.getAlliance().isEmpty()) return;
+        forceUpdatePose();
+    }
+
+    /**
+     * Forces pose update regardless of poseInitialized state.
+     * Called from autonomousInit to ensure pose is always set before auto starts.
+     */
+    public void forceUpdatePose(){
         updatePoseOnSelection(autoChooser.getSelected());
     }
 
