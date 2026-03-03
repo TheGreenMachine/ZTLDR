@@ -77,7 +77,7 @@ public abstract class BaseSuperstructure extends SubsystemBase {
                 // very little trust in the current state estimate. This will essentially make the
                 // next vision measurement added set the pose almost completely.
                 swerve.setStateStdDevs(
-                    VecBuilder.fill(100, 100, 100)
+                    VecBuilder.fill(1000, 1000, 1000)
                 );
                 // Set the sum of the vision estimate variances to zero for performing state
                 // standard deviation calculations.
