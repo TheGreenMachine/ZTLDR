@@ -48,7 +48,7 @@ public class RobotFactory {
      */
     public RobotFactory() {
         robotIsReal = RobotBase.isReal();
-        var robotName = "ztldr";/*System.getenv("ROBOT_NAME");*/
+        var robotName = System.getenv("ROBOT_NAME");
         if (robotName == null) {
             GreenLogger.log("ROBOT_NAME environment variable not defined using test yaml");
             robotName = "test";
