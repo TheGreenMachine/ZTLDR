@@ -1,115 +1,101 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package com.team1816.lib.inputs;
 
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-
 @SuppressWarnings("MethodName")
-public class CommandButtonBoard extends CommandGenericHID {
+public class CommandButtonBoard {
+
     private final ButtonBoard m_hid;
 
     public CommandButtonBoard(int port) {
-        super(port);
-        m_hid = new ButtonBoard(port);
+        this(new ButtonBoard(port));
     }
 
-    @Override
+    public CommandButtonBoard(ButtonBoard hid) {
+        m_hid = hid;
+    }
+
     public ButtonBoard getHID() {
         return m_hid;
     }
 
 
-    //topLeft
+    private Trigger hidButton(int buttonNumber, EventLoop loop) {
+        if (loop == null) {
+            return new Trigger(() -> m_hid.getRawButton(buttonNumber));
+        } else {
+            return new Trigger(loop, () -> m_hid.getRawButton(buttonNumber));
+        }
+    }
+
+
+
     public Trigger topLeft() {
-        return topLeft(CommandScheduler.getInstance().getDefaultButtonLoop());
+        return hidButton(ButtonBoard.Button.kTopLeft.value, null);
     }
-
     public Trigger topLeft(EventLoop loop) {
-        return button(ButtonBoard.Button.kTopLeft.value, loop);
+        return hidButton(ButtonBoard.Button.kTopLeft.value, loop);
     }
 
-
-    //topCenter
     public Trigger topCenter() {
-        return topCenter(CommandScheduler.getInstance().getDefaultButtonLoop());
+        return hidButton(ButtonBoard.Button.kTopCenter.value, null);
     }
-
     public Trigger topCenter(EventLoop loop) {
-        return button(ButtonBoard.Button.kTopCenter.value, loop);
+        return hidButton(ButtonBoard.Button.kTopCenter.value, loop);
     }
 
-
-    //topRight
     public Trigger topRight() {
-        return topRight(CommandScheduler.getInstance().getDefaultButtonLoop());
+        return hidButton(ButtonBoard.Button.kTopRight.value, null);
     }
-
     public Trigger topRight(EventLoop loop) {
-        return button(ButtonBoard.Button.kTopRight.value, loop);
+        return hidButton(ButtonBoard.Button.kTopRight.value, loop);
     }
 
 
-    //middleLeft
+
     public Trigger middleLeft() {
-        return middleLeft(CommandScheduler.getInstance().getDefaultButtonLoop());
+        return hidButton(ButtonBoard.Button.kMiddleLeft.value, null);
     }
-
     public Trigger middleLeft(EventLoop loop) {
-        return button(ButtonBoard.Button.kMiddleLeft.value, loop);
+        return hidButton(ButtonBoard.Button.kMiddleLeft.value, loop);
     }
 
-
-    //middleCenter
     public Trigger middleCenter() {
-        return middleCenter(CommandScheduler.getInstance().getDefaultButtonLoop());
+        return hidButton(ButtonBoard.Button.kMiddleCenter.value, null);
     }
-
     public Trigger middleCenter(EventLoop loop) {
-        return button(ButtonBoard.Button.kMiddleCenter.value, loop);
+        return hidButton(ButtonBoard.Button.kMiddleCenter.value, loop);
     }
 
-
-    //middleRight
     public Trigger middleRight() {
-        return middleRight(CommandScheduler.getInstance().getDefaultButtonLoop());
+        return hidButton(ButtonBoard.Button.kMiddleRight.value, null);
     }
-
     public Trigger middleRight(EventLoop loop) {
-        return button(ButtonBoard.Button.kMiddleRight.value, loop);
+        return hidButton(ButtonBoard.Button.kMiddleRight.value, loop);
     }
 
 
-    //bottomLeft
+
     public Trigger bottomLeft() {
-        return bottomLeft(CommandScheduler.getInstance().getDefaultButtonLoop());
+        return hidButton(ButtonBoard.Button.kBottomLeft.value, null);
     }
-
     public Trigger bottomLeft(EventLoop loop) {
-        return button(ButtonBoard.Button.kBottomLeft.value, loop);
+        return hidButton(ButtonBoard.Button.kBottomLeft.value, loop);
     }
 
-    //bottomCenter
     public Trigger bottomCenter() {
-        return bottomCenter(CommandScheduler.getInstance().getDefaultButtonLoop());
+        return hidButton(ButtonBoard.Button.kBottomCenter.value, null);
     }
-
     public Trigger bottomCenter(EventLoop loop) {
-        return button(ButtonBoard.Button.kBottomCenter.value, loop);
+        return hidButton(ButtonBoard.Button.kBottomCenter.value, loop);
     }
 
-
-    //bottomRight
     public Trigger bottomRight() {
-        return bottomRight(CommandScheduler.getInstance().getDefaultButtonLoop());
+        return hidButton(ButtonBoard.Button.kBottomRight.value, null);
     }
-
     public Trigger bottomRight(EventLoop loop) {
-        return button(ButtonBoard.Button.kBottomRight.value, loop);
+        return hidButton(ButtonBoard.Button.kBottomRight.value, loop);
     }
 }

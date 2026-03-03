@@ -5,6 +5,7 @@ import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.SubsystemDataProcessor;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -12,6 +13,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -40,6 +42,7 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
     private static final double[] poseArray = new double[3];
 
     private ActualState wantedState = ActualState.IDLING;
+    private ActualState previousWantedState = ActualState.IDLING;
 
     public Swerve(IDrivetrain drivetrain, CommandXboxController controller) {
         this.drivetrain = drivetrain;
@@ -49,8 +52,6 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
         // and Y is defined as to the left according to WPILib convention.
         // setup teleop drivetrain command
         maxAngularRate = RotationsPerSecond.of(kinematics.maxAngularRate).in(RadiansPerSecond);
-
-        SubsystemDataProcessor.createAndStartSubsystemDataProcessor(this);
 
         NetworkTable netTable;
         netTable = NetworkTableInstance.getDefault().getTable("");
@@ -63,6 +64,8 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
         // name must be Robot for elastic to show as robot in UI
         fieldPub = netTable.getDoubleArrayTopic("Field/Robot").publish();
         fieldTypePub = netTable.getStringTopic("Field/.type").publish();
+
+        SubsystemDataProcessor.createAndStartSubsystemDataProcessor(this);
     }
 
     public enum ActualState {
@@ -109,7 +112,7 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
         rot = rotLimiter.calculate(rot);
 
         // 5. Slow mode (right bumper = precision mode)
-        if (controller.rightBumper().getAsBoolean()) {
+        if (controller.leftTrigger().getAsBoolean()) {
             x   *= 0.35;
             y   *= 0.35;
             rot *= 0.45;
@@ -135,6 +138,12 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
             default:
                 drivetrain.setSwerveState(new SwerveRequest.Idle());
                 break;
+        }
+
+        if (wantedState != previousWantedState) {
+            GreenLogger.log("Swerve state: " + wantedState.toString());
+            SmartDashboard.putString("Swerve state: ", wantedState.toString());
+            previousWantedState = wantedState;
         }
     }
 
