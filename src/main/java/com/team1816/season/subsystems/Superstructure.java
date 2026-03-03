@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
+import java.util.EnumSet;
+
 //Some wantedStates are still here since they're tied to aspects of the code I don't 100% understand(ClimbSide & FeederControl) -Ishwaq
 public class Superstructure extends SubsystemBase {
     private final Swerve swerve;
@@ -51,6 +53,10 @@ public class Superstructure extends SubsystemBase {
 
         DUCK
     }
+    EnumSet<WantedSuperState> superStatesToDuck = EnumSet.of( WantedSuperState.SHOOTER_AUTOMATIC_HUB,
+        WantedSuperState.SHOOTER_DISTANCE_1, WantedSuperState.SHOOTER_DISTANCE_2,
+        WantedSuperState.SHOOTER_DISTANCE_3,
+        WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER);
 
     public enum ActualSuperState {
         DEFAULTING,
@@ -110,6 +116,7 @@ public class Superstructure extends SubsystemBase {
 
     private WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
     private WantedSuperState previousWantedSuperState = WantedSuperState.DEFAULT;
+    private ActualSuperState previousActualSuperState = ActualSuperState.DEFAULTING;
     private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
     // TODO: Add calibration state, maybe as the default here
@@ -140,12 +147,14 @@ public class Superstructure extends SubsystemBase {
         if (wantedSuperState != previousWantedSuperState) {
             GreenLogger.log("Wanted Superstate " + wantedSuperState);
             GreenLogger.log("Actual Superstate " + actualSuperState);
+            GreenLogger.log("Previous Wanted Superstate: " + previousWantedSuperState.toString());
             previousWantedSuperState = wantedSuperState;
         }
-
-        actualSuperState = handleStateTransitions();
-
-        applyStates();
+        if(actualSuperState != previousActualSuperState) {
+            GreenLogger.log("Previous Actual Superstate" + previousActualSuperState.toString());
+            SmartDashboard.putString("Previous Actual Superstate", previousActualSuperState.toString());
+            previousActualSuperState = actualSuperState;
+        }
     }
 
     private ActualSuperState handleStateTransitions() {
@@ -179,6 +188,9 @@ public class Superstructure extends SubsystemBase {
         if(wantAutomatedDucking && duckingPerimeterManager.isInsidePerimeter()) {  //DOES KEEP THE WANTED STATE THE SAME
             actualSuperState = ActualSuperState.DUCKING;
         }
+        if(previousActualSuperState == ActualSuperState.DUCKING &&
+            superStatesToDuck.contains(wantedSuperState)) {
+            actualSuperState = ActualSuperState.DUCKING; }
         return actualSuperState;
     }
 
@@ -260,7 +272,7 @@ public class Superstructure extends SubsystemBase {
 
     private void shootingDistance3() {
         shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
-        actualSuperState = ActualSuperState.DEFAULTING;
+//        actualSuperState = ActualSuperState.DEFAULTING;
     }
 
     private void snowblowingAutomaticCorner() {
