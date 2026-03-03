@@ -299,7 +299,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void intakeIdling() {
-        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
+        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
         feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
         actualSuperState = ActualSuperState.DEFAULTING;
     }
@@ -347,7 +347,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void ducking() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_UP, Feeder.FEEDER_STATE.SLOW_FEEDING,
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN, Feeder.FEEDER_STATE.SLOW_FEEDING,
             Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
             Climber.CLIMBER_STATE.IDLING);
     }
