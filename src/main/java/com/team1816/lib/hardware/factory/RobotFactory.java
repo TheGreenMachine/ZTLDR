@@ -238,6 +238,7 @@ public class RobotFactory {
         // if subsystem is not implemented we don't need anything from it
         if (!subsystem.implemented) return new ArrayList<>();
 
+        // TODO: Make the simCameraProperties in YAML hold the actual values we need.
         var cameraProp = new SimCameraProperties();
         cameraProp.setCalibration(960, 720, Rotation2d.fromDegrees(90));
         cameraProp.setCalibError(0.35, 0.10);

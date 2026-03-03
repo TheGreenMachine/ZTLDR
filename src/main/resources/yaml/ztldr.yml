@@ -356,7 +356,6 @@ subsystems:
                     pitchDegrees: 0
                     yawDegrees: 0
                 detectionType: APRIL_TAG
-                simCameraProperties: # TODO: split this into the actual values needed for simulating the camera
             physicalCameraUsedWithSim:
                 photonVisionUIName: Logi_C270_HD_WebCam
                 robotToCamera:

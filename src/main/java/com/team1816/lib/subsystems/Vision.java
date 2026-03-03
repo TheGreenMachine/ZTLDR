@@ -52,6 +52,12 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      * The base standard deviations to use for multi-tag estimates
      */
     private final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+    /**
+     * The standard deviations to use for an estimate that we should just throw out
+     */
+    private final Matrix<N3, N1> noTrustStdDevs = VecBuilder.fill(
+        Double.NaN, Double.NaN, Double.NaN
+    );
 
     /**
      * Constructs a Vision subsystem.
@@ -123,7 +129,11 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                         )
                 ) {
                     Matrix<N3, N1> standardDeviations = calculateEstimateStandardDeviations(estimatedRobotPose);
-                    posesWithStdDevs.add(Pair.of(estimatedRobotPose, standardDeviations));
+                    // If the standard deviations are the noTrustStdDevs, we'll just throw the
+                    // estimate out. Otherwise, add the estimate to the list to return.
+                    if (standardDeviations != noTrustStdDevs) {
+                        posesWithStdDevs.add(Pair.of(estimatedRobotPose, standardDeviations));
+                    }
                     // Tell the camera what the standard deviations for its latest estimate were,
                     // for logging purposes.
                     camera.latestVisionStdDevs = standardDeviations;
@@ -187,7 +197,8 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      *                           to calculate standard deviations for.
      * @return The calculated standard deviations for the vision pose estimate (x position in
      * meters, y position in meters, and heading in radians, although the units are somewhat
-     * ambiguous).
+     * ambiguous). Returns a matrix of {@link Double#NaN} if the estimate should be completely
+     * thrown out.
      */
     private Matrix<N3, N1> calculateEstimateStandardDeviations(EstimatedRobotPose estimatedRobotPose) {
         PhotonPoseEstimator.PoseStrategy strategy = estimatedRobotPose.strategy;
@@ -226,7 +237,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
             // (see https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/3D-tracking.html#ambiguity)
             // was too high, we don't trust this estimate at all.
             if (closestDistance > 6 || lowestAmbiguity > 0.2) {
-                return VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+                return noTrustStdDevs;
             }
 
             // If we trust the estimate enough to consider it, decrease our trust (increase the

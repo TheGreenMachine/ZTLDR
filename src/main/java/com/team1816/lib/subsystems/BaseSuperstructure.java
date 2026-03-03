@@ -38,34 +38,32 @@ public abstract class BaseSuperstructure extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // If the robot tilts too far (maybe going over a bump or climbing), we probably don't have
-        // an accurate pose estimate.
+        handlePoseLossFromTilting();
+    }
 
+    /**
+     * Handles checking if the robot has tilted too far (maybe going over a bump or climbing) to
+     * decide if we can no longer trust our robot pose estimate. If we tilt too far, we have either
+     * lost wheel contact with the ground or are driving over an uneven surface, and therefore our
+     * pose estimate (which includes wheel odometry) will no longer be accurate.
+     */
+    private void handlePoseLossFromTilting() {
         // The threshold of how far the robot can be tilted before we decide we don't have an
-        // accurate pose estimate.
+        // accurate pose estimate. Mainly to account for gyro noise.
         final double tiltPoseLossThresholdRadians = Units.degreesToRadians(5.0);
-        // The minimum number of good vision pose estimates to wait for until we decide we are
-        // confident in our pose estimate again.
-        final int minGoodPoseEstimatesUntilConfident = 10;
 
         if (BaseRobotState.robotTiltRadians > tiltPoseLossThresholdRadians) {
             BaseRobotState.hasAccuratePoseEstimate = false;
+            // If we are still tilted after starting to count up, reset our count of good vision
+            // estimates toward regaining a good estimate.
             goodVisionEstimatesSincePoseLoss = 0;
-        }
-        // If we've gotten enough good vision pose estimates since losing pose, we know where we
-        // are again.
-        else if (goodVisionEstimatesSincePoseLoss >= minGoodPoseEstimatesUntilConfident) {
-            BaseRobotState.hasAccuratePoseEstimate = true;
-            goodVisionEstimatesSincePoseLoss = 0;
-            // Once we know where we are, set the state standard deviations of the estimate back to
-            // their defaults.
-            swerve.setStateStdDevs(defaultStateStdDevs);
         }
     }
 
     /**
      * Updates the drivetrain's pose estimate by passing in unread vision pose estimates from the
-     * {@link Vision} subsystem.
+     * {@link Vision} subsystem. Also handles deciding when we have gotten enough good vision
+     * estimates to be confident in our combined pose estimate again after losing pose.
      */
     public void addVisionMeasurementsToDrivetrain() {
         List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> visionMeasurements = vision
@@ -86,6 +84,7 @@ public abstract class BaseSuperstructure extends SubsystemBase {
                 visionEstimateSincePoseLossVarianceSum = VecBuilder.fill(0, 0, 0);
             }
 
+            // Add the vision measurements to the drivetrain.
             swerve.addVisionMeasurement(
                 visionMeasurement.getFirst().estimatedPose.toPose2d(),
                 visionMeasurement.getFirst().timestampSeconds,
@@ -111,17 +110,35 @@ public abstract class BaseSuperstructure extends SubsystemBase {
                     && visionStdDevs.get(2, 0) <= maxTrustworthyRotationStdDev
             ) {
                 goodVisionEstimatesSincePoseLoss += 1;
-                // If we treat the state pose estimate as the average of each of the vision pose
-                // estimates since losing pose (the sum of the pose estimates over the number of
-                // pose estimates added), then according to statistics, the standard deviation
-                // should be the square root of the sum of the variances (standard deviations
-                // squared) over the number of pose estimates.
-                visionEstimateSincePoseLossVarianceSum = visionEstimateSincePoseLossVarianceSum
-                    .plus(visionStdDevs.elementTimes(visionStdDevs));
-                var stateStdDev = visionEstimateSincePoseLossVarianceSum
-                    .elementPower(0.5)
-                    .div(goodVisionEstimatesSincePoseLoss);
-                swerve.setStateStdDevs(stateStdDev);
+
+                // The minimum number of good vision pose estimates to wait for until we decide we
+                // are confident in our pose estimate again.
+                final int minGoodPoseEstimatesUntilConfident = 10;
+
+                // If we've gotten enough good vision pose estimates since losing pose, we know
+                // where we are again.
+                if (goodVisionEstimatesSincePoseLoss >= minGoodPoseEstimatesUntilConfident) {
+                    BaseRobotState.hasAccuratePoseEstimate = true;
+                    goodVisionEstimatesSincePoseLoss = 0;
+                    // Once we know where we are, set the state standard deviations of the estimate
+                    // back to their defaults.
+                    swerve.setStateStdDevs(defaultStateStdDevs);
+                }
+                // If we haven't gotten enough good vision pose estimates yet, increase our trust
+                // in the state estimate based on the good estimates we've gotten so far.
+                else {
+                    // If we treat the state pose estimate as the average of each of the vision pose
+                    // estimates since losing pose (the sum of the pose estimates over the number of
+                    // pose estimates added), then according to statistics, the standard deviation
+                    // should be the square root of the sum of the variances (standard deviations
+                    // squared) over the number of pose estimates.
+                    visionEstimateSincePoseLossVarianceSum = visionEstimateSincePoseLossVarianceSum
+                        .plus(visionStdDevs.elementTimes(visionStdDevs));
+                    var stateStdDev = visionEstimateSincePoseLossVarianceSum
+                        .elementPower(0.5)
+                        .div(goodVisionEstimatesSincePoseLoss);
+                    swerve.setStateStdDevs(stateStdDev);
+                }
             }
         }
     }
