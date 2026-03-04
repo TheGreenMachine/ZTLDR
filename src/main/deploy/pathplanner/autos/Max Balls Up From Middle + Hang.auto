@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "NewPath_copy3_copy1"
+            "pathName": "BottomGateFullFuel"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "NewPath_copy4_copy1"
+            "pathName": "FuelToHangViaTopGate"
           }
         }
       ]

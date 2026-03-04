@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "NewPath"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "NewPath_copy1"
+            "pathName": "DriverStationToDepot"
           }
         }
       ]
