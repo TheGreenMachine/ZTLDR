@@ -42,7 +42,6 @@ subsystems:
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 20
                 remoteSensor: PulseWidth
-                remoteOffest: .484
                 forwardSoftLimit: .33
                 reversSoftLimit: -.33
             flipperMotor:
@@ -52,10 +51,12 @@ subsystems:
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 20
-                remoteSensor: PulseWidth
-                remoteOffest: .484
-                forwardSoftLimit: .33
-                reversSoftLimit: -.33
+                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
+                remoteSensorId: 10
+                remoteOffest: 1.141357
+            flipCoder:
+                id: 10
+                deviceType: CANcoder
             pidConfig:
                 slot0:
                     kP: 48.046920
