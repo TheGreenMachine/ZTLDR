@@ -4,12 +4,13 @@ import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
+import com.team1816.season.DuckingPerimeterManager;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
+import java.util.EnumSet;
 
 //Some wantedStates are still here since they're tied to aspects of the code I don't 100% understand(ClimbSide & FeederControl) -Ishwaq
 public class Superstructure extends SubsystemBase {
@@ -19,7 +20,8 @@ public class Superstructure extends SubsystemBase {
     private final Intake intake;
     private final Feeder feeder;
     private final Climber climber;
-
+    private final DuckingPerimeterManager duckingPerimeterManager = new DuckingPerimeterManager();
+    public boolean wantAutomatedDucking = true; //<-WHERE YOU TO TURN OFF THE MECHANISM
     private CommandXboxController controller;
 
     public enum WantedSuperState {
@@ -49,8 +51,12 @@ public class Superstructure extends SubsystemBase {
         CLIMB_L3,
         CLIMB_DOWN_L1,
 
-        DROP_HEIGHT
+        DUCK
     }
+    EnumSet<WantedSuperState> superStatesToDuck = EnumSet.of( WantedSuperState.SHOOTER_AUTOMATIC_HUB,
+        WantedSuperState.SHOOTER_DISTANCE_1, WantedSuperState.SHOOTER_DISTANCE_2,
+        WantedSuperState.SHOOTER_DISTANCE_3,
+        WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER);
 
     public enum ActualSuperState {
         DEFAULTING,
@@ -79,7 +85,7 @@ public class Superstructure extends SubsystemBase {
         CLIMBING_L3,
         CLIMBING_DOWN_L1,
 
-        DROPPING_HEIGHT
+        DUCKING
     }
 
     public enum ClimbSide {
@@ -110,6 +116,7 @@ public class Superstructure extends SubsystemBase {
 
     private WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
     private WantedSuperState previousWantedSuperState = WantedSuperState.DEFAULT;
+    private ActualSuperState previousActualSuperState = ActualSuperState.DEFAULTING;
     private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
     // TODO: Add calibration state, maybe as the default here
@@ -130,6 +137,9 @@ public class Superstructure extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putBoolean("Is inside Perimeter: ", duckingPerimeterManager.checkIfInsidePerimeter());
+        SmartDashboard.putString("Wanted Super state: ", wantedSuperState.toString());
+        SmartDashboard.putString("Actual Super state: ", actualSuperState.toString());
         actualSuperState = handleStateTransitions();
 
         applyStates();
@@ -137,8 +147,13 @@ public class Superstructure extends SubsystemBase {
         if (wantedSuperState != previousWantedSuperState) {
             GreenLogger.log("Wanted Superstate " + wantedSuperState);
             GreenLogger.log("Actual Superstate " + actualSuperState);
-            SmartDashboard.putString("Super state: ", wantedSuperState.toString());
+            GreenLogger.log("Previous Wanted Superstate: " + previousWantedSuperState.toString());
             previousWantedSuperState = wantedSuperState;
+        }
+        if(actualSuperState != previousActualSuperState) {
+            GreenLogger.log("Previous Actual Superstate" + previousActualSuperState.toString());
+            SmartDashboard.putString("Previous Actual Superstate", previousActualSuperState.toString());
+            previousActualSuperState = actualSuperState;
         }
     }
 
@@ -168,10 +183,14 @@ public class Superstructure extends SubsystemBase {
             case CLIMB_L3 -> actualSuperState = ActualSuperState.CLIMBING_L3;
             case CLIMB_DOWN_L1 -> actualSuperState = ActualSuperState.CLIMBING_DOWN_L1;
 
-            case DROP_HEIGHT -> actualSuperState = ActualSuperState.DROPPING_HEIGHT;
+            case DUCK -> actualSuperState = ActualSuperState.DUCKING;
         }
-
-
+        if(wantAutomatedDucking && duckingPerimeterManager.isInsidePerimeter()) {  //DOES KEEP THE WANTED STATE THE SAME
+            actualSuperState = ActualSuperState.DUCKING;
+        }
+        if(previousActualSuperState == ActualSuperState.DUCKING &&
+            superStatesToDuck.contains(wantedSuperState)) {
+            actualSuperState = ActualSuperState.DUCKING; }
         return actualSuperState;
     }
 
@@ -197,13 +216,13 @@ public class Superstructure extends SubsystemBase {
             case OUTTAKING -> outtaking();
 
             case GATEKEEPING_ON -> gatekeepingOn();
-            case GATEKEEPING_OFF -> gatekeeperingOff();
+            case GATEKEEPING_OFF -> gatekeepingOff();
 
             case CLIMBING_L1 -> climbingL1();
             case CLIMBING_L3 -> climbingL3();
             case CLIMBING_DOWN_L1 -> climbingDownL1();
 
-            case DROPPING_HEIGHT -> droppingHeight();
+            case DUCKING -> ducking();
         }
     }
 
@@ -253,7 +272,7 @@ public class Superstructure extends SubsystemBase {
 
     private void shootingDistance3() {
         shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
-        actualSuperState = ActualSuperState.DEFAULTING;
+//        actualSuperState = ActualSuperState.DEFAULTING;
     }
 
     private void snowblowingAutomaticCorner() {
@@ -280,7 +299,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void intakeIdling() {
-        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
+        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
         feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
         actualSuperState = ActualSuperState.DEFAULTING;
     }
@@ -297,7 +316,7 @@ public class Superstructure extends SubsystemBase {
         actualSuperState = ActualSuperState.DEFAULTING;
     }
 
-    private void gatekeeperingOff() {
+    private void gatekeepingOff() {
         gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
 
         if (intake.isIntaking()) {
@@ -327,8 +346,8 @@ public class Superstructure extends SubsystemBase {
             Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
     }
 
-    private void droppingHeight() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_DOWN, Feeder.FEEDER_STATE.SLOW_FEEDING,
+    private void ducking() {
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN, Feeder.FEEDER_STATE.SLOW_FEEDING,
             Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
             Climber.CLIMBER_STATE.IDLING);
     }
