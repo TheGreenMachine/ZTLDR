@@ -32,6 +32,7 @@ shooterSettings:
     maximumDefaultPower: 0 # TODO: SET THIS
 subsystems:
     intake:
+        implemented: false
         devices:
             intakeMotor:
                 id: 2
@@ -71,6 +72,7 @@ subsystems:
             downAngle: 255
             upAngle: 45
     climber:
+        implemented: false
         devices:
             flipMotor:
                 deviceType: TalonFX
@@ -102,6 +104,7 @@ subsystems:
             linearSlideL1DownClimbing: 0
 
     feeder:
+        implemented: false
         devices:
             feedMotor:
                 deviceType: TalonFX
@@ -117,6 +120,7 @@ subsystems:
             reversing: -50
             idling: 0
     shooter:
+        implemented: false
         devices:
             topLaunchMotor:
                 deviceType: TalonFX
@@ -205,6 +209,7 @@ subsystems:
             distanceThreeRotationAngle: 0
             distanceThreeLaunchVelocity: 30
     gatekeeper:
+        implemented: false
         devices:
             topMotor:
                 deviceType: TalonFX
@@ -255,7 +260,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 41
-                remoteOffest: 0.284668
+                remoteOffest: -0.303223
             flCoder:
                 id: 41
                 deviceType: CANcoder
@@ -270,7 +275,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 43
-                remoteOffest: 0.173096
+                remoteOffest: -0.454346
             frCoder:
                 id: 43
                 deviceType: CANcoder
@@ -284,7 +289,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 42
-                remoteOffest: 0.177490 # -Absolute Position No Offset CanCoder
+                remoteOffest: -0.35215   # Negative Absolute Position No Offset CanCoder
             blCoder:
                 id: 42
                 deviceType: CANcoder
@@ -299,7 +304,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 40
-                remoteOffest: -0.291016
+                remoteOffest: -0.381348
             brCoder:
                 id: 40
                 deviceType: CANcoder

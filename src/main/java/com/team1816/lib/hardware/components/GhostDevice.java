@@ -66,4 +66,34 @@ public class GhostDevice implements IMotor {
 
     @Override
     public boolean hasDeviceCrashed() { return  false; }
+
+    @Override
+    public double getMotorVelocity() {
+        return 0;
+    }
+
+    @Override
+    public double getMotorPosition() {
+        return 0;
+    }
+
+    @Override
+    public void zeroMotorPosition() {
+
+    }
+
+    @Override
+    public StatusCode setSimRotorVelocity(double rps) {
+        return StatusCode.OK;
+    }
+
+    @Override
+    public StatusCode setSimRotorPosition(double rotations) {
+        return StatusCode.OK;
+    }
+
+    @Override
+    public double getSimMotorVoltage() {
+        return 0;
+    }
 }

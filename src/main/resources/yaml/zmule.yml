@@ -1,6 +1,5 @@
 defaultAuto: "Simple S"
 shooterSettings:
-
     distances:
         - 47
         - 100
@@ -25,6 +24,12 @@ shooterSettings:
         - 57
         - 67
         - 77
+    minimumDefaultAngle: 0 # TODO: SET THIS
+    minimumDefaultPower: 0 # TODO: SET THIS
+    mediumDefaultAngle: 0 # TODO: SET THIS
+    mediumDefaultPower: 0 # TODO: SET THIS
+    maximumDefaultAngle: 0 # TODO: SET THIS
+    maximumDefaultPower: 0 # TODO: SET THIS
 subsystems:
     intake:
         implemented: false
@@ -64,7 +69,7 @@ subsystems:
             inSpeed: -10
             inAngle: 255
 
-            downAngle: 225
+            downAngle: 255
             upAngle: 45
     climber:
         implemented: false
@@ -99,7 +104,6 @@ subsystems:
             linearSlideL1DownClimbing: 0
 
     feeder:
-        implemented: false
         devices:
             feedMotor:
                 deviceType: TalonFX
