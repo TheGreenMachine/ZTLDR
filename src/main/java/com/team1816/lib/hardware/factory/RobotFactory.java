@@ -480,6 +480,7 @@ public class RobotFactory {
             if (pid.kV != null) config.kV = pid.kV;
             if (pid.kI != null) config.kI = pid.kI;
             if (pid.gravityType != null) config.GravityType = pid.gravityType;
+            if (pid.staticFeedforwardSign != null) config.StaticFeedforwardSign = pid.staticFeedforwardSign;
             GreenLogger.log("  " + key +
                 " - kP:" + GetDisplay(config.kP) +
                 " kI:" + GetDisplay(config.kI) +
@@ -488,7 +489,9 @@ public class RobotFactory {
                 " kS:" + GetDisplay(config.kS) +
                 " kA:" + GetDisplay(config.kA) +
                 " kG:" + GetDisplay(config.kG) +
-                " gravityType:" + config.GravityType);
+                " gravityType:" + config.GravityType +
+                " staticFeedforwardSign:" + config.StaticFeedforwardSign
+            );
         }
         return config;
     }

@@ -179,6 +179,7 @@ subsystems:
             reversing: -50
             idling: 0
     gatekeeper:
+        canBusName: shooterCANivore
         devices:
             topMotor:
                 deviceType: TalonFX
@@ -243,31 +244,26 @@ subsystems:
             downAngle: 255
             upAngle: 45
     shooter:
+        canBusName: shooterCANivore
         devices:
             topLaunchMotor:
                 deviceType: TalonFX
                 id: 32
                 motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
                 pidConfig:
                     slot0:
-                        kP: 1
-                        kV: 0.135
+                        kS: 0.29
+                        kV: 0.115
+                        kP: 0.5
             bottomLaunchMotor:
                 deviceType: TalonFX
                 id: 33
                 motorRotation: CounterClockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
                 pidConfig:
                     slot0:
-                        kP: 0.1
-                        kV: 0.1
+                        kS: 0.28
+                        kV: 0.115
+                        kP: 0.5
             launchAngleMotor:
                 deviceType: TalonFXS
                 motorType: NEO550_JST
@@ -275,26 +271,24 @@ subsystems:
                 remoteSensorId: 36
                 id: 34
                 motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                reverseSoftLimit: 0.78
-                forwardSoftLimit: 0.833
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
-                pidConfig:
+                reverseSoftLimit: -0.602
+                forwardSoftLimit: -0.537
+                pidConfig: # TODO: Tune this one.
                     slot0:
-                        kP: 100
-                        kD: 1
-                        kS: 1
+                        kS: 0.29
+                        kP: 2
+                        kD: 0.1
+                        staticFeedforwardSign: UseClosedLoopSign
             rotationAngleMotor:
                 deviceType: TalonFX
                 id: 35
                 motorRotation: CounterClockwise_Positive
-                statorCurrentLimit: 60
-                neutralMode: Brake
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
+                pidConfig:
+                    slot0:
+                        kS: 0.29
+                        kP: 2
+                        kD: 0.1
+                        staticFeedforwardSign: UseClosedLoopSign
             launchAngleCoder:
                 id: 36
                 deviceType: CANcoder
