@@ -121,11 +121,11 @@ public class Superstructure extends SubsystemBase {
 
     public Superstructure(Swerve swerve) {
         this.swerve = swerve;
-        this.shooter = Singleton.get(Shooter.class);
-        this.gatekeeper = Singleton.get(Gatekeeper.class);
-        this.intake = Singleton.get(Intake.class);
-        this.feeder = Singleton.get(Feeder.class);
-        this.climber = Singleton.get(Climber.class);
+        this.shooter = Singleton.CreateSubSystem(Shooter.class);
+        this.gatekeeper = Singleton.CreateSubSystem(Gatekeeper.class);
+        this.intake = Singleton.CreateSubSystem(Intake.class);
+        this.feeder = Singleton.CreateSubSystem(Feeder.class);
+        this.climber = Singleton.CreateSubSystem(Climber.class);
     }
 
     @Override
