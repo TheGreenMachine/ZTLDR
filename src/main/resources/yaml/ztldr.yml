@@ -182,24 +182,22 @@ subsystems:
         devices:
             topMotor:
                 deviceType: TalonFX
-                id: 12
+                id: 30
                 motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
                 pidConfig:
                     slot0:
-                        kP: 0.1
-                        kV: 0.1
+                        kP: 0.5
+                        kS: 0.31
+                        kV: 0.081
             bottomMotor:
                 deviceType: TalonFX
-                id: 13
+                id: 31
                 motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
+                pidConfig:
+                    slot0:
+                        kP: 0.5
+                        kS: 0.31
+                        kV: 0.08
         constants:
             topClosedVelocity: 0
             topOpenVelocity: 10
@@ -248,7 +246,7 @@ subsystems:
         devices:
             topLaunchMotor:
                 deviceType: TalonFX
-                id: 16
+                id: 32
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
                 motionMagic:
@@ -260,8 +258,8 @@ subsystems:
                         kV: 0.135
             bottomLaunchMotor:
                 deviceType: TalonFX
-                id: 17
-                motorRotation: Clockwise_Positive
+                id: 33
+                motorRotation: CounterClockwise_Positive
                 statorCurrentLimit: 60
                 motionMagic:
                     expoKV: 0.05
@@ -271,15 +269,15 @@ subsystems:
                         kP: 0.1
                         kV: 0.1
             launchAngleMotor:
-                deviceType: TalonFX
+                deviceType: TalonFXS
                 motorType: NEO550_JST
                 remoteSensor: RemoteCANcoder
-                remoteSensorId: 1
-                id: 18
+                remoteSensorId: 36
+                id: 34
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
-                remoteOffset: 0.002
-                forwardSoftLimit: 0.085
+                reverseSoftLimit: 0.78
+                forwardSoftLimit: 0.833
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
@@ -290,28 +288,17 @@ subsystems:
                         kS: 1
             rotationAngleMotor:
                 deviceType: TalonFX
-                motorType: Minion_JST
-                id: 19
-                motorRotation: Clockwise_Positive #as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped
+                id: 35
+                motorRotation: CounterClockwise_Positive
                 statorCurrentLimit: 60
                 neutralMode: Brake
                 motionMagic:
                     expoKV: 0.05
                     expoKA: 0.04
             launchAngleCoder:
-                id: 5
+                id: 36
                 deviceType: CANcoder
-                shooterMotorLower:
-                # TODO: Change numbers if necessary
-                motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
-                pidConfig:
-                    slot0:
-                        kP: 1
-                        kV: 0.135
+                sensorDirection: Clockwise_Positive # TODO: Make this actually get applied to the config. See #153 in the GitHub Project.
         constants:
             rotationAngleSensorClockwiseLeft: 0
             rotationAngleSensorClockwiseRight: 1
