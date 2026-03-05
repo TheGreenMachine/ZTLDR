@@ -42,10 +42,10 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 41
+                remoteSensorId: 9
                 remoteOffest: 0.284668
             flCoder:
-                id: 1
+                id: 9
                 deviceType: CANcoder
             frDr:
                 id: 2
@@ -57,10 +57,10 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 43
+                remoteSensorId: 10
                 remoteOffest: 0.173096
             frCoder:
-                id: 2
+                id: 10
                 deviceType: CANcoder
             blDr:
                 id: 3
@@ -71,10 +71,10 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 42
+                remoteSensorId: 11
                 remoteOffest: 0.177490 # -Absolute Position No Offset CanCoder
             blCoder:
-                id: 3
+                id: 11
                 deviceType: CANcoder
             brDr:
                 id: 4
@@ -86,14 +86,14 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 40
+                remoteSensorId: 12
                 remoteOffest: -0.291016
             brCoder:
-                id: 4
+                id: 12
                 deviceType: CANcoder
             gyro:
                 deviceType: Pigeon2
-                id: 1
+                id: 0
         modules:
             fl:
                 drive: flDr
@@ -136,7 +136,7 @@ subsystems:
         devices:
             flipMotor:
                 deviceType: TalonFX
-                id: 9
+                id: 20
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
                 motionMagic:
@@ -144,7 +144,7 @@ subsystems:
                     expoKA: 0.04
             linearSlideMotor:
                 deviceType: TalonFX
-                id: 10
+                id: 21
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
                 motionMagic:
@@ -167,7 +167,7 @@ subsystems:
         devices:
             feedMotor:
                 deviceType: TalonFX
-                id: 11
+                id: 22
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
                 motionMagic:
@@ -207,7 +207,7 @@ subsystems:
     intake:
         devices:
             intakeMotor:
-                id: 14
+                id: 23
                 deviceType: TalonFXS
                 motorType: Brushed_DC
                 neutralMode: Brake
@@ -218,7 +218,7 @@ subsystems:
                 forwardSoftLimit: .33
                 reversSoftLimit: -.33
             flipperMotor:
-                id: 15
+                id: 24
                 deviceType: TalonFXS
                 motorType: Brushed_DC
                 neutralMode: Brake
@@ -318,10 +318,10 @@ subsystems:
         implemented: false
         devices:
             argb:
-                id: -1
+                id: 13
                 deviceType: CANifier
             drgb:
-                id: 10
+                id: 14
                 deviceType: CANdle
         constants:
             maxLevel: 96
