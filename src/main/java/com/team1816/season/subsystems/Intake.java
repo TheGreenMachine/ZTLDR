@@ -1,6 +1,6 @@
 package com.team1816.season.subsystems;
 
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
@@ -27,13 +27,14 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     private final IMotor flipperMotor = (IMotor) factory.getDevice(NAME, "flipperMotor");
 
     private final VelocityVoltage velocityControl = new VelocityVoltage(0);
-    private final PositionVoltage positionControl = new PositionVoltage(0);
+    private final MotionMagicExpoVoltage motionMagicExpoVoltage = new MotionMagicExpoVoltage(0);
+
 
     //PHYSICAL SUBSYSTEM DEPENDENT CONSTANTS
     private static final double MIN_INTAKE_MOTOR_CLAMP = -80;
     private static final double MAX_INTAKE_MOTOR_CLAMP = 80;
-    private static final double MIN_FLIPPER_MOTOR_CLAMP = 0;
-    private static final double MAX_FLIPPER_MOTOR_CLAMP = 80;
+    private static final double MIN_FLIPPER_MOTOR_CLAMP = -0.11;
+    private static final double MAX_FLIPPER_MOTOR_CLAMP = -0.033;
 
     //MECHANISMS
     private double currentPosition = 0;
@@ -101,7 +102,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     private void setFlipperAngle(double rotations) {
         double clampRotation = MathUtil.clamp(rotations, MIN_FLIPPER_MOTOR_CLAMP, MAX_FLIPPER_MOTOR_CLAMP);
 
-        flipperMotor.setControl(positionControl.withPosition(clampRotation));
+        flipperMotor.setControl(motionMagicExpoVoltage.withPosition(clampRotation));
     }
 
     public void setWantedState(INTAKE_STATE state) {
@@ -113,11 +114,11 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public boolean isOutaking() { return (wantedState == INTAKE_STATE.INTAKE_OUT); }
 
     public enum INTAKE_STATE {
-        INTAKE_IN(factory.getConstant(NAME, "inSpeed", -10, true), factory.getConstant(NAME, "inAngle", 255, true)),
-        INTAKE_OUT(factory.getConstant(NAME, "outSpeed", 10, true), factory.getConstant(NAME, "outAngle", 255, true)),
-        INTAKE_DOWN(0, factory.getConstant(NAME, "downAngle", 255, true)),
+        INTAKE_IN(factory.getConstant(NAME, "inSpeed", -10, true), factory.getConstant(NAME, "inPosition", -0.11, true)),
+        INTAKE_OUT(factory.getConstant(NAME, "outSpeed", 10, true), factory.getConstant(NAME, "outPosition", -0.033, true)),
+        INTAKE_DOWN(0, factory.getConstant(NAME, "downPosition", -0.033, true)),
         // Acts as the idle
-        INTAKE_UP(0, factory.getConstant(NAME, "upAngle", 45, true));
+        INTAKE_UP(0, factory.getConstant(NAME, "upPosition", -0.11, true));
 
         private double intakeMotorValue, flipperMotorValue;
 

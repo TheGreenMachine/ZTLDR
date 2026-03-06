@@ -53,25 +53,25 @@ subsystems:
                 statorCurrentLimit: 20
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 10
-                remoteOffest: 1.141357
+                remoteOffest: 0
+                rotorToSensor: 0.1
+                forwardSoftLimit: -0.033
+                reversSoftLimit: -0.11
+                motionMagic:
+                    expoKV: 0.07
+                    expokA: 0.04
+                pidConfig:
+                    slot0:
+                        kP: 10
+                        kV: 1
             flipCoder:
                 id: 10
                 deviceType: CANcoder
-            pidConfig:
-                slot0:
-                    kP: 48.046920
-                    kI: 0
-                    kD: 0.240234
         constants: # TODO: all of these
             intakeChannel: 7
             outSpeed: 10
-            outAngle: 255
 
             inSpeed: -10
-            inAngle: 255
-
-            downAngle: 255
-            upAngle: 45
     climber:
         implemented: false
         devices:
