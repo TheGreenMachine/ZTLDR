@@ -93,7 +93,7 @@ subsystems:
                 deviceType: CANcoder
             gyro:
                 deviceType: Pigeon2
-                id: 0
+                id: 13
         modules:
             fl:
                 drive: flDr
@@ -271,13 +271,12 @@ subsystems:
                 remoteSensorId: 36
                 id: 34
                 motorRotation: Clockwise_Positive
-                reverseSoftLimit: -0.602
-                forwardSoftLimit: -0.537
+                reverseSoftLimit: 0.046
+                forwardSoftLimit: 0.109
                 pidConfig: # TODO: Tune this one.
                     slot0:
-                        kS: 0.29
-                        kP: 2
-                        kD: 0.1
+                        kS: 0.3
+                        kP: 200
                         staticFeedforwardSign: UseClosedLoopSign
             rotationAngleMotor:
                 deviceType: TalonFX
@@ -293,6 +292,8 @@ subsystems:
                 id: 36
                 deviceType: CANcoder
                 sensorDirection: Clockwise_Positive # TODO: Make this actually get applied to the config. See #153 in the GitHub Project.
+                absoluteSensorDiscontinuityPoint: 0.625 # See above TODO.
+                magnetOffset: -0.35748674479 # See above TODO.
         constants:
             rotationAngleSensorClockwiseLeft: 0
             rotationAngleSensorClockwiseRight: 1
@@ -318,10 +319,10 @@ subsystems:
         implemented: false
         devices:
             argb:
-                id: 13
+                id: 14
                 deviceType: CANifier
             drgb:
-                id: 14
+                id: 15
                 deviceType: CANdle
         constants:
             maxLevel: 96
