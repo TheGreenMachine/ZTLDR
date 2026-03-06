@@ -261,7 +261,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 41
-                remoteOffest: -0.303223
+                remoteOffest: -0.300537
             flCoder:
                 id: 41
                 deviceType: CANcoder
@@ -276,7 +276,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 43
-                remoteOffest: -0.454346
+                remoteOffest: -0.439453
             frCoder:
                 id: 43
                 deviceType: CANcoder
@@ -290,7 +290,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 42
-                remoteOffest: -0.35215   # Negative Absolute Position No Offset CanCoder
+                remoteOffest: -0.351074   # Negative Absolute Position No Offset CanCoder
             blCoder:
                 id: 42
                 deviceType: CANcoder
@@ -305,7 +305,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 40
-                remoteOffest: -0.381348
+                remoteOffest: -0.383301
             brCoder:
                 id: 40
                 deviceType: CANcoder
