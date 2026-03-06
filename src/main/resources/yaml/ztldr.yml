@@ -38,8 +38,6 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
-                forwardSoftLimit: .33
-                reversSoftLimit: -.33
             flipperMotor:
                 id: 3
                 deviceType: TalonFX
@@ -50,22 +48,22 @@ subsystems:
                 remoteSensorId: 10
                 remoteOffest: 0
                 rotorToSensor: 0.1
-                forwardSoftLimit: -0.033
-                reversSoftLimit: -0.11
+                forwardSoftLimit: -0.0
+                reversSoftLimit: -0.20
                 motionMagic:
-                    expoKV: 0.07
-                    expoKA: 0.04
+                    expoKV: 10
+                    expoKA: 10
                 pidConfig:
                     slot0:
-                        kP: 10
+                        kP: 20
                         kV: 1
             flipCoder:
                 id: 10
                 deviceType: CANcoder
         constants: # TODO: all of these
-            intakeOnSpeed: .3
+            intakeOnSpeed: .25
             intakeOffSpeed: 0
-            inPosition: -0.11
+            inPosition: -0.115
             outPosition: -0.033
     climber:
         implemented: false
