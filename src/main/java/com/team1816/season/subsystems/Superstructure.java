@@ -363,6 +363,7 @@ public class Superstructure extends SubsystemBase {
         intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
         feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
         shooter.setWantedState(Shooter.SHOOTER_STATE.AIMING_HUB);
+        gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
     }
 
     public void shootingAutomatic() {  //the shooter position to automatically shoot at hub or corner depending on location
