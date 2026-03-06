@@ -329,11 +329,12 @@ subsystems:
             slot0:
                 kP: 0.4
                 kI: 0
-                kD: 0.0008
-                kV: 0.115
+                kD: 0
+                kV: 0.13
+                kS: 0.06
         azimuthPID:
             slot0:
-                kP: 75
+                kP: 100
                 kD: 0.5
                 kV: 2.66
                 kS: 0.1
@@ -343,14 +344,15 @@ subsystems:
             wheelbaseLength: .60325 # meters
             wheelbaseWidth: .60325 # meters
             robotMass: 74.088 # kg
-            wheelRadius: .04935 # meters
-            maxDriveRPS: 90 # measured motor max speed rps
-            maxAngularRate: .75 # rad/sec
+            wheelRadius: .04938 # meters (1.944 in)
+            maxDriveRPS: 98 # measured motor max speed rps
+            maxAngularRate: 8.285 # rad/sec
             wheelCOF: 1.7
         constants:
-            translationKp: 3
+            translationKp: 4
             rotationKp: 3
-
+            rotationKi: 0
+            rotationKd: 0
 autopathing:
     paths:
         ethan:
