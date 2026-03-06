@@ -1,5 +1,6 @@
 package com.team1816.season.subsystems;
 
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.hardware.components.motor.IMotor;
@@ -26,7 +27,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     private final IMotor intakeMotor = (IMotor) factory.getDevice(NAME, "intakeMotor");
     private final IMotor flipperMotor = (IMotor) factory.getDevice(NAME, "flipperMotor");
 
-    private final VelocityVoltage velocityControl = new VelocityVoltage(0);
+    private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
     private final MotionMagicExpoVoltage motionMagicExpoVoltage = new MotionMagicExpoVoltage(0);
 
 
@@ -96,7 +97,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     private void setIntakeSpeed(double velocity) {
         double clampedVelocity = MathUtil.clamp(velocity, MIN_INTAKE_MOTOR_CLAMP, MAX_INTAKE_MOTOR_CLAMP);
 
-        intakeMotor.setControl(velocityControl.withVelocity(clampedVelocity));
+        intakeMotor.setControl(dutyCycleOut.withOutput(clampedVelocity));
     }
 
     private void setFlipperPosition(double rotations) {
@@ -116,7 +117,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public enum INTAKE_STATE {
         INTAKE_IN_AND_OFF(factory.getConstant(NAME, "intakeOffSpeed", 0, true),
             factory.getConstant(NAME, "inPosition", -0.11, true)),
-        INTAKE_OUT_AND_ON(factory.getConstant(NAME, "intakeOnSpeed", 10, true),
+        INTAKE_OUT_AND_ON(factory.getConstant(NAME, "intakeOnSpeed", .242, true),
             factory.getConstant(NAME, "outPosition", -0.033, true));
 
         private double intakeMotorValue, flipperMotorValue;

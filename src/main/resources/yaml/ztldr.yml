@@ -32,22 +32,17 @@ shooterSettings:
     maximumDefaultPower: 0 # TODO: SET THIS
 subsystems:
     intake:
-        implemented: false
         devices:
             intakeMotor:
                 id: 2
-                deviceType: TalonFXS
-                motorType: Brushed_DC
-                neutralMode: Brake
-                motorRotation: Clockwise_Positive
-                statorCurrentLimit: 20
-                remoteSensor: PulseWidth
+                deviceType: TalonFX
+                neutralMode: Coast
+                motorRotation: CounterClockwise_Positive
                 forwardSoftLimit: .33
                 reversSoftLimit: -.33
             flipperMotor:
                 id: 3
-                deviceType: TalonFXS
-                motorType: Brushed_DC
+                deviceType: TalonFX
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 20
@@ -59,7 +54,7 @@ subsystems:
                 reversSoftLimit: -0.11
                 motionMagic:
                     expoKV: 0.07
-                    expokA: 0.04
+                    expoKA: 0.04
                 pidConfig:
                     slot0:
                         kP: 10
@@ -68,8 +63,10 @@ subsystems:
                 id: 10
                 deviceType: CANcoder
         constants: # TODO: all of these
-            intakeOnSpeed: 10
+            intakeOnSpeed: .3
             intakeOffSpeed: 0
+            inPosition: -0.11
+            outPosition: -0.033
     climber:
         implemented: false
         devices:
