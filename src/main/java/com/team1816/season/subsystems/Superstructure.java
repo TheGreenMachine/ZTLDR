@@ -237,8 +237,12 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void shootingAutomaticHub() {
-        shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
-        actualSuperState = ActualSuperState.DEFAULTING;
+        if(gatekeeper.getWantedState() == Gatekeeper.GATEKEEPER_STATE.CLOSED) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.AIMING_HUB);
+        } else {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
+        }
+//        actualSuperState = ActualSuperState.DEFAULTING;
     }
 
     private void shootingDistance1() {
@@ -257,8 +261,11 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void snowblowingAutomaticCorner() {
-        shooter.setWantedState(Shooter.SHOOTER_STATE.SNOWBLOWING);
-        actualSuperState = ActualSuperState.DEFAULTING;
+        if(gatekeeper.getWantedState() == Gatekeeper.GATEKEEPER_STATE.CLOSED) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.AIMING_CORNER);
+        } else {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.SNOWBLOWING);
+        }
     }
 
     private void intakeLifting() {
@@ -292,12 +299,22 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void gatekeepingOn() {
+        if(shooter.getWantedState() == Shooter.SHOOTER_STATE.AIMING_HUB) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
+        } else if (shooter.getWantedState() == Shooter.SHOOTER_STATE.AIMING_CORNER) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.SNOWBLOWING);
+        }
         gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.OPEN);
         feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
         actualSuperState = ActualSuperState.DEFAULTING;
     }
 
     private void gatekeeperingOff() {
+        if(shooter.getWantedState() == Shooter.SHOOTER_STATE.AUTOMATIC) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.AIMING_HUB);
+        } else if (shooter.getWantedState() == Shooter.SHOOTER_STATE.SNOWBLOWING) {
+            shooter.setWantedState(Shooter.SHOOTER_STATE.AIMING_CORNER);
+        }
         gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
 
         if (intake.isIntaking()) {
@@ -345,7 +362,8 @@ public class Superstructure extends SubsystemBase {
         swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
         intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
         feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
-        shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
+        shooter.setWantedState(Shooter.SHOOTER_STATE.AIMING_HUB);
+        gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
     }
 
     public void shootingAutomatic() {  //the shooter position to automatically shoot at hub or corner depending on location
