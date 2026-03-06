@@ -246,7 +246,7 @@ public class Superstructure extends SubsystemBase {
 
     private void intakeOutAndOn() {
         intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT_AND_ON);
-        feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
+        feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
         actualSuperState = ActualSuperState.DEFAULTING;
     }
 

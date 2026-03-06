@@ -98,20 +98,16 @@ subsystems:
             linearSlideL1DownClimbing: 0
 
     feeder:
-        implemented: false
         devices:
             feedMotor:
                 deviceType: TalonFX
                 id: 16
-                motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
+                neutralMode: Coast
+                motorRotation: CounterClockwise_Positive
         constants:
-            fastFeeding: 50
-            slowFeeding: 20
-            reversing: -50
+            fastFeeding: 0.296
+            slowFeeding: 0.086
+            reversing: 0
             idling: 0
     shooter:
         implemented: false
