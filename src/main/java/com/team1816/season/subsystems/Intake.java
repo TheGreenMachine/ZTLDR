@@ -19,8 +19,8 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     //CLASS
     public static final String NAME = "intake";
 
-    private INTAKE_STATE wantedState = INTAKE_STATE.INTAKE_UP;
-    private INTAKE_STATE previousWantedState = INTAKE_STATE.INTAKE_UP;
+    private INTAKE_STATE wantedState = INTAKE_STATE.INTAKE_IN_AND_OFF;
+    private INTAKE_STATE previousWantedState = INTAKE_STATE.INTAKE_IN_AND_OFF;
 
     //MOTORS
     private final IMotor intakeMotor = (IMotor) factory.getDevice(NAME, "intakeMotor");
@@ -76,19 +76,19 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         double intakeSpeed = wantedState.getIntakeMotorValue();
-        double flipperAngle = wantedState.getFlipperMotorValue();
+        double flipperPosition = wantedState.getFlipperMotorValue();
 
         setIntakeSpeed(wantedState.getIntakeMotorValue());
-        setFlipperAngle(wantedState.getFlipperMotorValue());
+        setFlipperPosition(wantedState.getFlipperMotorValue());
 
         if (wantedState != previousWantedState) {
             GreenLogger.log("Intake state: " + wantedState.toString());
             GreenLogger.log("Intake speed: " + intakeSpeed);
-            GreenLogger.log("Intake angle: " + flipperAngle);
+            GreenLogger.log("Intake position: " + flipperPosition);
 
             SmartDashboard.putString("Intake state: ", wantedState.toString());
             SmartDashboard.putNumber("Intake speed: ", intakeSpeed);
-            SmartDashboard.putNumber("Intake angle: ", flipperAngle);
+            SmartDashboard.putNumber("Intake position: ", flipperPosition);
             previousWantedState = wantedState;
         }
     }
@@ -99,7 +99,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         intakeMotor.setControl(velocityControl.withVelocity(clampedVelocity));
     }
 
-    private void setFlipperAngle(double rotations) {
+    private void setFlipperPosition(double rotations) {
         double clampRotation = MathUtil.clamp(rotations, MIN_FLIPPER_MOTOR_CLAMP, MAX_FLIPPER_MOTOR_CLAMP);
 
         flipperMotor.setControl(motionMagicExpoVoltage.withPosition(clampRotation));
@@ -109,16 +109,15 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         this.wantedState = state;
     }
 
-    public boolean isIntaking() { return (wantedState == INTAKE_STATE.INTAKE_IN); }
+    public boolean isIntaking() { return (wantedState == INTAKE_STATE.INTAKE_IN_AND_OFF); }
 
-    public boolean isOutaking() { return (wantedState == INTAKE_STATE.INTAKE_OUT); }
+    public boolean isOutaking() { return (wantedState == INTAKE_STATE.INTAKE_OUT_AND_ON); }
 
     public enum INTAKE_STATE {
-        INTAKE_IN(factory.getConstant(NAME, "inSpeed", -10, true), factory.getConstant(NAME, "inPosition", -0.11, true)),
-        INTAKE_OUT(factory.getConstant(NAME, "outSpeed", 10, true), factory.getConstant(NAME, "outPosition", -0.033, true)),
-        INTAKE_DOWN(0, factory.getConstant(NAME, "downPosition", -0.033, true)),
-        // Acts as the idle
-        INTAKE_UP(0, factory.getConstant(NAME, "upPosition", -0.11, true));
+        INTAKE_IN_AND_OFF(factory.getConstant(NAME, "intakeOffSpeed", 0, true),
+            factory.getConstant(NAME, "inPosition", -0.11, true)),
+        INTAKE_OUT_AND_ON(factory.getConstant(NAME, "intakeOnSpeed", 10, true),
+            factory.getConstant(NAME, "outPosition", -0.033, true));
 
         private double intakeMotorValue, flipperMotorValue;
 

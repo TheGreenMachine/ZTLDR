@@ -68,10 +68,8 @@ subsystems:
                 id: 10
                 deviceType: CANcoder
         constants: # TODO: all of these
-            intakeChannel: 7
-            outSpeed: 10
-
-            inSpeed: -10
+            intakeOnSpeed: 10
+            intakeOffSpeed: 0
     climber:
         implemented: false
         devices:
