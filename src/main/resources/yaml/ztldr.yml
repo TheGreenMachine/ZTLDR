@@ -179,7 +179,7 @@ subsystems:
             reversing: -50
             idling: 0
     gatekeeper:
-        canBusName: shooterCANivore
+        canBusName: shootercanivore
         devices:
             topMotor:
                 deviceType: TalonFX
@@ -244,7 +244,7 @@ subsystems:
             downAngle: 255
             upAngle: 45
     shooter:
-        canBusName: shooterCANivore
+        canBusName: shootercanivore
         devices:
             topLaunchMotor:
                 deviceType: TalonFX
@@ -281,12 +281,12 @@ subsystems:
             rotationAngleMotor:
                 deviceType: TalonFX
                 id: 35
-                motorRotation: CounterClockwise_Positive
+                motorRotation: Clockwise_Positive
                 pidConfig:
                     slot0:
                         kS: 0.29
-                        kP: 2
-                        kD: 0.1
+                        kP: 1
+                        kD: 0.05
                         staticFeedforwardSign: UseClosedLoopSign
             launchAngleCoder:
                 id: 36
