@@ -59,8 +59,8 @@ public class RobotContainer extends BaseRobotContainer {
         operatorController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
         operatorController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB)));
 
-        driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_DROP)));
-        driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_LIFT)));
+        driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_OUT_AND_ON)));
+        driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_IN_AND_OFF)));
 
 
         //agitate button TBD
@@ -107,7 +107,7 @@ public class RobotContainer extends BaseRobotContainer {
         }));
 
         NamedCommands.registerCommand("intaking", Commands.runOnce(() -> {
-             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.INTAKE);
+             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.INTAKE_OUT_AND_ON);
         }));
 
         /*

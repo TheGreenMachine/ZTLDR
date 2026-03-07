@@ -380,6 +380,11 @@ public class RobotFactory {
             config.FeedbackRotorOffset = deviceConfig.remoteOffest;
             GreenLogger.log("  remoteOffest: " + config.FeedbackRotorOffset);
         }
+
+        if (deviceConfig.rotorToSensor != null) {
+            config.RotorToSensorRatio = deviceConfig.rotorToSensor;
+            GreenLogger.log("  rotorToSensor: " + config.RotorToSensorRatio);
+        }
         return config;
     }
 

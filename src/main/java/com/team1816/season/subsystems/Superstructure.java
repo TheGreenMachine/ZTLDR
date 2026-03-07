@@ -6,8 +6,6 @@ import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -35,12 +33,8 @@ public class Superstructure extends SubsystemBase {
 
         SNOWBLOWER_AUTOMATIC_CORNER,
 
-        INTAKE_LIFT,
-        INTAKE_DROP,
-        INTAKE_IDLE,
-
-        INTAKE,
-        OUTTAKE,
+        INTAKE_IN_AND_OFF,
+        INTAKE_OUT_AND_ON,
 
         GATEKEEPER_ON,
         GATEKEEPER_OFF,
@@ -65,12 +59,8 @@ public class Superstructure extends SubsystemBase {
 
         SNOWBLOWING_AUTOMATIC_CORNER,
 
-        INTAKE_LIFTING,
-        INTAKE_DROPPING,
-        INTAKE_IDLING,
-
-        INTAKING,
-        OUTTAKING,
+        INTAKING_IN_AND_OFF,
+        INTAKING_OUT_AND_ON,
 
         GATEKEEPING_ON,
         GATEKEEPING_OFF,
@@ -154,12 +144,8 @@ public class Superstructure extends SubsystemBase {
             case SHOOTER_DISTANCE_2 -> actualSuperState = ActualSuperState.SHOOTING_DISTANCE_2;
             case SHOOTER_DISTANCE_3 -> actualSuperState = ActualSuperState.SHOOTING_DISTANCE_3;
 
-            case INTAKE_LIFT -> actualSuperState = ActualSuperState.INTAKE_LIFTING;
-            case INTAKE_DROP -> actualSuperState = ActualSuperState.INTAKE_DROPPING;
-            case INTAKE_IDLE -> actualSuperState = ActualSuperState.INTAKE_IDLING;
-
-            case INTAKE -> actualSuperState = ActualSuperState.INTAKING;
-            case OUTTAKE -> actualSuperState = ActualSuperState.OUTTAKING;
+            case INTAKE_OUT_AND_ON -> actualSuperState = ActualSuperState.INTAKING_OUT_AND_ON;
+            case INTAKE_IN_AND_OFF -> actualSuperState = ActualSuperState.INTAKING_IN_AND_OFF;
 
             case GATEKEEPER_ON -> actualSuperState = ActualSuperState.GATEKEEPING_ON;
             case GATEKEEPER_OFF -> actualSuperState = ActualSuperState.GATEKEEPING_OFF;
@@ -189,12 +175,8 @@ public class Superstructure extends SubsystemBase {
 
             case SNOWBLOWING_AUTOMATIC_CORNER -> snowblowingAutomaticCorner();
 
-            case INTAKE_LIFTING -> intakeLifting();
-            case INTAKE_DROPPING -> intakeDropping();
-            case INTAKE_IDLING -> intakeIdling();
-
-            case INTAKING -> intaking();
-            case OUTTAKING -> outtaking();
+            case INTAKING_OUT_AND_ON -> intakeOutAndOn();
+            case INTAKING_IN_AND_OFF -> intakeInAndOff();
 
             case GATEKEEPING_ON -> gatekeepingOn();
             case GATEKEEPING_OFF -> gatekeeperingOff();
@@ -208,13 +190,7 @@ public class Superstructure extends SubsystemBase {
     }
 
     public void setWantedSuperState(WantedSuperState superState) {
-        if ((superState == WantedSuperState.INTAKE) && intake.isIntaking()) {
-            this.wantedSuperState = WantedSuperState.INTAKE_IDLE;
-        } else if ((superState == WantedSuperState.OUTTAKE) && intake.isOutaking()) {
-            this.wantedSuperState = WantedSuperState.INTAKE_IDLE;
-        } else {
-            this.wantedSuperState = superState;
-        }
+        this.wantedSuperState = superState;
     }
 
     private void setWantedSubsystemStates(Intake.INTAKE_STATE intakeState, Feeder.FEEDER_STATE feederState,
@@ -268,33 +244,15 @@ public class Superstructure extends SubsystemBase {
         }
     }
 
-    private void intakeLifting() {
-        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_UP);
+    private void intakeOutAndOn() {
+        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT_AND_ON);
+        feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
+        actualSuperState = ActualSuperState.DEFAULTING;
+    }
+
+    private void intakeInAndOff() {
+        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF);
         feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-        actualSuperState = ActualSuperState.DEFAULTING;
-    }
-
-    private void intakeDropping() {
-        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
-        feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
-        actualSuperState = ActualSuperState.DEFAULTING;
-    }
-
-    private void intaking() {
-        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
-        feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
-        actualSuperState = ActualSuperState.DEFAULTING;
-    }
-
-    private void intakeIdling() {
-        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_DOWN);
-        feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-        actualSuperState = ActualSuperState.DEFAULTING;
-    }
-
-    private void outtaking() {
-        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT);
-        feeder.setWantedState(Feeder.FEEDER_STATE.REVERSING);
         actualSuperState = ActualSuperState.DEFAULTING;
     }
 
@@ -327,25 +285,25 @@ public class Superstructure extends SubsystemBase {
     }
 
     private void climbingL1() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_DOWN, Feeder.FEEDER_STATE.SLOW_FEEDING,
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF, Feeder.FEEDER_STATE.SLOW_FEEDING,
             Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
             Climber.CLIMBER_STATE.L1_UP_CLIMBING);
     }
 
     private void climbingL3() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_DOWN, Feeder.FEEDER_STATE.SLOW_FEEDING,
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF, Feeder.FEEDER_STATE.SLOW_FEEDING,
             Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
             Climber.CLIMBER_STATE.L3_UP_CLIMBING);
     }
 
     private void climbingDownL1() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_DOWN, Feeder.FEEDER_STATE.SLOW_FEEDING,
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF, Feeder.FEEDER_STATE.SLOW_FEEDING,
             Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
             Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
     }
 
     private void droppingHeight() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_DOWN, Feeder.FEEDER_STATE.SLOW_FEEDING,
+        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF, Feeder.FEEDER_STATE.SLOW_FEEDING,
             Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
             Climber.CLIMBER_STATE.IDLING);
     }
@@ -360,7 +318,7 @@ public class Superstructure extends SubsystemBase {
 
     public void teleopInit() {
         swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
-        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
+        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT_AND_ON);
         feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
         shooter.setWantedState(Shooter.SHOOTER_STATE.AIMING_HUB);
         gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);

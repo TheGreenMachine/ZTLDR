@@ -1,5 +1,6 @@
 package com.team1816.season.subsystems;
 
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.hardware.components.motor.IMotor;
@@ -21,7 +22,7 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
     //MOTORS
     private final IMotor feedMotor = (IMotor)factory.getDevice(NAME, "feedMotor");
 
-    private final VelocityVoltage velocityReq = new VelocityVoltage(0);
+    private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
 
     //PHYSICAL SUBSYSTEM DEPENDENT CONSTANTS
     private static final double MIN_FEED_MOTOR_CLAMP = -80;
@@ -56,7 +57,7 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
     private void setFeedVelocity(double feedVelocity){
         double clampedVelocity = MathUtil.clamp(feedVelocity, MIN_FEED_MOTOR_CLAMP, MAX_FEED_MOTOR_CLAMP);
 
-        feedMotor.setControl(velocityReq.withVelocity(clampedVelocity));
+        feedMotor.setControl(dutyCycleOut.withOutput(clampedVelocity));
     }
 
     public void setWantedState(FEEDER_STATE state) {
