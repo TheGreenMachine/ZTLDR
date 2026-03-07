@@ -18,8 +18,8 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
     private GATEKEEPER_STATE previousWantedState = GATEKEEPER_STATE.CLOSED;
 
     //MOTORS
-    private final IMotor topMotor = (IMotor)factory.getDevice(NAME, "topMotor");
-    private final IMotor bottomMotor = (IMotor)factory.getDevice(NAME, "bottomMotor");
+    private final IMotor topMotor;
+    private final IMotor bottomMotor;
 
     private final VelocityVoltage voltageReq = new VelocityVoltage(0);
 
@@ -28,6 +28,11 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
     private static final double MAX_TOP_MOTOR_CLAMP = 80;
     private static final double MIN_BOTTOM_MOTOR_CLAMP = 0;
     private static final double MAX_BOTTOM_MOTOR_CLAMP = 80;
+
+    public Gatekeeper () {
+        topMotor = (IMotor) factory.getDevice(NAME, "topMotor");
+        bottomMotor = (IMotor) factory.getDevice(NAME, "bottomMotor");
+    }
 
     @Override
     public void periodic() {
