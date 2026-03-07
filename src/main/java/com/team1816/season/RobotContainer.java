@@ -45,7 +45,7 @@ public class RobotContainer extends BaseRobotContainer {
 
     private void configureBindings() {
 
-        driverController.rightTrigger().whileTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_ON)));
+        driverController.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_ON)));
         driverController.rightTrigger().onFalse(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_OFF)));
 
         //one or the other, depends on drive team:
@@ -54,10 +54,10 @@ public class RobotContainer extends BaseRobotContainer {
         driverController.povLeft().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
         driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.shootingAutomatic()));
 
-        operatorController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
-        operatorController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
-        operatorController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
-        operatorController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB)));
+        driverController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
+        driverController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
+        driverController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
+        driverController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB)));
 
         driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_DROP)));
         driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_LIFT)));

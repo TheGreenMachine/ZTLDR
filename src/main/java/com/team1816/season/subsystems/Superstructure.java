@@ -346,7 +346,7 @@ public class Superstructure extends SubsystemBase {
         swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
         intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN);
         feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
-        shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
+        shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
     }
 
     public void shootingAutomatic() {  //the shooter position to automatically shoot at hub or corner depending on location

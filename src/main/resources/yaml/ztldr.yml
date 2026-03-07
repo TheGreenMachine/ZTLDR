@@ -297,26 +297,24 @@ subsystems:
         constants:
             rotationAngleSensorClockwiseLeft: 0
             rotationAngleSensorClockwiseRight: 1
-            motorRotationsPerLaunchAngleDegree: 3.5
             motorRotationsPerTurretRotation: 15.625 # 250/16 gear ratio
             initialShooterOffsetX: 0
             initialShooterOffsetY: 0
             initialShooterOffsetZ: 22
-            calibrationThreshold: 10
-            calibrationPositionArcAngle: 0.75
-            rotationOffsetFromCalibrationZero: 70
-            distanceOneLaunchAngle: 3
-            distanceOneRotationAngle: 45
-            distanceOneLaunchVelocity: 10
-            distanceTwoLaunchAngle: 45
-            distanceTwoRotationAngle: 90
-            distanceTwoLaunchVelocity: 20
-            distanceThreeLaunchAngle: 86
+            distanceOneLaunchAngle: 25
+            distanceOneRotationAngle: 0
+            distanceOneLaunchVelocity: 25
+            distanceTwoLaunchAngle: 30
+            distanceTwoRotationAngle: 0
+            distanceTwoLaunchVelocity: 50
+            distanceThreeLaunchAngle: 35
             distanceThreeRotationAngle: 0
-            distanceThreeLaunchVelocity: 30
+            distanceThreeLaunchVelocity: 100
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570
             secondLowestBeamBreakToZero: 7.65625
+            launchAngleMotorBottomLimitRotations: 0.046
+            launchAngleMotorTopLimitRotations: 0.109
     ledManager:
         implemented: false
         devices:

@@ -31,8 +31,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     //CLASS
     public static final String NAME = "shooter";
 
-    private SHOOTER_STATE wantedState = SHOOTER_STATE.IDLE;
-    private SHOOTER_STATE previousWantedState = SHOOTER_STATE.IDLE;
+    private SHOOTER_STATE wantedState = SHOOTER_STATE.DISTANCE_ONE;
+    private SHOOTER_STATE previousWantedState = SHOOTER_STATE.DISTANCE_ONE;
 
     //MOTORS
     private final IMotor topLaunchMotor = (IMotor) factory.getDevice(NAME, "topLaunchMotor");
@@ -40,8 +40,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final IMotor launchAngleMotor = (IMotor) factory.getDevice(NAME, "launchAngleMotor");
     private final IMotor rotationAngleMotor = (IMotor) factory.getDevice(NAME, "rotationAngleMotor");
 
-    private final VelocityVoltage velocityControl = new VelocityVoltage(0);
-    private VelocityVoltage rotationVelocityControl = new VelocityVoltage(0);
+    private final VelocityVoltage topLaunchMotorVelocityRequest = new VelocityVoltage(0);
+    private final VelocityVoltage bottomLaunchMotorVelocityRequest = new VelocityVoltage(0);
     private final PositionVoltage launchAnglePositionRequest = new PositionVoltage(0);
     private final PositionVoltage turretPositionRequest = new PositionVoltage(0);
 
@@ -64,10 +64,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private boolean previousSensorValuesKnown = false;
 
     //CONSTANTS
-    private final double MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE;
     private final double MOTOR_ROTATIONS_PER_TURRET_ROTATION;
     private final Translation3d SHOOTER_OFFSET;
     private final double HALF_FIELD_WIDTH = FlippingUtil.fieldSizeY/2;
+    private final double LAUNCH_ANGLE_MOTOR_BOTTOM_LIMIT_ROTATIONS;
+    private final double LAUNCH_ANGLE_MOTOR_TOP_LIMIT_ROTATIONS;
 
     //CALIBRATION
     private final double CLOSE_DISTANCE_BETWEEN_BEAM_BREAKS;
@@ -153,12 +154,13 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public Shooter(){
         super();
 
-        MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE = factory.getConstant(NAME, "motorRotationsPerLaunchAngleDegree", 0); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
         MOTOR_ROTATIONS_PER_TURRET_ROTATION = factory.getConstant(NAME, "motorRotationsPerTurretRotation", 0);
         SHOOTER_OFFSET = new Translation3d(factory.getConstant(NAME, "initialShooterOffsetX",0), factory.getConstant(NAME, "initialShooterOffsetY",0), factory.getConstant(NAME, "initialShooterOffsetZ",0)); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
         CLOSE_DISTANCE_BETWEEN_BEAM_BREAKS = factory.getConstant(NAME, "closeDistanceBetweenBeamBreaks", 0);
         FAR_DISTANCE_BETWEEN_BEAM_BREAKS = factory.getConstant(NAME, "farDistanceBetweenBeamBreaks", 0);
         SECOND_LOWEST_BEAM_BREAK_TO_ZERO = factory.getConstant(NAME, "secondLowestBeamBreakToZero", 0);
+        LAUNCH_ANGLE_MOTOR_BOTTOM_LIMIT_ROTATIONS = factory.getConstant(NAME, "launchAngleMotorBottomLimitRotations", 0);
+        LAUNCH_ANGLE_MOTOR_TOP_LIMIT_ROTATIONS = factory.getConstant(NAME, "launchAngleMotorTopLimitRotations", 0);
 
         launcherTranslation = new Translation3d(0,0,0).plus(SHOOTER_OFFSET);
 
@@ -260,7 +262,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         setLaunchAngle(launchAngle);
         setRotationAngle(rotationAngle);
-        setPower(launchPower);
+        setLaunchMotorVelocities(launchPower);
 
         if (wantedState != previousWantedState) {
             GreenLogger.log("Shooter state: " + wantedState.toString());
@@ -341,19 +343,17 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 .minus(BaseRobotState.swerveDriveState.Pose.getRotation());
     }
 
-    private void setPower(double wantedVelocity) {
-        double output = MathUtil.clamp(wantedVelocity, 0, 100);
-
-        topLaunchMotor.setControl(velocityControl.withVelocity(output));
-        bottomLaunchMotor.setControl(velocityControl.withVelocity(output));
+    private void setLaunchMotorVelocities(double wantedVelocity) {
+        topLaunchMotor.setControl(topLaunchMotorVelocityRequest.withVelocity(wantedVelocity));
+        bottomLaunchMotor.setControl(bottomLaunchMotorVelocityRequest.withVelocity(wantedVelocity));
     }
 
     private void setLaunchAngle(double wantedAngleDegrees) {
-        double rotations = wantedAngleDegrees * MOTOR_ROTATIONS_PER_LAUNCH_ANGLE_DEGREE;
+        double rotations = wantedAngleDegrees / 360;
 
-        double output = MathUtil.clamp(rotations, 0, 1000); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+        double clampedRotations = MathUtil.clamp(rotations, LAUNCH_ANGLE_MOTOR_BOTTOM_LIMIT_ROTATIONS, LAUNCH_ANGLE_MOTOR_TOP_LIMIT_ROTATIONS);
 
-        launchAngleMotor.setControl(launchAnglePositionRequest.withPosition(output));
+        launchAngleMotor.setControl(launchAnglePositionRequest.withPosition(clampedRotations));
     }
 
     /**
