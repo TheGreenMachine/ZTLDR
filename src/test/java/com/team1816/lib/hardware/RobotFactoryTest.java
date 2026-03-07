@@ -117,6 +117,7 @@ public class RobotFactoryTest {
                 case "id" -> assertEquals(-1, field.get(inst));
                 case "invertSensor"-> assertEquals(false, field.get(inst));
                 case "defaultAuto" -> assertEquals("", field.get(inst));
+                case "rotorToSensor" -> assertEquals(1.0, field.get(inst));
                 default -> assertNull(field.get(inst), clazz.getSimpleName() + ":" + field.getName());
             }
         }

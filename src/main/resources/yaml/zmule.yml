@@ -104,6 +104,7 @@ subsystems:
             linearSlideL1DownClimbing: 0
 
     feeder:
+        implemented: false
         devices:
             feedMotor:
                 deviceType: TalonFX
