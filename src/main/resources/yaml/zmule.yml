@@ -32,6 +32,7 @@ shooterSettings:
     maximumDefaultPower: 0 # TODO: SET THIS
 subsystems:
     intake:
+        implemented: false
         devices:
             intakeMotor:
                 id: 2
@@ -71,6 +72,7 @@ subsystems:
             downAngle: 255
             upAngle: 45
     climber:
+        implemented: false
         devices:
             flipMotor:
                 deviceType: TalonFX
@@ -102,6 +104,7 @@ subsystems:
             linearSlideL1DownClimbing: 0
 
     feeder:
+        implemented: false
         devices:
             feedMotor:
                 deviceType: TalonFX
@@ -117,6 +120,7 @@ subsystems:
             reversing: -50
             idling: 0
     shooter:
+        implemented: false
         devices:
             topLaunchMotor:
                 deviceType: TalonFX
@@ -205,6 +209,7 @@ subsystems:
             distanceThreeRotationAngle: 0
             distanceThreeLaunchVelocity: 30
     gatekeeper:
+        implemented: false
         devices:
             topMotor:
                 deviceType: TalonFX
