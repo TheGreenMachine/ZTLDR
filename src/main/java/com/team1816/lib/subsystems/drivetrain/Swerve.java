@@ -41,8 +41,8 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
     private static StringPublisher fieldTypePub;
     private static final double[] poseArray = new double[3];
 
-    private ActualState wantedState = ActualState.IDLING;
-    private ActualState previousWantedState = ActualState.IDLING;
+    private ActualState wantedState = ActualState.MANUAL_DRIVING;
+    private ActualState previousWantedState = ActualState.MANUAL_DRIVING;
 
     public Swerve(IDrivetrain drivetrain, CommandXboxController controller) {
         this.drivetrain = drivetrain;

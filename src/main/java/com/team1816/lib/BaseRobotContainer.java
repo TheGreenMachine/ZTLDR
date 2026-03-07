@@ -11,7 +11,6 @@ import com.team1816.lib.subsystems.LedManager;
 import com.team1816.lib.subsystems.drivetrain.IDrivetrain;
 import com.team1816.lib.subsystems.drivetrain.Drivetrain;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
-import com.team1816.season.subsystems.Superstructure;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -23,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class BaseRobotContainer {
     public static IDrivetrain drivetrain;
 
-    protected Superstructure superstructure;
     protected CommandXboxController driverController = new CommandXboxController(0);
     protected CommandXboxController operatorController = new CommandXboxController(1);
     protected CommandButtonBoard buttonBoard = new CommandButtonBoard(2);

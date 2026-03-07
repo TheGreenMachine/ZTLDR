@@ -6,7 +6,6 @@ import com.team1816.lib.events.PubSubHandler;
 import com.team1816.lib.subsystems.LedManager;
 import com.team1816.lib.util.Elastic;
 import com.team1816.lib.util.GreenLogger;
-import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -68,7 +67,7 @@ public class Robot extends TimedRobot {
                 CommandScheduler.getInstance().schedule(autonomousCommand);
             }
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.AUTONOMOUS);
-            robotContainer.autonomousInit();
+//            robotContainer.autonomousInit();
         } catch (Throwable t) {
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
             GreenLogger.log(t);
@@ -82,7 +81,7 @@ public class Robot extends TimedRobot {
                 autonomousCommand.cancel();
             }
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ENABLED);
-            robotContainer.teleopInit();
+//            robotContainer.teleopInit();
             //robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
             Elastic.selectTab("Teleoperated");
         } catch (Throwable t) {
@@ -119,6 +118,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopExit() {
-        robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
+//        robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
     }
 }
