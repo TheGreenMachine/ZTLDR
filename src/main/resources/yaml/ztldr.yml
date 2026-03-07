@@ -61,7 +61,7 @@ subsystems:
                 id: 10
                 deviceType: CANcoder
         constants: # TODO: all of these
-            intakeOnSpeed: .25
+            intakeOnSpeed: .50
             intakeOffSpeed: 0
             inPosition: -0.115
             outPosition: -0.033
@@ -330,8 +330,8 @@ subsystems:
         kinematics:
             driveGearing: 6.03
             steerGearing: 26.0909
-            wheelbaseLength: .60325 # meters
-            wheelbaseWidth: .60325 # meters
+            wheelbaseLength: .505 # meters
+            wheelbaseWidth: .505 # meters
             robotMass: 74.088 # kg
             wheelRadius: .04938 # meters (1.944 in)
             maxDriveRPS: 98 # measured motor max speed rps

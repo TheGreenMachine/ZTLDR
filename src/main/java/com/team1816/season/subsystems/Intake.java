@@ -117,7 +117,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public enum INTAKE_STATE {
         INTAKE_IN_AND_OFF(factory.getConstant(NAME, "intakeOffSpeed", 0, true),
             factory.getConstant(NAME, "inPosition", -0.11, true)),
-        INTAKE_OUT_AND_ON(factory.getConstant(NAME, "intakeOnSpeed", .242, true),
+        INTAKE_OUT_AND_ON(factory.getConstant(NAME, "intakeOnSpeed", .5, true),
             factory.getConstant(NAME, "outPosition", -0.033, true));
 
         private double intakeMotorValue, flipperMotorValue;
