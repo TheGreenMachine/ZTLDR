@@ -591,7 +591,7 @@ public class RobotFactory {
             // CTRE overwrites some of the defaults see their docs
             factory.DriveMotorInitialConfigs = driveConf;
             factory.DriveMotorGains = driveSlot;
-            factory.DriveMotorClosedLoopOutput = SwerveModuleConstants.ClosedLoopOutputType.Voltage;
+            factory.DriveMotorClosedLoopOutput = SwerveModuleConstants.ClosedLoopOutputType.TorqueCurrentFOC;
 
             factory.SteerMotorClosedLoopOutput = SwerveModuleConstants.ClosedLoopOutputType.Voltage;
             factory.SteerMotorGains = steerSlot;

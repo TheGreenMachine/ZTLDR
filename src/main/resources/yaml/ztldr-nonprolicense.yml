@@ -316,12 +316,11 @@ subsystems:
                 azimuth: brAz
         drivePID:
             slot0:
-                kP: 10.0
+                kP: 0.4
                 kI: 0
                 kD: 0
-                kV: 0
-                kS: 0
-                kA: 0.3
+                kV: 0.13
+                kS: 0.06
         azimuthPID:
             slot0:
                 kP: 100

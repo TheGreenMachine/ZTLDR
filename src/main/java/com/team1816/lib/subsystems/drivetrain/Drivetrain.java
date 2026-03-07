@@ -92,7 +92,7 @@ public class Drivetrain extends SwerveDrivetrain<CommonTalon, CommonTalon, Paren
 
         robotConfig = new RobotConfig(massKG, MOI, moduleConfig, modules);
         var tranKp = factory.getConstant(NAME, "translationKp", 5.0);
-        //var tranKd = factory.getConstant(NAME, "translationKd", 0.2);
+        var tranKd = factory.getConstant(NAME, "translationKd", 0);
         var rotKp = factory.getConstant(NAME, "rotationKp", 5.0);
         var rotKi = factory.getConstant(NAME, "rotationKi", 0);
         var rotKd = factory.getConstant(NAME, "rotationKd", 0);
@@ -100,7 +100,7 @@ public class Drivetrain extends SwerveDrivetrain<CommonTalon, CommonTalon, Paren
             "translationKp:" + GetDisplay(tranKp) +
                 " rotationKp:" + GetDisplay(rotKp)
         );
-        var transPID = new PIDConstants(tranKp, 0, 0);
+        var transPID = new PIDConstants(tranKp, 0, tranKd);
         var rotPID = new PIDConstants(rotKp, rotKi, rotKd);
         GreenLogger.log("transPID", transPID);
         GreenLogger.log("rotPID", rotPID);
