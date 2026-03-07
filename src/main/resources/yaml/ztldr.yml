@@ -298,7 +298,7 @@ subsystems:
             rotationAngleSensorClockwiseLeft: 0
             rotationAngleSensorClockwiseRight: 1
             motorRotationsPerLaunchAngleDegree: 3.5
-            motorRotationsPerRotationAngleDegree: 3.5
+            motorRotationsPerTurretRotation: 15.625 # 250/16 gear ratio
             initialShooterOffsetX: 0
             initialShooterOffsetY: 0
             initialShooterOffsetZ: 22
@@ -314,7 +314,9 @@ subsystems:
             distanceThreeLaunchAngle: 86
             distanceThreeRotationAngle: 0
             distanceThreeLaunchVelocity: 30
-            distanceBetweenBeamBreaks: 0 # TODO: Set this
+            closeDistanceBetweenBeamBreaks: 0.419
+            farDistanceBetweenBeamBreaks: 13.570
+            secondLowestBeamBreakToZero: 7.65625
     ledManager:
         implemented: false
         devices:
