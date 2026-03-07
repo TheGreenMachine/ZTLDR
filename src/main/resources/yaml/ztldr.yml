@@ -43,7 +43,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 9
-                remoteOffest: 0.284668
+                remoteOffest: -0.300537
             flCoder:
                 id: 9
                 deviceType: CANcoder
@@ -58,7 +58,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 10
-                remoteOffest: 0.173096
+                remoteOffest: -0.439453
             frCoder:
                 id: 10
                 deviceType: CANcoder
@@ -72,7 +72,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 11
-                remoteOffest: 0.177490 # -Absolute Position No Offset CanCoder
+                remoteOffest: -0.351074   # Negative Absolute Position No Offset CanCoder
             blCoder:
                 id: 11
                 deviceType: CANcoder
@@ -87,7 +87,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 12
-                remoteOffest: -0.291016
+                remoteOffest: -0.383301
             brCoder:
                 id: 12
                 deviceType: CANcoder
@@ -111,28 +111,44 @@ subsystems:
             slot0:
                 kP: 0.4
                 kI: 0
-                kD: 0.0008
-                kV: 0.115
+                kD: 0
+                kV: 0.13
+                kS: 0.06
         azimuthPID:
             slot0:
-                kP: 75
+                kP: 100
                 kD: 0.5
                 kV: 2.66
                 kS: 0.1
         kinematics:
             driveGearing: 6.03
             steerGearing: 26.0909
-            wheelbaseLength: .60325 # meters
-            wheelbaseWidth: .60325 # meters
+            wheelbaseLength: .505 # meters
+            wheelbaseWidth: .505 # meters
             robotMass: 74.088 # kg
-            wheelRadius: .04935 # meters
-            maxDriveRPS: 90 # measured motor max speed rps
-            maxAngularRate: .75 # rad/sec
+            wheelRadius: .04938 # meters (1.944 in)
+            maxDriveRPS: 98 # measured motor max speed rps
+            maxAngularRate: 8.285 # rad/sec
             wheelCOF: 1.7
         constants:
-            translationKp: 3
+            translationKp: 4
             rotationKp: 3
+            rotationKi: 0
+            rotationKd: 0
+    ledManager:
+        implemented: false
+        devices:
+            argb:
+                id: 14
+                deviceType: CANifier
+            drgb:
+                id: 15
+                deviceType: CANdle
+        constants:
+            maxLevel: 96
+            ledCount: 66
     climber:
+        implemented: false
         devices:
             flipMotor:
                 deviceType: TalonFX
@@ -168,16 +184,47 @@ subsystems:
             feedMotor:
                 deviceType: TalonFX
                 id: 22
-                motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
+                neutralMode: Coast
+                motorRotation: CounterClockwise_Positive
         constants:
-            fastFeeding: 50
-            slowFeeding: 20
-            reversing: -50
+            fastFeeding: 0.296
+            slowFeeding: 0.086
+            reversing: 0
             idling: 0
+    intake:
+        devices:
+            intakeMotor:
+                id: 23
+                deviceType: TalonFX
+                neutralMode: Coast
+                motorRotation: CounterClockwise_Positive
+            flipperMotor:
+                id: 24
+                deviceType: TalonFX
+                neutralMode: Brake
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 20
+                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
+                remoteSensorId: 25
+                remoteOffest: 0
+                rotorToSensor: 0.1
+                forwardSoftLimit: -0.0
+                reversSoftLimit: -0.20
+                motionMagic:
+                    expoKV: 10
+                    expoKA: 10
+                pidConfig:
+                    slot0:
+                        kP: 20
+                        kV: 1
+            flipCoder:
+                id: 25
+                deviceType: CANcoder
+        constants: # TODO: all of these
+            intakeOnSpeed: .50
+            intakeOffSpeed: 0
+            inPosition: -0.115
+            outPosition: -0.033
     gatekeeper:
         canBusName: shootercanivore
         devices:
@@ -204,45 +251,6 @@ subsystems:
             topOpenVelocity: 40
             bottomClosedVelocity: 0
             bottomOpenVelocity: 40
-    intake:
-        devices:
-            intakeMotor:
-                id: 23
-                deviceType: TalonFXS
-                motorType: Brushed_DC
-                neutralMode: Brake
-                motorRotation: Clockwise_Positive
-                statorCurrentLimit: 20
-                remoteSensor: PulseWidth
-                remoteOffest: .484
-                forwardSoftLimit: .33
-                reversSoftLimit: -.33
-            flipperMotor:
-                id: 24
-                deviceType: TalonFXS
-                motorType: Brushed_DC
-                neutralMode: Brake
-                motorRotation: Clockwise_Positive
-                statorCurrentLimit: 20
-                remoteSensor: PulseWidth
-                remoteOffest: .484
-                forwardSoftLimit: .33
-                reversSoftLimit: -.33
-            pidConfig:
-                slot0:
-                    kP: 48.046920
-                    kI: 0
-                    kD: 0.240234
-        constants: # TODO: all of these
-            intakeChannel: 7
-            outSpeed: 10
-            outAngle: 255
-
-            inSpeed: -10
-            inAngle: 255
-
-            downAngle: 255
-            upAngle: 45
     shooter:
         canBusName: shootercanivore
         devices:
@@ -315,18 +323,6 @@ subsystems:
             secondLowestBeamBreakToZero: 7.65625
             launchAngleMotorBottomLimitRotations: 0.046
             launchAngleMotorTopLimitRotations: 0.109
-    ledManager:
-        implemented: false
-        devices:
-            argb:
-                id: 14
-                deviceType: CANifier
-            drgb:
-                id: 15
-                deviceType: CANdle
-        constants:
-            maxLevel: 96
-            ledCount: 66
 
 autopathing:
     paths:

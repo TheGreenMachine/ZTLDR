@@ -52,7 +52,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     //DEVICES
     private final DigitalInput rotationAngleSensorClockwiseLeft = new DigitalInput((int) factory.getConstant(NAME, "rotationAngleSensorClockwiseLeft", 0));
-    private final DigitalInput rotationAngleSensorClockwiseRight = new DigitalInput((int) factory.getConstant(NAME, "rotationAngleSensorClockwiseRight", 0));
+    private final DigitalInput rotationAngleSensorClockwiseRight = new DigitalInput((int) factory.getConstant(NAME, "rotationAngleSensorClockwiseRight", 1));
 
     //HARDWARE RECORDED VALUES
     private double currentRotationPosition;
@@ -69,6 +69,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final double HALF_FIELD_WIDTH = FlippingUtil.fieldSizeY/2;
     private final double LAUNCH_ANGLE_MOTOR_BOTTOM_LIMIT_ROTATIONS;
     private final double LAUNCH_ANGLE_MOTOR_TOP_LIMIT_ROTATIONS;
+    public double maxLaunchAngle = 0; //<-SET MAX ANGLE HERE
 
     //CALIBRATION
     private final double CLOSE_DISTANCE_BETWEEN_BEAM_BREAKS;
@@ -121,7 +122,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         DISTANCE_TWO(factory.getConstant(NAME,"distanceTwoLaunchAngle",0), factory.getConstant(NAME,"distanceTwoRotationAngle",0), factory.getConstant(NAME,"distanceTwoLaunchVelocity",0)),
         DISTANCE_THREE(factory.getConstant(NAME,"distanceThreeLaunchAngle",0), factory.getConstant(NAME,"distanceThreeRotationAngle",0), factory.getConstant(NAME,"distanceThreeLaunchVelocity",0)),
         AUTOMATIC(-1, -1, -1),
+        AIMING_HUB(-1,-1,0),
         SNOWBLOWING(-1, -1, -1),
+        AIMING_CORNER(-1,-1,-1),
         IDLE(0, 0, 0);
 
         private double launchAngle;
@@ -144,11 +147,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double getLaunchPower() {
             return launchVelocity;
         }
-    }
-
-    public enum CALIBRATION_STATE {
-        CALIBRATING,
-        CALIBRATED
     }
 
     public Shooter(){
@@ -259,6 +257,45 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             launchPower = shooterDistanceSetting.getPower();
             rotationAngle = Math.tan((launcherTranslation.getY()-currentTarget.position.getY())/(launcherTranslation.getX()-currentTarget.position.getX()));
         }
+        if(wantedState == SHOOTER_STATE.AIMING_HUB || wantedState == SHOOTER_STATE.AIMING_CORNER) {
+            if(wantedState == SHOOTER_STATE.AIMING_HUB){
+                if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
+                    setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_HUB);
+                }
+                else {
+                    setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_HUB);
+                }
+            }
+            if(wantedState == SHOOTER_STATE.AIMING_CORNER){
+                if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
+                    if (launcherTranslation.getY() < HALF_FIELD_WIDTH) {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_RIGHT_CORNER);
+                    }
+                    else {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_LEFT_CORNER);
+                    }
+                } else {
+                    if (launcherTranslation.getY() < HALF_FIELD_WIDTH) {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_LEFT_CORNER);
+                    }
+                    else {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_RIGHT_CORNER);
+                    }
+                }
+            }
+
+            double distance = launcherTranslation.toTranslation2d().getDistance(currentTarget.position.toTranslation2d());
+
+            ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator.getShooterDistanceSetting(distance);
+            if(shooterDistanceSetting.getAngle() > maxLaunchAngle) {
+                launchAngle = maxLaunchAngle;
+            } else {
+                launchAngle = shooterDistanceSetting.getAngle();
+            }
+            launchPower = shooterDistanceSetting.getPower();
+            rotationAngle = Math.tan((launcherTranslation.getY()-currentTarget.position.getY())/(launcherTranslation.getX()-currentTarget.position.getX()));
+
+        }
 
         setLaunchAngle(launchAngle);
         setRotationAngle(rotationAngle);
@@ -354,6 +391,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double clampedRotations = MathUtil.clamp(rotations, LAUNCH_ANGLE_MOTOR_BOTTOM_LIMIT_ROTATIONS, LAUNCH_ANGLE_MOTOR_TOP_LIMIT_ROTATIONS);
 
         launchAngleMotor.setControl(launchAnglePositionRequest.withPosition(clampedRotations));
+    }
+
+    public SHOOTER_STATE getWantedState() {
+        return wantedState;
     }
 
     /**
