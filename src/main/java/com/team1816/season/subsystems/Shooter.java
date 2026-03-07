@@ -65,6 +65,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final Rotation2d CALIBRATION_POSITION_ARC_ANGLE;
     private final Rotation2d ROTATION_OFFSET_FROM_CALIBRATION_ZERO;
     private static final double HALF_FIELD_WIDTH = FlippingUtil.fieldSizeY/2;
+    public double maxLaunchAngle = 0; //<-SET MAX ANGLE HERE
 
     //CALIBRATION
     private Double[] calibrationPositions = new Double[]{0.0, 0.0};
@@ -110,7 +111,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         DISTANCE_TWO(factory.getConstant(NAME,"distanceTwoLaunchAngle",0), factory.getConstant(NAME,"distanceTwoRotationAngle",0), factory.getConstant(NAME,"distanceTwoLaunchVelocity",0)),
         DISTANCE_THREE(factory.getConstant(NAME,"distanceThreeLaunchAngle",0), factory.getConstant(NAME,"distanceThreeRotationAngle",0), factory.getConstant(NAME,"distanceThreeLaunchVelocity",0)),
         AUTOMATIC(-1, -1, -1),
+        AIMING_HUB(-1,-1,0),
         SNOWBLOWING(-1, -1, -1),
+        AIMING_CORNER(-1,-1,-1),
         IDLE(0, 0, 0);
 
         private double launchAngle;
@@ -222,6 +225,45 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             launchPower = shooterDistanceSetting.getPower();
             rotationAngle = Math.tan((launcherTranslation.getY()-currentTarget.position.getY())/(launcherTranslation.getX()-currentTarget.position.getX()));
         }
+        if(wantedState == SHOOTER_STATE.AIMING_HUB || wantedState == SHOOTER_STATE.AIMING_CORNER) {
+            if(wantedState == SHOOTER_STATE.AIMING_HUB){
+                if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
+                    setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_HUB);
+                }
+                else {
+                    setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_HUB);
+                }
+            }
+            if(wantedState == SHOOTER_STATE.AIMING_CORNER){
+                if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
+                    if (launcherTranslation.getY() < HALF_FIELD_WIDTH) {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_RIGHT_CORNER);
+                    }
+                    else {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.RED_LEFT_CORNER);
+                    }
+                } else {
+                    if (launcherTranslation.getY() < HALF_FIELD_WIDTH) {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_LEFT_CORNER);
+                    }
+                    else {
+                        setCurrentAutoAimTarget(AUTO_AIM_TARGETS.BLUE_RIGHT_CORNER);
+                    }
+                }
+            }
+
+            double distance = launcherTranslation.toTranslation2d().getDistance(currentTarget.position.toTranslation2d());
+
+            ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator.getShooterDistanceSetting(distance);
+            if(shooterDistanceSetting.getAngle() > maxLaunchAngle) {
+                launchAngle = maxLaunchAngle;
+            } else {
+                launchAngle = shooterDistanceSetting.getAngle();
+            }
+            launchPower = shooterDistanceSetting.getPower();
+            rotationAngle = Math.tan((launcherTranslation.getY()-currentTarget.position.getY())/(launcherTranslation.getX()-currentTarget.position.getX()));
+
+        }
 
         setLaunchAngle(launchAngle);
         setRotationAngle(rotationAngle);
@@ -294,6 +336,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double output = MathUtil.clamp(rotations, 0, 1000); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
 
         launchAngleMotor.setControl(positionControl.withPosition(output));
+    }
+
+    public SHOOTER_STATE getWantedState() {
+        return wantedState;
     }
 
     private void setRotationAngle(double wantedAngleDegrees) {

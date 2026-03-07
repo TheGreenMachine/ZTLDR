@@ -80,6 +80,10 @@
             "type": "object",
             "existingJavaType": "java.util.Map<String, PIDSlotConfiguration>",
             "additionalProperties": false
+        },
+        "rotorToSensor": {
+            "default": 1,
+            "type": "number"
         }
     }
 }

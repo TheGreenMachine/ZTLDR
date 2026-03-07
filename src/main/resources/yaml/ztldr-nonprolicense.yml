@@ -32,45 +32,39 @@ shooterSettings:
     maximumDefaultPower: 0 # TODO: SET THIS
 subsystems:
     intake:
-        implemented: false
         devices:
             intakeMotor:
                 id: 2
-                deviceType: TalonFXS
-                motorType: Brushed_DC
-                neutralMode: Brake
-                motorRotation: Clockwise_Positive
-                statorCurrentLimit: 20
-                remoteSensor: PulseWidth
-                remoteOffest: .484
-                forwardSoftLimit: .33
-                reversSoftLimit: -.33
+                deviceType: TalonFX
+                neutralMode: Coast
+                motorRotation: CounterClockwise_Positive
             flipperMotor:
                 id: 3
-                deviceType: TalonFXS
-                motorType: Brushed_DC
+                deviceType: TalonFX
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 20
-                remoteSensor: PulseWidth
-                remoteOffest: .484
-                forwardSoftLimit: .33
-                reversSoftLimit: -.33
-            pidConfig:
-                slot0:
-                    kP: 48.046920
-                    kI: 0
-                    kD: 0.240234
+                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
+                remoteSensorId: 10
+                remoteOffest: 0
+                rotorToSensor: 0.1
+                forwardSoftLimit: -0.0
+                reversSoftLimit: -0.20
+                motionMagic:
+                    expoKV: 10
+                    expoKA: 10
+                pidConfig:
+                    slot0:
+                        kP: 20
+                        kV: 1
+            flipCoder:
+                id: 10
+                deviceType: CANcoder
         constants: # TODO: all of these
-            intakeChannel: 7
-            outSpeed: 10
-            outAngle: 255
-
-            inSpeed: -10
-            inAngle: 255
-
-            downAngle: 255
-            upAngle: 45
+            intakeOnSpeed: .50
+            intakeOffSpeed: 0
+            inPosition: -0.115
+            outPosition: -0.033
     climber:
         implemented: false
         devices:
@@ -108,15 +102,12 @@ subsystems:
             feedMotor:
                 deviceType: TalonFX
                 id: 16
-                motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
+                neutralMode: Coast
+                motorRotation: CounterClockwise_Positive
         constants:
-            fastFeeding: 50
-            slowFeeding: 20
-            reversing: -50
+            fastFeeding: 0.296
+            slowFeeding: 0.086
+            reversing: 0
             idling: 0
     shooter:
         implemented: false
@@ -236,7 +227,6 @@ subsystems:
             bottomClosedVelocity: 0
             bottomOpenVelocity: 5
     ledManager:
-
         implemented: false
         devices:
             argb:
@@ -260,7 +250,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 41
-                remoteOffest: 0.284668
+                remoteOffest: -0.300537
             flCoder:
                 id: 41
                 deviceType: CANcoder
@@ -275,7 +265,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 43
-                remoteOffest: 0.173096
+                remoteOffest: -0.439453
             frCoder:
                 id: 43
                 deviceType: CANcoder
@@ -289,7 +279,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 42
-                remoteOffest: 0.177490 # -Absolute Position No Offset CanCoder
+                remoteOffest: -0.351074   # Negative Absolute Position No Offset CanCoder
             blCoder:
                 id: 42
                 deviceType: CANcoder
@@ -304,7 +294,7 @@ subsystems:
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 40
-                remoteOffest: -0.291016
+                remoteOffest: -0.383301
             brCoder:
                 id: 40
                 deviceType: CANcoder
@@ -340,41 +330,19 @@ subsystems:
         kinematics:
             driveGearing: 6.03
             steerGearing: 26.0909
-            wheelbaseLength: .3683 # meters (2 x 0.18415 module offset)
-            wheelbaseWidth: .3683 # meters (2 x 0.18415 module offset)
-            robotMass: 27.216 # kg (60 lbs)
+            wheelbaseLength: .505 # meters
+            wheelbaseWidth: .505 # meters
+            robotMass: 74.088 # kg
             wheelRadius: .04938 # meters (1.944 in)
             maxDriveRPS: 98 # measured motor max speed rps
             maxAngularRate: 8.285 # rad/sec
             wheelCOF: 1.7
         constants:
-            translationKp: 4
-            rotationKp: 3
+            translationKp: 7
+            translationKd: 0
+            rotationKp: 5
             rotationKi: 0
             rotationKd: 0
-    vision:
-        cameras:
-            zmuleFrontCamera:
-                photonVisionUIName: Camera-Front
-                robotToCamera:
-                    xInches: 10.25
-                    yInches: 0
-                    zInches: 9.375
-                    rollDegrees: 0
-                    pitchDegrees: 0
-                    yawDegrees: 0
-                detectionType: APRIL_TAG
-            zmuleRightCamera:
-                photonVisionUIName: Camera-Right
-                robotToCamera:
-                    xInches: 0
-                    yInches: -8.75
-                    zInches: 8.375
-                    rollDegrees: 0
-                    pitchDegrees: 0
-                    yawDegrees: -90
-                detectionType: APRIL_TAG
-
 autopathing:
     paths:
         ethan:

@@ -484,6 +484,11 @@ public class RobotFactory {
             config.FeedbackRotorOffset = deviceConfig.remoteOffest;
             GreenLogger.log("  remoteOffest: " + config.FeedbackRotorOffset);
         }
+
+        if (deviceConfig.rotorToSensor != null) {
+            config.RotorToSensorRatio = deviceConfig.rotorToSensor;
+            GreenLogger.log("  rotorToSensor: " + config.RotorToSensorRatio);
+        }
         return config;
     }
 
@@ -690,7 +695,7 @@ public class RobotFactory {
             // CTRE overwrites some of the defaults see their docs
             factory.DriveMotorInitialConfigs = driveConf;
             factory.DriveMotorGains = driveSlot;
-            factory.DriveMotorClosedLoopOutput = SwerveModuleConstants.ClosedLoopOutputType.Voltage;
+            factory.DriveMotorClosedLoopOutput = SwerveModuleConstants.ClosedLoopOutputType.TorqueCurrentFOC;
 
             factory.SteerMotorClosedLoopOutput = SwerveModuleConstants.ClosedLoopOutputType.Voltage;
             factory.SteerMotorGains = steerSlot;
