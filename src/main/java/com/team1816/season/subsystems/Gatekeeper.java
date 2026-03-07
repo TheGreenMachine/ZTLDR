@@ -73,6 +73,9 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
 
         bottomMotor.setControl(voltageReq.withVelocity(clampedVelocity));
     }
+    public GATEKEEPER_STATE getWantedState() {
+        return wantedState;
+    }
 
     public void setWantedState(GATEKEEPER_STATE state) {
         wantedState = state;
