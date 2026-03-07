@@ -201,9 +201,9 @@ subsystems:
                         kV: 0.08
         constants:
             topClosedVelocity: 0
-            topOpenVelocity: 10
+            topOpenVelocity: 40
             bottomClosedVelocity: 0
-            bottomOpenVelocity: 5
+            bottomOpenVelocity: 40
     intake:
         devices:
             intakeMotor:
@@ -303,13 +303,13 @@ subsystems:
             initialShooterOffsetZ: 22
             distanceOneLaunchAngle: 25
             distanceOneRotationAngle: 0
-            distanceOneLaunchVelocity: 25
+            distanceOneLaunchVelocity: 50
             distanceTwoLaunchAngle: 30
             distanceTwoRotationAngle: 0
             distanceTwoLaunchVelocity: 50
             distanceThreeLaunchAngle: 35
             distanceThreeRotationAngle: 0
-            distanceThreeLaunchVelocity: 100
+            distanceThreeLaunchVelocity: 50
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570
             secondLowestBeamBreakToZero: 7.65625
