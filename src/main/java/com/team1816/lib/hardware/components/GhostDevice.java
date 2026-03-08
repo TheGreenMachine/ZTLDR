@@ -35,9 +35,6 @@ public class GhostDevice implements IMotor {
     }
 
     @Override
-    public boolean hasDeviceCrashed() { return  false; }
-
-    @Override
     public double getMotorVelocity() {
         return 0;
     }
@@ -64,6 +61,9 @@ public class GhostDevice implements IMotor {
 
     @Override
     public double getSimMotorVoltage() {
-        return 0;
+        return 12;
     }
+
+    @Override
+    public boolean hasDeviceCrashed() { return  false; }
 }

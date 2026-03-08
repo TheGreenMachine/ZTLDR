@@ -34,6 +34,11 @@
             "default": null,
             "type": "enum",
             "existingJavaType": "com.ctre.phoenix6.signals.GravityTypeValue"
+        },
+        "staticFeedforwardSign": {
+            "default": null,
+            "type": "enum",
+            "existingJavaType": "com.ctre.phoenix6.signals.StaticFeedforwardSignValue"
         }
     }
 }

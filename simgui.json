@@ -26,16 +26,23 @@
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/Field": "Field2d",
       "/SmartDashboard/Auto Mode": "String Chooser",
       "/SmartDashboard/Climber": "Mechanism2d",
+      "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Intake": "Mechanism2d",
       "/SmartDashboard/PathPlanner": "Alerts",
       "/SmartDashboard/Pathfind Target": "String Chooser",
-      "/SmartDashboard/Shooter Incline": "Mechanism2d"
+      "/SmartDashboard/PhotonAlerts": "Alerts",
+      "/SmartDashboard/Shooter Incline": "Mechanism2d",
+      "/SmartDashboard/VisionSystemSim-VisionSim/Sim Field": "Field2d"
     },
     "windows": {
-      "/Field": {
+      "/SmartDashboard/Auto Mode": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
         "Turret": {
           "arrowColor": [
             0.4181083142757416,
@@ -55,14 +62,141 @@
           "visible": true
         }
       },
-      "/SmartDashboard/Auto Mode": {
+      "/SmartDashboard/Shooter Incline": {
         "window": {
           "visible": true
         }
       },
-      "/SmartDashboard/Shooter Incline": {
+      "/SmartDashboard/VisionSystemSim-VisionSim/Sim Field": {
+        "Robot": {
+          "arrowColor": [
+            1.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 3.0,
+          "color": [
+            1.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "weight": 3.0
+        },
+        "apriltag": {
+          "image": "C:\\Users\\henry\\ZTLDR\\field_images\\apriltag.png"
+        },
+        "bottom": 1914,
+        "cameras": {
+          "arrowColor": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "arrowSize": 19,
+          "arrowWeight": 3.0,
+          "color": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "style": "Hidden"
+        },
+        "exampleCamera/visionPoseEstimate": {
+          "arrowColor": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 3.0,
+          "color": [
+            0.0,
+            1.0,
+            1.0,
+            255.0
+          ],
+          "weight": 3.0
+        },
+        "height": 8.069275856018066,
+        "left": 245,
+        "maybeRealCamera/visionPoseEstimate": {
+          "arrowColor": [
+            0.0,
+            0.49803921580314636,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 3.0,
+          "color": [
+            0.0,
+            0.49803921580314636,
+            1.0,
+            255.0
+          ],
+          "weight": 3.0
+        },
+        "physicalCameraUsedWithSim/visionPoseEstimate": {
+          "arrowColor": [
+            0.0,
+            0.0,
+            1.0,
+            255.0
+          ],
+          "arrowWeight": 3.0,
+          "color": [
+            0.0,
+            0.0,
+            1.0,
+            255.0
+          ],
+          "weight": 3.0
+        },
+        "physicalCams/cameras": {
+          "arrowColor": [
+            0.0,
+            0.0,
+            1.0,
+            255.0
+          ],
+          "arrowSize": 19,
+          "arrowWeight": 3.0,
+          "color": [
+            0.0,
+            0.0,
+            1.0,
+            255.0
+          ],
+          "style": "Hidden"
+        },
+        "physicalCams/visibleTargetPoses": {
+          "image": "C:\\Users\\henry\\ZTLDR\\field_images\\visible-vision-target.png"
+        },
+        "right": 3942,
+        "top": 118,
+        "visibleTargetPoses": {
+          "image": "C:\\Users\\henry\\ZTLDR\\field_images\\visible-vision-target.png"
+        },
+        "width": 16.54119300842285,
         "window": {
           "visible": true
+        },
+        "zmuleFrontCamera/visionPoseEstimation": {
+          "arrowColor": [
+            255.0,
+            32.27847671508789,
+            0.0,
+            255.0
+          ],
+          "color": [
+            0.0,
+            255.0,
+            251.77212524414063,
+            255.0
+          ]
         }
       }
     }
@@ -89,6 +223,17 @@
       }
     },
     "transitory": {
+      "CameraPublisher": {
+        "UI Name-processed": {
+          "string[]##v_/CameraPublisher/UI Name-processed/streams": {
+            "open": true
+          }
+        },
+        "open": true
+      },
+      "Elastic": {
+        "open": true
+      },
       "Field": {
         "Pose2d##v_/Field/Robot": {
           "open": true
@@ -114,6 +259,15 @@
         }
       },
       "odometry": {
+        "open": true
+      },
+      "photonvision": {
+        "HD Pro Webcam C920": {
+          "open": true
+        },
+        "HD_Pro_Webcam_C920": {
+          "open": true
+        },
         "open": true
       },
       "turret": {

@@ -1,5 +1,7 @@
 package com.team1816.season;
 
+import com.team1816.lib.BaseRobot;
+import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.commands.SubsystemTestCommand;
 import com.team1816.lib.events.PubSubHandler;
@@ -11,17 +13,11 @@ import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Threads;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-public class Robot extends TimedRobot {
-
+public class Robot extends BaseRobot {
     private RobotContainer robotContainer;
-
-    public Robot() {
-    }
-
     double periodicLoopTime;
     private Command autonomousCommand;
     private final PubSubHandler pubsub = Singleton.get(PubSubHandler.class);
@@ -35,7 +31,6 @@ public class Robot extends TimedRobot {
             // used to serve elastic dashboards must be port 5800
             WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
             GreenLogger.periodicLog("timings/RobotLoop (ms)", () -> periodicLoopTime);
-            robotContainer = new RobotContainer();
         } catch (Throwable t) {
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
             GreenLogger.log(t);
@@ -55,13 +50,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        if(robotContainer == null) return;
         robotContainer.updateInitialPose();
     }
 
     @Override
     public void autonomousInit() {
         try {
+            // Ensure pose is always initialized before scheduling auto
+            robotContainer.forceUpdatePose();
             autonomousCommand = robotContainer.autoChooser.getSelected();
             // schedule the autonomous command
             if (autonomousCommand != null) {
@@ -103,6 +99,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
+        super.robotPeriodic();
         try {
             Threads.setCurrentThreadPriority(true, 99);
             double start = HALUtil.getFPGATime();
@@ -120,5 +117,11 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopExit() {
         robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
+    }
+
+    @Override
+    protected BaseRobotContainer createRobotContainer() {
+        robotContainer = new RobotContainer();
+        return robotContainer;
     }
 }

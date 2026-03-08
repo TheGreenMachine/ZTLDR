@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CircleTest"
+            "pathName": "BottomGateFullFuel"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FuelToHangViaTopGate"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "Choreo Autos",
   "choreoAuto": true
 }

@@ -182,7 +182,7 @@ subsystems:
                 deviceType: TalonFX
                 motorType: Minion_JST
                 id: 13
-                motorRotation: Clockwise_Positive
+                motorRotation: Clockwise_Positive #as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped
                 statorCurrentLimit: 60
                 neutralMode: Brake
                 motionMagic:
@@ -237,6 +237,7 @@ subsystems:
             bottomClosedVelocity: 0
             bottomOpenVelocity: 5
     ledManager:
+
         implemented: false
         devices:
             argb:
@@ -328,27 +329,52 @@ subsystems:
             slot0:
                 kP: 0.4
                 kI: 0
-                kD: 0.0008
-                kV: 0.115
+                kD: 0
+                kV: 0.13
+                kS: 0.06
         azimuthPID:
             slot0:
-                kP: 75
+                kP: 100
                 kD: 0.5
                 kV: 2.66
                 kS: 0.1
         kinematics:
             driveGearing: 6.03
             steerGearing: 26.0909
-            wheelbaseLength: .60325 # meters
-            wheelbaseWidth: .60325 # meters
-            robotMass: 74.088 # kg
-            wheelRadius: .04935 # meters
-            maxDriveRPS: 90 # measured motor max speed rps
-            maxAngularRate: .75 # rad/sec
+            wheelbaseLength: .3683 # meters (2 x 0.18415 module offset)
+            wheelbaseWidth: .3683 # meters (2 x 0.18415 module offset)
+            robotMass: 27.216 # kg (60 lbs)
+            wheelRadius: .04938 # meters (1.944 in)
+            maxDriveRPS: 98 # measured motor max speed rps
+            maxAngularRate: 8.285 # rad/sec
             wheelCOF: 1.7
         constants:
-            translationKp: 3
+            translationKp: 4
             rotationKp: 3
+            rotationKi: 0
+            rotationKd: 0
+    vision:
+        cameras:
+            zmuleFrontCamera:
+                photonVisionUIName: Camera-Front
+                robotToCamera:
+                    xInches: 10.25
+                    yInches: 0
+                    zInches: 9.375
+                    rollDegrees: 0
+                    pitchDegrees: 0
+                    yawDegrees: 0
+                detectionType: APRIL_TAG
+            zmuleRightCamera:
+                photonVisionUIName: Camera-Right
+                robotToCamera:
+                    xInches: 0
+                    yInches: -8.75
+                    zInches: 8.375
+                    rollDegrees: 0
+                    pitchDegrees: 0
+                    yawDegrees: -90
+                detectionType: APRIL_TAG
 
 autopathing:
     paths:

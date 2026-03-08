@@ -1,71 +1,51 @@
 package com.team1816.lib.subsystems.drivetrain;
 
-import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.team1816.lib.BaseRobotState;
+import com.team1816.lib.Singleton;
+import com.team1816.lib.hardware.factory.RobotFactory;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.GreenLogger;
-import com.team1816.lib.util.SubsystemDataProcessor;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
+import static com.team1816.lib.Singleton.factory;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDataRefresher, ITestableSubsystem {
+public class Swerve extends SubsystemBase implements ITestableSubsystem {
+
+    private final String NAME = "drivetrain";
 
     private final IDrivetrain drivetrain;
+
     private final CommandXboxController controller;
     private final SlewRateLimiter xLimiter = new SlewRateLimiter(3);    // forward/back
     private final SlewRateLimiter yLimiter = new SlewRateLimiter(3);    // strafe
     private final SlewRateLimiter rotLimiter = new SlewRateLimiter(6);  // rotation
     private static double maxAngularRate = 0;
-    private SwerveDrivetrain.SwerveDriveState swerveDriveState = new  SwerveDrivetrain.SwerveDriveState();
-
-    /* Robot swerve drive state */
-    private static StructPublisher<Pose2d> drivePose;
-    private static StructPublisher<ChassisSpeeds> driveSpeeds;
-    private static StructArrayPublisher<SwerveModuleState> driveModuleStates;
-    private static StructArrayPublisher<SwerveModuleState> driveModuleTargets;
-    private static StructArrayPublisher<SwerveModulePosition> driveModulePositions;
-    private static DoublePublisher driveTimestamp;
-    private static DoublePublisher driveOdometryFrequency;
-    private static DoubleArrayPublisher fieldPub;
-    private static StringPublisher fieldTypePub;
-    private static final double[] poseArray = new double[3];
 
     private ActualState wantedState = ActualState.IDLING;
     private ActualState previousWantedState = ActualState.IDLING;
 
-    public Swerve(IDrivetrain drivetrain, CommandXboxController controller) {
-        this.drivetrain = drivetrain;
+    public Swerve(CommandXboxController controller) {
+        // TODO: This Singleton.get stuff is a temporary workaround until I fix a bug with the
+        //  static factory member from the Singleton not initializing properly for the first
+        //  subsystem that is created.
+        drivetrain = Singleton.get(RobotFactory.class).getSwerveDrivetrain(NAME);
+
         this.controller = controller;
         var kinematics = drivetrain.getKinematicsConfig();
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         // setup teleop drivetrain command
         maxAngularRate = RotationsPerSecond.of(kinematics.maxAngularRate).in(RadiansPerSecond);
-
-        NetworkTable netTable;
-        netTable = NetworkTableInstance.getDefault().getTable("");
-        driveSpeeds = netTable.getStructTopic(IDrivetrain.NAME + "/Speeds", ChassisSpeeds.struct).publish();
-        driveModuleStates = netTable.getStructArrayTopic(IDrivetrain.NAME + "/ModuleStates", SwerveModuleState.struct).publish();
-        driveModuleTargets = netTable.getStructArrayTopic(IDrivetrain.NAME + "/ModuleTargets", SwerveModuleState.struct).publish();
-        driveModulePositions = netTable.getStructArrayTopic(IDrivetrain.NAME + "/ModulePositions", SwerveModulePosition.struct).publish();
-        driveTimestamp = netTable.getDoubleTopic(IDrivetrain.NAME + "/Timestamp").publish();
-        driveOdometryFrequency = netTable.getDoubleTopic(IDrivetrain.NAME + "/OdometryFrequency").publish();
-        // name must be Robot for elastic to show as robot in UI
-        fieldPub = netTable.getDoubleArrayTopic("Field/Robot").publish();
-        fieldTypePub = netTable.getStringTopic("Field/.type").publish();
-
-        SubsystemDataProcessor.createAndStartSubsystemDataProcessor(this);
     }
 
     public enum ActualState {
@@ -78,15 +58,6 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
     public void periodic() {
         readFromHardware();
         applyStates();
-    }
-
-    @Override
-    public void readFromHardware() {
-        // Get state to use locally
-        swerveDriveState = drivetrain.getState();
-        // Publish the state to the base robot state
-        BaseRobotState.swerveDriveState = swerveDriveState;
-        processSwerveState();
     }
 
     private SwerveRequest GetSwerverCommand(SwerveRequest.FieldCentric drive) {
@@ -151,24 +122,47 @@ public class Swerve extends SubsystemBase implements SubsystemDataProcessor.IDat
         this.wantedState = state;
     }
 
-    private void processSwerveState() {
-        driveSpeeds.set(swerveDriveState.Speeds);
-        if(swerveDriveState.ModuleStates != null) {
-            driveModuleStates.set(swerveDriveState.ModuleStates);
-            driveModuleTargets.set(swerveDriveState.ModuleTargets);
-            driveModulePositions.set(swerveDriveState.ModulePositions);
-        }
-        driveTimestamp.set(swerveDriveState.Timestamp);
-        driveOdometryFrequency.set(1.0 / swerveDriveState.OdometryPeriod);
-        processPose2d(swerveDriveState.Pose);
+    public void resetPose(Pose2d pose) {
+        drivetrain.resetPose(pose);
     }
 
-    public static void processPose2d(Pose2d pose) {
-        // update Field NOTE: this format is deprecated for advantage scope but no support in simulator yet
-        poseArray[0] = pose.getX();
-        poseArray[1] = pose.getY();
-        poseArray[2] = pose.getRotation().getDegrees();
-        fieldTypePub.set("Field2d");
-        fieldPub.set(poseArray);
+    /**
+     * Adds a vision measurement to the Kalman Filter. This will correct the
+     * odometry pose estimate while still accounting for measurement noise.
+     *
+     * @param visionRobotPoseMeters    The pose of the robot as measured by the
+     *                                 vision camera.
+     * @param timestampSeconds         The timestamp of the vision measurement in
+     *                                 seconds.
+     * @param visionMeasurementStdDevs Standard deviations of the vision pose
+     *                                 measurement (x position
+     *                                 in meters, y position in meters, and heading
+     *                                 in radians). Increase these numbers to trust
+     *                                 the vision pose measurement less.
+     */
+    public void addVisionMeasurement(
+        Pose2d visionRobotPoseMeters,
+        double timestampSeconds,
+        Matrix<N3, N1> visionMeasurementStdDevs)
+    {
+        drivetrain.addVisionMeasurement(
+            visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs
+        );
+    }
+
+    /**
+     * Sets the pose estimator's trust in robot odometry. This might be used to change trust in
+     * odometry after an impact with the wall or traversing a bump.
+     *
+     * @param stateStdDevs Standard deviations of the pose estimate. Increase these numbers to
+     *                     trust your state estimate less. This matrix is in the form [x, y,
+     *                     theta]ᵀ, with units in meters and radians.
+     */
+    public void setStateStdDevs(Matrix<N3, N1> stateStdDevs) {
+        drivetrain.setStateStdDevs(stateStdDevs);
+    }
+
+    public void simTeleportRobot(Pose2d pose) {
+        drivetrain.simTeleportRobot(pose);
     }
 }

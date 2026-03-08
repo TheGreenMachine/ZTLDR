@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Bizarre Circle"
+            "pathName": "Straight90Turn"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
-  "choreoAuto": false
+  "folder": "Choreo Autos",
+  "choreoAuto": true
 }

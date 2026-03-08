@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Straight"
+            "pathName": "StraightBack"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": null,
-  "choreoAuto": false
+  "folder": "Choreo Autos",
+  "choreoAuto": true
 }

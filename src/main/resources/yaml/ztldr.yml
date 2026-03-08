@@ -31,46 +31,130 @@ shooterSettings:
     maximumDefaultAngle: 0 # TODO: SET THIS
     maximumDefaultPower: 0 # TODO: SET THIS
 subsystems:
-    intake:
+    drivetrain:
         devices:
-            intakeMotor:
-                id: 2
+            flDr:
+                id: 1
                 deviceType: TalonFX
-                neutralMode: Coast
-                motorRotation: CounterClockwise_Positive
-            flipperMotor:
-                id: 3
+                neutralMode: Brake
+            flAz:
+                id: 5
+                deviceType: TalonFX
+                neutralMode: Brake
+                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
+                remoteSensorId: 9
+                remoteOffest: -0.300537
+            flCoder:
+                id: 9
+                deviceType: CANcoder
+            frDr:
+                id: 2
                 deviceType: TalonFX
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
-                statorCurrentLimit: 20
+            frAz:
+                id: 6
+                deviceType: TalonFX
+                neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 10
-                remoteOffest: 0
-                rotorToSensor: 0.1
-                forwardSoftLimit: -0.0
-                reversSoftLimit: -0.20
-                motionMagic:
-                    expoKV: 10
-                    expoKA: 10
-                pidConfig:
-                    slot0:
-                        kP: 20
-                        kV: 1
-            flipCoder:
+                remoteOffest: -0.439453
+            frCoder:
                 id: 10
                 deviceType: CANcoder
-        constants: # TODO: all of these
-            intakeOnSpeed: .50
-            intakeOffSpeed: 0
-            inPosition: -0.115
-            outPosition: -0.033
+            blDr:
+                id: 3
+                deviceType: TalonFX
+                neutralMode: Brake
+            blAz:
+                id: 7
+                deviceType: TalonFX
+                neutralMode: Brake
+                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
+                remoteSensorId: 11
+                remoteOffest: -0.351074   # Negative Absolute Position No Offset CanCoder
+            blCoder:
+                id: 11
+                deviceType: CANcoder
+            brDr:
+                id: 4
+                deviceType: TalonFX
+                neutralMode: Brake
+                motorRotation: Clockwise_Positive
+            brAz:
+                id: 8
+                deviceType: TalonFX
+                neutralMode: Brake
+                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
+                remoteSensorId: 12
+                remoteOffest: -0.383301
+            brCoder:
+                id: 12
+                deviceType: CANcoder
+            gyro:
+                deviceType: Pigeon2
+                id: 13
+        modules:
+            fl:
+                drive: flDr
+                azimuth: flAz
+            fr:
+                drive: frDr
+                azimuth: frAz
+            bl:
+                drive: blDr
+                azimuth: blAz
+            br:
+                drive: brDr
+                azimuth: brAz
+        drivePID:
+            slot0:
+                kP: 10.0
+                kI: 0
+                kD: 0
+                kV: 0
+                kS: 0
+                kA: 0.3
+        azimuthPID:
+            slot0:
+                kP: 100
+                kD: 0.5
+                kV: 2.66
+                kS: 0.1
+        kinematics:
+            driveGearing: 6.03
+            steerGearing: 26.0909
+            wheelbaseLength: .505 # meters
+            wheelbaseWidth: .505 # meters
+            robotMass: 74.088 # kg
+            wheelRadius: .04938 # meters (1.944 in)
+            maxDriveRPS: 98 # measured motor max speed rps
+            maxAngularRate: 8.285 # rad/sec
+            wheelCOF: 1.7
+        constants:
+            translationKp: 20
+            translationKd: 0
+            rotationKp: 10
+            rotationKi: 0
+            rotationKd: 0
+    ledManager:
+        implemented: false
+        devices:
+            argb:
+                id: 14
+                deviceType: CANifier
+            drgb:
+                id: 15
+                deviceType: CANdle
+        constants:
+            maxLevel: 96
+            ledCount: 66
     climber:
         implemented: false
         devices:
             flipMotor:
                 deviceType: TalonFX
-                id: 16
+                id: 20
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
                 motionMagic:
@@ -78,7 +162,7 @@ subsystems:
                     expoKA: 0.04
             linearSlideMotor:
                 deviceType: TalonFX
-                id: 28
+                id: 21
                 motorRotation: Clockwise_Positive
                 statorCurrentLimit: 60
                 motionMagic:
@@ -101,7 +185,7 @@ subsystems:
         devices:
             feedMotor:
                 deviceType: TalonFX
-                id: 16
+                id: 22
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
         constants:
@@ -109,239 +193,158 @@ subsystems:
             slowFeeding: 0.086
             reversing: 0
             idling: 0
-    shooter:
-        implemented: false
+    intake:
         devices:
-            topLaunchMotor:
+            intakeMotor:
+                id: 23
                 deviceType: TalonFX
-                id: 15
-                motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
-                pidConfig:
-                    slot0:
-                        kP: 1
-                        kV: 0.135
-            bottomLaunchMotor:
+                neutralMode: Coast
+                motorRotation: CounterClockwise_Positive
+            flipperMotor:
+                id: 24
                 deviceType: TalonFX
-                id: 16
-                motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
-                pidConfig:
-                    slot0:
-                        kP: 0.1
-                        kV: 0.1
-            launchAngleMotor:
-                deviceType: TalonFX
-                motorType: NEO550_JST
-                remoteSensor: RemoteCANcoder
-                remoteSensorId: 1
-                id: 39
-                motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                remoteOffset: 0.002
-                forwardSoftLimit: 0.085
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
-                pidConfig:
-                    slot0:
-                        kP: 100
-                        kD: 1
-                        kS: 1
-            launchAngleCoder:
-                id: 1
-                deviceType: CANcoder
-                shooterMotorLower:
-                # TODO: Change numbers if necessary
-                motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
-                pidConfig:
-                    slot0:
-                        kP: 1
-                        kV: 0.135
-            rotationAngleMotor:
-                deviceType: TalonFX
-                motorType: Minion_JST
-                id: 13
-                motorRotation: Clockwise_Positive #as a note, the rotation motor should move clockwise on positive dutycycle, otherwise directions will be flipped
-                statorCurrentLimit: 60
                 neutralMode: Brake
+                motorRotation: Clockwise_Positive
+                statorCurrentLimit: 20
+                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
+                remoteSensorId: 25
+                remoteOffest: 0
+                rotorToSensor: 0.1
+                forwardSoftLimit: -0.0
+                reversSoftLimit: -0.20
                 motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
-        constants:
-            rotationAngleSensorClockwiseLeft: 0
-            rotationAngleSensorClockwiseRight: 1
-            motorRotationsPerLaunchAngleDegree: 3.5
-            motorRotationsPerRotationAngleDegree: 3.5
-            initialShooterOffsetX: 0
-            initialShooterOffsetY: 0
-            initialShooterOffsetZ: 22
-            calibrationThreshold: 10
-            calibrationPositionArcAngle: 0.75
-            rotationOffsetFromCalibrationZero: 70
-            distanceOneLaunchAngle: 3
-            distanceOneRotationAngle: 45
-            distanceOneLaunchVelocity: 10
-            distanceTwoLaunchAngle: 45
-            distanceTwoRotationAngle: 90
-            distanceTwoLaunchVelocity: 20
-            distanceThreeLaunchAngle: 86
-            distanceThreeRotationAngle: 0
-            distanceThreeLaunchVelocity: 30
+                    expoKV: 10
+                    expoKA: 10
+                pidConfig:
+                    slot0:
+                        kP: 20
+                        kV: 1
+            flipCoder:
+                id: 25
+                deviceType: CANcoder
+        constants: # TODO: all of these
+            intakeOnSpeed: .50
+            intakeOffSpeed: 0
+            inPosition: -0.115
+            outPosition: -0.033
     gatekeeper:
-        implemented: false
+        canBusName: shootercanivore
         devices:
             topMotor:
                 deviceType: TalonFX
-                id: 14
+                id: 30
                 motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
                 pidConfig:
                     slot0:
-                        kP: 0.1
-                        kV: 0.1
+                        kP: 0.5
+                        kS: 0.31
+                        kV: 0.081
             bottomMotor:
                 deviceType: TalonFX
-                id: 22
+                id: 31
                 motorRotation: Clockwise_Positive
-                statorCurrentLimit: 60
-                motionMagic:
-                    expoKV: 0.05
-                    expoKA: 0.04
+                pidConfig:
+                    slot0:
+                        kP: 0.5
+                        kS: 0.31
+                        kV: 0.08
         constants:
             topClosedVelocity: 0
-            topOpenVelocity: 10
+            topOpenVelocity: 40
             bottomClosedVelocity: 0
-            bottomOpenVelocity: 5
-    ledManager:
-        implemented: false
+            bottomOpenVelocity: 40
+    shooter:
+        canBusName: shootercanivore
         devices:
-            argb:
-                id: -1
-                deviceType: CANifier
-            drgb:
-                id: 10
-                deviceType: CANdle
-        constants:
-            maxLevel: 96
-            ledCount: 66
-    drivetrain:
-        devices:
-            flDr:
-                id: 35
+            topLaunchMotor:
                 deviceType: TalonFX
-                neutralMode: Brake
-            flAz:
-                id: 30
-                deviceType: TalonFX
-                neutralMode: Brake
-                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 41
-                remoteOffest: -0.300537
-            flCoder:
-                id: 41
-                deviceType: CANcoder
-            frDr:
-                id: 34
-                deviceType: TalonFX
-                neutralMode: Brake
-                motorRotation: Clockwise_Positive
-            frAz:
-                id: 31
-                deviceType: TalonFX
-                neutralMode: Brake
-                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 43
-                remoteOffest: -0.439453
-            frCoder:
-                id: 43
-                deviceType: CANcoder
-            blDr:
-                id: 37
-                deviceType: TalonFX
-                neutralMode: Brake
-            blAz:
-                id: 33
-                deviceType: TalonFX
-                neutralMode: Brake
-                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 42
-                remoteOffest: -0.351074   # Negative Absolute Position No Offset CanCoder
-            blCoder:
-                id: 42
-                deviceType: CANcoder
-            brDr:
-                id: 36
-                deviceType: TalonFX
-                neutralMode: Brake
-                motorRotation: Clockwise_Positive
-            brAz:
                 id: 32
+                motorRotation: Clockwise_Positive
+                pidConfig:
+                    slot0:
+                        kS: 0.29
+                        kV: 0.115
+                        kP: 0.5
+            bottomLaunchMotor:
                 deviceType: TalonFX
-                neutralMode: Brake
-                remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 40
-                remoteOffest: -0.383301
-            brCoder:
-                id: 40
+                id: 33
+                motorRotation: CounterClockwise_Positive
+                pidConfig:
+                    slot0:
+                        kS: 0.28
+                        kV: 0.115
+                        kP: 0.5
+            launchAngleMotor:
+                deviceType: TalonFXS
+                motorType: NEO550_JST
+                remoteSensor: RemoteCANcoder
+                remoteSensorId: 36
+                id: 34
+                motorRotation: Clockwise_Positive
+                reverseSoftLimit: 0.046
+                forwardSoftLimit: 0.109
+                pidConfig: # TODO: Tune this one.
+                    slot0:
+                        kS: 0.3
+                        kP: 200
+                        staticFeedforwardSign: UseClosedLoopSign
+            rotationAngleMotor:
+                deviceType: TalonFX
+                id: 35
+                motorRotation: Clockwise_Positive
+                pidConfig:
+                    slot0:
+                        kS: 0.29
+                        kP: 1
+                        kD: 0.05
+                        staticFeedforwardSign: UseClosedLoopSign
+            launchAngleCoder:
+                id: 36
                 deviceType: CANcoder
-            gyro:
-                deviceType: Pigeon2
-                id: 5
-        modules:
-            fl:
-                drive: flDr
-                azimuth: flAz
-            fr:
-                drive: frDr
-                azimuth: frAz
-            bl:
-                drive: blDr
-                azimuth: blAz
-            br:
-                drive: brDr
-                azimuth: brAz
-        drivePID:
-            slot0:
-                kP: 0.4
-                kI: 0
-                kD: 0
-                kV: 0.13
-                kS: 0.06
-        azimuthPID:
-            slot0:
-                kP: 100
-                kD: 0.5
-                kV: 2.66
-                kS: 0.1
-        kinematics:
-            driveGearing: 6.03
-            steerGearing: 26.0909
-            wheelbaseLength: .505 # meters
-            wheelbaseWidth: .505 # meters
-            robotMass: 74.088 # kg
-            wheelRadius: .04938 # meters (1.944 in)
-            maxDriveRPS: 98 # measured motor max speed rps
-            maxAngularRate: 8.285 # rad/sec
-            wheelCOF: 1.7
+                sensorDirection: Clockwise_Positive # TODO: Make this actually get applied to the config. See #153 in the GitHub Project.
+                absoluteSensorDiscontinuityPoint: 0.625 # See above TODO.
+                magnetOffset: -0.35748674479 # See above TODO.
         constants:
-            translationKp: 4
-            rotationKp: 3
-            rotationKi: 0
-            rotationKd: 0
+            rotationAngleSensorClockwiseLeft: 0
+            rotationAngleSensorClockwiseRight: 1
+            motorRotationsPerTurretRotation: 15.625 # 250/16 gear ratio
+            initialShooterOffsetX: 0
+            initialShooterOffsetY: 0
+            initialShooterOffsetZ: 22
+            distanceOneLaunchAngle: 25
+            distanceOneRotationAngle: 0
+            distanceOneLaunchVelocity: 50
+            distanceTwoLaunchAngle: 30
+            distanceTwoRotationAngle: 0
+            distanceTwoLaunchVelocity: 50
+            distanceThreeLaunchAngle: 35
+            distanceThreeRotationAngle: 0
+            distanceThreeLaunchVelocity: 50
+            closeDistanceBetweenBeamBreaks: 0.419
+            farDistanceBetweenBeamBreaks: 13.570
+            secondLowestBeamBreakToZero: 7.65625
+            launchAngleMotorBottomLimitRotations: 0.046
+            launchAngleMotorTopLimitRotations: 0.109
+    vision:
+        implemented: false
+        cameras:
+            exampleCamera:
+                photonVisionUIName: UI Name
+                robotToCamera:
+                    xInches: 0
+                    yInches: 0
+                    zInches: 24
+                    rollDegrees: 0
+                    pitchDegrees: 0
+                    yawDegrees: 0
+                detectionType: APRIL_TAG
+            physicalCameraUsedWithSim:
+                photonVisionUIName: Logi_C270_HD_WebCam
+                robotToCamera:
+                    zInches: 24
+                detectionType: APRIL_TAG
+                simulateWithPhysicalCamera: true
+
 autopathing:
     paths:
         ethan:
