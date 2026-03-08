@@ -7,21 +7,19 @@ import com.pathplanner.lib.util.FlippingUtil;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
+import com.team1816.lib.util.FieldContainer;
 import com.team1816.lib.util.ShooterDistanceSetting;
 import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.networktables.DoubleArrayPublisher;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -55,7 +53,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final DigitalInput rotationAngleSensorClockwiseRight = new DigitalInput((int) factory.getConstant(NAME, "rotationAngleSensorClockwiseRight", 1));
 
     //HARDWARE RECORDED VALUES
-    private double currentRotationPosition;
     private boolean leftSensorTriggered = false;
     private boolean rightSensorTriggered = false;
     private boolean sensorValuesHaveBeenSet = false;
@@ -84,10 +81,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final DutyCycleOut turretDutyCycleOutRequest = new DutyCycleOut(0);
 
     //MECHANISMS
-    private final NetworkTable networkTable;
-    private final DoubleArrayPublisher turretFieldPose;
-    private final double[] poseArray = new double[3];
-
     private Mechanism2d launchMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
     private MechanismRoot2d launchMechRoot = launchMech.getRoot("Launch Root", 1.5, 0);
     private MechanismLigament2d launchAngleML = launchMechRoot.append(
@@ -162,10 +155,18 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         launcherTranslation = new Translation3d(0,0,0).plus(SHOOTER_OFFSET);
 
-        networkTable = NetworkTableInstance.getDefault().getTable("");
-        turretFieldPose = networkTable.getDoubleArrayTopic("Field/Turret").publish();
-        SmartDashboard.putData("Shooter Incline", launchMech);
-        currentRotationPosition = rotationAngleMotor.getMotorPosition();
+        GreenLogger.periodicLog("Shooter Incline", () -> launchMech);
+        GreenLogger.periodicLog(NAME + "/Turret Field Pose", this::getCurrentTurretPose2d, Pose2d.struct);
+        GreenLogger.periodicLog(NAME + "/Calibrated", this::isCalibrated);
+        GreenLogger.periodicLog(NAME + "/Left Sensor Triggered", () -> leftSensorTriggered);
+        GreenLogger.periodicLog(NAME + "/Right Sensor Triggered", () -> rightSensorTriggered);
+        GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
+        GreenLogger.periodicLog(NAME + "/Wanted Launch Angle Degrees", () -> wantedState.launchAngle);
+        GreenLogger.periodicLog(NAME + "/Wanted Launch Velocity RPS", () -> wantedState.launchVelocity);
+        GreenLogger.periodicLog(NAME + "/Wanted Turret Angle Degrees", () -> wantedState.rotationAngle);
+        GreenLogger.periodicLog(
+            NAME + "/Rotation Angle Motor Offset Rotations", () -> rotationAngleMotorOffsetRotations
+        );
     }
 
     public void periodic() {
@@ -185,8 +186,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     @Override
     public void readFromHardware() {
-        currentRotationPosition = rotationAngleMotor.getMotorPosition();
-
         // Beam Break Sensor Reading
         if (sensorValuesHaveBeenSet) {
             // If this isn't the first loop, set the previous sensor triggered values to what the
@@ -205,14 +204,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         launcherTranslation = new Translation3d(BaseRobotState.robotPose.getX(), BaseRobotState.robotPose.getY(), 0).plus(SHOOTER_OFFSET);
 
-        var robotPose = BaseRobotState.robotPose;
-        poseArray[0] = robotPose.getX();
-        poseArray[1] = robotPose.getY();
-        poseArray[2] = robotPose.getRotation().getDegrees() + (
-            (rotationAngleMotor.getMotorPosition() - rotationAngleMotorOffsetRotations)
-                / MOTOR_ROTATIONS_PER_TURRET_ROTATION * 360
-        );
-        turretFieldPose.set(poseArray);
+        FieldContainer.field.getObject("Turret").setPose(getCurrentTurretPose2d());
 
         launchAngleML.setAngle(wantedState.getLaunchAngle()); //todo: Will need to change to correspond with motor
     }
@@ -301,18 +293,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         setRotationAngle(rotationAngle);
         setLaunchMotorVelocities(launchPower);
 
-        if (wantedState != previousWantedState) {
-            GreenLogger.log("Shooter state: " + wantedState.toString());
-            GreenLogger.log("Launch Angle: " + launchAngle);
-            GreenLogger.log("Launch Power: " + launchPower);
-            GreenLogger.log("Rotation Angle: " + rotationAngle);
-
-            SmartDashboard.putString("Shooter state: ", wantedState.toString());
-            SmartDashboard.putNumber("Launch Angle: ", launchAngle);
-            SmartDashboard.putNumber("Launch Power: ", launchPower);
-            SmartDashboard.putNumber("Rotation Angle: ", rotationAngle);
-            previousWantedState = wantedState;
-        }
+        previousWantedState = wantedState;
     }
 
     public void setWantedState(SHOOTER_STATE state) {
@@ -367,7 +348,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 }
             }
         }
-        SmartDashboard.putNumber("RotationAngleMotorOffsetRotations", rotationAngleMotorOffsetRotations);
     }
 
     private void setAutomaticRotationAngle() {
@@ -433,6 +413,23 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         else {
             GreenLogger.log("Can't set rotation angle of shooter. Rotation not calibrated.");
         }
+    }
+
+    /**
+     * Gets the {@link Pose2d} representing the turret's current pose on the field.
+     *
+     * @return The current field-relative {@link Pose2d} of the turret.
+     */
+    private Pose2d getCurrentTurretPose2d() {
+        return new Pose2d(
+            BaseRobotState.robotPose.getTranslation(),
+            BaseRobotState.robotPose.getRotation().plus(
+                Rotation2d.fromRotations(
+                    (rotationAngleMotor.getMotorPosition() - rotationAngleMotorOffsetRotations)
+                        / MOTOR_ROTATIONS_PER_TURRET_ROTATION
+                )
+            )
+        );
     }
 
     public boolean isCalibrated() {
