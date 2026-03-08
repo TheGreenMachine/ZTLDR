@@ -84,9 +84,6 @@
           ],
           "weight": 3.0
         },
-        "apriltag": {
-          "image": "C:\\Users\\henry\\ZTLDR\\field_images\\apriltag.png"
-        },
         "bottom": 1914,
         "cameras": {
           "arrowColor": [
@@ -171,9 +168,6 @@
             255.0
           ],
           "style": "Hidden"
-        },
-        "physicalCams/visibleTargetPoses": {
-          "image": "C:\\Users\\henry\\ZTLDR\\field_images\\visible-vision-target.png"
         },
         "right": 3942,
         "top": 118,

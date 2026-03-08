@@ -343,7 +343,8 @@ public class RobotFactory {
     private IPhoenix6 getDevInst(DeviceConfiguration deviceConfig, SubsystemConfig subsystemConfig, boolean logDetails) {
         IPhoenix6 devInst = null;
         var bus = subsystemConfig.canBusName;
-        if (!subsystemConfig.implemented || deviceConfig.id > startingGhostId) {
+        var ghost = !subsystemConfig.implemented || deviceConfig.id > startingGhostId || deviceConfig.id < 0;
+        if (ghost) {
             GreenLogger.log("Device " + deviceConfig.name + " not implemented ghosting");
             bus = "ghost";
         } else {
@@ -360,7 +361,7 @@ public class RobotFactory {
             canbus = canBusMap.get(bus);
         }
 
-        if (!subsystemConfig.implemented) return new GhostDevice(deviceConfig.id, canbus);
+        if (ghost) return new GhostDevice(deviceConfig.id, canbus);
 
         switch (deviceConfig.deviceType) {
             case TalonFX  -> devInst = new TalonFXImpl(deviceConfig.id, canbus);

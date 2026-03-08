@@ -95,15 +95,11 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void setIntakeSpeed(double velocity) {
-        double clampedVelocity = MathUtil.clamp(velocity, MIN_INTAKE_MOTOR_CLAMP, MAX_INTAKE_MOTOR_CLAMP);
-
-        intakeMotor.setControl(dutyCycleOut.withOutput(clampedVelocity));
+        intakeMotor.setControl(dutyCycleOut.withOutput(velocity));
     }
 
     private void setFlipperPosition(double rotations) {
-        double clampRotation = MathUtil.clamp(rotations, MIN_FLIPPER_MOTOR_CLAMP, MAX_FLIPPER_MOTOR_CLAMP);
-
-        flipperMotor.setControl(motionMagicExpoVoltage.withPosition(clampRotation));
+        flipperMotor.setControl(motionMagicExpoVoltage.withPosition(rotations));
     }
 
     public void setWantedState(INTAKE_STATE state) {
