@@ -25,6 +25,8 @@ public class CANdiImpl extends CANdi implements IPhoenix6 {
     @Override
     public StatusCode applyConfiguration(ParentConfiguration config, String logPath, boolean logging) {
         GreenLogger.periodicLog(logPath + "Connected", this::isConnected);
+        GreenLogger.periodicLog(logPath + "S1", this::getS1Closed);
+        GreenLogger.periodicLog(logPath + "S2", this::getS2Closed);
         return this.getConfigurator().apply((CANdiConfiguration) config);
     }
 
@@ -35,4 +37,5 @@ public class CANdiImpl extends CANdi implements IPhoenix6 {
 
     @Override
     public boolean hasDeviceCrashed() { return getStickyFault_BootDuringEnable().getValue(); }
+
 }

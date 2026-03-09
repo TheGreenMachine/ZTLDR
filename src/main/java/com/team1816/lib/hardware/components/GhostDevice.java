@@ -65,5 +65,10 @@ public class GhostDevice implements IMotor {
     }
 
     @Override
+    public boolean isGhost() {
+        return true;
+    }
+
+    @Override
     public boolean hasDeviceCrashed() { return  false; }
 }

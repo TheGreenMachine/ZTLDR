@@ -5,6 +5,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.pathplanner.lib.util.FlippingUtil;
 import com.team1816.lib.BaseRobotState;
+import com.team1816.lib.hardware.components.IPhoenix6;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.FieldContainer;
@@ -37,6 +38,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final IMotor bottomLaunchMotor = (IMotor) factory.getDevice(NAME, "bottomLaunchMotor");
     private final IMotor launchAngleMotor = (IMotor) factory.getDevice(NAME, "launchAngleMotor");
     private final IMotor rotationAngleMotor = (IMotor) factory.getDevice(NAME, "rotationAngleMotor");
+    private final IPhoenix6 candi = (IPhoenix6) factory.getDevice(NAME, "candi");
 
     private final VelocityVoltage topLaunchMotorVelocityRequest = new VelocityVoltage(0);
     private final VelocityVoltage bottomLaunchMotorVelocityRequest = new VelocityVoltage(0);
@@ -144,7 +146,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public Shooter(){
         super();
-
+        // if the turret is ghosted we can say we are calibrated because the motors will not move
+        if(rotationAngleMotor.isGhost()) isCalibrated = true;
         MOTOR_ROTATIONS_PER_TURRET_ROTATION = factory.getConstant(NAME, "motorRotationsPerTurretRotation", 1);
         SHOOTER_OFFSET = new Translation3d(factory.getConstant(NAME, "initialShooterOffsetX",0), factory.getConstant(NAME, "initialShooterOffsetY",0), factory.getConstant(NAME, "initialShooterOffsetZ",0)); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
         CLOSE_DISTANCE_BETWEEN_BEAM_BREAKS = factory.getConstant(NAME, "closeDistanceBetweenBeamBreaks", 0);
@@ -367,10 +370,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private void setLaunchAngle(double wantedAngleDegrees) {
         double rotations = wantedAngleDegrees / 360;
-
-        double clampedRotations = MathUtil.clamp(rotations, LAUNCH_ANGLE_MOTOR_BOTTOM_LIMIT_ROTATIONS, LAUNCH_ANGLE_MOTOR_TOP_LIMIT_ROTATIONS);
-
-        launchAngleMotor.setControl(launchAnglePositionRequest.withPosition(clampedRotations));
+        launchAngleMotor.setControl(launchAnglePositionRequest.withPosition(rotations));
     }
 
     public SHOOTER_STATE getWantedState() {

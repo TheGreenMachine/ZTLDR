@@ -34,66 +34,66 @@ subsystems:
     drivetrain:
         devices:
             flDr:
-                id: 1
+                id: 35
                 deviceType: TalonFX
                 neutralMode: Brake
             flAz:
-                id: 5
+                id: 30
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 9
                 remoteOffest: -0.300537
             flCoder:
-                id: 9
+                id: 41
                 deviceType: CANcoder
             frDr:
-                id: 2
+                id: 34
                 deviceType: TalonFX
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
             frAz:
-                id: 6
+                id: 31
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 10
                 remoteOffest: -0.439453
             frCoder:
-                id: 10
+                id: 43
                 deviceType: CANcoder
             blDr:
-                id: 3
+                id: 37
                 deviceType: TalonFX
                 neutralMode: Brake
             blAz:
-                id: 7
+                id: 33
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 11
                 remoteOffest: -0.351074   # Negative Absolute Position No Offset CanCoder
             blCoder:
-                id: 11
+                id: 42
                 deviceType: CANcoder
             brDr:
-                id: 4
+                id: 36
                 deviceType: TalonFX
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
             brAz:
-                id: 8
+                id: 32
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 12
                 remoteOffest: -0.383301
             brCoder:
-                id: 12
+                id: 40
                 deviceType: CANcoder
             gyro:
                 deviceType: Pigeon2
-                id: 13
+                id: 5
         modules:
             fl:
                 drive: flDr
@@ -196,38 +196,37 @@ subsystems:
     intake:
         devices:
             intakeMotor:
-                id: 23
+                id: 2
                 deviceType: TalonFX
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
             flipperMotor:
-                id: 24
+                id: 3
                 deviceType: TalonFX
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
-                statorCurrentLimit: 20
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 25
+                remoteSensorId: 10
                 remoteOffest: 0
                 rotorToSensor: 0.1
-                forwardSoftLimit: -0.0
-                reversSoftLimit: -0.20
                 motionMagic:
                     expoKV: 10
                     expoKA: 10
                 pidConfig:
                     slot0:
-                        kP: 20
-                        kV: 1
+                        kP: 12
+                        kD: 0.1
+                        kS: 0.1
             flipCoder:
-                id: 25
+                id: 10
                 deviceType: CANcoder
         constants: # TODO: all of these
             intakeOnSpeed: .50
             intakeOffSpeed: 0
-            inPosition: -0.115
-            outPosition: -0.033
+            inPosition: -0.139
+            outPosition: 0.017
     gatekeeper:
+        implemented: false
         canBusName: shootercanivore
         devices:
             topMotor:
@@ -254,6 +253,7 @@ subsystems:
             bottomClosedVelocity: 0
             bottomOpenVelocity: 40
     shooter:
+        implemented: true
         canBusName: shootercanivore
         devices:
             topLaunchMotor:
@@ -283,6 +283,7 @@ subsystems:
                 motorRotation: Clockwise_Positive
                 reverseSoftLimit: 0.046
                 forwardSoftLimit: 0.109
+                statorCurrentLimit: 35
                 pidConfig: # TODO: Tune this one.
                     slot0:
                         kS: 0.3
@@ -304,6 +305,9 @@ subsystems:
                 sensorDirection: Clockwise_Positive # TODO: Make this actually get applied to the config. See #153 in the GitHub Project.
                 absoluteSensorDiscontinuityPoint: 0.625 # See above TODO.
                 magnetOffset: -0.35748674479 # See above TODO.
+            candi:
+                id: 37
+                deviceType: CANdi
         constants:
             rotationAngleSensorClockwiseLeft: 0
             rotationAngleSensorClockwiseRight: 1
