@@ -9,6 +9,12 @@
           "data": {
             "pathName": "DriverStationToDepot"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "InTheZone"
+          }
         }
       ]
     }
