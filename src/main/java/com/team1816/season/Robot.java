@@ -56,6 +56,7 @@ public class Robot extends BaseRobot {
     @Override
     public void autonomousInit() {
         try {
+            robotContainer.autonomousInit();
             // Ensure pose is always initialized before scheduling auto
             robotContainer.forceUpdatePose();
             autonomousCommand = robotContainer.autoChooser.getSelected();
@@ -64,7 +65,6 @@ public class Robot extends BaseRobot {
                 CommandScheduler.getInstance().schedule(autonomousCommand);
             }
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.AUTONOMOUS);
-            robotContainer.autonomousInit();
         } catch (Throwable t) {
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
             GreenLogger.log(t);
@@ -112,11 +112,6 @@ public class Robot extends BaseRobot {
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
             GreenLogger.log(t);
         }
-    }
-
-    @Override
-    public void teleopExit() {
-        robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
     }
 
     @Override

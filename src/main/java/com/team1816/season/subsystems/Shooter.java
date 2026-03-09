@@ -31,7 +31,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public static final String NAME = "shooter";
 
     private SHOOTER_STATE wantedState = SHOOTER_STATE.DISTANCE_ONE;
-    private SHOOTER_STATE previousWantedState = SHOOTER_STATE.DISTANCE_ONE;
 
     //MOTORS
     private final IMotor topLaunchMotor = (IMotor) factory.getDevice(NAME, "topLaunchMotor");
@@ -295,8 +294,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         setLaunchAngle(launchAngle);
         setRotationAngle(rotationAngle);
         setLaunchMotorVelocities(launchPower);
-
-        previousWantedState = wantedState;
     }
 
     public void setWantedState(SHOOTER_STATE state) {
@@ -434,5 +431,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public boolean isCalibrated() {
         return isCalibrated;
+    }
+
+    public boolean isAimed() {
+        // TODO: Make this return true if the turret, incline, and launch motors are all aimed.
+        return true;
     }
 }
