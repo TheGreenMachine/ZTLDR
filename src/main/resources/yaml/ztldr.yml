@@ -42,7 +42,7 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 9
+                remoteSensorId: 41
                 remoteOffest: -0.300537
             flCoder:
                 id: 41
@@ -57,7 +57,7 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 10
+                remoteSensorId: 43
                 remoteOffest: -0.439453
             frCoder:
                 id: 43
@@ -71,7 +71,7 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 11
+                remoteSensorId: 42
                 remoteOffest: -0.351074   # Negative Absolute Position No Offset CanCoder
             blCoder:
                 id: 42
@@ -86,7 +86,7 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 12
+                remoteSensorId: 40
                 remoteOffest: -0.383301
             brCoder:
                 id: 40
@@ -231,7 +231,7 @@ subsystems:
         devices:
             topMotor:
                 deviceType: TalonFX
-                id: 30
+                id: 23
                 motorRotation: Clockwise_Positive
                 pidConfig:
                     slot0:
@@ -240,7 +240,7 @@ subsystems:
                         kV: 0.081
             bottomMotor:
                 deviceType: TalonFX
-                id: 31
+                id: 24
                 motorRotation: Clockwise_Positive
                 pidConfig:
                     slot0:
@@ -253,12 +253,12 @@ subsystems:
             bottomClosedVelocity: 0
             bottomOpenVelocity: 40
     shooter:
-        implemented: true
+        implemented: false
         canBusName: shootercanivore
         devices:
             topLaunchMotor:
                 deviceType: TalonFX
-                id: 32
+                id: 25
                 motorRotation: Clockwise_Positive
                 pidConfig:
                     slot0:
@@ -267,7 +267,7 @@ subsystems:
                         kP: 0.5
             bottomLaunchMotor:
                 deviceType: TalonFX
-                id: 33
+                id: 26
                 motorRotation: CounterClockwise_Positive
                 pidConfig:
                     slot0:
@@ -279,7 +279,7 @@ subsystems:
                 motorType: NEO550_JST
                 remoteSensor: RemoteCANcoder
                 remoteSensorId: 36
-                id: 34
+                id: 27
                 motorRotation: Clockwise_Positive
                 reverseSoftLimit: 0.046
                 forwardSoftLimit: 0.109
@@ -291,7 +291,7 @@ subsystems:
                         staticFeedforwardSign: UseClosedLoopSign
             rotationAngleMotor:
                 deviceType: TalonFX
-                id: 35
+                id: 28
                 motorRotation: Clockwise_Positive
                 pidConfig:
                     slot0:
@@ -300,13 +300,13 @@ subsystems:
                         kD: 0.05
                         staticFeedforwardSign: UseClosedLoopSign
             launchAngleCoder:
-                id: 36
+                id: 29
                 deviceType: CANcoder
                 sensorDirection: Clockwise_Positive # TODO: Make this actually get applied to the config. See #153 in the GitHub Project.
                 absoluteSensorDiscontinuityPoint: 0.625 # See above TODO.
                 magnetOffset: -0.35748674479 # See above TODO.
             candi:
-                id: 37
+                id: 6
                 deviceType: CANdi
         constants:
             rotationAngleSensorClockwiseLeft: 0
