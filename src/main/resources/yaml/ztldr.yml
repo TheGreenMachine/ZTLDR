@@ -32,6 +32,7 @@ shooterSettings:
     maximumDefaultPower: 0 # TODO: SET THIS
 subsystems:
     drivetrain:
+        implemented: false
         devices:
             flDr:
                 id: 35
@@ -182,6 +183,7 @@ subsystems:
             linearSlideL1DownClimbing: 0
 
     feeder:
+        implemented: false
         devices:
             feedMotor:
                 deviceType: TalonFX
@@ -194,6 +196,7 @@ subsystems:
             reversing: 0
             idling: 0
     intake:
+        implemented: false
         devices:
             intakeMotor:
                 id: 2
@@ -226,7 +229,6 @@ subsystems:
             inPosition: -0.139
             outPosition: 0.017
     gatekeeper:
-        implemented: false
         canBusName: shootercanivore
         devices:
             topMotor:
@@ -253,7 +255,6 @@ subsystems:
             bottomClosedVelocity: 0
             bottomOpenVelocity: 40
     shooter:
-        implemented: false
         canBusName: shootercanivore
         devices:
             topLaunchMotor:
@@ -262,9 +263,9 @@ subsystems:
                 motorRotation: Clockwise_Positive
                 pidConfig:
                     slot0:
-                        kS: 0.29
+                        kS: 0.28
                         kV: 0.115
-                        kP: 0.5
+                        kP: 3
             bottomLaunchMotor:
                 deviceType: TalonFX
                 id: 26
@@ -273,12 +274,12 @@ subsystems:
                     slot0:
                         kS: 0.28
                         kV: 0.115
-                        kP: 0.5
+                        kP: 3
             launchAngleMotor:
                 deviceType: TalonFXS
                 motorType: NEO550_JST
                 remoteSensor: RemoteCANcoder
-                remoteSensorId: 36
+                remoteSensorId: 29
                 id: 27
                 motorRotation: Clockwise_Positive
                 reverseSoftLimit: 0.046
@@ -317,13 +318,13 @@ subsystems:
             initialShooterOffsetZ: 22
             distanceOneLaunchAngle: 25
             distanceOneRotationAngle: 0
-            distanceOneLaunchVelocity: 50
-            distanceTwoLaunchAngle: 30
+            distanceOneLaunchVelocity: 65
+            distanceTwoLaunchAngle: 25
             distanceTwoRotationAngle: 0
-            distanceTwoLaunchVelocity: 50
-            distanceThreeLaunchAngle: 35
+            distanceTwoLaunchVelocity: 45
+            distanceThreeLaunchAngle: 25
             distanceThreeRotationAngle: 0
-            distanceThreeLaunchVelocity: 50
+            distanceThreeLaunchVelocity: 43
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570
             secondLowestBeamBreakToZero: 7.65625
