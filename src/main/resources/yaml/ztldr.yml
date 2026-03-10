@@ -19,46 +19,41 @@ shooterSettings:
         - 19
         - 20
     angles:
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
+        - 25 #4
+        - 25 #5
+        - 25 #6
+        - 25 #7
+        - 25 #8
+        - 25 #9
+        - 25 #10
+        - 25 #11
+        - 25 #12
+        - 25 #13
+        - 25 #14
+        - 22 #15
+        - 22 #16
+        - 21 #17
+        - 21 #18
+        - 22 #19
+        - 22 #20
     powers:
-        - 43
-        - 45
-        - 45
-        - 45
-        - 45
-        - 45
-        - 45
-        - 45
-        - 45
-        - 45
-        - 45
-        - 45
-        - 45
-        - 45
-        - 45
-        - 45
-        - 45
-        - 45
-        - 65
+        - 43 #4
+        - 45 #5
+        - 45 #6
+        - 45 #7
+        - 45 #8
+        - 45 #9
+        - 45 #10
+        - 45 #11
+        - 45 #12
+        - 45 #13
+        - 45 #14
+        - 55 #15
+        - 57 #16
+        - 62 #17
+        - 63 #18
+        - 65 #19
+        - 65 #20
     minimumDefaultAngle: 0 # TODO: SET THIS
     minimumDefaultPower: 0 # TODO: SET THIS
     mediumDefaultAngle: 0 # TODO: SET THIS
@@ -177,7 +172,7 @@ subsystems:
         implemented: false
         devices:
             argb:
-                id: -1
+                id: 14
                 deviceType: CANifier
             drgb:
                 id: 15
@@ -351,15 +346,15 @@ subsystems:
             initialShooterOffsetX: 0
             initialShooterOffsetY: 0
             initialShooterOffsetZ: 22
-            distanceOneLaunchAngle: 25
+            distanceOneLaunchAngle: 22
             distanceOneRotationAngle: 0
-            distanceOneLaunchVelocity: 65
-            distanceTwoLaunchAngle: 25
+            distanceOneLaunchVelocity: 54
+            distanceTwoLaunchAngle: 22
             distanceTwoRotationAngle: 0
-            distanceTwoLaunchVelocity: 45
-            distanceThreeLaunchAngle: 25
+            distanceTwoLaunchVelocity: 53
+            distanceThreeLaunchAngle: 22
             distanceThreeRotationAngle: 0
-            distanceThreeLaunchVelocity: 43
+            distanceThreeLaunchVelocity: 52
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570
             secondLowestBeamBreakToZero: 7.65625
