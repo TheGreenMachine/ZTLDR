@@ -330,24 +330,50 @@ subsystems:
             launchAngleMotorBottomLimitRotations: 0.046
             launchAngleMotorTopLimitRotations: 0.109
     vision:
-        implemented: false
         cameras:
-            exampleCamera:
-                photonVisionUIName: UI Name
+            forwardLeft:
+                photonVisionUIName: Forward_Left
                 robotToCamera:
-                    xInches: 0
-                    yInches: 0
-                    zInches: 24
+                    xInches: -12.5
+                    yInches: 13
+                    zInches: 16.75
                     rollDegrees: 0
                     pitchDegrees: 0
-                    yawDegrees: 0
+                    yawDegrees: 55
                 detectionType: APRIL_TAG
-            physicalCameraUsedWithSim:
-                photonVisionUIName: Logi_C270_HD_WebCam
+            forwardRight:
+                photonVisionUIName: Forward_Right
                 robotToCamera:
-                    zInches: 24
+                    xInches: -12.5
+                    yInches: -13
+                    zInches: 16.75
+                    rollDegrees: 0
+                    pitchDegrees: 0
+                    yawDegrees: -55
                 detectionType: APRIL_TAG
-                simulateWithPhysicalCamera: true
+            backwardLeft:
+                photonVisionUIName: Backward_Left
+                robotToCamera:
+                    xInches: -12.5
+                    yInches: 13
+                    zInches: 15
+                    rollDegrees: 0
+                    pitchDegrees: 0
+                    yawDegrees: 155
+                detectionType: APRIL_TAG
+            backwardRight:
+                photonVisionUIName: Backward_Right
+                robotToCamera:
+                    xInches: -12.5
+                    yInches: -13
+                    zInches: 15
+                    rollDegrees: 0
+                    pitchDegrees: 0
+                    yawDegrees: -155
+                detectionType: APRIL_TAG
+            fuelDetector:
+                photonVisionUIName: Fuel_Detector
+                detectionType: NONE # TODO: Object detection
 
 autopathing:
     paths:
