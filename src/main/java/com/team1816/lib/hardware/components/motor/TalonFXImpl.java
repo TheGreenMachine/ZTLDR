@@ -83,6 +83,11 @@ public class TalonFXImpl extends TalonFX implements ICTREDevice, IMotor {
     }
 
     @Override
+    public boolean isGhost() {
+        return false;
+    }
+
+    @Override
     public StatusCode setSimSupplyVoltage(double volts) {
         return simState.setSupplyVoltage(volts);
     }

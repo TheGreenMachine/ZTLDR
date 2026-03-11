@@ -2,6 +2,8 @@ package com.team1816.lib.hardware.factory;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.*;
+import com.ctre.phoenix6.hardware.ParentDevice;
+import com.ctre.phoenix6.hardware.traits.CommonTalon;
 import com.ctre.phoenix6.signals.*;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -17,15 +19,22 @@ import com.team1816.lib.hardware.components.led.CANifierImpl;
 import com.team1816.lib.hardware.components.motor.TalonFXImpl;
 import com.team1816.lib.hardware.components.motor.TalonFXSImpl;
 import com.team1816.lib.hardware.components.sensor.CANCoderImpl;
+import com.team1816.lib.hardware.components.sensor.Camera;
 import com.team1816.lib.hardware.components.sensor.CANdiImpl;
 import com.team1816.lib.hardware.components.sensor.CanRangeImpl;
+import com.team1816.lib.subsystems.drivetrain.CTRESwerveDrivetrainImpl;
+import com.team1816.lib.subsystems.drivetrain.IDrivetrain;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import org.photonvision.simulation.SimCameraProperties;
 
 import java.util.*;
 
@@ -215,6 +224,101 @@ public class RobotFactory {
     }
 
     /**
+     * Gets all cameras from the YAML configuration for the provided subsystem.
+     *
+     * @param subsystemName The name of the subsystem in the YAML configuration file.
+     * @return The cameras for the provided subsystem.
+     */
+    public List<Camera> getCameras(String subsystemName) {
+        if (config == null) {
+            throw new NullPointerException("config is null");
+        }
+        var subsystem = getSubsystemConfig(subsystemName);
+
+        // if subsystem is not implemented we don't need anything from it
+        if (!subsystem.implemented) return new ArrayList<>();
+
+        // TODO: Make the simCameraProperties in YAML hold the actual values we need.
+        var cameraProp = new SimCameraProperties();
+        cameraProp.setCalibration(960, 720, Rotation2d.fromDegrees(90));
+        cameraProp.setCalibError(0.35, 0.10);
+        cameraProp.setFPS(15);
+        cameraProp.setAvgLatencyMs(50);
+        cameraProp.setLatencyStdDevMs(15);
+
+        List<Camera> cameras = new ArrayList<>();
+        for (Map.Entry<String, CameraConfiguration> entry : subsystem.cameras.entrySet()) {
+            String cameraName = entry.getKey();
+            CameraConfiguration cameraConfig = entry.getValue();
+            if (cameraConfig != null) {
+                RobotToCamera robotToCam = cameraConfig.robotToCamera;
+                if (robotToCam != null) {
+                    GreenLogger.log("Creating camera " + cameraName);
+                    GreenLogger.log("  photonVisionUIName: " + cameraConfig.photonVisionUIName);
+                    GreenLogger.log(
+                        "  robotToCamera: xInches=" + robotToCam.xInches +
+                            ", yInches=" + robotToCam.yInches +
+                            ", zInches=" + robotToCam.zInches +
+                            ", rollDegrees=" + robotToCam.rollDegrees +
+                            ", pitchDegrees=" + robotToCam.pitchDegrees +
+                            ", yawDegrees=" + robotToCam.yawDegrees
+                    );
+                    GreenLogger.log("  detectionType: " + cameraConfig.detectionType);
+                    GreenLogger.log("  simCameraProperties: " + cameraConfig.simCameraProperties);
+                    GreenLogger.log("  simulateWithPhysicalCamera: " + cameraConfig.simulateWithPhysicalCamera);
+
+                    Camera camera = new Camera(
+                        cameraName,
+                        cameraConfig.photonVisionUIName,
+                        new Transform3d(
+                            new Translation3d(
+                                Units.inchesToMeters(robotToCam.xInches),
+                                Units.inchesToMeters(robotToCam.yInches),
+                                Units.inchesToMeters(robotToCam.zInches)
+                            ),
+                            new Rotation3d(
+                                Units.degreesToRadians(robotToCam.rollDegrees),
+                                Units.degreesToRadians(robotToCam.pitchDegrees),
+                                Units.degreesToRadians(robotToCam.yawDegrees)
+                            )
+                        ),
+                        cameraConfig.detectionType,
+                        cameraProp,
+                        cameraConfig.simulateWithPhysicalCamera
+                    );
+
+                    cameras.add(camera);
+
+                    String logPath = subsystemName + "/" + cameraName + "/";
+                    camera.setUpPeriodicLogging(logPath);
+                }
+            }
+        }
+
+        return cameras;
+    }
+
+    /**
+     * Constructs a swerve drivetrain from the YAML configuration for the provided subsystem.
+     *
+     * @param subsystemName The name of the subsystem in the YAML configuration file.
+     * @return The swerve drivetrain for the provided subsystem.
+     */
+    public IDrivetrain getSwerveDrivetrain(String subsystemName) {
+        IDrivetrain swerveDrivetrain = new CTRESwerveDrivetrainImpl(
+            (id, bus) -> (CommonTalon) factory.getDeviceById(subsystemName, id),
+            (id, bus) -> (CommonTalon) factory.getDeviceById(subsystemName, id),
+            (id, bus) -> (ParentDevice) factory.getDeviceById(subsystemName, id),
+            factory.getSwerveDrivetrainConstant(subsystemName)
+        );
+
+        String logPath = subsystemName + "/" + "swerveDrivetrain" + "/";
+        swerveDrivetrain.setUpPeriodicLogging(logPath);
+
+        return swerveDrivetrain;
+    }
+
+    /**
      * Used to get devices by their ID. Used by CTRE swerve.
      */
     public IPhoenix6 getDeviceById(String subsystemName, int id) {
@@ -239,7 +343,8 @@ public class RobotFactory {
     private IPhoenix6 getDevInst(DeviceConfiguration deviceConfig, SubsystemConfig subsystemConfig, boolean logDetails) {
         IPhoenix6 devInst = null;
         var bus = subsystemConfig.canBusName;
-        if (!subsystemConfig.implemented || deviceConfig.id > startingGhostId) {
+        var ghost = !subsystemConfig.implemented || deviceConfig.id > startingGhostId || deviceConfig.id < 0;
+        if (ghost) {
             GreenLogger.log("Device " + deviceConfig.name + " not implemented ghosting");
             bus = "ghost";
         } else {
@@ -256,7 +361,7 @@ public class RobotFactory {
             canbus = canBusMap.get(bus);
         }
 
-        if (!subsystemConfig.implemented) return new GhostDevice(deviceConfig.id, canbus);
+        if (ghost) return new GhostDevice(deviceConfig.id, canbus);
 
         switch (deviceConfig.deviceType) {
             case TalonFX  -> devInst = new TalonFXImpl(deviceConfig.id, canbus);
@@ -485,6 +590,7 @@ public class RobotFactory {
             if (pid.kV != null) config.kV = pid.kV;
             if (pid.kI != null) config.kI = pid.kI;
             if (pid.gravityType != null) config.GravityType = pid.gravityType;
+            if (pid.staticFeedforwardSign != null) config.StaticFeedforwardSign = pid.staticFeedforwardSign;
             GreenLogger.log("  " + key +
                 " - kP:" + GetDisplay(config.kP) +
                 " kI:" + GetDisplay(config.kI) +
@@ -493,7 +599,9 @@ public class RobotFactory {
                 " kS:" + GetDisplay(config.kS) +
                 " kA:" + GetDisplay(config.kA) +
                 " kG:" + GetDisplay(config.kG) +
-                " gravityType:" + config.GravityType);
+                " gravityType:" + config.GravityType +
+                " staticFeedforwardSign:" + config.StaticFeedforwardSign
+            );
         }
         return config;
     }

@@ -82,6 +82,11 @@ public class TalonFXSImpl extends TalonFXS implements ICTREDevice, IMotor {
     }
 
     @Override
+    public boolean isGhost() {
+        return false;
+    }
+
+    @Override
     public StatusCode setSimRotorPosition(double rotations) {
         return simState.setRawRotorPosition(rotations);
     }

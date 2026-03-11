@@ -2,16 +2,16 @@ package com.team1816.season.subsystems;
 
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.Singleton;
+import com.team1816.lib.subsystems.BaseSuperstructure;
+import com.team1816.lib.subsystems.Vision;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 //Some wantedStates are still here since they're tied to aspects of the code I don't 100% understand(ClimbSide & FeederControl) -Ishwaq
-public class Superstructure extends SubsystemBase {
-    private final Swerve swerve;
+public class Superstructure extends BaseSuperstructure {
     private final Shooter shooter;
     private final Gatekeeper gatekeeper;
     private final Intake intake;
@@ -23,7 +23,7 @@ public class Superstructure extends SubsystemBase {
     public enum WantedSuperState {
         DEFAULT,
 
-        SHOOTER_CALIBRATE,
+        INITIALIZING,
 
         SHOOTER_AUTOMATIC_HUB,
 
@@ -49,7 +49,7 @@ public class Superstructure extends SubsystemBase {
     public enum ActualSuperState {
         DEFAULTING,
 
-        SHOOTING_CALIBRATING,
+        INITIALIZING,
 
         SHOOTING_AUTOMATIC_HUB,
 
@@ -98,11 +98,9 @@ public class Superstructure extends SubsystemBase {
         DEFAULTING
     }
 
-    private WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
-    private WantedSuperState previousWantedSuperState = WantedSuperState.DEFAULT;
-    private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
-
-    // TODO: Add calibration state, maybe as the default here
+    private WantedSuperState wantedSuperState = WantedSuperState.INITIALIZING;
+    private WantedSuperState previousWantedSuperState = WantedSuperState.INITIALIZING;
+    private ActualSuperState actualSuperState = ActualSuperState.INITIALIZING;
 
     private WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING; //Do we need this??
     private FeederControlState feederControlState = FeederControlState.DEFAULTING; //What to do with this?
@@ -110,8 +108,8 @@ public class Superstructure extends SubsystemBase {
 
     private ClimbSide climbSide = ClimbSide.LEFT;
 
-    public Superstructure(Swerve swerve) {
-        this.swerve = swerve;
+    public Superstructure(Swerve swerve, Vision vision) {
+        super(swerve, vision);
         this.shooter = Singleton.CreateSubSystem(Shooter.class);
         this.gatekeeper = Singleton.CreateSubSystem(Gatekeeper.class);
         this.intake = Singleton.CreateSubSystem(Intake.class);
@@ -121,6 +119,8 @@ public class Superstructure extends SubsystemBase {
 
     @Override
     public void periodic() {
+        super.periodic();
+
         actualSuperState = handleStateTransitions();
 
         applyStates();
@@ -137,7 +137,7 @@ public class Superstructure extends SubsystemBase {
         switch (wantedSuperState) {
             case DEFAULT -> actualSuperState = ActualSuperState.DEFAULTING;
 
-            case SHOOTER_CALIBRATE -> actualSuperState = ActualSuperState.SHOOTING_CALIBRATING;
+            case INITIALIZING -> actualSuperState = ActualSuperState.INITIALIZING;
 
             case SHOOTER_AUTOMATIC_HUB -> actualSuperState = ActualSuperState.SHOOTING_AUTOMATIC_HUB;
 
@@ -166,7 +166,7 @@ public class Superstructure extends SubsystemBase {
         switch (actualSuperState) {
             case DEFAULTING -> defaulting();
 
-            case SHOOTING_CALIBRATING -> shootCalibrating();
+            case INITIALIZING -> initializing();
 
             case SHOOTING_AUTOMATIC_HUB -> shootingAutomaticHub();
 
@@ -211,8 +211,11 @@ public class Superstructure extends SubsystemBase {
         }
     }
 
-    private void shootCalibrating() {
+    private void initializing() {
         shooter.setWantedState(Shooter.SHOOTER_STATE.CALIBRATING);
+        if (shooter.isCalibrated()) {
+            setWantedSuperState(WantedSuperState.DEFAULT);
+        }
     }
 
     private void shootingAutomaticHub() {
@@ -325,12 +328,12 @@ public class Superstructure extends SubsystemBase {
         swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
         intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT_AND_ON);
         feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
-        shooter.setWantedState(Shooter.SHOOTER_STATE.AIMING_HUB);
+        shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
         gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
     }
 
     public void shootingAutomatic() {  //the shooter position to automatically shoot at hub or corner depending on location
-        if (BaseRobotState.swerveDriveState.Pose.getX() >  5) {  //TODO: account for color and fix the number
+        if (BaseRobotState.robotPose.getX() >  5) {  //TODO: account for color and fix the number
             setWantedSuperState(WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER);
         } else {
             setWantedSuperState(WantedSuperState.SHOOTER_AUTOMATIC_HUB);

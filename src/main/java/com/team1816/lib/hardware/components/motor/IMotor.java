@@ -14,4 +14,5 @@ public interface IMotor extends IPhoenix6 {
     StatusCode setSimRotorVelocity(double rps);
     StatusCode setSimRotorPosition(double rotations);
     double getSimMotorVoltage();
+    boolean isGhost();
 }
