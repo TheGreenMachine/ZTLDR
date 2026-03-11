@@ -175,9 +175,6 @@
           "image": "C:\\Users\\henry\\ZTLDR\\field_images\\visible-vision-target.png"
         },
         "width": 16.54119300842285,
-        "window": {
-          "visible": true
-        },
         "zmuleFrontCamera/visionPoseEstimation": {
           "arrowColor": [
             255.0,
