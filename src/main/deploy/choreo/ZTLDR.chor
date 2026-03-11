@@ -3,7 +3,22 @@
  "version":2,
  "type":"Swerve",
  "variables":{
-  "expressions":{},
+  "expressions":{
+   "CenterUpEndX":{
+    "dimension":"Number",
+    "var":{
+     "exp":"7.568860054016113",
+     "val":7.568860054016113
+    }
+   },
+   "CenterUpEndY":{
+    "dimension":"Number",
+    "var":{
+     "exp":"6.470850467681885",
+     "val":6.470850467681885
+    }
+   }
+  },
   "poses":{
    "BottomFuel":{
     "x":{
