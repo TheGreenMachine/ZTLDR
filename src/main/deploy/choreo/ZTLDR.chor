@@ -4,18 +4,25 @@
  "type":"Swerve",
  "variables":{
   "expressions":{
+   "CenterUpEndHead":{
+    "dimension":"Angle",
+    "var":{
+     "exp":"135 deg",
+     "val":2.356194490192345
+    }
+   },
    "CenterUpEndX":{
     "dimension":"Number",
     "var":{
-     "exp":"7.568860054016113",
-     "val":7.568860054016113
+     "exp":"7.601321697235107",
+     "val":7.601321697235107
     }
    },
    "CenterUpEndY":{
     "dimension":"Number",
     "var":{
-     "exp":"6.470850467681885",
-     "val":6.470850467681885
+     "exp":"6.4395551681518555",
+     "val":6.4395551681518555
     }
    }
   },
