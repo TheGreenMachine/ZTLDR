@@ -31,6 +31,8 @@ public class RobotContainer extends BaseRobotContainer {
         // TODO: This may or may not be what we want for PathPlanner path following.
         superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.AUTOMATIC_DRIVING);
         superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC);
+        superstructure.setInclineDucking(false);
+        superstructure.setTurretPresetAngle(0);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
         superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE);
         superstructure.setSuperstructureWantedFeederState(Superstructure.WantedFeederState.FEED);
@@ -41,21 +43,21 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
         superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.MANUAL_DRIVING);
         superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC);
+        superstructure.setTurretPresetAngle(0);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
-        superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE);
-        superstructure.setSuperstructureWantedFeederState(Superstructure.WantedFeederState.FEED);
-        superstructure.setSuperstructureWantedClimberState(Superstructure.WantedClimberState.STOW);
     }
 
     private void configureBindings() {
         // TODO: Set up the controls that we actually want.
         // Gatekeeper
-        driverController.rightTrigger().onTrue(Commands.runOnce(() ->
-            superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)
-        ))
-            .onFalse(Commands.runOnce(() ->
-                superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE)
-            ));
+        driverController.rightTrigger().onTrue(Commands.runOnce(() -> {
+            superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
+            superstructure.setInclineDucking(false);
+        }))
+            .onFalse(Commands.runOnce(() -> {
+                superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
+                superstructure.setInclineDucking(true);
+            }));
 
         // Shooter
         driverController.x().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE)));
@@ -82,6 +84,18 @@ public class RobotContainer extends BaseRobotContainer {
         ));
         NamedCommands.registerCommand("shooter/presetFar", Commands.runOnce(() ->
             superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_FAR)
+        ));
+        NamedCommands.registerCommand("shooter/setTurretPresetAngle0Degrees", Commands.runOnce(() ->
+            superstructure.setTurretPresetAngle(0)
+        ));
+        NamedCommands.registerCommand("shooter/setTurretPresetAngle90Degrees", Commands.runOnce(() ->
+            superstructure.setTurretPresetAngle(90)
+        ));
+        NamedCommands.registerCommand("shooter/setTurretPresetAngle180Degrees", Commands.runOnce(() ->
+            superstructure.setTurretPresetAngle(180)
+        ));
+        NamedCommands.registerCommand("shooter/setTurretPresetAngle270Degrees", Commands.runOnce(() ->
+            superstructure.setTurretPresetAngle(270)
         ));
 
         NamedCommands.registerCommand("intake/intake", Commands.runOnce(() ->

@@ -2,11 +2,9 @@ package com.team1816.season.subsystems;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.GreenLogger;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -20,8 +18,8 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     //CLASS
     public static final String NAME = "intake";
 
-    private INTAKE_STATE wantedState = INTAKE_STATE.INTAKE_IN_AND_OFF;
-    private INTAKE_STATE previousWantedState = INTAKE_STATE.INTAKE_IN_AND_OFF;
+    private IntakeState wantedState = IntakeState.STOW;
+    private IntakeState previousWantedState = IntakeState.STOW;
 
     //MOTORS
     private final IMotor intakeMotor = (IMotor) factory.getDevice(NAME, "intakeMotor");
@@ -102,23 +100,23 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         flipperMotor.setControl(motionMagicExpoVoltage.withPosition(rotations));
     }
 
-    public void setWantedState(INTAKE_STATE state) {
+    public void setWantedState(IntakeState state) {
         this.wantedState = state;
     }
 
-    public boolean isIntaking() { return (wantedState == INTAKE_STATE.INTAKE_IN_AND_OFF); }
+    public boolean isIntaking() { return (wantedState == IntakeState.STOW); }
 
-    public boolean isOutaking() { return (wantedState == INTAKE_STATE.INTAKE_OUT_AND_ON); }
+    public boolean isOutaking() { return (wantedState == IntakeState.INTAKE); }
 
-    public enum INTAKE_STATE {
-        INTAKE_IN_AND_OFF(factory.getConstant(NAME, "intakeOffSpeed", 0, true),
+    public enum IntakeState {
+        STOW(factory.getConstant(NAME, "intakeOffSpeed", 0, true),
             factory.getConstant(NAME, "inPosition", -0.11, true)),
-        INTAKE_OUT_AND_ON(factory.getConstant(NAME, "intakeOnSpeed", .5, true),
+        INTAKE(factory.getConstant(NAME, "intakeOnSpeed", .5, true),
             factory.getConstant(NAME, "outPosition", -0.033, true));
 
         private double intakeMotorValue, flipperMotorValue;
 
-        INTAKE_STATE (double speed, double flipperMotorValue) {
+        IntakeState(double speed, double flipperMotorValue) {
             this.intakeMotorValue = speed;
             this.flipperMotorValue = flipperMotorValue;
         }

@@ -112,11 +112,31 @@ public class Superstructure extends BaseSuperstructure {
         this.wantedClimberState = climberState;
     }
 
+    /**
+     * Sets if the incline of the shooter should duck down to fit under the trench.
+     *
+     * @param shouldInclineDuck If the incline of the shooter should duck down to fit under the trench.
+     */
+    public void setInclineDucking(boolean shouldInclineDuck) {
+        shooter.setInclineDucking(shouldInclineDuck);
+    }
+
+    /**
+     * Sets the angle to point the turret of the shooter at when using one of the distance presets
+     * (in degrees).
+     *
+     * @param wantedAngleDegrees The angle to point the turret of the shooter at when using one of
+     *                           the distance presets (in degrees).
+     */
+    public void setTurretPresetAngle(double wantedAngleDegrees) {
+        shooter.setTurretPresetAngle(wantedAngleDegrees);
+    }
+
     private void setWantedSubsystemStates(
-        Intake.INTAKE_STATE intakeState,
+        Intake.IntakeState intakeState,
         Feeder.FEEDER_STATE feederState,
         Gatekeeper.GATEKEEPER_STATE gatekeeperState,
-        Shooter.SHOOTER_STATE shooterState,
+        Shooter.ShooterState shooterState,
         Climber.CLIMBER_STATE climbState
     )  {
         intake.setWantedState(intakeState);
@@ -136,10 +156,10 @@ public class Superstructure extends BaseSuperstructure {
         );
         shooter.setWantedState(
             switch (wantedShooterState) {
-                case AUTOMATIC -> Shooter.SHOOTER_STATE.AUTOMATIC;
-                case PRESET_CLOSE -> Shooter.SHOOTER_STATE.DISTANCE_ONE;
-                case PRESET_MIDDLE -> Shooter.SHOOTER_STATE.DISTANCE_TWO;
-                case PRESET_FAR -> Shooter.SHOOTER_STATE.DISTANCE_THREE;
+                case AUTOMATIC -> Shooter.ShooterState.AUTOMATIC;
+                case PRESET_CLOSE -> Shooter.ShooterState.PRESET_CLOSE;
+                case PRESET_MIDDLE -> Shooter.ShooterState.PRESET_MIDDLE;
+                case PRESET_FAR -> Shooter.ShooterState.PRESET_FAR;
             }
         );
         gatekeeper.setWantedState(
@@ -152,8 +172,8 @@ public class Superstructure extends BaseSuperstructure {
         );
         intake.setWantedState(
             switch (wantedIntakeState) {
-                case INTAKE -> Intake.INTAKE_STATE.INTAKE_OUT_AND_ON;
-                case STOW -> Intake.INTAKE_STATE.INTAKE_IN_AND_OFF;
+                case INTAKE -> Intake.IntakeState.INTAKE;
+                case STOW -> Intake.IntakeState.STOW;
             }
         );
         feeder.setWantedState(
@@ -173,15 +193,15 @@ public class Superstructure extends BaseSuperstructure {
 
     private void climbingL1() {
         // TODO: Handle Superstructure climbing behavior.
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF, Feeder.FEEDER_STATE.SLOW_FEEDING,
-            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
+        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FEEDER_STATE.SLOW_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.ShooterState.IDLE,
             Climber.CLIMBER_STATE.L1_UP_CLIMBING);
     }
 
     private void climbingL3() {
         // TODO: Handle Superstructure climbing behavior.
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF, Feeder.FEEDER_STATE.SLOW_FEEDING,
-            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
+        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FEEDER_STATE.SLOW_FEEDING,
+            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.ShooterState.IDLE,
             Climber.CLIMBER_STATE.L3_UP_CLIMBING);
     }
 
