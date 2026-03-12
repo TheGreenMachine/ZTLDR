@@ -77,8 +77,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final double SECOND_LOWEST_BEAM_BREAK_TO_ZERO;
     private boolean isCalibrated = false;
     private double rotationAngleMotorOffsetRotations;
-    private final double FAST_CALIBRATION_SPEED = 0.08;
-    private final double SLOW_CALIBRATION_SPEED = 0.04;
+    private final double FAST_CALIBRATION_SPEED = 0.04;
+    private final double SLOW_CALIBRATION_SPEED = 0.02;
     private final DutyCycleOut turretDutyCycleOutRequest = new DutyCycleOut(0);
     private double initialCalibrationStallingTimestamp = -1;
     private final double CALIBRATION_STALL_SECONDS = 1;
@@ -317,24 +317,28 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         // detection process for beam breaks changing will be the same
         if (DriverStation.isEnabled()) {
             // Set the initial stalling timestamp if it hasn't been set yet
-            if (initialCalibrationStallingTimestamp == -1) {
+            if (initialCalibrationStallingTimestamp == -1 && !rotationAngleSensorClockwiseLeft.get() && !rotationAngleSensorClockwiseRight.get()) {
                 initialCalibrationStallingTimestamp = Timer.getFPGATimestamp();
+                GreenLogger.log("Reset timestamp");
             }
 
             // If the timestamp has been initialized and the time elapsed has reached the calibration stalling seconds...
             if (initialCalibrationStallingTimestamp != -1 && Timer.getFPGATimestamp() - initialCalibrationStallingTimestamp >= CALIBRATION_STALL_SECONDS) {
                 // Move clockwise slowly
                 rotationAngleMotor.setControl(turretDutyCycleOutRequest.withOutput(-SLOW_CALIBRATION_SPEED));
+                GreenLogger.log("Stalled, going backwards");
             }
             // Otherwise, if the right beam break is tripped...
             else if (!rotationAngleSensorClockwiseRight.get()) {
                 // Move counterclockwise slowly
                 rotationAngleMotor.setControl(turretDutyCycleOutRequest.withOutput(SLOW_CALIBRATION_SPEED));
+                GreenLogger.log("Right sensor is hit, going slowly");
             }
             // Otherwise (so if right sensor isn't tripped, and either the initial calibration timestamp hasn't been initialized or it hasn't reached the stalling time)...
             else {
                 // Move counterclockwise quickly
                 rotationAngleMotor.setControl(turretDutyCycleOutRequest.withOutput(FAST_CALIBRATION_SPEED));
+                GreenLogger.log("Right sensor not hit, going quickly");
             }
         }
         // Reset the initial calibration timestamp in case the robot is ever re-enabled
