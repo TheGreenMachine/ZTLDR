@@ -135,6 +135,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final double FOURTH_BEAM_BREAK_POSITION_MOTOR_ROTATIONS;
 
     //CALIBRATION
+    /**
+     * The offset in motor rotations of the turret motor from the reference frame where robot
+     * forward is zero to the positions read by the motor.
+     */
     private double turretMotorOffsetRotations;
     private final double FAST_CALIBRATION_SPEED = 0.09;
     private final double SLOW_CALIBRATION_SPEED = 0.04;
