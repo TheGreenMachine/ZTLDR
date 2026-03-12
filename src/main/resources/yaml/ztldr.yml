@@ -1,29 +1,65 @@
 defaultAuto: "Simple S"
 shooterSettings:
     distances:
-        - 47
-        - 100
-        - 135
-        - 160
-        - 220
-        - 338
-        - 420
-    angles:
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-        - 25
-    powers:
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+        - 8
+        - 9
+        - 10
+        - 11
+        - 12
+        - 13
+        - 14
+        - 15
+        - 16
         - 17
-        - 27
-        - 37
-        - 47
-        - 57
-        - 67
-        - 77
+        - 18
+        - 19
+        - 20
+    angles:
+        - 17 #2
+        - 17 #3
+        - 20 #4
+        - 20 #5
+        - 20 #6
+        - 21 #7
+        - 21 #8
+        - 22 #9
+        - 22 #10
+        - 22 #11
+        - 22 #12
+        - 22 #13
+        - 22 #14
+        - 22 #15
+        - 22 #16
+        - 21 #17
+        - 21 #18
+        - 22 #19
+        - 22 #20
+    powers:
+        - 30 #2
+        - 33 #3
+        - 31 #4
+        - 33 #5
+        - 35 #6
+        - 36 #7
+        - 39 #8
+        - 41 #9
+        - 43 #10
+        - 44 #11
+        - 46 #12
+        - 47 #13
+        - 49 #14
+        - 55 #15
+        - 57 #16
+        - 62 #17
+        - 63 #18
+        - 65 #19
+        - 65 #20
     minimumDefaultAngle: 0 # TODO: SET THIS
     minimumDefaultPower: 0 # TODO: SET THIS
     mediumDefaultAngle: 0 # TODO: SET THIS
@@ -32,6 +68,7 @@ shooterSettings:
     maximumDefaultPower: 0 # TODO: SET THIS
 subsystems:
     drivetrain:
+        implemented: false
         devices:
             flDr:
                 id: 35
@@ -42,7 +79,7 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 9
+                remoteSensorId: 41
                 remoteOffest: -0.300537
             flCoder:
                 id: 41
@@ -57,7 +94,7 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 10
+                remoteSensorId: 43
                 remoteOffest: -0.439453
             frCoder:
                 id: 43
@@ -71,7 +108,7 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 11
+                remoteSensorId: 42
                 remoteOffest: -0.351074   # Negative Absolute Position No Offset CanCoder
             blCoder:
                 id: 42
@@ -86,7 +123,7 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
-                remoteSensorId: 12
+                remoteSensorId: 40
                 remoteOffest: -0.383301
             brCoder:
                 id: 40
@@ -182,6 +219,7 @@ subsystems:
             linearSlideL1DownClimbing: 0
 
     feeder:
+        implemented: false
         devices:
             feedMotor:
                 deviceType: TalonFX
@@ -194,6 +232,7 @@ subsystems:
             reversing: 0
             idling: 0
     intake:
+        implemented: false
         devices:
             intakeMotor:
                 id: 2
@@ -209,29 +248,22 @@ subsystems:
                 remoteSensorId: 10
                 remoteOffest: 0
                 rotorToSensor: 0.1
-                motionMagic:
-                    expoKV: 10
-                    expoKA: 10
-                pidConfig:
-                    slot0:
-                        kP: 12
-                        kD: 0.1
-                        kS: 0.1
             flipCoder:
                 id: 10
                 deviceType: CANcoder
         constants: # TODO: all of these
-            intakeOnSpeed: .50
+            intakeOnSpeed: .35
             intakeOffSpeed: 0
-            inPosition: -0.139
-            outPosition: 0.017
+            flipperMotorOutMinimumPosition: 0.0058
+            flipperMotorRetractCurrentAmperes: -1
+            flipperMotorExtendCurrentAmperes: 30
+            flipperMotorHoldOutCurrentAmperes: 15
     gatekeeper:
-        implemented: false
         canBusName: shootercanivore
         devices:
             topMotor:
                 deviceType: TalonFX
-                id: 30
+                id: 23
                 motorRotation: Clockwise_Positive
                 pidConfig:
                     slot0:
@@ -240,7 +272,7 @@ subsystems:
                         kV: 0.081
             bottomMotor:
                 deviceType: TalonFX
-                id: 31
+                id: 24
                 motorRotation: Clockwise_Positive
                 pidConfig:
                     slot0:
@@ -253,33 +285,32 @@ subsystems:
             bottomClosedVelocity: 0
             bottomOpenVelocity: 40
     shooter:
-        implemented: true
         canBusName: shootercanivore
         devices:
             topLaunchMotor:
                 deviceType: TalonFX
-                id: 32
+                id: 25
                 motorRotation: Clockwise_Positive
                 pidConfig:
                     slot0:
-                        kS: 0.29
+                        kS: 0.28
                         kV: 0.115
-                        kP: 0.5
+                        kP: 3
             bottomLaunchMotor:
                 deviceType: TalonFX
-                id: 33
+                id: 26
                 motorRotation: CounterClockwise_Positive
                 pidConfig:
                     slot0:
                         kS: 0.28
                         kV: 0.115
-                        kP: 0.5
+                        kP: 3
             inclineMotor:
                 deviceType: TalonFXS
                 motorType: NEO550_JST
                 remoteSensor: RemoteCANcoder
-                remoteSensorId: 36
-                id: 34
+                remoteSensorId: 29
+                id: 27
                 motorRotation: Clockwise_Positive
                 reverseSoftLimit: 0.046
                 forwardSoftLimit: 0.109
@@ -291,7 +322,7 @@ subsystems:
                         staticFeedforwardSign: UseClosedLoopSign
             turretMotor:
                 deviceType: TalonFX
-                id: 35
+                id: 28
                 motorRotation: Clockwise_Positive
                 pidConfig:
                     slot0:
@@ -300,13 +331,13 @@ subsystems:
                         kD: 0.05
                         staticFeedforwardSign: UseClosedLoopSign
             inclineCoder:
-                id: 36
+                id: 29
                 deviceType: CANcoder
                 sensorDirection: Clockwise_Positive # TODO: Make this actually get applied to the config. See #153 in the GitHub Project.
                 absoluteSensorDiscontinuityPoint: 0.625 # See above TODO.
                 magnetOffset: -0.35748674479 # See above TODO.
             candi:
-                id: 37
+                id: 6
                 deviceType: CANdi
         constants:
             leftTurretSensorChannel: 0
@@ -316,12 +347,12 @@ subsystems:
             initialShooterOffsetY: 0
             initialShooterOffsetZ: 22
             inclineDuckingLimitDegrees: 17
-            distanceOneInclineAngleDegrees: 25
-            distanceOneLaunchVelocityRPS: 50
-            distanceTwoInclineAngleDegrees: 30
-            distanceTwoLaunchVelocityRPS: 50
-            distanceThreeInclineAngleDegrees: 35
-            distanceThreeLaunchVelocityRPS: 50
+            distanceOneInclineAngleDegrees: 22
+            distanceOneLaunchVelocityRPS: 54
+            distanceTwoInclineAngleDegrees: 22
+            distanceTwoLaunchVelocityRPS: 53
+            distanceThreeInclineAngleDegrees: 22
+            distanceThreeLaunchVelocityRPS: 52
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570
             secondLowestBeamBreakToZero: 7.65625
