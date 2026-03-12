@@ -1,12 +1,10 @@
 package com.team1816.season.subsystems;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.GreenLogger;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -28,7 +26,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     private final IMotor flipperMotor = (IMotor) factory.getDevice(NAME, "flipperMotor");
 
     private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
-    private final MotionMagicExpoVoltage motionMagicExpoVoltage = new MotionMagicExpoVoltage(0);
+    private final TorqueCurrentFOC flipperMotorTorqueCurrentRequest = new TorqueCurrentFOC(0);
 
 
     //PHYSICAL SUBSYSTEM DEPENDENT CONSTANTS
@@ -36,6 +34,11 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     private static final double MAX_INTAKE_MOTOR_CLAMP = 80;
     private static final double MIN_FLIPPER_MOTOR_CLAMP = -0.11;
     private static final double MAX_FLIPPER_MOTOR_CLAMP = -0.033;
+    /**
+     * The minimum position of the flipper motor to count it as far enough out to switch to our
+     * lower current to just hold it out instead of pushing it out.
+     */
+    private final double FLIPPER_MOTOR_OUT_MINIMUM_POSITION;
 
     //MECHANISMS
     private double currentPosition = 0;
@@ -48,6 +51,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public Intake () {
         super();
         SmartDashboard.putData("Intake", intakeMech);
+        FLIPPER_MOTOR_OUT_MINIMUM_POSITION = factory.getConstant(NAME, "flipperMotorOutMinimumPosition", 0);
     }
 
     @Override
@@ -62,12 +66,6 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.log(NAME+"/intakeMotor/"+wantedState.name()+"_adjusted_value/"+wantedState.getIntakeMotorValue());
     }
 
-    public void adjustCurrentFlipperMotorSetPoint(double adjustValue){
-        wantedState.adjustFlipperMotorSetPoint(adjustValue);
-
-        GreenLogger.log(NAME+"/flipperMotor/"+wantedState.name()+"_adjusted_value/"+wantedState.getFlipperMotorValue());
-    }
-
     @Override
     public void readFromHardware() {
         currentPosition = flipperMotor.getMotorPosition();
@@ -77,10 +75,10 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         double intakeSpeed = wantedState.getIntakeMotorValue();
-        double flipperPosition = wantedState.getFlipperMotorValue();
+        FlipperPosition flipperPosition = wantedState.getFlipperMotorPosition();
 
-        setIntakeSpeed(wantedState.getIntakeMotorValue());
-        setFlipperPosition(wantedState.getFlipperMotorValue());
+        setIntakeSpeed(intakeSpeed);
+        setFlipperPosition(flipperPosition);
 
         if (wantedState != previousWantedState) {
             GreenLogger.log("Intake state: " + wantedState.toString());
@@ -89,7 +87,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
             SmartDashboard.putString("Intake state: ", wantedState.toString());
             SmartDashboard.putNumber("Intake speed: ", intakeSpeed);
-            SmartDashboard.putNumber("Intake position: ", flipperPosition);
+            SmartDashboard.putString("Intake position: ", String.valueOf(flipperPosition));
             previousWantedState = wantedState;
         }
     }
@@ -98,8 +96,18 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         intakeMotor.setControl(dutyCycleOut.withOutput(velocity));
     }
 
-    private void setFlipperPosition(double rotations) {
-        flipperMotor.setControl(motionMagicExpoVoltage.withPosition(rotations));
+    private void setFlipperPosition(FlipperPosition position) {
+        if (position == FlipperPosition.IN) {
+            flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(-1));
+        }
+        else {
+            if (flipperMotor.getMotorPosition() < FLIPPER_MOTOR_OUT_MINIMUM_POSITION) {
+                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(30));
+            }
+            else {
+                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(15));
+            }
+        }
     }
 
     public void setWantedState(INTAKE_STATE state) {
@@ -110,33 +118,43 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     public boolean isOutaking() { return (wantedState == INTAKE_STATE.INTAKE_OUT_AND_ON); }
 
+    /**
+     * The position of the flipper. This is not just a number, since we are doing a custom current
+     * based control, so the behavior is completely different for going in and out.
+     */
+    private enum FlipperPosition {
+        IN,
+        OUT
+    }
+
     public enum INTAKE_STATE {
-        INTAKE_IN_AND_OFF(factory.getConstant(NAME, "intakeOffSpeed", 0, true),
-            factory.getConstant(NAME, "inPosition", -0.11, true)),
-        INTAKE_OUT_AND_ON(factory.getConstant(NAME, "intakeOnSpeed", .5, true),
-            factory.getConstant(NAME, "outPosition", -0.033, true));
+        INTAKE_IN_AND_OFF(
+            factory.getConstant(NAME, "intakeOffSpeed", 0, true),
+            FlipperPosition.IN
+        ),
+        INTAKE_OUT_AND_ON(
+            factory.getConstant(NAME, "intakeOnSpeed", .5, true),
+            FlipperPosition.OUT
+        );
 
-        private double intakeMotorValue, flipperMotorValue;
+        private double intakeMotorValue;
+        private final FlipperPosition flipperMotorPosition;
 
-        INTAKE_STATE (double speed, double flipperMotorValue) {
+        INTAKE_STATE (double speed, FlipperPosition flipperMotorPosition) {
             this.intakeMotorValue = speed;
-            this.flipperMotorValue = flipperMotorValue;
+            this.flipperMotorPosition = flipperMotorPosition;
         }
 
         private void adjustIntakeMotorSetPoint(double adjustValue){
             this.intakeMotorValue += adjustValue;
         }
 
-        private void adjustFlipperMotorSetPoint(double adjustValue){
-            this.flipperMotorValue += adjustValue;
-        }
-
         public double getIntakeMotorValue() {
             return intakeMotorValue;
         }
 
-        public double getFlipperMotorValue() {
-            return flipperMotorValue;
+        private FlipperPosition getFlipperMotorPosition() {
+            return flipperMotorPosition;
         }
     }
 }
