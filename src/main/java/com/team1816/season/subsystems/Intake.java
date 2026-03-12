@@ -39,6 +39,9 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
      * lower current to just hold it out instead of pushing it out.
      */
     private final double FLIPPER_MOTOR_OUT_MINIMUM_POSITION;
+    private final double FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES;
+    private final double FLIPPER_MOTOR_EXTEND_CURRENT_AMPERES;
+    private final double FLIPPER_MOTOR_HOLD_OUT_CURRENT_AMPERES;
 
     //MECHANISMS
     private double currentPosition = 0;
@@ -52,6 +55,9 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         super();
         SmartDashboard.putData("Intake", intakeMech);
         FLIPPER_MOTOR_OUT_MINIMUM_POSITION = factory.getConstant(NAME, "flipperMotorOutMinimumPosition", 0);
+        FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES = factory.getConstant(NAME, "flipperMotorRetractCurrentAmperes", 0);
+        FLIPPER_MOTOR_EXTEND_CURRENT_AMPERES = factory.getConstant(NAME, "flipperMotorExtendCurrentAmperes", 0);
+        FLIPPER_MOTOR_HOLD_OUT_CURRENT_AMPERES = factory.getConstant(NAME, "flipperMotorHoldOutCurrentAmperes", 0);
     }
 
     @Override
@@ -98,14 +104,20 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     private void setFlipperPosition(FlipperPosition position) {
         if (position == FlipperPosition.IN) {
-            flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(-1));
+            flipperMotor.setControl(
+                flipperMotorTorqueCurrentRequest.withOutput(FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES)
+            );
         }
         else {
             if (flipperMotor.getMotorPosition() < FLIPPER_MOTOR_OUT_MINIMUM_POSITION) {
-                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(30));
+                flipperMotor.setControl(
+                    flipperMotorTorqueCurrentRequest.withOutput(FLIPPER_MOTOR_EXTEND_CURRENT_AMPERES)
+                );
             }
             else {
-                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(15));
+                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(
+                    FLIPPER_MOTOR_HOLD_OUT_CURRENT_AMPERES)
+                );
             }
         }
     }

@@ -255,6 +255,9 @@ subsystems:
             intakeOnSpeed: .35
             intakeOffSpeed: 0
             flipperMotorOutMinimumPosition: 0.0058
+            flipperMotorRetractCurrentAmperes: -1
+            flipperMotorExtendCurrentAmperes: 30
+            flipperMotorHoldOutCurrentAmperes: 15
     gatekeeper:
         canBusName: shootercanivore
         devices:
