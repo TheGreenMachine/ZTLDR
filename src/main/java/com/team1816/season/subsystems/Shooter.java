@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -76,11 +77,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final double SECOND_LOWEST_BEAM_BREAK_TO_ZERO;
     private boolean isCalibrated = false;
     private double rotationAngleMotorOffsetRotations;
-    // TODO: The below values will be needed for automatic calibration.
-    private final double FAST_CALIBRATION_SPEED = 0.08;
-    private final double SLOW_CALIBRATION_SPEED = 0.06;
-    private final double EXTRA_SLOW_CALIBRATION_SPEED = 0.04;
+    private final double FAST_CALIBRATION_SPEED = 0.09;
+    private final double SLOW_CALIBRATION_SPEED = 0.04;
     private final DutyCycleOut turretDutyCycleOutRequest = new DutyCycleOut(0);
+    private double initialCalibrationStallingTimestamp = -1;
+    private final double CALIBRATION_STALL_SECONDS = 1;
 
     //MECHANISMS
     private Mechanism2d launchMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
@@ -175,10 +176,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public void periodic() {
         readFromHardware();
 
-        // TODO: Uncomment this once we add automatic calibration.
-//        if (rotationAngleMotor.hasDeviceCrashed()) {
-//            isCalibrated = false;
-//        }
+        if (rotationAngleMotor.hasDeviceCrashed()) {
+            isCalibrated = false;
+        }
 
         if (!isCalibrated) {
             calibratePeriodic();
@@ -312,6 +312,35 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * sensors change triggered values.
      */
     private void calibratePeriodic() {
+        // We only want to run the motors to automatically calibrate if the robot is enabled, but the
+        // detection process for beam breaks changing will be the same
+        if (DriverStation.isEnabled()) {
+            // Set the initial stalling timestamp if it hasn't been set yet
+            if (initialCalibrationStallingTimestamp == -1 && !rotationAngleSensorClockwiseLeft.get() && !rotationAngleSensorClockwiseRight.get()) {
+                initialCalibrationStallingTimestamp = Timer.getFPGATimestamp();
+            }
+
+            // If the timestamp has been initialized and the time elapsed has reached the calibration stalling seconds...
+            if (initialCalibrationStallingTimestamp != -1 && Timer.getFPGATimestamp() - initialCalibrationStallingTimestamp >= CALIBRATION_STALL_SECONDS) {
+                // Move clockwise slowly
+                rotationAngleMotor.setControl(turretDutyCycleOutRequest.withOutput(-SLOW_CALIBRATION_SPEED));
+            }
+            // Otherwise, if the right beam break is tripped...
+            else if (!rotationAngleSensorClockwiseRight.get()) {
+                // Move counterclockwise slowly
+                rotationAngleMotor.setControl(turretDutyCycleOutRequest.withOutput(SLOW_CALIBRATION_SPEED));
+            }
+            // Otherwise (so if right sensor isn't tripped, and either the initial calibration timestamp hasn't been initialized or it hasn't reached the stalling time)...
+            else {
+                // Move counterclockwise quickly
+                rotationAngleMotor.setControl(turretDutyCycleOutRequest.withOutput(FAST_CALIBRATION_SPEED));
+            }
+        }
+        // Reset the initial calibration timestamp in case the robot is ever re-enabled
+        else {
+            initialCalibrationStallingTimestamp = -1;
+        }
+
         // While there are only two beam break sensors, we can see them on both sides of the
         // turret's range of motion because of the width of the part that blocks them. This means
         // we have four distinct locations we can measure based on the beam breaks. We know we are
@@ -321,36 +350,30 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             if (leftSensorTriggered != previousLeftSensorTriggered) { // Change in left sensor triggered value.
                 if (rightSensorTriggered) {
                     // Must be at the first of the four positions where sensor values change.
-                    rotationAngleMotorOffsetRotations =
-                        rotationAngleMotor.getMotorPosition()
-                            - (-SECOND_LOWEST_BEAM_BREAK_TO_ZERO + -CLOSE_DISTANCE_BETWEEN_BEAM_BREAKS);
-                    isCalibrated = true;
+                    finishCalibration(-SECOND_LOWEST_BEAM_BREAK_TO_ZERO + -CLOSE_DISTANCE_BETWEEN_BEAM_BREAKS);
                 }
                 else {
                     // Must be at the third of the four positions where sensor values change.
-                    rotationAngleMotorOffsetRotations =
-                        rotationAngleMotor.getMotorPosition()
-                            - (FAR_DISTANCE_BETWEEN_BEAM_BREAKS - SECOND_LOWEST_BEAM_BREAK_TO_ZERO);
-                    isCalibrated = true;
+                    finishCalibration(FAR_DISTANCE_BETWEEN_BEAM_BREAKS - SECOND_LOWEST_BEAM_BREAK_TO_ZERO);
                 }
             }
             else if (rightSensorTriggered != previousRightSensorTriggered) { // Change in the right sensor triggered value.
                 if (leftSensorTriggered) {
                     // Must be at the fourth of the four positions where sensor values change.
-                    rotationAngleMotorOffsetRotations =
-                        rotationAngleMotor.getMotorPosition()
-                            - (FAR_DISTANCE_BETWEEN_BEAM_BREAKS - SECOND_LOWEST_BEAM_BREAK_TO_ZERO + CLOSE_DISTANCE_BETWEEN_BEAM_BREAKS);
-                    isCalibrated = true;
+                    finishCalibration(FAR_DISTANCE_BETWEEN_BEAM_BREAKS - SECOND_LOWEST_BEAM_BREAK_TO_ZERO + CLOSE_DISTANCE_BETWEEN_BEAM_BREAKS);
                 }
                 else {
                     // Must be at the second of the four positions where sensor values change.
-                    rotationAngleMotorOffsetRotations =
-                        rotationAngleMotor.getMotorPosition()
-                            - (-SECOND_LOWEST_BEAM_BREAK_TO_ZERO);
-                    isCalibrated = true;
+                    finishCalibration(-SECOND_LOWEST_BEAM_BREAK_TO_ZERO);
                 }
             }
         }
+    }
+
+    private void finishCalibration(double beamBreakPositionMotorRotations) {
+        rotationAngleMotorOffsetRotations = rotationAngleMotor.getMotorPosition() - beamBreakPositionMotorRotations;
+        rotationAngleMotor.setControl(turretDutyCycleOutRequest.withOutput(0));
+        isCalibrated = true;
     }
 
     private void setAutomaticRotationAngle() {
