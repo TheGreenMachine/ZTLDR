@@ -68,7 +68,6 @@ shooterSettings:
     maximumDefaultPower: 0 # TODO: SET THIS
 subsystems:
     drivetrain:
-        implemented: false
         devices:
             flDr:
                 id: 35
