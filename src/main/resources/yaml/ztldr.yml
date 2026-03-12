@@ -327,7 +327,7 @@ subsystems:
                 pidConfig:
                     slot0:
                         kS: 0.29
-                        kP: 0.1
+                        kP: 1
                         kD: 0.05
                         staticFeedforwardSign: UseClosedLoopSign
             launchAngleCoder:

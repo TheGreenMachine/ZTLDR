@@ -77,8 +77,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final double SECOND_LOWEST_BEAM_BREAK_TO_ZERO;
     private boolean isCalibrated = false;
     private double rotationAngleMotorOffsetRotations;
-    private final double FAST_CALIBRATION_SPEED = 0.04;
-    private final double SLOW_CALIBRATION_SPEED = 0.02;
+    private final double FAST_CALIBRATION_SPEED = 0.09;
+    private final double SLOW_CALIBRATION_SPEED = 0.04;
     private final DutyCycleOut turretDutyCycleOutRequest = new DutyCycleOut(0);
     private double initialCalibrationStallingTimestamp = -1;
     private final double CALIBRATION_STALL_SECONDS = 1;
@@ -376,7 +376,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void finishCalibration(double beamBreakPositionMotorRotations) {
-        rotationAngleMotorOffsetRotations = rotationAngleMotorOffsetRotations - beamBreakPositionMotorRotations;
+        rotationAngleMotorOffsetRotations = rotationAngleMotor.getMotorPosition() - beamBreakPositionMotorRotations;
         rotationAngleMotor.setControl(turretDutyCycleOutRequest.withOutput(0));
         isCalibrated = true;
     }
