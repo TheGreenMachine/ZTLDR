@@ -68,7 +68,7 @@ shooterSettings:
     maximumDefaultPower: 0 # TODO: SET THIS
 subsystems:
     drivetrain:
-        implemented: false
+        implemented: true
         devices:
             flDr:
                 id: 35
@@ -175,7 +175,7 @@ subsystems:
             rotationKi: 0
             rotationKd: 0
     ledManager:
-        implemented: false
+        implemented: true
         devices:
             argb:
                 id: 14
@@ -219,7 +219,7 @@ subsystems:
             linearSlideL1DownClimbing: 0
 
     feeder:
-        implemented: false
+        implemented: true
         devices:
             feedMotor:
                 deviceType: TalonFX
@@ -232,7 +232,7 @@ subsystems:
             reversing: 0
             idling: 0
     intake:
-        implemented: false
+        implemented: true
         devices:
             intakeMotor:
                 id: 2
