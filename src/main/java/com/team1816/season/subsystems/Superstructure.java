@@ -339,4 +339,8 @@ public class Superstructure extends BaseSuperstructure {
             setWantedSuperState(WantedSuperState.SHOOTER_AUTOMATIC_HUB);
         }
     }
+
+    public void adjustShooterVelocity(boolean positive) {
+        shooter.adjustShooterVelocity(positive);
+    }
 }

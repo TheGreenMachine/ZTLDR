@@ -360,6 +360,7 @@ subsystems:
             secondLowestBeamBreakToZero: 7.65625
             launchAngleMotorBottomLimitRotations: 0.046
             launchAngleMotorTopLimitRotations: 0.109
+            launchVelocityIncrement: 2
     vision:
         implemented: false
         cameras:
