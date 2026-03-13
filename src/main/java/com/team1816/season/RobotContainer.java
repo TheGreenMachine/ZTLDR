@@ -88,46 +88,12 @@ public class RobotContainer extends BaseRobotContainer {
 //        configureBindings();
 //    }
 
-    public final void registerCommands() {
-        NamedCommands.registerCommand("automatedHubShooting", Commands.runOnce(() -> {
-             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB);
-        }));
-        NamedCommands.registerCommand("automatedCorner1Shooting", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER); //Figure out which corners are which
-        }));
-
-        NamedCommands.registerCommand("automatedHubSnowblowing", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_AUTOMATIC_HUB);
-        }));
-        NamedCommands.registerCommand("automatedCorner1Snowblowing", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER); //Figure out which corners are which
-        }));
-
-        NamedCommands.registerCommand("intaking", Commands.runOnce(() -> {
-             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.INTAKE_OUT_AND_ON);
-        }));
-
-        /*
-        NamedCommands.registerCommand("slowFeeding", Commands.runOnce(() -> {
-             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.FEEDER_SLOW);
-        }));
-        NamedCommands.registerCommand("fastFeeding", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.FEEDER_FAST);
-        }));
-
-         */
-        NamedCommands.registerCommand("openGatekeeper", Commands.runOnce(() -> {
+    public final void registerCommands() {  //Auto init has initial states for subsystems
+        NamedCommands.registerCommand("shoot", Commands.runOnce(() -> {
             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_ON);
         }));
-
-        NamedCommands.registerCommand("closeGatekeeper", Commands.runOnce(() -> {
+        NamedCommands.registerCommand("notShoot", Commands.runOnce(() -> {
             getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_OFF);
-        }));
-        NamedCommands.registerCommand("l1Climbing", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.CLIMB_L1);
-        }));
-        NamedCommands.registerCommand("defaulting", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
         }));
     }
 }
