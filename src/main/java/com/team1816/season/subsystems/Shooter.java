@@ -71,7 +71,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final double LAUNCH_ANGLE_MOTOR_TOP_LIMIT_ROTATIONS;
     public double maxLaunchAngle = 0; //<-SET MAX ANGLE HERE
 
-    private final double launchMotorVelocityIncrement = factory.getConstant("launchVelocityIncrement", 0);
+    private final double launchMotorVelocityIncrement = factory.getConstant(NAME, "launchVelocityIncrement", 0);
 
     //CALIBRATION
     private final double CLOSE_DISTANCE_BETWEEN_BEAM_BREAKS;
@@ -448,15 +448,17 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param positive whether to increase or decrease the offset by the increment
      */
     public void adjustShooterVelocity(boolean positive) {
-        if (launchMotorVelocityOffset - launchMotorVelocityIncrement < .01) {
-            launchMotorVelocityOffset = 0;
-        } else if (positive) {
+        if (positive) {
             launchMotorVelocityOffset += launchMotorVelocityIncrement;
         } else {
             launchMotorVelocityOffset -= launchMotorVelocityIncrement;
         }
 
-        GreenLogger.log("Set shooter offset to " +  launchMotorVelocityOffset + "rps");
+        if (launchMotorVelocityOffset < 0) {
+            launchMotorVelocityOffset = 0;
+        }
+
+        GreenLogger.log("Adjusted shooter offset to " +  launchMotorVelocityOffset + "rps by " + launchMotorVelocityIncrement + "rps");
     }
 
     /**
