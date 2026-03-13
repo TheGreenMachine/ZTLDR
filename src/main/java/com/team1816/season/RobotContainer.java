@@ -52,10 +52,10 @@ public class RobotContainer extends BaseRobotContainer {
         driverController.rightTrigger().onFalse(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_OFF)));
 
         //one or the other, depends on drive team:
-        driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
-        driverController.povRight().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
-        driverController.povLeft().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
-        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.shootingAutomatic()));
+//        driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
+//        driverController.povRight().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
+//        driverController.povLeft().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
+//        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.shootingAutomatic()));
 
         driverController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
         driverController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
@@ -64,6 +64,9 @@ public class RobotContainer extends BaseRobotContainer {
 
         driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_OUT_AND_ON)));
         driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_IN_AND_OFF)));
+
+        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.feeder.setWantedState(Feeder.FEEDER_STATE.REVERSING)));
+        driverController.povDown().onFalse(Commands.runOnce(() -> superstructure.feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING)));
 
 
         //agitate button TBD
