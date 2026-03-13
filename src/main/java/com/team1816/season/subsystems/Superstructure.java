@@ -106,6 +106,9 @@ public class Superstructure extends BaseSuperstructure {
     private FeederControlState feederControlState = FeederControlState.DEFAULTING; //What to do with this?
     private boolean isAutonomous = false;
 
+    // TODO: remove this
+    public static boolean isIntakePushingIn = false;
+
     private ClimbSide climbSide = ClimbSide.LEFT;
 
     public Superstructure(Swerve swerve, Vision vision) {
@@ -284,7 +287,7 @@ public class Superstructure extends BaseSuperstructure {
         if (intake.isIntaking()) {
             feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
         } else {
-            feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
+            feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
         }
 
         actualSuperState = ActualSuperState.DEFAULTING;
@@ -338,5 +341,13 @@ public class Superstructure extends BaseSuperstructure {
         } else {
             setWantedSuperState(WantedSuperState.SHOOTER_AUTOMATIC_HUB);
         }
+    }
+
+    public void pushIntakeIn() {
+        isIntakePushingIn = true;
+    }
+
+    public void stopPushingIntakeIn() {
+        isIntakePushingIn = false;
     }
 }

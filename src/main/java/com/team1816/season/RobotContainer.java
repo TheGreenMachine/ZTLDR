@@ -51,6 +51,9 @@ public class RobotContainer extends BaseRobotContainer {
         driverController.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_ON)));
         driverController.rightTrigger().onFalse(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_OFF)));
 
+        driverController.leftTrigger().onTrue(Commands.runOnce(() -> superstructure.pushIntakeIn()));
+        driverController.leftTrigger().whileFalse(Commands.runOnce(() -> superstructure.stopPushingIntakeIn()));
+
         //one or the other, depends on drive team:
         driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
         driverController.povRight().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));

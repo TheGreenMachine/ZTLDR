@@ -65,8 +65,8 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
     }
 
     public enum FEEDER_STATE {
-        SLOW_FEEDING(factory.getConstant(NAME, "fastFeeding", 0)),
-        FAST_FEEDING(factory.getConstant(NAME, "slowFeeding", 0)),
+        SLOW_FEEDING(factory.getConstant(NAME, "slowFeeding", 0)),
+        FAST_FEEDING(factory.getConstant(NAME, "fastFeeding", 0)),
         REVERSING(factory.getConstant(NAME, "reversing", 0)),
         IDLING(factory.getConstant(NAME, "idling", 0));
 

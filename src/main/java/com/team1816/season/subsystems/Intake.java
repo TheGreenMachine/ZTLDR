@@ -43,6 +43,9 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     private final double FLIPPER_MOTOR_EXTEND_CURRENT_AMPERES;
     private final double FLIPPER_MOTOR_HOLD_OUT_CURRENT_AMPERES;
 
+    // TODO: remove this
+    private final double PUSH_NTAKE_IN_CURRENT_AMPERES = -8;
+
     //MECHANISMS
     private double currentPosition = 0;
     private static final double ROTATIONS_TO_DEGREES_RATIO = 1;
@@ -84,7 +87,12 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         FlipperPosition flipperPosition = wantedState.getFlipperMotorPosition();
 
         setIntakeSpeed(intakeSpeed);
-        setFlipperPosition(flipperPosition);
+        if (Superstructure.isIntakePushingIn) {
+            flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(PUSH_NTAKE_IN_CURRENT_AMPERES));
+        }
+        else {
+            setFlipperPosition(flipperPosition);
+        }
 
         if (wantedState != previousWantedState) {
             GreenLogger.log("Intake state: " + wantedState.toString());
