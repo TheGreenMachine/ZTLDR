@@ -68,7 +68,7 @@ shooterSettings:
     maximumDefaultPower: 0 # TODO: SET THIS
 subsystems:
     drivetrain:
-        implemented: false
+        implemented: true
         devices:
             flDr:
                 id: 35
@@ -175,7 +175,7 @@ subsystems:
             rotationKi: 0
             rotationKd: 0
     ledManager:
-        implemented: false
+        implemented: true
         devices:
             argb:
                 id: 14
@@ -219,7 +219,7 @@ subsystems:
             linearSlideL1DownClimbing: 0
 
     feeder:
-        implemented: false
+        implemented: true
         devices:
             feedMotor:
                 deviceType: TalonFX
@@ -232,7 +232,7 @@ subsystems:
             reversing: 0
             idling: 0
     intake:
-        implemented: false
+        implemented: true
         devices:
             intakeMotor:
                 id: 2
@@ -248,22 +248,16 @@ subsystems:
                 remoteSensorId: 10
                 remoteOffest: 0
                 rotorToSensor: 0.1
-                motionMagic:
-                    expoKV: 10
-                    expoKA: 10
-                pidConfig:
-                    slot0:
-                        kP: 12
-                        kD: 0.1
-                        kS: 0.1
             flipCoder:
                 id: 10
                 deviceType: CANcoder
         constants: # TODO: all of these
-            intakeOnSpeed: .50
+            intakeOnSpeed: .35
             intakeOffSpeed: 0
-            inPosition: -0.139
-            outPosition: 0.017
+            flipperMotorOutMinimumPosition: 0.0058
+            flipperMotorRetractCurrentAmperes: -1
+            flipperMotorExtendCurrentAmperes: 30
+            flipperMotorHoldOutCurrentAmperes: 15
     gatekeeper:
         canBusName: shootercanivore
         devices:
@@ -367,24 +361,50 @@ subsystems:
             launchAngleMotorBottomLimitRotations: 0.046
             launchAngleMotorTopLimitRotations: 0.109
     vision:
-        implemented: false
         cameras:
-            exampleCamera:
-                photonVisionUIName: UI Name
+            forwardLeft: # Pi IP: 10.18.16.11
+                photonVisionUIName: Forward_Left
                 robotToCamera:
-                    xInches: 0
-                    yInches: 0
-                    zInches: 24
+                    xInches: -12.5
+                    yInches: 13
+                    zInches: 16.75
                     rollDegrees: 0
                     pitchDegrees: 0
-                    yawDegrees: 0
+                    yawDegrees: 55
                 detectionType: APRIL_TAG
-            physicalCameraUsedWithSim:
-                photonVisionUIName: Logi_C270_HD_WebCam
+            forwardRight: # Pi IP: 10.18.16.12.
+                photonVisionUIName: Forward_Right
                 robotToCamera:
-                    zInches: 24
+                    xInches: -12.5
+                    yInches: -13
+                    zInches: 16.75
+                    rollDegrees: 0
+                    pitchDegrees: 0
+                    yawDegrees: -55
                 detectionType: APRIL_TAG
-                simulateWithPhysicalCamera: true
+            backwardLeft: # Pi IP: 10.18.16.13
+                photonVisionUIName: Backward_Left
+                robotToCamera:
+                    xInches: -12.5
+                    yInches: 13
+                    zInches: 15
+                    rollDegrees: 0
+                    pitchDegrees: 0
+                    yawDegrees: 155
+                detectionType: APRIL_TAG
+            backwardRight: # Pi IP: 10.18.16.14
+                photonVisionUIName: Backward_Right
+                robotToCamera:
+                    xInches: -12.5
+                    yInches: -13
+                    zInches: 15
+                    rollDegrees: 0
+                    pitchDegrees: 0
+                    yawDegrees: -155
+                detectionType: APRIL_TAG
+#            fuelDetector:
+#                photonVisionUIName: Fuel_Detector
+#                detectionType: NONE # TODO: Object detection
 
 autopathing:
     paths:
