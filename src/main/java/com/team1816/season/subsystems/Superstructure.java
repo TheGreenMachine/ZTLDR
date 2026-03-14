@@ -189,6 +189,8 @@ public class Superstructure extends BaseSuperstructure {
                 }
                 : Gatekeeper.GatekeeperState.CLOSED
         );
+        // Only spin up the launch motors if we are trying to shoot to save battery.
+        shooter.setSpinUpLaunchMotors(gatekeeper.getState() == Gatekeeper.GatekeeperState.OPEN);
         intake.setWantedState(
             switch (wantedIntakeState) {
                 case INTAKE -> Intake.IntakeState.INTAKE;

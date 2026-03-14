@@ -1,6 +1,7 @@
 package com.team1816.season.subsystems;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.pathplanner.lib.util.FlippingUtil;
@@ -34,9 +35,14 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private ShooterState wantedState = ShooterState.PRESET_CLOSE;
 
     /**
-     * The velocity we want the launch motors to run at (in RPS).
+     * The velocity we want the launch motors to run at (in RPS), assuming {@link
+     * #spinUpLaunchMotors} is true.
      */
     private double wantedLaunchVelocityRPS = 0;
+    /**
+     * If the launch motors should be enabled to spin up.
+     */
+    private boolean spinUpLaunchMotors = false;
 
     /**
      * The angle we want the incline of the shooter to go to, assuming it is not ducking (in
@@ -76,6 +82,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private final VelocityVoltage topLaunchMotorVelocityRequest = new VelocityVoltage(0);
     private final VelocityVoltage bottomLaunchMotorVelocityRequest = new VelocityVoltage(0);
+    private final NeutralOut neutralModeRequest = new NeutralOut();
     private final PositionVoltage inclineMotorPositionRequest = new PositionVoltage(0);
     private final PositionVoltage turretMotorPositionRequest = new PositionVoltage(0);
 
@@ -162,7 +169,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final Translation2d RIGHT_CORNER_TRANSLATION_2D = new Translation2d(2, 2);
     private final double ROBOT_STARTING_LINE = Units.inchesToMeters(156.61);
 
-    private ShooterTableCalculator shooterTableCalculator = new ShooterTableCalculator();
+    private final ShooterTableCalculator shooterTableCalculator = new ShooterTableCalculator();
 
     public Shooter() {
         super();
@@ -203,6 +210,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         // The current launch velocities (in RPS) are already logged by the motor, so we don't need to log them here.
         GreenLogger.periodicLog(NAME + "/launchMotors/Wanted Launch Velocity RPS", () -> wantedLaunchVelocityRPS);
         GreenLogger.periodicLog(NAME + "/launchMotors/Aimed", this::areLaunchMotorsAimed);
+        GreenLogger.periodicLog(NAME + "/launchMotors/Spinning Up", () -> spinUpLaunchMotors);
 
         // Because this first one is a Mechanism2d, it will be under the SmartDashboard section of the NetworkTables.
         GreenLogger.periodicLog("Shooter Incline", () -> inclineMech2d);
@@ -320,6 +328,16 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     /**
+     * Sets if the launch motors should be spun up to the {@link #wantedLaunchVelocityRPS}. Pass in
+     * false to effectively disable the launch motors.
+     *
+     * @param shouldSpinUpLaunchMotors If the launch motors should be allowed to spin up.
+     */
+    public void setSpinUpLaunchMotors(boolean shouldSpinUpLaunchMotors) {
+        spinUpLaunchMotors = shouldSpinUpLaunchMotors;
+    }
+
+    /**
      * Gets the {@link Translation2d} of the target that we should aim at, based on the location of
      * the robot on the field. Specifically, determines if we should aim at the hub or the corner
      * of the alliance zone, determines which corner to aim at if aiming at the corner, and gets
@@ -374,12 +392,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
     private void aimTurretAtTarget(Translation2d targetTranslation2d) {
-        Pose2d robotPose = BaseRobotState.robotPose;
-        Translation2d robotTranslation2d = robotPose.getTranslation();
-        Translation2d shooterTranslation2d = robotTranslation2d.plus(SHOOTER_OFFSET.toTranslation2d());
+        Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
         Translation2d shooterToTargetTranslation2d = targetTranslation2d.minus(shooterTranslation2d);
         Rotation2d fieldRelativeRotation2dToTarget = shooterToTargetTranslation2d.getAngle();
-        Rotation2d robotRotation2d = robotPose.getRotation();
+        Rotation2d robotRotation2d = BaseRobotState.robotPose.getRotation();
         Rotation2d robotRelativeRotation2dToTarget = fieldRelativeRotation2dToTarget.minus(robotRotation2d);
         double robotRelativeDegreesToTarget = robotRelativeRotation2dToTarget.getDegrees();
         setTurretAngle(robotRelativeDegreesToTarget);
@@ -392,9 +408,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
     private void aimInclineAndLaunchersAtTarget(Translation2d targetTranslation2d) {
-        Pose2d robotPose = BaseRobotState.robotPose;
-        Translation2d robotTranslation2d = robotPose.getTranslation();
-        Translation2d shooterTranslation2d = robotTranslation2d.plus(SHOOTER_OFFSET.toTranslation2d());
+        Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
         double distanceToTarget = shooterTranslation2d.getDistance(targetTranslation2d);
         ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator.getShooterDistanceSetting(distanceToTarget);
         double inclineAngleDegrees = shooterDistanceSetting.getAngle();
@@ -479,8 +493,14 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      */
     private void setLaunchVelocities(double wantedVelocityRPS) {
         wantedLaunchVelocityRPS = wantedVelocityRPS;
-        topLaunchMotor.setControl(topLaunchMotorVelocityRequest.withVelocity(wantedLaunchVelocityRPS));
-        bottomLaunchMotor.setControl(bottomLaunchMotorVelocityRequest.withVelocity(wantedLaunchVelocityRPS));
+        if (spinUpLaunchMotors) {
+            topLaunchMotor.setControl(topLaunchMotorVelocityRequest.withVelocity(wantedLaunchVelocityRPS));
+            bottomLaunchMotor.setControl(bottomLaunchMotorVelocityRequest.withVelocity(wantedLaunchVelocityRPS));
+        }
+        else {
+            topLaunchMotor.setControl(neutralModeRequest);
+            bottomLaunchMotor.setControl(neutralModeRequest);
+        }
     }
 
     /**
@@ -624,14 +644,14 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     /**
-     * Gets if the whole shooter (turret, incline, and launch motors) is aimed at the target and
-     * ready to shoot.
+     * Gets if the whole shooter (turret and incline) is aimed at the target and ready to shoot. We
+     * are assuming the launch motor spinup time is negligible, so we are not currently checking
+     * them.
      *
      * @return If the shooter is aimed.
      */
     public boolean isAimed() {
-        return areLaunchMotorsAimed()
-            && isInclineAimed()
+        return isInclineAimed()
             && isTurretAimed()
             // If we are auto trying to auto aim but don't actually know where we are, we are
             // probably not aimed correctly.
