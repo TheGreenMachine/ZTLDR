@@ -39,12 +39,12 @@ public class GreenLogger {
         }
 
         // this will log the robot modes i.e., auto enabled estop
-        //DriverStation.startDataLog(DataLogManager.getLog(), false);
+        DriverStation.startDataLog(DataLogManager.getLog(), false);
         // Log network tables then we can use advantage scope on a live robot
         // and use the same layout for the logs
-        //DataLogManager.logNetworkTables(true);
+        DataLogManager.logNetworkTables(true);
         // don't log console since we output to network tables
-        //DataLogManager.logConsoleOutput(false);
+        DataLogManager.logConsoleOutput(false);
         netTable = NetworkTableInstance.getDefault().getTable("");
         msg = netTable.getStringTopic("messages").publish();
     }
