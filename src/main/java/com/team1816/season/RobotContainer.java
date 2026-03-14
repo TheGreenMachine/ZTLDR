@@ -60,7 +60,7 @@ public class RobotContainer extends BaseRobotContainer {
         driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_IN_AND_OFF)));
 
         operatorController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.adjustShooterVelocity(true)));
-        operatorController.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.adjustShooterVelocity(false)));
+        operatorController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.adjustShooterVelocity(false)));
 
         driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.feeder.setWantedState(Feeder.FEEDER_STATE.REVERSING)));
         driverController.povDown().onFalse(Commands.runOnce(() -> superstructure.feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING)));
