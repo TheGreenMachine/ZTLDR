@@ -2,7 +2,7 @@ package com.team1816.season;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.team1816.lib.BaseRobotContainer;
-import com.team1816.season.subsystems.Superstructure;
+import com.team1816.season.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 public class RobotContainer extends BaseRobotContainer {
@@ -14,10 +14,11 @@ public class RobotContainer extends BaseRobotContainer {
         // i.e. subsystems that always exist like the drivetrain and path planner
         initializeLibSubSystems();
 
+        registerCommands();
+
         buildAutoChooser();
 
         configureBindings();
-        registerCommands();
     }
 
     @Override
@@ -118,6 +119,27 @@ public class RobotContainer extends BaseRobotContainer {
         ));
         NamedCommands.registerCommand("default", Commands.runOnce(() ->
             superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT)
+        ));
+
+        // BottomBlueToMiddle
+        NamedCommands.registerCommand("BottomBlueToMiddleStart0", Commands.runOnce(() ->
+            {
+                superstructure.setInclineDucking(true);
+                superstructure.setWantedSubsystemStates(
+                    Intake.IntakeState.INTAKE_POSITION_2,
+                    Feeder.FEEDER_STATE.FAST_FEEDING,
+                    Gatekeeper.GATEKEEPER_STATE.CLOSED,
+                    Shooter.ShooterState.PRESET_MIDDLE,
+                    Climber.CLIMBER_STATE.IDLING
+                );
+                superstructure.setTurretPresetAngle(-110);
+            }
+        ));
+        NamedCommands.registerCommand("BottomBlueToMiddleStart1", Commands.runOnce(() ->
+            superstructure.setInclineDucking(false)
+        ));
+        NamedCommands.registerCommand("BottomBlueToMiddleStart2", Commands.runOnce(() ->
+            superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)
         ));
     }
 }

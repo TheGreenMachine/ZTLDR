@@ -132,7 +132,7 @@ public class Superstructure extends BaseSuperstructure {
         shooter.setTurretPresetAngle(wantedAngleDegrees);
     }
 
-    private void setWantedSubsystemStates(
+    public void setWantedSubsystemStates(
         Intake.IntakeState intakeState,
         Feeder.FEEDER_STATE feederState,
         Gatekeeper.GATEKEEPER_STATE gatekeeperState,
