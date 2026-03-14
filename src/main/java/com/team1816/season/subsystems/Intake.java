@@ -154,14 +154,14 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     public void incrementFlipperInwards() {
         switch (flipperPosition) {
-            case OUT -> wantedState = INTAKE_STATE.INTAKE_POSITION_1;
-            case POSITION_1 -> wantedState = INTAKE_STATE.INTAKE_POSITION_2;
-            case POSITION_2 -> wantedState = INTAKE_STATE.INTAKE_IN_AND_OFF;
+            case OUT -> wantedState = IntakeState.INTAKE_POSITION_1;
+            case POSITION_1 -> wantedState = IntakeState.INTAKE_POSITION_2;
+            case POSITION_2 -> wantedState = IntakeState.STOW;
         }
     }
 
     public void resetFlipperOut() {
-        wantedState = INTAKE_STATE.INTAKE_OUT_AND_ON;
+        wantedState = IntakeState.INTAKE;
     }
 
     /**

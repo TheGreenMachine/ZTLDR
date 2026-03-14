@@ -124,16 +124,6 @@ public class Robot extends BaseRobot {
     }
 
     @Override
-    public void teleopExit() {
-        try {
-            robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
-        } catch (Throwable t) {
-            robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
-            GreenLogger.log(t);
-        }
-    }
-
-    @Override
     protected BaseRobotContainer createRobotContainer() {
         robotContainer = new RobotContainer();
         return robotContainer;
