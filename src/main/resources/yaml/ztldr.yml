@@ -175,7 +175,7 @@ subsystems:
             rotationKi: 0
             rotationKd: 0
     ledManager:
-        implemented: true
+        implemented: false
         devices:
             argb:
                 id: 14

@@ -46,8 +46,12 @@ public abstract class BaseSuperstructure extends SubsystemBase {
      * decide if we can no longer trust our robot pose estimate. If we tilt too far, we have either
      * lost wheel contact with the ground or are driving over an uneven surface, and therefore our
      * pose estimate (which includes wheel odometry) will no longer be accurate.
+     *
+     * Synchronized because {@link #addVisionMeasurementsToDrivetrain()} runs on the vision thread
+     * and both methods access {@code goodVisionEstimatesSincePoseLoss} and
+     * {@link BaseRobotState#hasAccuratePoseEstimate}.
      */
-    private void handlePoseLossFromTilting() {
+    private synchronized void handlePoseLossFromTilting() {
         // The threshold of how far the robot can be tilted before we decide we don't have an
         // accurate pose estimate. Mainly to account for gyro noise.
         final double tiltPoseLossThresholdRadians = Units.degreesToRadians(5.0);
@@ -64,8 +68,14 @@ public abstract class BaseSuperstructure extends SubsystemBase {
      * Updates the drivetrain's pose estimate by passing in unread vision pose estimates from the
      * {@link Vision} subsystem. Also handles deciding when we have gotten enough good vision
      * estimates to be confident in our combined pose estimate again after losing pose.
+     *
+     * Synchronized because this method is called from the vision thread (via
+     * {@link com.team1816.lib.BaseRobot}'s addPeriodic) while {@link #handlePoseLossFromTilting()}
+     * runs on the main robot thread. Both methods read/write shared state
+     * ({@code goodVisionEstimatesSincePoseLoss}, {@code visionEstimateSincePoseLossVarianceSum},
+     * and {@link BaseRobotState#hasAccuratePoseEstimate}).
      */
-    public void addVisionMeasurementsToDrivetrain() {
+    public synchronized void addVisionMeasurementsToDrivetrain() {
         List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> visionMeasurements = vision
             .getVisionEstimatedPosesWithStdDevs();
 

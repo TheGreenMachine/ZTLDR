@@ -108,8 +108,8 @@ public class Robot extends BaseRobot {
 
     @Override
     public void robotPeriodic() {
-        super.robotPeriodic();
         try {
+            super.robotPeriodic();
             Threads.setCurrentThreadPriority(true, 99);
             double start = HALUtil.getFPGATime();
             CommandScheduler.getInstance().run();
@@ -125,7 +125,12 @@ public class Robot extends BaseRobot {
 
     @Override
     public void teleopExit() {
-        robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
+        try {
+            robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
+        } catch (Throwable t) {
+            robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
+            GreenLogger.log(t);
+        }
     }
 
     @Override
