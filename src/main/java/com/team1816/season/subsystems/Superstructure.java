@@ -188,10 +188,13 @@ public class Superstructure extends BaseSuperstructure {
             }
         );
         feeder.setWantedState(
-            switch (wantedFeederState) {
-                case FEED -> Feeder.FeederState.SLOW_FEEDING;
-                case IDLE -> Feeder.FeederState.IDLING;
-            }
+            gatekeeper.getState() == Gatekeeper.GatekeeperState.OPEN
+                ? switch (wantedFeederState) {
+                    case FEED -> Feeder.FeederState.FEEDING;
+                    case STOP -> Feeder.FeederState.STOPPED;
+                }
+                // If the gatekeeper isn't running, keep the feeder stopped to avoid jamming.
+                : Feeder.FeederState.STOPPED
         );
         climber.setWantedState(
             switch (wantedClimberState) {
@@ -204,14 +207,14 @@ public class Superstructure extends BaseSuperstructure {
 
     private void climbingL1() {
         // TODO: Handle Superstructure climbing behavior.
-        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FeederState.SLOW_FEEDING,
+        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FeederState.FEEDING,
             Gatekeeper.GatekeeperState.CLOSED, Shooter.ShooterState.IDLE,
             Climber.ClimberState.L1_UP_CLIMBING);
     }
 
     private void climbingL3() {
         // TODO: Handle Superstructure climbing behavior.
-        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FeederState.SLOW_FEEDING,
+        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FeederState.FEEDING,
             Gatekeeper.GatekeeperState.CLOSED, Shooter.ShooterState.IDLE,
             Climber.ClimberState.L3_UP_CLIMBING);
     }
@@ -252,7 +255,7 @@ public class Superstructure extends BaseSuperstructure {
 
     public enum WantedFeederState {
         FEED,
-        IDLE
+        STOP
     }
 
     public enum WantedClimberState {

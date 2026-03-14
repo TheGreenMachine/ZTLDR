@@ -227,10 +227,8 @@ subsystems:
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
         constants:
-            fastFeeding: 0.296
-            slowFeeding: 0.086
-            reversing: 0
-            idling: 0
+            feedingDutyCycle: 0.7
+            stoppedDutyCycle: 0
     intake:
         implemented: true
         devices:

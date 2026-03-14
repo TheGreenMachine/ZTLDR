@@ -75,6 +75,15 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
         wantedState = state;
     }
 
+    /**
+     * Gets the current value of {@link #wantedState} for the gatekeeper.
+     *
+     * @return The current {@link #wantedState}.
+     */
+    public GatekeeperState getState() {
+        return wantedState;
+    }
+
     public enum GatekeeperState {
         OPEN(factory.getConstant(NAME, "topOpenVelocity", 0), factory.getConstant(NAME, "bottomOpenVelocity", 0)),
         CLOSED(factory.getConstant(NAME, "topClosedVelocity", 0), factory.getConstant(NAME, "bottomClosedVelocity", 0));
