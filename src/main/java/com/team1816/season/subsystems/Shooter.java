@@ -71,6 +71,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final double LAUNCH_ANGLE_MOTOR_TOP_LIMIT_ROTATIONS;
     public double maxLaunchAngle = 0; //<-SET MAX ANGLE HERE
 
+    private final double launchMotorVelocityIncrement = factory.getConstant(NAME, "launchVelocityIncrement", 0);
+
     //CALIBRATION
     private final double CLOSE_DISTANCE_BETWEEN_BEAM_BREAKS;
     private final double FAR_DISTANCE_BETWEEN_BEAM_BREAKS;
@@ -82,6 +84,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final DutyCycleOut turretDutyCycleOutRequest = new DutyCycleOut(0);
     private double initialCalibrationStallingTimestamp = -1;
     private final double CALIBRATION_STALL_SECONDS = 1;
+
+    private double launchMotorVelocityOffset = 0;
 
     //MECHANISMS
     private Mechanism2d launchMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
@@ -387,8 +391,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void setLaunchMotorVelocities(double wantedVelocity) {
-        topLaunchMotor.setControl(topLaunchMotorVelocityRequest.withVelocity(wantedVelocity));
-        bottomLaunchMotor.setControl(bottomLaunchMotorVelocityRequest.withVelocity(wantedVelocity));
+        topLaunchMotor.setControl(topLaunchMotorVelocityRequest.withVelocity(wantedVelocity + launchMotorVelocityOffset));
+        bottomLaunchMotor.setControl(bottomLaunchMotorVelocityRequest.withVelocity(wantedVelocity + launchMotorVelocityOffset));
     }
 
     private void setLaunchAngle(double wantedAngleDegrees) {
@@ -399,6 +403,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public SHOOTER_STATE getWantedState() {
         return wantedState;
     }
+
 
     /**
      * Sends a position request to the {@link #rotationAngleMotor} based on the passed in
@@ -436,6 +441,25 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         else {
             GreenLogger.log("Can't set rotation angle of shooter. Rotation not calibrated.");
         }
+    }
+
+    /**
+     * Adjusts the shooter velocity by a YAML-defined increment. Does not allow negative offset.
+     *
+     * @param positive whether to increase or decrease the offset by the increment
+     */
+    public void adjustShooterVelocity(boolean positive) {
+        if (positive) {
+            launchMotorVelocityOffset += launchMotorVelocityIncrement;
+        } else {
+            launchMotorVelocityOffset -= launchMotorVelocityIncrement;
+        }
+
+        if (launchMotorVelocityOffset < 0) {
+            launchMotorVelocityOffset = 0;
+        }
+
+        GreenLogger.log("Adjusted shooter offset to " +  launchMotorVelocityOffset + "rps by " + launchMotorVelocityIncrement + "rps");
     }
 
     /**
