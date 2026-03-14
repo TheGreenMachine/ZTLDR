@@ -30,9 +30,10 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
         // TODO: This may or may not be what we want for PathPlanner path following.
         superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.AUTOMATIC_DRIVING);
-        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC);
+        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE);
         superstructure.setInclineDucking(false);
-        superstructure.setTurretPresetAngle(0);
+        superstructure.setTurretFixedAngle(0);
+        superstructure.setAutoAimTurret(true);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
         superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE);
         superstructure.setSuperstructureWantedFeederState(Superstructure.WantedFeederState.FEED);
@@ -42,8 +43,7 @@ public class RobotContainer extends BaseRobotContainer {
     public void teleopInit() {
         superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
         superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.MANUAL_DRIVING);
-        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC);
-        superstructure.setTurretPresetAngle(0);
+        superstructure.setAutoAimTurret(true);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
     }
 
@@ -63,7 +63,7 @@ public class RobotContainer extends BaseRobotContainer {
         driverController.x().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE)));
         driverController.y().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_MIDDLE)));
         driverController.b().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_FAR)));
-        driverController.a().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC)));
+        driverController.a().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.FULLY_AUTOMATIC)));
 
         // Intake
         driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)));
@@ -74,7 +74,7 @@ public class RobotContainer extends BaseRobotContainer {
         // TODO: Set up the PathPlanner NamedCommands that we actually want.
         // Shooter
         NamedCommands.registerCommand("shooter/automatic", Commands.runOnce(() ->
-             superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC)
+             superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.FULLY_AUTOMATIC)
         ));
         NamedCommands.registerCommand("shooter/presetClose", Commands.runOnce(() ->
             superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE)
@@ -86,16 +86,16 @@ public class RobotContainer extends BaseRobotContainer {
             superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_FAR)
         ));
         NamedCommands.registerCommand("shooter/setTurretPresetAngle0Degrees", Commands.runOnce(() ->
-            superstructure.setTurretPresetAngle(0)
+            superstructure.setTurretFixedAngle(0)
         ));
         NamedCommands.registerCommand("shooter/setTurretPresetAngle90Degrees", Commands.runOnce(() ->
-            superstructure.setTurretPresetAngle(90)
+            superstructure.setTurretFixedAngle(90)
         ));
         NamedCommands.registerCommand("shooter/setTurretPresetAngle180Degrees", Commands.runOnce(() ->
-            superstructure.setTurretPresetAngle(180)
+            superstructure.setTurretFixedAngle(180)
         ));
         NamedCommands.registerCommand("shooter/setTurretPresetAngle270Degrees", Commands.runOnce(() ->
-            superstructure.setTurretPresetAngle(270)
+            superstructure.setTurretFixedAngle(270)
         ));
 
         NamedCommands.registerCommand("intake/intake", Commands.runOnce(() ->

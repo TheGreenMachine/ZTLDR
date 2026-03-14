@@ -343,9 +343,9 @@ subsystems:
             leftTurretSensorChannel: 0
             rightTurretSensorChannel: 1
             motorRotationsPerTurretRotation: 15.625 # 250/16 gear ratio
-            initialShooterOffsetX: 0
-            initialShooterOffsetY: 0
-            initialShooterOffsetZ: 22
+            shooterOffsetXMeters: 0
+            shooterOffsetYMeters: 0
+            shooterOffsetZMeters: 0.5588
             inclineDuckingLimitDegrees: 17
             distanceOneInclineAngleDegrees: 22
             distanceOneLaunchVelocityRPS: 54

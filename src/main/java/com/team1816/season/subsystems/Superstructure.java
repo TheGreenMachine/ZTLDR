@@ -41,7 +41,7 @@ public class Superstructure extends BaseSuperstructure {
     private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
     private WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
-    private WantedShooterState wantedShooterState = WantedShooterState.AUTOMATIC;
+    private WantedShooterState wantedShooterState = WantedShooterState.PRESET_CLOSE;
     private WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSE;
     private WantedIntakeState wantedIntakeState = WantedIntakeState.INTAKE;
     private WantedFeederState wantedFeederState = WantedFeederState.FEED;
@@ -122,14 +122,25 @@ public class Superstructure extends BaseSuperstructure {
     }
 
     /**
-     * Sets the angle to point the turret of the shooter at when using one of the distance presets
-     * (in degrees).
+     * Sets the angle to point the turret at when the turret isn't auto aiming (in degrees).
      *
-     * @param wantedAngleDegrees The angle to point the turret of the shooter at when using one of
-     *                           the distance presets (in degrees).
+     * @param wantedAngleDegrees The angle to point the turret at when the turret isn't auto aiming
+     *                           (in degrees).
      */
-    public void setTurretPresetAngle(double wantedAngleDegrees) {
-        shooter.setTurretPresetAngle(wantedAngleDegrees);
+    public void setTurretFixedAngle(double wantedAngleDegrees) {
+        shooter.setTurretFixedAngle(wantedAngleDegrees);
+    }
+
+    /**
+     * Sets if the turret should automatically point at either the hub or the corners. If false,
+     * the turret will point at the angle set by {@link #setTurretFixedAngle(double)} instead.
+     * Note that this will be ignored if the shooter state is {@link
+     * Shooter.ShooterState#FULLY_AUTOMATIC}.
+     *
+     * @param shouldAutoAimTurret If the turret of the shooter should aim automatically.
+     */
+    public void setAutoAimTurret(boolean shouldAutoAimTurret) {
+        shooter.setAutoAimTurret(shouldAutoAimTurret);
     }
 
     private void setWantedSubsystemStates(
@@ -156,7 +167,7 @@ public class Superstructure extends BaseSuperstructure {
         );
         shooter.setWantedState(
             switch (wantedShooterState) {
-                case AUTOMATIC -> Shooter.ShooterState.AUTOMATIC;
+                case FULLY_AUTOMATIC -> Shooter.ShooterState.FULLY_AUTOMATIC;
                 case PRESET_CLOSE -> Shooter.ShooterState.PRESET_CLOSE;
                 case PRESET_MIDDLE -> Shooter.ShooterState.PRESET_MIDDLE;
                 case PRESET_FAR -> Shooter.ShooterState.PRESET_FAR;
@@ -223,7 +234,7 @@ public class Superstructure extends BaseSuperstructure {
     }
 
     public enum WantedShooterState {
-        AUTOMATIC,
+        FULLY_AUTOMATIC,
         PRESET_CLOSE,
         PRESET_MIDDLE,
         PRESET_FAR
