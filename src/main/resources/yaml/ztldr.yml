@@ -219,7 +219,7 @@ subsystems:
             linearSlideL1DownClimbing: 0
 
     feeder:
-        implemented: true
+        implemented: false
         devices:
             feedMotor:
                 deviceType: TalonFX
@@ -252,13 +252,14 @@ subsystems:
                 id: 10
                 deviceType: CANcoder
         constants: # TODO: all of these
-            intakeOnSpeed: .35
+            intakeOnSpeed: .45
             intakeOffSpeed: 0
             flipperMotorOutMinimumPosition: 0.0058
             flipperMotorRetractCurrentAmperes: -20
             flipperMotorExtendCurrentAmperes: 30
             flipperMotorHoldOutCurrentAmperes: 8
     gatekeeper:
+        implemented: false
         canBusName: shootercanivore
         devices:
             topMotor:
@@ -285,6 +286,7 @@ subsystems:
             bottomClosedVelocity: 0
             bottomOpenVelocity: 40
     shooter:
+        implemented: false
         canBusName: shootercanivore
         devices:
             topLaunchMotor:

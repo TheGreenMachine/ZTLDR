@@ -129,7 +129,7 @@ public class RobotContainer extends BaseRobotContainer {
                     Intake.IntakeState.INTAKE_POSITION_2,
                     Feeder.FEEDER_STATE.FAST_FEEDING,
                     Gatekeeper.GATEKEEPER_STATE.CLOSED,
-                    Shooter.ShooterState.PRESET_MIDDLE,
+                    Shooter.ShooterState.IDLE,
                     Climber.CLIMBER_STATE.IDLING
                 );
                 superstructure.setTurretPresetAngle(-110);
@@ -139,7 +139,10 @@ public class RobotContainer extends BaseRobotContainer {
             superstructure.setInclineDucking(false)
         ));
         NamedCommands.registerCommand("BottomBlueToMiddleStart2", Commands.runOnce(() ->
-            superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)
+            {
+                superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
+                superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_MIDDLE);
+            }
         ));
     }
 }
