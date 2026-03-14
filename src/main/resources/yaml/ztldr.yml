@@ -219,7 +219,7 @@ subsystems:
             linearSlideL1DownClimbing: 0
 
     feeder:
-        implemented: false
+        implemented: true
         devices:
             feedMotor:
                 deviceType: TalonFX
@@ -227,10 +227,8 @@ subsystems:
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
         constants:
-            fastFeeding: 0.7
-            slowFeeding: 0
-            reversing: 0
-            idling: 0
+            feedingDutyCycle: 0.7
+            stoppedDutyCycle: 0
     intake:
         implemented: true
         devices:
@@ -254,12 +252,13 @@ subsystems:
         constants: # TODO: all of these
             intakeOnSpeed: .45
             intakeOffSpeed: 0
-            flipperMotorOutMinimumPosition: 0.0058
+            flipperMotorOutMinimumPosition: 0.166
+            flipperMotorPullInOnePosition: 0.1
+            flipperMotorPullInTwoPosition: 0.05
             flipperMotorRetractCurrentAmperes: -20
             flipperMotorExtendCurrentAmperes: 30
             flipperMotorHoldOutCurrentAmperes: 8
     gatekeeper:
-        implemented: false
         canBusName: shootercanivore
         devices:
             topMotor:
@@ -286,7 +285,6 @@ subsystems:
             bottomClosedVelocity: 0
             bottomOpenVelocity: 40
     shooter:
-        implemented: false
         canBusName: shootercanivore
         devices:
             topLaunchMotor:
@@ -345,9 +343,9 @@ subsystems:
             leftTurretSensorChannel: 0
             rightTurretSensorChannel: 1
             motorRotationsPerTurretRotation: 15.625 # 250/16 gear ratio
-            initialShooterOffsetX: 0
-            initialShooterOffsetY: 0
-            initialShooterOffsetZ: 22
+            shooterOffsetXMeters: 0
+            shooterOffsetYMeters: 0
+            shooterOffsetZMeters: 0.5588
             inclineDuckingLimitDegrees: 17
             distanceOneInclineAngleDegrees: 22
             distanceOneLaunchVelocityRPS: 54

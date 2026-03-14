@@ -41,7 +41,7 @@ public class Superstructure extends BaseSuperstructure {
     private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
     private WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
-    private WantedShooterState wantedShooterState = WantedShooterState.AUTOMATIC;
+    private WantedShooterState wantedShooterState = WantedShooterState.PRESET_CLOSE;
     private WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSE;
     private WantedIntakeState wantedIntakeState = WantedIntakeState.INTAKE;
     private WantedFeederState wantedFeederState = WantedFeederState.FEED;
@@ -104,6 +104,14 @@ public class Superstructure extends BaseSuperstructure {
         this.wantedIntakeState = intakeState;
     }
 
+    public void incrementPullInSuperstructureIntakeState() {
+        wantedIntakeState = switch (wantedIntakeState) {
+            case INTAKE -> WantedIntakeState.PULL_IN_ONE;
+            case PULL_IN_ONE -> WantedIntakeState.PULL_IN_TWO;
+            case PULL_IN_TWO, STOW -> WantedIntakeState.STOW;
+        };
+    }
+
     public void setSuperstructureWantedFeederState(WantedFeederState feederState) {
         this.wantedFeederState = feederState;
     }
@@ -122,22 +130,33 @@ public class Superstructure extends BaseSuperstructure {
     }
 
     /**
-     * Sets the angle to point the turret of the shooter at when using one of the distance presets
-     * (in degrees).
+     * Sets the angle to point the turret at when the turret isn't auto aiming (in degrees).
      *
-     * @param wantedAngleDegrees The angle to point the turret of the shooter at when using one of
-     *                           the distance presets (in degrees).
+     * @param wantedAngleDegrees The angle to point the turret at when the turret isn't auto aiming
+     *                           (in degrees).
      */
-    public void setTurretPresetAngle(double wantedAngleDegrees) {
-        shooter.setTurretPresetAngle(wantedAngleDegrees);
+    public void setTurretFixedAngle(double wantedAngleDegrees) {
+        shooter.setTurretFixedAngle(wantedAngleDegrees);
+    }
+
+    /**
+     * Sets if the turret should automatically point at either the hub or the corners. If false,
+     * the turret will point at the angle set by {@link #setTurretFixedAngle(double)} instead.
+     * Note that this will be ignored if the shooter state is {@link
+     * Shooter.ShooterState#FULLY_AUTOMATIC}.
+     *
+     * @param shouldAutoAimTurret If the turret of the shooter should aim automatically.
+     */
+    public void setAutoAimTurret(boolean shouldAutoAimTurret) {
+        shooter.setAutoAimTurret(shouldAutoAimTurret);
     }
 
     public void setWantedSubsystemStates(
         Intake.IntakeState intakeState,
-        Feeder.FEEDER_STATE feederState,
-        Gatekeeper.GATEKEEPER_STATE gatekeeperState,
+        Feeder.FeederState feederState,
+        Gatekeeper.GatekeeperState gatekeeperState,
         Shooter.ShooterState shooterState,
-        Climber.CLIMBER_STATE climbState
+        Climber.ClimberState climbState
     )  {
         intake.setWantedState(intakeState);
         feeder.setWantedState(feederState);
@@ -156,7 +175,7 @@ public class Superstructure extends BaseSuperstructure {
         );
         shooter.setWantedState(
             switch (wantedShooterState) {
-                case AUTOMATIC -> Shooter.ShooterState.AUTOMATIC;
+                case FULLY_AUTOMATIC -> Shooter.ShooterState.FULLY_AUTOMATIC;
                 case PRESET_CLOSE -> Shooter.ShooterState.PRESET_CLOSE;
                 case PRESET_MIDDLE -> Shooter.ShooterState.PRESET_MIDDLE;
                 case PRESET_FAR -> Shooter.ShooterState.PRESET_FAR;
@@ -165,44 +184,49 @@ public class Superstructure extends BaseSuperstructure {
         gatekeeper.setWantedState(
             shooter.isAimed()
                 ? switch (wantedGatekeeperState) {
-                    case OPEN -> Gatekeeper.GATEKEEPER_STATE.OPEN;
-                    case CLOSE -> Gatekeeper.GATEKEEPER_STATE.CLOSED;
+                    case OPEN -> Gatekeeper.GatekeeperState.OPEN;
+                    case CLOSE -> Gatekeeper.GatekeeperState.CLOSED;
                 }
-                : Gatekeeper.GATEKEEPER_STATE.CLOSED
+                : Gatekeeper.GatekeeperState.CLOSED
         );
         intake.setWantedState(
             switch (wantedIntakeState) {
                 case INTAKE -> Intake.IntakeState.INTAKE;
                 case STOW -> Intake.IntakeState.STOW;
+                case PULL_IN_ONE -> Intake.IntakeState.PULL_IN_ONE;
+                case PULL_IN_TWO -> Intake.IntakeState.PULL_IN_TWO;
             }
         );
         feeder.setWantedState(
-            switch (wantedFeederState) {
-                case FEED -> Feeder.FEEDER_STATE.SLOW_FEEDING;
-                case IDLE -> Feeder.FEEDER_STATE.IDLING;
-            }
+            gatekeeper.getState() == Gatekeeper.GatekeeperState.OPEN
+                ? switch (wantedFeederState) {
+                    case FEED -> Feeder.FeederState.FEEDING;
+                    case STOP -> Feeder.FeederState.STOPPED;
+                }
+                // If the gatekeeper isn't running, keep the feeder stopped to avoid jamming.
+                : Feeder.FeederState.STOPPED
         );
         climber.setWantedState(
             switch (wantedClimberState) {
-                case STOW, UP -> Climber.CLIMBER_STATE.IDLING;
-                case L1 -> Climber.CLIMBER_STATE.L1_UP_CLIMBING;
-                case L3 -> Climber.CLIMBER_STATE.L3_UP_CLIMBING;
+                case STOW, UP -> Climber.ClimberState.IDLING;
+                case L1 -> Climber.ClimberState.L1_UP_CLIMBING;
+                case L3 -> Climber.ClimberState.L3_UP_CLIMBING;
             }
         );
     }
 
     private void climbingL1() {
         // TODO: Handle Superstructure climbing behavior.
-        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FEEDER_STATE.SLOW_FEEDING,
-            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.ShooterState.IDLE,
-            Climber.CLIMBER_STATE.L1_UP_CLIMBING);
+        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FeederState.FEEDING,
+            Gatekeeper.GatekeeperState.CLOSED, Shooter.ShooterState.IDLE,
+            Climber.ClimberState.L1_UP_CLIMBING);
     }
 
     private void climbingL3() {
         // TODO: Handle Superstructure climbing behavior.
-        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FEEDER_STATE.SLOW_FEEDING,
-            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.ShooterState.IDLE,
-            Climber.CLIMBER_STATE.L3_UP_CLIMBING);
+        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FeederState.FEEDING,
+            Gatekeeper.GatekeeperState.CLOSED, Shooter.ShooterState.IDLE,
+            Climber.ClimberState.L3_UP_CLIMBING);
     }
 
     public enum WantedSuperState {
@@ -223,7 +247,7 @@ public class Superstructure extends BaseSuperstructure {
     }
 
     public enum WantedShooterState {
-        AUTOMATIC,
+        FULLY_AUTOMATIC,
         PRESET_CLOSE,
         PRESET_MIDDLE,
         PRESET_FAR
@@ -236,12 +260,14 @@ public class Superstructure extends BaseSuperstructure {
 
     public enum WantedIntakeState {
         INTAKE,
-        STOW
+        STOW,
+        PULL_IN_ONE,
+        PULL_IN_TWO
     }
 
     public enum WantedFeederState {
         FEED,
-        IDLE
+        STOP
     }
 
     public enum WantedClimberState {

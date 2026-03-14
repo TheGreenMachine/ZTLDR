@@ -10,12 +10,10 @@ import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.FieldContainer;
 import com.team1816.lib.util.GreenLogger;
+import com.team1816.lib.util.ShooterDistanceSetting;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -55,9 +53,19 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private boolean isTurretCalibrated = false;
     private boolean isTurretAimingInDeadZone = false;
     /**
-     * The angle to point the turret at when using one of the distance presets (in degrees).
+     * The angle to point the turret at when {@link #autoAimTurret} is false (in degrees).
      */
-    private double turretPresetAngleDegrees = 0;
+    private double turretFixedAngleDegrees = 0;
+    /**
+     * If the turret should automatically pick a target and point at it, rather than using the
+     * {@link #turretFixedAngleDegrees}.
+     */
+    private boolean autoAimTurret = true;
+    /**
+     * If the shooter is automatically aiming in any way that relies on have an accurate pose
+     * estimate.
+     */
+    private boolean isAutoAiming = true;
 
     //MOTORS
     private final IMotor topLaunchMotor = (IMotor) factory.getDevice(NAME, "topLaunchMotor");
@@ -70,11 +78,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final VelocityVoltage bottomLaunchMotorVelocityRequest = new VelocityVoltage(0);
     private final PositionVoltage inclineMotorPositionRequest = new PositionVoltage(0);
     private final PositionVoltage turretMotorPositionRequest = new PositionVoltage(0);
-
-    //AUTO AIM
-    private AUTO_AIM_TARGETS currentTarget = AUTO_AIM_TARGETS.RED_HUB;
-    // TODO: get the launcher position from the vision or whatever
-    private Translation3d launcherTranslation;
 
     //DEVICES
     private final DigitalInput leftTurretSensor = new DigitalInput((int) factory.getConstant(NAME, "leftTurretSensorChannel", 0));
@@ -91,7 +94,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     //CONSTANTS
     private final double MOTOR_ROTATIONS_PER_TURRET_ROTATION;
     private final Translation3d SHOOTER_OFFSET;
-    private final double HALF_FIELD_WIDTH = FlippingUtil.fieldSizeY/2;
     /**
      * The tolerance for the turret rotation to consider it aimed at the target (in degrees).
      */
@@ -152,25 +154,13 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final MechanismLigament2d inclineMotorML = inclineMechRoot.append(
         new MechanismLigament2d("Incline Angle", 1.5, 0));
 
-    public enum AUTO_AIM_TARGETS{
-        // TODO: figure out hub z value
-        BLUE_HUB(new Translation3d(4.6228, 3.8608, 40)),
-        RED_HUB(new Translation3d(11.915394, 3.8608, 40)),
-        BLUE_LEFT_CORNER(new Translation3d(2, 6.07, 0)),
-        BLUE_RIGHT_CORNER(new Translation3d(2, 2, 0)),
-        RED_LEFT_CORNER(new Translation3d(16.27, 2, 0)),
-        RED_RIGHT_CORNER(new Translation3d(16.27, 6.07, 0));
-
-        private Translation3d position;
-
-        AUTO_AIM_TARGETS (Translation3d position){
-            this.position = position;
-        }
-
-        public Translation3d getPosition(){
-            return position;
-        }
-    }
+    //TARGET TRANSLATION2DS
+    // These are all on the blue side, and will be flipped based on alliance. Left and right are
+    // from the driver station perspective.
+    private final Translation2d HUB_TRANSLATION_2D = new Translation2d(Units.inchesToMeters(182.11), Units.inchesToMeters(158.84));
+    private final Translation2d LEFT_CORNER_TRANSLATION_2D = new Translation2d(2, 6.07);
+    private final Translation2d RIGHT_CORNER_TRANSLATION_2D = new Translation2d(2, 2);
+    private final double ROBOT_STARTING_LINE = Units.inchesToMeters(156.61);
 
     private ShooterTableCalculator shooterTableCalculator = new ShooterTableCalculator();
 
@@ -179,7 +169,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         // if the turret is ghosted we can say we are calibrated because the motors will not move
         if(turretMotor.isGhost()) isTurretCalibrated = true;
         MOTOR_ROTATIONS_PER_TURRET_ROTATION = factory.getConstant(NAME, "motorRotationsPerTurretRotation", 1);
-        SHOOTER_OFFSET = new Translation3d(factory.getConstant(NAME, "initialShooterOffsetX",0), factory.getConstant(NAME, "initialShooterOffsetY",0), factory.getConstant(NAME, "initialShooterOffsetZ",0)); //TODO WHEN PHYSICAL SUBSYSTEM EXISTS, set this.
+        SHOOTER_OFFSET = new Translation3d(
+            factory.getConstant(NAME, "shooterOffsetXMeters",0),
+            factory.getConstant(NAME, "shooterOffsetYMeters",0),
+            factory.getConstant(NAME, "shooterOffsetZMeters",0)
+        );
 
         // Find the turret positions of the four spots that we would see beam break values change,
         // in motor rotations relative robot forward.
@@ -202,10 +196,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         INCLINE_DUCKING_LIMIT_DEGREES = factory.getConstant(NAME, "inclineDuckingLimitDegrees", 0);
 
-        launcherTranslation = new Translation3d(0,0,0).plus(SHOOTER_OFFSET);
-
         GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
         GreenLogger.periodicLog(NAME + "/Aimed", this::isAimed);
+        GreenLogger.periodicLog(NAME + "/Is Auto Aiming", () -> isAutoAiming);
 
         // The current launch velocities (in RPS) are already logged by the motor, so we don't need to log them here.
         GreenLogger.periodicLog(NAME + "/launchMotors/Wanted Launch Velocity RPS", () -> wantedLaunchVelocityRPS);
@@ -227,6 +220,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.periodicLog(NAME + "/turret/Left Sensor Triggered", () -> leftSensorTriggered);
         GreenLogger.periodicLog(NAME + "/turret/Right Sensor Triggered", () -> rightSensorTriggered);
         GreenLogger.periodicLog(NAME + "/turret/Motor Offset Rotations", () -> turretMotorOffsetRotations);
+        GreenLogger.periodicLog(NAME + "/turret/Fixed Angle Degrees", () -> turretFixedAngleDegrees);
+        GreenLogger.periodicLog(NAME + "/turret/Auto Aiming Turret", () -> autoAimTurret);
     }
 
     public void periodic() {
@@ -261,8 +256,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         // Now the sensor triggered values have been set at least once.
         sensorValuesHaveBeenSet = true;
 
-        launcherTranslation = new Translation3d(BaseRobotState.robotPose.getX(), BaseRobotState.robotPose.getY(), 0).plus(SHOOTER_OFFSET);
-
         FieldContainer.field.getObject("Turret").setPose(getCurrentTurretPose2d());
 
         inclineMotorML.setAngle(getCurrentInclineAngleDegrees());
@@ -272,87 +265,24 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         switch (wantedState) {
             case IDLE, PRESET_CLOSE, PRESET_MIDDLE, PRESET_FAR -> {
                 setInclineAngle(wantedState.getInclineAngleDegrees());
-                setTurretAngle(turretPresetAngleDegrees);
+                if (autoAimTurret) {
+                    isAutoAiming = true;
+                    Translation2d target = getTargetTranslation2d();
+                    aimTurretAtTarget(target);
+                }
+                else {
+                    isAutoAiming = false;
+                    setTurretAngle(turretFixedAngleDegrees);
+                }
                 setLaunchVelocities(wantedState.getLaunchVelocityRPS());
             }
-            case AUTOMATIC, AIMING_CORNER, SNOWBLOWING, AIMING_HUB -> {
-                // TODO: Implement these. See commented out code below as a starting point.
+            case FULLY_AUTOMATIC -> {
+                isAutoAiming = true;
+                Translation2d target = getTargetTranslation2d();
+                aimInclineAndLaunchersAtTarget(target);
+                aimTurretAtTarget(target);
             }
         }
-
-//        if (wantedState == ShooterState.AUTOMATIC || wantedState == ShooterState.SNOWBLOWING) {
-//
-//            if (wantedState == ShooterState.AUTOMATIC) {
-//                if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
-//                    currentTarget = AUTO_AIM_TARGETS.RED_HUB;
-//                }
-//                else {
-//                    currentTarget = AUTO_AIM_TARGETS.BLUE_HUB;
-//                }
-//            }
-//            else {
-//                if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
-//                    if (launcherTranslation.getY() < HALF_FIELD_WIDTH) {
-//                        currentTarget = AUTO_AIM_TARGETS.RED_RIGHT_CORNER;
-//                    }
-//                    else {
-//                        currentTarget = AUTO_AIM_TARGETS.RED_LEFT_CORNER;
-//                    }
-//                } else {
-//                    if (launcherTranslation.getY() < HALF_FIELD_WIDTH) {
-//                        currentTarget = AUTO_AIM_TARGETS.BLUE_LEFT_CORNER;
-//                    }
-//                    else {
-//                        currentTarget = AUTO_AIM_TARGETS.BLUE_RIGHT_CORNER;
-//                    }
-//                }
-//            }
-//
-//            double distance = launcherTranslation.toTranslation2d().getDistance(currentTarget.position.toTranslation2d());
-//
-//            ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator.getShooterDistanceSetting(distance);
-//            launchAngle = shooterDistanceSetting.getAngle();
-//            launchPower = shooterDistanceSetting.getPower();
-//            rotationAngle = Math.tan((launcherTranslation.getY()-currentTarget.position.getY())/(launcherTranslation.getX()-currentTarget.position.getX()));
-//        }
-//        if(wantedState == ShooterState.AIMING_HUB || wantedState == ShooterState.AIMING_CORNER) {
-//            if(wantedState == ShooterState.AIMING_HUB){
-//                if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
-//                    currentTarget = AUTO_AIM_TARGETS.RED_HUB;
-//                }
-//                else {
-//                    currentTarget = AUTO_AIM_TARGETS.BLUE_HUB;
-//                }
-//            }
-//            if(wantedState == ShooterState.AIMING_CORNER){
-//                if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
-//                    if (launcherTranslation.getY() < HALF_FIELD_WIDTH) {
-//                        currentTarget = (AUTO_AIM_TARGETS.RED_RIGHT_CORNER);
-//                    }
-//                    else {
-//                        currentTarget = AUTO_AIM_TARGETS.RED_LEFT_CORNER;
-//                    }
-//                } else {
-//                    if (launcherTranslation.getY() < HALF_FIELD_WIDTH) {
-//                        currentTarget = AUTO_AIM_TARGETS.BLUE_LEFT_CORNER;
-//                    }
-//                    else {
-//                        currentTarget = AUTO_AIM_TARGETS.BLUE_RIGHT_CORNER;
-//                    }
-//                }
-//            }
-//
-//            double distance = launcherTranslation.toTranslation2d().getDistance(currentTarget.position.toTranslation2d());
-//
-//            ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator.getShooterDistanceSetting(distance);
-//            if(shooterDistanceSetting.getAngle() > maxLaunchAngle) {
-//                launchAngle = maxLaunchAngle;
-//            } else {
-//                launchAngle = shooterDistanceSetting.getAngle();
-//            }
-//            launchPower = shooterDistanceSetting.getPower();
-//            rotationAngle = Math.tan((launcherTranslation.getY()-currentTarget.position.getY())/(launcherTranslation.getX()-currentTarget.position.getX()));
-//        }
     }
 
     public void setWantedState(ShooterState state) {
@@ -369,13 +299,108 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     /**
-     * Sets the angle to point the turret at when using one of the distance presets (in degrees).
+     * Sets the angle to point the turret at when {@link #autoAimTurret} is false (in degrees).
      *
-     * @param wantedAngleDegrees The angle to point the turret at when using one of the distance
-     *                           presets (in degrees).
+     * @param wantedAngleDegrees The angle to point the turret at when {@link #autoAimTurret} is
+     *                           false (in degrees).
      */
-    public void setTurretPresetAngle(double wantedAngleDegrees) {
-        turretPresetAngleDegrees = wantedAngleDegrees;
+    public void setTurretFixedAngle(double wantedAngleDegrees) {
+        turretFixedAngleDegrees = wantedAngleDegrees;
+    }
+
+    /**
+     * Sets if the turret should automatically point at either the hub or the corners. If false,
+     * the turret will point at the {@link #turretFixedAngleDegrees} instead. Note that this will
+     * be ignored if the state is {@link ShooterState#FULLY_AUTOMATIC}.
+     *
+     * @param shouldAutoAimTurret If the turret should aim automatically.
+     */
+    public void setAutoAimTurret(boolean shouldAutoAimTurret) {
+        autoAimTurret = shouldAutoAimTurret;
+    }
+
+    /**
+     * Gets the {@link Translation2d} of the target that we should aim at, based on the location of
+     * the robot on the field. Specifically, determines if we should aim at the hub or the corner
+     * of the alliance zone, determines which corner to aim at if aiming at the corner, and gets
+     * the correct {@link Translation2d} of this target based on the alliance.
+     *
+     * @return The {@link Translation2d} of the target we should aim at.
+     */
+    private Translation2d getTargetTranslation2d() {
+        Pose2d robotPose = BaseRobotState.robotPose;
+        double robotXMeters = robotPose.getX();
+        double robotYMeters = robotPose.getY();
+        boolean isBlueAlliance = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
+        boolean isInAllianceZone = isBlueAlliance
+            ? robotXMeters < ROBOT_STARTING_LINE
+            : robotXMeters > FlippingUtil.fieldSizeX - ROBOT_STARTING_LINE;
+        if (isInAllianceZone) {
+            // Aim at hub
+            return flipTranslation2dBasedOnAlliance(HUB_TRANSLATION_2D);
+        }
+        else {
+            // Aim at corner on alliance side. Determine left or right based on which half of the
+            // field we are on.
+            // Left and right are from driver station perspective, so if we are blue alliance, we
+            // are on the left if y is greater than the middle, and if we are red alliance, we are
+            // on the left if y is less than the middle.
+            if (isBlueAlliance == robotYMeters > (FlippingUtil.fieldSizeY / 2)) {
+                return flipTranslation2dBasedOnAlliance(LEFT_CORNER_TRANSLATION_2D);
+            }
+            else {
+                return flipTranslation2dBasedOnAlliance(RIGHT_CORNER_TRANSLATION_2D);
+            }
+        }
+    }
+
+    /**
+     * Flips the passed in {@link Translation2d} based on the alliance.
+     *
+     * @param blueTranslation2d The {@link Translation2d} to flip. This should be the {@link
+     * Translation2d} for the blue alliance side.
+     * @return The original {@link Translation2d} if the alliance is blue, or the flipped {@link
+     * Translation2d} if the alliance is red.
+     */
+    private Translation2d flipTranslation2dBasedOnAlliance(Translation2d blueTranslation2d) {
+        return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue
+            ? blueTranslation2d
+            : FlippingUtil.flipFieldPosition(blueTranslation2d);
+    }
+
+    /**
+     * Automatically points the turret at the passed in target.
+     *
+     * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
+     */
+    private void aimTurretAtTarget(Translation2d targetTranslation2d) {
+        Pose2d robotPose = BaseRobotState.robotPose;
+        Translation2d robotTranslation2d = robotPose.getTranslation();
+        Translation2d shooterTranslation2d = robotTranslation2d.plus(SHOOTER_OFFSET.toTranslation2d());
+        Translation2d shooterToTargetTranslation2d = targetTranslation2d.minus(shooterTranslation2d);
+        Rotation2d fieldRelativeRotation2dToTarget = shooterToTargetTranslation2d.getAngle();
+        Rotation2d robotRotation2d = robotPose.getRotation();
+        Rotation2d robotRelativeRotation2dToTarget = fieldRelativeRotation2dToTarget.minus(robotRotation2d);
+        double robotRelativeDegreesToTarget = robotRelativeRotation2dToTarget.getDegrees();
+        setTurretAngle(robotRelativeDegreesToTarget);
+    }
+
+    /**
+     * Automatically points the incline and spins up the launchers to shoot at the passed in target
+     * at hub height using the shooter lookup table.
+     *
+     * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
+     */
+    private void aimInclineAndLaunchersAtTarget(Translation2d targetTranslation2d) {
+        Pose2d robotPose = BaseRobotState.robotPose;
+        Translation2d robotTranslation2d = robotPose.getTranslation();
+        Translation2d shooterTranslation2d = robotTranslation2d.plus(SHOOTER_OFFSET.toTranslation2d());
+        double distanceToTarget = shooterTranslation2d.getDistance(targetTranslation2d);
+        ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator.getShooterDistanceSetting(distanceToTarget);
+        double inclineAngleDegrees = shooterDistanceSetting.getAngle();
+        double launchVelocityRPS = shooterDistanceSetting.getPower();
+        setInclineAngle(inclineAngleDegrees);
+        setLaunchVelocities(launchVelocityRPS);
     }
 
     /**
@@ -444,16 +469,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         turretMotorOffsetRotations = turretMotor.getMotorPosition() - beamBreakPositionMotorRotations;
         turretMotor.setControl(turretDutyCycleOutRequest.withOutput(0));
         isTurretCalibrated = true;
-    }
-
-    private void setAutomaticRotationAngle() {
-        if(wantedState != ShooterState.AUTOMATIC) return;
-
-        Rotation2d robotCentricWantedAngle =
-            currentTarget.getPosition().toTranslation2d()
-                .minus(BaseRobotState.robotPose.getTranslation())
-                .getAngle()
-                .minus(BaseRobotState.robotPose.getRotation());
     }
 
     /**
@@ -569,19 +584,17 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @return The current field-relative {@link Pose2d} of the turret.
      */
     private Pose2d getCurrentTurretPose2d() {
-        Pose2d robotPose = BaseRobotState.robotPose;
+        Translation2d robotToTurretTranslation2d = SHOOTER_OFFSET.toTranslation2d();
+        Rotation2d robotToTurretRotation2d = getCurrentRobotRelativeTurretRotation2d();
 
-        // Just show the turret in the center of the robot for now.
-        Translation2d fieldRelativeTurretTranslation2d = robotPose.getTranslation();
-
-        Rotation2d fieldRelativeRobotRotation2d = robotPose.getRotation();
-        Rotation2d robotRelativeTurretRotation2d = getCurrentRobotRelativeTurretRotation2d();
-        Rotation2d fieldRelativeTurretRotation2d = fieldRelativeRobotRotation2d.plus(robotRelativeTurretRotation2d);
-
-        return new Pose2d(
-            fieldRelativeTurretTranslation2d,
-            fieldRelativeTurretRotation2d
+        Transform2d robotToTurretTransform2d = new Transform2d(
+            robotToTurretTranslation2d,
+            robotToTurretRotation2d
         );
+
+        Pose2d robotPose2d = BaseRobotState.robotPose;
+
+        return robotPose2d.transformBy(robotToTurretTransform2d);
     }
 
     /**
@@ -617,7 +630,12 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @return If the shooter is aimed.
      */
     public boolean isAimed() {
-        return areLaunchMotorsAimed() && isInclineAimed() && isTurretAimed();
+        return areLaunchMotorsAimed()
+            && isInclineAimed()
+            && isTurretAimed()
+            // If we are auto trying to auto aim but don't actually know where we are, we are
+            // probably not aimed correctly.
+            && !(isAutoAiming && !BaseRobotState.hasAccuratePoseEstimate);
     }
 
     public enum ShooterState {
@@ -633,10 +651,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             factory.getConstant(NAME,"distanceThreeInclineAngleDegrees",0),
             factory.getConstant(NAME,"distanceThreeLaunchVelocityRPS",0)
         ),
-        AUTOMATIC(-1, -1),
-        AIMING_HUB(-1, -1),
-        SNOWBLOWING(-1, -1),
-        AIMING_CORNER(-1, -1),
+        FULLY_AUTOMATIC(-1, -1),
         IDLE(0, 0);
 
         private final double inclineAngleDegrees, launchVelocityRPS;

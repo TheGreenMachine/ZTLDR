@@ -39,6 +39,8 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
      * lower current to just hold it out instead of pushing it out.
      */
     private final double FLIPPER_MOTOR_OUT_MINIMUM_POSITION;
+    private final double FLIPPER_MOTOR_PULL_IN_ONE_POSITION;
+    private final double FLIPPER_MOTOR_PULL_IN_TWO_POSITION;
     private final double FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES;
     private final double FLIPPER_MOTOR_EXTEND_CURRENT_AMPERES;
     private final double FLIPPER_MOTOR_HOLD_OUT_CURRENT_AMPERES;
@@ -51,15 +53,17 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     private MechanismLigament2d intakeAngleML = intakeMechRoot.append(
         new MechanismLigament2d("Intake Angle", 1.5, 0));
 
-    private FlipperPosition flipperPosition;
-
     public Intake () {
         super();
         SmartDashboard.putData("Intake", intakeMech);
         FLIPPER_MOTOR_OUT_MINIMUM_POSITION = factory.getConstant(NAME, "flipperMotorOutMinimumPosition", 0);
+        FLIPPER_MOTOR_PULL_IN_ONE_POSITION = factory.getConstant(NAME, "flipperMotorPullInOnePosition", 0);
+        FLIPPER_MOTOR_PULL_IN_TWO_POSITION = factory.getConstant(NAME, "flipperMotorPullInTwoPosition", 0);
         FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES = factory.getConstant(NAME, "flipperMotorRetractCurrentAmperes", 0);
         FLIPPER_MOTOR_EXTEND_CURRENT_AMPERES = factory.getConstant(NAME, "flipperMotorExtendCurrentAmperes", 0);
         FLIPPER_MOTOR_HOLD_OUT_CURRENT_AMPERES = factory.getConstant(NAME, "flipperMotorHoldOutCurrentAmperes", 0);
+
+        GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
     }
 
     @Override
@@ -83,7 +87,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         double intakeSpeed = wantedState.getIntakeMotorValue();
-        flipperPosition = wantedState.getFlipperMotorPosition();
+        FlipperPosition flipperPosition = wantedState.getFlipperMotorPosition();
 
         setIntakeSpeed(intakeSpeed);
         setFlipperPosition(flipperPosition);
@@ -105,41 +109,45 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void setFlipperPosition(FlipperPosition position) {
-        if (position == FlipperPosition.IN) {
-            flipperMotor.setControl(
+        switch (position) {
+            case IN -> flipperMotor.setControl(
                 flipperMotorTorqueCurrentRequest.withOutput(FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES)
             );
-        }
-        else if (position == FlipperPosition.POSITION_1) {
-            if (flipperMotor.getMotorPosition() > 0.105) {
-                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES));
+            case OUT -> {
+                if (flipperMotor.getMotorPosition() < FLIPPER_MOTOR_OUT_MINIMUM_POSITION) {
+                    flipperMotor.setControl(
+                        flipperMotorTorqueCurrentRequest.withOutput(FLIPPER_MOTOR_EXTEND_CURRENT_AMPERES)
+                    );
+                }
+                else {
+                    flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(
+                        FLIPPER_MOTOR_HOLD_OUT_CURRENT_AMPERES)
+                    );
+                }
             }
-            else {
-                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(
-                    0)
-                );
+            case PULL_IN_ONE -> {
+                if (flipperMotor.getMotorPosition() > FLIPPER_MOTOR_PULL_IN_ONE_POSITION) {
+                    flipperMotor.setControl(
+                        flipperMotorTorqueCurrentRequest.withOutput(FLIPPER_MOTOR_HOLD_OUT_CURRENT_AMPERES)
+                    );
+                }
+                else {
+                    flipperMotor.setControl(
+                        flipperMotorTorqueCurrentRequest.withOutput(0)
+                    );
+                }
             }
-        }
-        else if (position == FlipperPosition.POSITION_2) {
-            if (flipperMotor.getMotorPosition() > 0.046) {
-                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES));
-            }
-            else {
-                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(
-                    0)
-                );
-            }
-        }
-        else {
-            if (flipperMotor.getMotorPosition() < FLIPPER_MOTOR_OUT_MINIMUM_POSITION) {
-                flipperMotor.setControl(
-                    flipperMotorTorqueCurrentRequest.withOutput(FLIPPER_MOTOR_EXTEND_CURRENT_AMPERES)
-                );
-            }
-            else {
-                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(
-                    FLIPPER_MOTOR_HOLD_OUT_CURRENT_AMPERES)
-                );
+            case PULL_IN_TWO -> {
+                if (flipperMotor.getMotorPosition() > FLIPPER_MOTOR_PULL_IN_TWO_POSITION) {
+                    flipperMotor.setControl(
+                        flipperMotorTorqueCurrentRequest.withOutput(FLIPPER_MOTOR_HOLD_OUT_CURRENT_AMPERES)
+                    );
+                }
+                else {
+                    flipperMotor.setControl(
+                        flipperMotorTorqueCurrentRequest.withOutput(0)
+                    );
+                }
             }
         }
     }
@@ -152,27 +160,15 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     public boolean isOutaking() { return (wantedState == IntakeState.INTAKE); }
 
-    public void incrementFlipperInwards() {
-        switch (flipperPosition) {
-            case OUT -> wantedState = IntakeState.INTAKE_POSITION_1;
-            case POSITION_1 -> wantedState = IntakeState.INTAKE_POSITION_2;
-            case POSITION_2 -> wantedState = IntakeState.STOW;
-        }
-    }
-
-    public void resetFlipperOut() {
-        wantedState = IntakeState.INTAKE;
-    }
-
     /**
      * The position of the flipper. This is not just a number, since we are doing a custom current
      * based control, so the behavior is completely different for going in and out.
      */
-    private enum FlipperPosition {
+    public enum FlipperPosition {
         IN,
         OUT,
-        POSITION_1,
-        POSITION_2
+        PULL_IN_ONE,
+        PULL_IN_TWO
     }
 
     public enum IntakeState {
@@ -184,13 +180,13 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
             factory.getConstant(NAME, "intakeOnSpeed", .5, true),
             FlipperPosition.OUT
         ),
-        INTAKE_POSITION_1(
-            factory.getConstant(NAME, "intakeOnSpeed", .5, true),
-            FlipperPosition.POSITION_1
+        PULL_IN_ONE(
+            factory.getConstant(NAME, "intakeOnSpeed", 0),
+            FlipperPosition.PULL_IN_ONE
         ),
-        INTAKE_POSITION_2(
-            factory.getConstant(NAME, "intakeOnSpeed", .5, true),
-            FlipperPosition.POSITION_2
+        PULL_IN_TWO(
+            factory.getConstant(NAME, "intakeOnSpeed", 0),
+            FlipperPosition.PULL_IN_TWO
         );
 
         private double intakeMotorValue;
