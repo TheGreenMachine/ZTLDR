@@ -1,0 +1,127 @@
+{
+ "name":"hi",
+ "version":2,
+ "type":"Swerve",
+ "variables":{
+  "expressions":{},
+  "poses":{
+   "End":{
+    "x":{
+     "exp":"5.696086883544922 m",
+     "val":5.696086883544922
+    },
+    "y":{
+     "exp":"0.7283875346183777 m",
+     "val":0.7283875346183777
+    },
+    "heading":{
+     "exp":"End.heading",
+     "val":0.0
+    }
+   },
+   "FreeGate":{
+    "x":{
+     "exp":"5.691760063171387 m",
+     "val":5.691760063171387
+    },
+    "y":{
+     "exp":"0.5559641718864441 m",
+     "val":0.5559641718864441
+    },
+    "heading":{
+     "exp":"0 deg",
+     "val":0.0
+    }
+   },
+   "Start":{
+    "x":{
+     "exp":"4.425225734710693 m",
+     "val":4.425225734710693
+    },
+    "y":{
+     "exp":"0.5559637546539307 m",
+     "val":0.5559637546539307
+    },
+    "heading":{
+     "exp":"0 deg",
+     "val":0.0
+    }
+   }
+  }
+ },
+ "config":{
+  "frontLeft":{
+   "x":{
+    "exp":"0.2525 m",
+    "val":0.2525
+   },
+   "y":{
+    "exp":"0.2525 m",
+    "val":0.2525
+   }
+  },
+  "backLeft":{
+   "x":{
+    "exp":"-0.2525 m",
+    "val":-0.2525
+   },
+   "y":{
+    "exp":"-0.2525 m",
+    "val":-0.2525
+   }
+  },
+  "mass":{
+   "exp":"56.7 kg",
+   "val":56.7
+  },
+  "inertia":{
+   "exp":"1.5 kg m ^ 2",
+   "val":1.5
+  },
+  "gearing":{
+   "exp":"6.03",
+   "val":6.03
+  },
+  "radius":{
+   "exp":"2 in",
+   "val":0.0508
+  },
+  "vmax":{
+   "exp":"3000 RPM",
+   "val":314.1592653589793
+  },
+  "tmax":{
+   "exp":"3 N * m",
+   "val":3.0
+  },
+  "cof":{
+   "exp":"1.5",
+   "val":1.5
+  },
+  "bumper":{
+   "front":{
+    "exp":"0.4305 m",
+    "val":0.4305
+   },
+   "side":{
+    "exp":"0.4305 m",
+    "val":0.4305
+   },
+   "back":{
+    "exp":"0.4305 m",
+    "val":0.4305
+   }
+  },
+  "differentialTrackWidth":{
+   "exp":"22 in",
+   "val":0.5588
+  }
+ },
+ "generationFeatures":[],
+ "codegen":{
+  "root":"../C:/Users/ethan/IdeaProjects/ZTLDR/src/main/deploy/choreo",
+  "genVars":true,
+  "genTrajData":true,
+  "useChoreoLib":true
+ }
+}
