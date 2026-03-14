@@ -62,6 +62,8 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES = factory.getConstant(NAME, "flipperMotorRetractCurrentAmperes", 0);
         FLIPPER_MOTOR_EXTEND_CURRENT_AMPERES = factory.getConstant(NAME, "flipperMotorExtendCurrentAmperes", 0);
         FLIPPER_MOTOR_HOLD_OUT_CURRENT_AMPERES = factory.getConstant(NAME, "flipperMotorHoldOutCurrentAmperes", 0);
+
+        GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
     }
 
     @Override
