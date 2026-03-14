@@ -169,7 +169,7 @@ public class GreenLogger {
             // For NTSendables, log using the SmartDashboard. This will automatically hand periodic
             // updating based on the NTSendable's internal state. Note that this will not work
             // properly if the result of the supplier changes after the initial call.
-            SmartDashboard.putData(name, (NTSendable) result);
+            //SmartDashboard.putData(name, (NTSendable) result);
             // The publisher is null for NTSendables, since we use the SmartDashboard instead.
             pub = null;
         } else {

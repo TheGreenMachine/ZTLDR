@@ -227,7 +227,7 @@ subsystems:
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
         constants:
-            fastFeeding: 0.296
+            fastFeeding: 0.7
             slowFeeding: 0.086
             reversing: 0
             idling: 0
@@ -254,10 +254,10 @@ subsystems:
         constants: # TODO: all of these
             intakeOnSpeed: .35
             intakeOffSpeed: 0
-            flipperMotorOutMinimumPosition: 0.0058
-            flipperMotorRetractCurrentAmperes: -1
-            flipperMotorExtendCurrentAmperes: 30
-            flipperMotorHoldOutCurrentAmperes: 15
+            flipperMotorOutMinimumPosition: 0.166
+            flipperMotorRetractCurrentAmperes: -20
+            flipperMotorExtendCurrentAmperes: 20
+            flipperMotorHoldOutCurrentAmperes: 8
     gatekeeper:
         canBusName: shootercanivore
         devices:
@@ -335,7 +335,7 @@ subsystems:
                 deviceType: CANcoder
                 sensorDirection: Clockwise_Positive # TODO: Make this actually get applied to the config. See #153 in the GitHub Project.
                 absoluteSensorDiscontinuityPoint: 0.625 # See above TODO.
-                magnetOffset: -0.35748674479 # See above TODO.
+                magnetOffset: -0.190 # See above TODO.
             candi:
                 id: 6
                 deviceType: CANdi
@@ -361,6 +361,7 @@ subsystems:
             launchAngleMotorBottomLimitRotations: 0.046
             launchAngleMotorTopLimitRotations: 0.109
     vision:
+        implemented: true
         cameras:
             forwardLeft: # Pi IP: 10.18.16.11
                 photonVisionUIName: Forward_Left

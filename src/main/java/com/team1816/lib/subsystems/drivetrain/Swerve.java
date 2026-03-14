@@ -113,7 +113,7 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
 
         if (wantedState != previousWantedState) {
             GreenLogger.log("Swerve state: " + wantedState.toString());
-            SmartDashboard.putString("Swerve state: ", wantedState.toString());
+            //SmartDashboard.putString("Swerve state: ", wantedState.toString());
             previousWantedState = wantedState;
         }
     }

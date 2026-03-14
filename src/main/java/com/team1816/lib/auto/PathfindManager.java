@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class PathfindManager {
     public PathfindManager() {
         commandChooser = new SendableChooser<>();
-        SmartDashboard.putData("Pathfind Target", commandChooser);
+        //SmartDashboard.putData("Pathfind Target", commandChooser);
 
         commandChooser.setDefaultOption("None", null);
 

@@ -51,9 +51,11 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     private MechanismLigament2d intakeAngleML = intakeMechRoot.append(
         new MechanismLigament2d("Intake Angle", 1.5, 0));
 
+    FlipperPosition flipperPosition;
+
     public Intake () {
         super();
-        SmartDashboard.putData("Intake", intakeMech);
+        //SmartDashboard.putData("Intake", intakeMech);
         FLIPPER_MOTOR_OUT_MINIMUM_POSITION = factory.getConstant(NAME, "flipperMotorOutMinimumPosition", 0);
         FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES = factory.getConstant(NAME, "flipperMotorRetractCurrentAmperes", 0);
         FLIPPER_MOTOR_EXTEND_CURRENT_AMPERES = factory.getConstant(NAME, "flipperMotorExtendCurrentAmperes", 0);
@@ -81,7 +83,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         double intakeSpeed = wantedState.getIntakeMotorValue();
-        FlipperPosition flipperPosition = wantedState.getFlipperMotorPosition();
+        flipperPosition = wantedState.getFlipperMotorPosition();
 
         setIntakeSpeed(intakeSpeed);
         setFlipperPosition(flipperPosition);
@@ -91,9 +93,9 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
             GreenLogger.log("Intake speed: " + intakeSpeed);
             GreenLogger.log("Intake position: " + flipperPosition);
 
-            SmartDashboard.putString("Intake state: ", wantedState.toString());
-            SmartDashboard.putNumber("Intake speed: ", intakeSpeed);
-            SmartDashboard.putString("Intake position: ", String.valueOf(flipperPosition));
+            //SmartDashboard.putString("Intake state: ", wantedState.toString());
+            //SmartDashboard.putNumber("Intake speed: ", intakeSpeed);
+            //SmartDashboard.putString("Intake position: ", String.valueOf(flipperPosition));
             previousWantedState = wantedState;
         }
     }
@@ -108,6 +110,36 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
                 flipperMotorTorqueCurrentRequest.withOutput(FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES)
             );
         }
+        else if (position == FlipperPosition.POSITION_1) {
+            if (flipperMotor.getMotorPosition() > 0.105) {
+                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES));
+            }
+            else {
+                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(
+                    FLIPPER_MOTOR_EXTEND_CURRENT_AMPERES)
+                );
+            }
+        }
+        else if (position == FlipperPosition.POSITION_2) {
+            if (flipperMotor.getMotorPosition() > 0.046) {
+                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES));
+            }
+            else {
+                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(
+                    FLIPPER_MOTOR_EXTEND_CURRENT_AMPERES)
+                );
+            }
+        }
+//        else if (position == FlipperPosition.POSITION_3) {
+//            if (flipperMotor.getMotorPosition() > ) {
+//                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES));
+//            }
+//        }
+//        else if (position == FlipperPosition.POSITION_4) {
+//            if (flipperMotor.getMotorPosition() > ) {
+//                flipperMotor.setControl(flipperMotorTorqueCurrentRequest.withOutput(FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES));
+//            }
+//        }
         else {
             if (flipperMotor.getMotorPosition() < FLIPPER_MOTOR_OUT_MINIMUM_POSITION) {
                 flipperMotor.setControl(
@@ -120,6 +152,23 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
                 );
             }
         }
+    }
+
+    public void incrementFlipperInwards() {
+        switch (flipperPosition) {
+            case OUT -> wantedState = INTAKE_STATE.INTAKE_POSITION_2;
+            case POSITION_2 -> wantedState = INTAKE_STATE.INTAKE_POSITION_1;
+            case POSITION_1 -> wantedState = INTAKE_STATE.INTAKE_IN_AND_OFF;
+//            case OUT -> wantedState = INTAKE_STATE.INTAKE_POSITION_4;
+//            case POSITION_4 -> wantedState = INTAKE_STATE.INTAKE_POSITION_3;
+//            case POSITION_3 -> wantedState = INTAKE_STATE.INTAKE_POSITION_2;
+//            case POSITION_2 -> wantedState = INTAKE_STATE.INTAKE_POSITION_1;
+//            case POSITION_1 -> wantedState = INTAKE_STATE.INTAKE_IN_AND_OFF;
+        }
+    }
+
+    public void resetFlipperOut() {
+        wantedState = INTAKE_STATE.INTAKE_OUT_AND_ON;
     }
 
     public void setWantedState(INTAKE_STATE state) {
@@ -136,7 +185,11 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
      */
     private enum FlipperPosition {
         IN,
-        OUT
+        OUT,
+        POSITION_1,
+        POSITION_2
+//        POSITION_3,
+//        POSITION_4
     }
 
     public enum INTAKE_STATE {
@@ -147,7 +200,23 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         INTAKE_OUT_AND_ON(
             factory.getConstant(NAME, "intakeOnSpeed", .5, true),
             FlipperPosition.OUT
+        ),
+        INTAKE_POSITION_1(
+            factory.getConstant(NAME, "intakeOnSpeed", .5, true),
+            FlipperPosition.POSITION_1
+        ),
+        INTAKE_POSITION_2(
+            factory.getConstant(NAME, "intakeOnSpeed", .5, true),
+            FlipperPosition.POSITION_2
         );
+//        INTAKE_POSITION_3(
+//            factory.getConstant(NAME, "intakeOnSpeed", .5, true),
+//            FlipperPosition.POSITION_3
+//        ),
+//        INTAKE_POSITION_4(
+//            factory.getConstant(NAME, "intakeOnSpeed", .5, true),
+//            FlipperPosition.POSITION_4
+//        );
 
         private double intakeMotorValue;
         private final FlipperPosition flipperMotorPosition;

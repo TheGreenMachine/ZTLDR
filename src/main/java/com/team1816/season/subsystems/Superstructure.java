@@ -15,7 +15,7 @@ public class Superstructure extends BaseSuperstructure {
     private final Shooter shooter;
     private final Gatekeeper gatekeeper;
     private final Intake intake;
-    private final Feeder feeder;
+    public final Feeder feeder;
     private final Climber climber;
 
     private CommandXboxController controller;
@@ -106,6 +106,7 @@ public class Superstructure extends BaseSuperstructure {
     private FeederControlState feederControlState = FeederControlState.DEFAULTING; //What to do with this?
     private boolean isAutonomous = false;
 
+
     private ClimbSide climbSide = ClimbSide.LEFT;
 
     public Superstructure(Swerve swerve, Vision vision) {
@@ -128,7 +129,7 @@ public class Superstructure extends BaseSuperstructure {
         if (wantedSuperState != previousWantedSuperState) {
             GreenLogger.log("Wanted Superstate " + wantedSuperState);
             GreenLogger.log("Actual Superstate " + actualSuperState);
-            SmartDashboard.putString("Super state: ", wantedSuperState.toString());
+            //SmartDashboard.putString("Super state: ", wantedSuperState.toString());
             previousWantedSuperState = wantedSuperState;
         }
     }
@@ -284,10 +285,19 @@ public class Superstructure extends BaseSuperstructure {
         if (intake.isIntaking()) {
             feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
         } else {
-            feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
+            feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
         }
 
         actualSuperState = ActualSuperState.DEFAULTING;
+    }
+
+    private void feederReversingToggle() {
+        if (feeder.getWantedState() == Feeder.FEEDER_STATE.REVERSING){
+            feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
+        } else if (feeder.getWantedState() == Feeder.FEEDER_STATE.FAST_FEEDING){
+            feeder.setWantedState(Feeder.FEEDER_STATE.REVERSING);
+        }
+
     }
 
     private void climbingL1() {
@@ -341,5 +351,13 @@ public class Superstructure extends BaseSuperstructure {
         } else {
             setWantedSuperState(WantedSuperState.SHOOTER_AUTOMATIC_HUB);
         }
+    }
+
+    public void incrementFlipperInwards() {
+        intake.incrementFlipperInwards();
+    }
+
+    public void resetFlipperOut() {
+        intake.resetFlipperOut();
     }
 }
