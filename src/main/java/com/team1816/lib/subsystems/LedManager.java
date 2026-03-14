@@ -87,7 +87,13 @@ public class LedManager extends SubsystemBase implements ITestableSubsystem {
 
     private void writeToLed(int r, int g, int b) {
         SOLID_COLOR.Color = new RGBWColor(r,g,b);
-        lastStatusCode = candle.setControl(SOLID_COLOR);
+        // Only write to CANdle if the device is connected to avoid CAN timeout stalls
+        // (20-133ms blocking) when the device drops off the bus
+        if (candle.isConnected()) {
+            lastStatusCode = candle.setControl(SOLID_COLOR);
+        } else {
+            lastStatusCode = StatusCode.OK;
+        }
         // special handling for Phoenix6 5 and ghosting to prevent cluttering up IPhoenix6 interface
         if (canifier instanceof CANifierImpl) {
             ((CANifierImpl)canifier).setLEDOutput(r / 255.0, CANifier.LEDChannel.LEDChannelB);

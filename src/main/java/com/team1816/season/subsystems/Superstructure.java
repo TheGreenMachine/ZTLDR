@@ -331,6 +331,9 @@ public class Superstructure extends BaseSuperstructure {
     public void autonomousInit() {
         isAutonomous = true;
         swerve.setWantedState(Swerve.ActualState.IDLING);
+        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT_AND_ON);
+        shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
+        gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
     }
 
     public void teleopInit() {
