@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "BottomBlueToMiddleStart0"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BottomBlueToMiddle.0"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BottomBlueToMiddleStart1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BottomBlueToMiddle.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BottomBlueToMiddleStart2"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": "Choreo Autos",
+  "choreoAuto": true
+}
