@@ -255,9 +255,9 @@ subsystems:
             flipperMotorOutMinimumPosition: 0.166
             flipperMotorPullInOnePosition: 0.1
             flipperMotorPullInTwoPosition: 0.05
-            flipperMotorRetractCurrentAmperes: -1
+            flipperMotorRetractCurrentAmperes: -20
             flipperMotorExtendCurrentAmperes: 30
-            flipperMotorHoldOutCurrentAmperes: 15
+            flipperMotorHoldOutCurrentAmperes: 8
     gatekeeper:
         canBusName: shootercanivore
         devices:
