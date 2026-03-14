@@ -1,7 +1,6 @@
 package com.team1816.season.subsystems;
 
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.GreenLogger;
@@ -9,7 +8,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,8 +18,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     //CLASS
     public static final String NAME = "climber";
 
-    private CLIMBER_STATE wantedState = CLIMBER_STATE.IDLING;
-    private CLIMBER_STATE previousWantedState = CLIMBER_STATE.IDLING;
+    private ClimberState wantedState = ClimberState.IDLING;
 
     //MOTORS
     private final IMotor flipMotor = (IMotor)factory.getDevice(NAME, "flipMotor");
@@ -44,7 +41,8 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
 
     public Climber () {
         super();
-        SmartDashboard.putData("Climber", climberMech);
+        GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
+        GreenLogger.periodicLog("Climber", () -> climberMech);
     }
 
     @Override
@@ -74,11 +72,6 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     private void applyState() {
         setFlipMotor(wantedState.getFlipMotorValue());
         setLinearSlideMotor(wantedState.getLinearSlideMotorValue());
-
-        if (wantedState != previousWantedState) {
-            GreenLogger.log("Climber state: " + wantedState.toString());
-            previousWantedState = wantedState;
-        }
     }
 
     private void setFlipMotor(double position){
@@ -93,11 +86,11 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
         linearSlideMotor.setControl(positionReq.withPosition(clampedPosition));
     }
 
-    public void setWantedState(CLIMBER_STATE wantedState) {
+    public void setWantedState(ClimberState wantedState) {
         this.wantedState = wantedState;
     }
 
-    public enum CLIMBER_STATE {
+    public enum ClimberState {
         IDLING(factory.getConstant(NAME, "flipIdling", 0), factory.getConstant(NAME, "linearSlideIdling", 0)),
         L3_UP_CLIMBING(factory.getConstant(NAME, "flipL3UpClimbing", 0), factory.getConstant(NAME, "linearSlideL3UpClimbing", 0)),
         L3_DOWN_CLIMBING(factory.getConstant(NAME, "flipL3DownClimbing", 0), factory.getConstant(NAME, "linearSlideL3DownClimbing", 0)),
@@ -106,7 +99,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
 
         private double flipMotorValue, linearSlideMotorValue;
 
-        CLIMBER_STATE (double flipMotorValue, double linearSlideMotorValue){
+        ClimberState(double flipMotorValue, double linearSlideMotorValue){
             this.flipMotorValue = flipMotorValue;
             this.linearSlideMotorValue = linearSlideMotorValue;
         }

@@ -1,13 +1,10 @@
 package com.team1816.season.subsystems;
 
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.team1816.lib.Singleton;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.team1816.lib.Singleton.factory;
@@ -16,8 +13,7 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
     //CLASS
     public static final String NAME = "feeder";
 
-    private FEEDER_STATE wantedState = FEEDER_STATE.IDLING;
-    private FEEDER_STATE previousWantedState = FEEDER_STATE.IDLING;
+    private FeederState wantedState = FeederState.IDLING;
 
     //MOTORS
     private final IMotor feedMotor = (IMotor)factory.getDevice(NAME, "feedMotor");
@@ -27,6 +23,11 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
     //PHYSICAL SUBSYSTEM DEPENDENT CONSTANTS
     private static final double MIN_FEED_MOTOR_CLAMP = -80;
     private static final double MAX_FEED_MOTOR_CLAMP = 80;
+
+    public Feeder() {
+        super();
+        GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
+    }
 
     @Override
     public void periodic() {
@@ -46,12 +47,6 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         setFeedVelocity(wantedState.getFeedMotorValue());
-
-        if (wantedState != previousWantedState) {
-            GreenLogger.log("Feeder state: " + wantedState.toString());
-            SmartDashboard.putString("Feeder state: ", wantedState.toString());
-            previousWantedState = wantedState;
-        }
     }
 
     private void setFeedVelocity(double feedVelocity){
@@ -60,11 +55,11 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
         feedMotor.setControl(dutyCycleOut.withOutput(clampedVelocity));
     }
 
-    public void setWantedState(FEEDER_STATE state) {
+    public void setWantedState(FeederState state) {
         wantedState = state;
     }
 
-    public enum FEEDER_STATE {
+    public enum FeederState {
         SLOW_FEEDING(factory.getConstant(NAME, "fastFeeding", 0)),
         FAST_FEEDING(factory.getConstant(NAME, "slowFeeding", 0)),
         REVERSING(factory.getConstant(NAME, "reversing", 0)),
@@ -72,7 +67,7 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
 
         private double feedMotorValue;
 
-        FEEDER_STATE (double feedMotorValue){
+        FeederState(double feedMotorValue){
             this.feedMotorValue = feedMotorValue;
         }
 

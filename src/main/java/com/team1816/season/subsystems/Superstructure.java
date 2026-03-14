@@ -145,10 +145,10 @@ public class Superstructure extends BaseSuperstructure {
 
     private void setWantedSubsystemStates(
         Intake.IntakeState intakeState,
-        Feeder.FEEDER_STATE feederState,
-        Gatekeeper.GATEKEEPER_STATE gatekeeperState,
+        Feeder.FeederState feederState,
+        Gatekeeper.GatekeeperState gatekeeperState,
         Shooter.ShooterState shooterState,
-        Climber.CLIMBER_STATE climbState
+        Climber.ClimberState climbState
     )  {
         intake.setWantedState(intakeState);
         feeder.setWantedState(feederState);
@@ -176,10 +176,10 @@ public class Superstructure extends BaseSuperstructure {
         gatekeeper.setWantedState(
             shooter.isAimed()
                 ? switch (wantedGatekeeperState) {
-                    case OPEN -> Gatekeeper.GATEKEEPER_STATE.OPEN;
-                    case CLOSE -> Gatekeeper.GATEKEEPER_STATE.CLOSED;
+                    case OPEN -> Gatekeeper.GatekeeperState.OPEN;
+                    case CLOSE -> Gatekeeper.GatekeeperState.CLOSED;
                 }
-                : Gatekeeper.GATEKEEPER_STATE.CLOSED
+                : Gatekeeper.GatekeeperState.CLOSED
         );
         intake.setWantedState(
             switch (wantedIntakeState) {
@@ -189,31 +189,31 @@ public class Superstructure extends BaseSuperstructure {
         );
         feeder.setWantedState(
             switch (wantedFeederState) {
-                case FEED -> Feeder.FEEDER_STATE.SLOW_FEEDING;
-                case IDLE -> Feeder.FEEDER_STATE.IDLING;
+                case FEED -> Feeder.FeederState.SLOW_FEEDING;
+                case IDLE -> Feeder.FeederState.IDLING;
             }
         );
         climber.setWantedState(
             switch (wantedClimberState) {
-                case STOW, UP -> Climber.CLIMBER_STATE.IDLING;
-                case L1 -> Climber.CLIMBER_STATE.L1_UP_CLIMBING;
-                case L3 -> Climber.CLIMBER_STATE.L3_UP_CLIMBING;
+                case STOW, UP -> Climber.ClimberState.IDLING;
+                case L1 -> Climber.ClimberState.L1_UP_CLIMBING;
+                case L3 -> Climber.ClimberState.L3_UP_CLIMBING;
             }
         );
     }
 
     private void climbingL1() {
         // TODO: Handle Superstructure climbing behavior.
-        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FEEDER_STATE.SLOW_FEEDING,
-            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.ShooterState.IDLE,
-            Climber.CLIMBER_STATE.L1_UP_CLIMBING);
+        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FeederState.SLOW_FEEDING,
+            Gatekeeper.GatekeeperState.CLOSED, Shooter.ShooterState.IDLE,
+            Climber.ClimberState.L1_UP_CLIMBING);
     }
 
     private void climbingL3() {
         // TODO: Handle Superstructure climbing behavior.
-        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FEEDER_STATE.SLOW_FEEDING,
-            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.ShooterState.IDLE,
-            Climber.CLIMBER_STATE.L3_UP_CLIMBING);
+        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FeederState.SLOW_FEEDING,
+            Gatekeeper.GatekeeperState.CLOSED, Shooter.ShooterState.IDLE,
+            Climber.ClimberState.L3_UP_CLIMBING);
     }
 
     public enum WantedSuperState {
