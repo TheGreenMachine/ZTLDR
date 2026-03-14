@@ -103,13 +103,13 @@ public class RobotContainer extends BaseRobotContainer {
             {
                 superstructure.setInclineDucking(true);
                 superstructure.setWantedSubsystemStates(
-                    Intake.IntakeState.INTAKE_POSITION_2,
-                    Feeder.FEEDER_STATE.FAST_FEEDING,
-                    Gatekeeper.GATEKEEPER_STATE.CLOSED,
+                    Intake.IntakeState.PULL_IN_TWO,
+                    Feeder.FeederState.FEEDING,
+                    Gatekeeper.GatekeeperState.CLOSED,
                     Shooter.ShooterState.IDLE,
-                    Climber.CLIMBER_STATE.IDLING
+                    Climber.ClimberState.IDLING
                 );
-                superstructure.setTurretPresetAngle(-110);
+                superstructure.setTurretFixedAngle(-110);
             }
         ));
         NamedCommands.registerCommand("BottomBlueToMiddleStart1", Commands.runOnce(() ->

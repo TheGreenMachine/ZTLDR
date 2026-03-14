@@ -276,8 +276,4 @@ public class Superstructure extends BaseSuperstructure {
         L1,
         L3
     }
-
-    public void incrementFlipperInwards() {
-        intake.incrementFlipperInwards();
-    }
 }
