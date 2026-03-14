@@ -68,7 +68,7 @@ shooterSettings:
     maximumDefaultPower: 0 # TODO: SET THIS
 subsystems:
     drivetrain:
-        implemented: false
+        implemented: true
         devices:
             flDr:
                 id: 35
@@ -219,7 +219,7 @@ subsystems:
             linearSlideL1DownClimbing: 0
 
     feeder:
-        implemented: false
+        implemented: true
         devices:
             feedMotor:
                 deviceType: TalonFX
@@ -232,7 +232,7 @@ subsystems:
             reversing: 0
             idling: 0
     intake:
-        implemented: false
+        implemented: true
         devices:
             intakeMotor:
                 id: 2
@@ -360,24 +360,50 @@ subsystems:
             inclineAngleToleranceDegrees: 2
             launcherVelocityToleranceRPS: 2
     vision:
-        implemented: false
         cameras:
-            exampleCamera:
-                photonVisionUIName: UI Name
+            forwardLeft: # Pi IP: 10.18.16.11
+                photonVisionUIName: Forward_Left
                 robotToCamera:
-                    xInches: 0
-                    yInches: 0
-                    zInches: 24
+                    xInches: -12.5
+                    yInches: 13
+                    zInches: 16.75
                     rollDegrees: 0
                     pitchDegrees: 0
-                    yawDegrees: 0
+                    yawDegrees: 55
                 detectionType: APRIL_TAG
-            physicalCameraUsedWithSim:
-                photonVisionUIName: Logi_C270_HD_WebCam
+            forwardRight: # Pi IP: 10.18.16.12.
+                photonVisionUIName: Forward_Right
                 robotToCamera:
-                    zInches: 24
+                    xInches: -12.5
+                    yInches: -13
+                    zInches: 16.75
+                    rollDegrees: 0
+                    pitchDegrees: 0
+                    yawDegrees: -55
                 detectionType: APRIL_TAG
-                simulateWithPhysicalCamera: true
+            backwardLeft: # Pi IP: 10.18.16.13
+                photonVisionUIName: Backward_Left
+                robotToCamera:
+                    xInches: -12.5
+                    yInches: 13
+                    zInches: 15
+                    rollDegrees: 0
+                    pitchDegrees: 0
+                    yawDegrees: 155
+                detectionType: APRIL_TAG
+            backwardRight: # Pi IP: 10.18.16.14
+                photonVisionUIName: Backward_Right
+                robotToCamera:
+                    xInches: -12.5
+                    yInches: -13
+                    zInches: 15
+                    rollDegrees: 0
+                    pitchDegrees: 0
+                    yawDegrees: -155
+                detectionType: APRIL_TAG
+#            fuelDetector:
+#                photonVisionUIName: Fuel_Detector
+#                detectionType: NONE # TODO: Object detection
 
 autopathing:
     paths:
