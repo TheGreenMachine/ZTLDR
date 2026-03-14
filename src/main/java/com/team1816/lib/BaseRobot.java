@@ -1,6 +1,7 @@
 package com.team1816.lib;
 
 import com.team1816.lib.util.FieldContainer;
+import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 public abstract class BaseRobot extends TimedRobot {
@@ -17,7 +18,14 @@ public abstract class BaseRobot extends TimedRobot {
         // faster than the main robot loop to make sure we always have the most up-to-date pose
         // estimate.
         addPeriodic(
-            baseRobotContainer::addVisionMeasurementsToDrivetrain,
+            () -> {
+                try {
+                    baseRobotContainer.addVisionMeasurementsToDrivetrain();
+                }
+                catch (Throwable t) {
+                    GreenLogger.log(t);
+                }
+            },
             addVisionMeasurementsLoopTimeSeconds
         );
     }

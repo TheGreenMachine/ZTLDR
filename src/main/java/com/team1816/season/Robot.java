@@ -40,6 +40,10 @@ public class Robot extends BaseRobot {
     @Override
     public void disabledInit() {
         try {
+            if (autonomousCommand != null) {
+                autonomousCommand.cancel();
+            }
+            CommandScheduler.getInstance().cancelAll();
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.DISABLED);
             Elastic.selectTab("Autonomous");
         } catch (Throwable t) {
@@ -50,7 +54,12 @@ public class Robot extends BaseRobot {
 
     @Override
     public void disabledPeriodic() {
-        robotContainer.updateInitialPose();
+        try {
+            robotContainer.updateInitialPose();
+        } catch (Throwable t) {
+            robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
+            GreenLogger.log(t);
+        }
     }
 
     @Override
