@@ -18,8 +18,8 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     //CLASS
     public static final String NAME = "intake";
 
-    private INTAKE_STATE wantedState = INTAKE_STATE.INTAKE_IN_AND_OFF;
-    private INTAKE_STATE previousWantedState = INTAKE_STATE.INTAKE_IN_AND_OFF;
+    private IntakeState wantedState = IntakeState.STOW;
+    private IntakeState previousWantedState = IntakeState.STOW;
 
     //MOTORS
     private final IMotor intakeMotor = (IMotor) factory.getDevice(NAME, "intakeMotor");
@@ -144,13 +144,13 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         }
     }
 
-    public void setWantedState(INTAKE_STATE state) {
+    public void setWantedState(IntakeState state) {
         this.wantedState = state;
     }
 
-    public boolean isIntaking() { return (wantedState == INTAKE_STATE.INTAKE_IN_AND_OFF); }
+    public boolean isIntaking() { return (wantedState == IntakeState.STOW); }
 
-    public boolean isOutaking() { return (wantedState == INTAKE_STATE.INTAKE_OUT_AND_ON); }
+    public boolean isOutaking() { return (wantedState == IntakeState.INTAKE); }
 
     public void incrementFlipperInwards() {
         switch (flipperPosition) {
@@ -175,12 +175,12 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         POSITION_2
     }
 
-    public enum INTAKE_STATE {
-        INTAKE_IN_AND_OFF(
+    public enum IntakeState {
+        STOW(
             factory.getConstant(NAME, "intakeOffSpeed", 0, true),
             FlipperPosition.IN
         ),
-        INTAKE_OUT_AND_ON(
+        INTAKE(
             factory.getConstant(NAME, "intakeOnSpeed", .5, true),
             FlipperPosition.OUT
         ),
@@ -196,7 +196,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         private double intakeMotorValue;
         private final FlipperPosition flipperMotorPosition;
 
-        INTAKE_STATE (double speed, FlipperPosition flipperMotorPosition) {
+        IntakeState(double speed, FlipperPosition flipperMotorPosition) {
             this.intakeMotorValue = speed;
             this.flipperMotorPosition = flipperMotorPosition;
         }

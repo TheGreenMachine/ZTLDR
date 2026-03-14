@@ -2,8 +2,6 @@ package com.team1816.season;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.team1816.lib.BaseRobotContainer;
-import com.team1816.lib.Singleton;
-import com.team1816.season.subsystems.Feeder;
 import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.wpilibj2.command.Commands;
 
@@ -28,75 +26,98 @@ public class RobotContainer extends BaseRobotContainer {
         return superstructure;
     }
 
-    public Superstructure getSuperstructure() {
-        return superstructure;
-    }
-
     public void autonomousInit() {
-        superstructure.autonomousInit();
+        superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
+        // TODO: This may or may not be what we want for PathPlanner path following.
+        superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.AUTOMATIC_DRIVING);
+        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC);
+        superstructure.setInclineDucking(false);
+        superstructure.setTurretPresetAngle(0);
+        superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
+        superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE);
+        superstructure.setSuperstructureWantedFeederState(Superstructure.WantedFeederState.FEED);
+        superstructure.setSuperstructureWantedClimberState(Superstructure.WantedClimberState.STOW);
     }
 
     public void teleopInit() {
         superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
-        superstructure.teleopInit();
+        superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.MANUAL_DRIVING);
+        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC);
+        superstructure.setTurretPresetAngle(0);
+        superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
     }
-
-//    public enum ControllerMode {
-//        CLIMBING,
-//        SNOWBLOWING,
-//    }
 
     private void configureBindings() {
+        // TODO: Set up the controls that we actually want.
+        // Gatekeeper
+        driverController.rightTrigger().onTrue(Commands.runOnce(() -> {
+            superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
+            superstructure.setInclineDucking(false);
+        }))
+            .onFalse(Commands.runOnce(() -> {
+                superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
+                superstructure.setInclineDucking(true);
+            }));
 
-        driverController.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_ON)));
-        driverController.rightTrigger().onFalse(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_OFF)));
+        // Shooter
+        driverController.x().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE)));
+        driverController.y().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_MIDDLE)));
+        driverController.b().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_FAR)));
+        driverController.a().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC)));
 
-        driverController.x().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_1)));
-        driverController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_2)));
-        driverController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.SHOOTER_DISTANCE_3)));
-        driverController.a().onTrue(Commands.runOnce(() -> superstructure.shootingAutomatic()));
-
-        driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_OUT_AND_ON)));
-        driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_IN_AND_OFF)));
+        // Intake
+        driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)));
+        driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)));
 
         driverController.povRight().onTrue(Commands.runOnce(() -> superstructure.incrementFlipperInwards()));
-
-        //driverController.povUp()
-
-        //agitate button TBD
-        //add manual shooter speed adjustments
-
-
-//        switch (currentControllerMode) {
-//            case SNOWBLOWING -> {
-//                driverController.start().onTrue(Commands.runOnce(() -> setCurrentControllerMode(ControllerMode.CLIMBING)));
-//
-//            }
-//            case CLIMBING -> {
-//                driverController.back().onTrue(Commands.runOnce(() -> setCurrentControllerMode(ControllerMode.SNOWBLOWING)));
-//
-//                driverController.y().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMB_L3)));
-//                driverController.a().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMB_L1)));
-//                driverController.b().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMB_DOWN_L1)));
-//
-//                //add manual climber up/down adjustments and the extend/retract adjustments
-//            }
-//            //manual mode?
-//        }
-
     }
 
-//    private void setCurrentControllerMode(ControllerMode wantedControllerMode){
-//        currentControllerMode = wantedControllerMode;
-//        configureBindings();
-//    }
+    public final void registerCommands() {
+        // TODO: Set up the PathPlanner NamedCommands that we actually want.
+        // Shooter
+        NamedCommands.registerCommand("shooter/automatic", Commands.runOnce(() ->
+             superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.AUTOMATIC)
+        ));
+        NamedCommands.registerCommand("shooter/presetClose", Commands.runOnce(() ->
+            superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE)
+        ));
+        NamedCommands.registerCommand("shooter/presetMiddle", Commands.runOnce(() ->
+            superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_MIDDLE)
+        ));
+        NamedCommands.registerCommand("shooter/presetFar", Commands.runOnce(() ->
+            superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_FAR)
+        ));
+        NamedCommands.registerCommand("shooter/setTurretPresetAngle0Degrees", Commands.runOnce(() ->
+            superstructure.setTurretPresetAngle(0)
+        ));
+        NamedCommands.registerCommand("shooter/setTurretPresetAngle90Degrees", Commands.runOnce(() ->
+            superstructure.setTurretPresetAngle(90)
+        ));
+        NamedCommands.registerCommand("shooter/setTurretPresetAngle180Degrees", Commands.runOnce(() ->
+            superstructure.setTurretPresetAngle(180)
+        ));
+        NamedCommands.registerCommand("shooter/setTurretPresetAngle270Degrees", Commands.runOnce(() ->
+            superstructure.setTurretPresetAngle(270)
+        ));
 
-    public final void registerCommands() {  //Auto init has initial states for subsystems
-        NamedCommands.registerCommand("shoot", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_ON);
-        }));
-        NamedCommands.registerCommand("notShoot", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_OFF);
-        }));
+        NamedCommands.registerCommand("intake/intake", Commands.runOnce(() ->
+             superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)
+        ));
+
+        // Gatekeeper
+        NamedCommands.registerCommand("gatekeeper/open", Commands.runOnce(() ->
+            superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)
+        ));
+        NamedCommands.registerCommand("gatekeeper/close", Commands.runOnce(() ->
+            superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE)
+        ));
+
+        // Superstructure
+        NamedCommands.registerCommand("climbL1", Commands.runOnce(() ->
+            superstructure.setWantedSuperState(Superstructure.WantedSuperState.CLIMB_L1)
+        ));
+        NamedCommands.registerCommand("default", Commands.runOnce(() ->
+            superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT)
+        ));
     }
 }

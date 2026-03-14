@@ -305,7 +305,7 @@ subsystems:
                         kS: 0.28
                         kV: 0.115
                         kP: 3
-            launchAngleMotor:
+            inclineMotor:
                 deviceType: TalonFXS
                 motorType: NEO550_JST
                 remoteSensor: RemoteCANcoder
@@ -320,7 +320,7 @@ subsystems:
                         kS: 0.3
                         kP: 200
                         staticFeedforwardSign: UseClosedLoopSign
-            rotationAngleMotor:
+            turretMotor:
                 deviceType: TalonFX
                 id: 28
                 motorRotation: Clockwise_Positive
@@ -330,7 +330,7 @@ subsystems:
                         kP: 1
                         kD: 0.05
                         staticFeedforwardSign: UseClosedLoopSign
-            launchAngleCoder:
+            inclineCoder:
                 id: 29
                 deviceType: CANcoder
                 sensorDirection: Clockwise_Positive # TODO: Make this actually get applied to the config. See #153 in the GitHub Project.
@@ -340,26 +340,25 @@ subsystems:
                 id: 6
                 deviceType: CANdi
         constants:
-            rotationAngleSensorClockwiseLeft: 0
-            rotationAngleSensorClockwiseRight: 1
+            leftTurretSensorChannel: 0
+            rightTurretSensorChannel: 1
             motorRotationsPerTurretRotation: 15.625 # 250/16 gear ratio
             initialShooterOffsetX: 0
             initialShooterOffsetY: 0
             initialShooterOffsetZ: 22
-            distanceOneLaunchAngle: 22
-            distanceOneRotationAngle: 0
-            distanceOneLaunchVelocity: 54
-            distanceTwoLaunchAngle: 22
-            distanceTwoRotationAngle: 0
-            distanceTwoLaunchVelocity: 53
-            distanceThreeLaunchAngle: 22
-            distanceThreeRotationAngle: 0
-            distanceThreeLaunchVelocity: 52
+            inclineDuckingLimitDegrees: 17
+            distanceOneInclineAngleDegrees: 22
+            distanceOneLaunchVelocityRPS: 54
+            distanceTwoInclineAngleDegrees: 22
+            distanceTwoLaunchVelocityRPS: 53
+            distanceThreeInclineAngleDegrees: 22
+            distanceThreeLaunchVelocityRPS: 52
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570
             secondLowestBeamBreakToZero: 7.65625
-            launchAngleMotorBottomLimitRotations: 0.046
-            launchAngleMotorTopLimitRotations: 0.109
+            turretRotationToleranceDegrees: 2
+            inclineAngleToleranceDegrees: 2
+            launcherVelocityToleranceRPS: 2
     vision:
         cameras:
             forwardLeft: # Pi IP: 10.18.16.11

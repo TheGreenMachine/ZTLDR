@@ -12,6 +12,8 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobotBase;
 import edu.wpi.first.wpilibj.Watchdog;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -73,9 +75,10 @@ public class GreenLogger {
      * {@link Pose2d}, or various other WPILib classes), please use {@link #periodicLog(String,
      * Supplier, Struct)} to specify the {@link Struct} type.
      * <p>
-     * For {@link NTSendable}s, the supplier should always return a reference to the same object,
-     * since it will only be called once and then logs will be updated based on that {@link
-     * NTSendable}'s internal state.
+     * For {@link NTSendable}s (including {@link Field2d}s and {@link Mechanism2d}s), the supplier
+     * should always return a reference to the same object, since it will only be called once and
+     * then logs will be updated based on that {@link NTSendable}'s internal state. Also, note that
+     * {@link NTSendable}s will show up under the SmartDashboard section of the NetworkTables.
      * <p>
      * If you are logging a {@link List}, please use {@link #periodicLogList(String, Supplier,
      * Class)} or {@link #periodicLogList(String, Supplier, Class, Struct)}.
@@ -102,9 +105,10 @@ public class GreenLogger {
      * {@link String}s, {@link StructSerializable} classes (if the {@link Struct} is passed in, see
      * above), and {@link NTSendable}s. Anything else passed in will be logged as a {@link String}.
      * <p>
-     * For {@link NTSendable}s, the supplier should always return a reference to the same object,
-     * since it will only be called once and then logs will be updated based on that {@link
-     * NTSendable}'s internal state.
+     * For {@link NTSendable}s (including {@link Field2d}s and {@link Mechanism2d}s), the supplier
+     * should always return a reference to the same object, since it will only be called once and
+     * then logs will be updated based on that {@link NTSendable}'s internal state. Also, note that
+     * {@link NTSendable}s will show up under the SmartDashboard section of the NetworkTables.
      * <p>
      * If you are logging a {@link List}, please use {@link #periodicLogList(String, Supplier,
      * Class)} or {@link #periodicLogList(String, Supplier, Class, Struct)}.
