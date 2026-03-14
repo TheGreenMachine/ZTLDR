@@ -252,7 +252,9 @@ subsystems:
         constants: # TODO: all of these
             intakeOnSpeed: .35
             intakeOffSpeed: 0
-            flipperMotorOutMinimumPosition: 0.0058
+            flipperMotorOutMinimumPosition: 0.166
+            flipperMotorPullInOnePosition: 0.1
+            flipperMotorPullInTwoPosition: 0.05
             flipperMotorRetractCurrentAmperes: -1
             flipperMotorExtendCurrentAmperes: 30
             flipperMotorHoldOutCurrentAmperes: 15
