@@ -89,11 +89,16 @@ public class RobotContainer extends BaseRobotContainer {
 //    }
 
     public final void registerCommands() {  //Auto init has initial states for subsystems
-        NamedCommands.registerCommand("shoot", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_ON);
+        NamedCommands.registerCommand("BottomBlueToMiddleStart0", Commands.runOnce(() -> {
+            superstructure.setWantedSuperState(Superstructure.WantedSuperState.BottomBlueToMiddle0);
         }));
-        NamedCommands.registerCommand("notShoot", Commands.runOnce(() -> {
-            getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.GATEKEEPER_OFF);
+
+        NamedCommands.registerCommand("BottomBlueToMiddleStart1", Commands.runOnce(() -> {
+            superstructure.setWantedSuperState(Superstructure.WantedSuperState.BottomBlueToMiddle1);
+        }));
+
+        NamedCommands.registerCommand("BottomBlueToMiddleStart2", Commands.runOnce(() -> {
+            superstructure.setWantedSuperState(Superstructure.WantedSuperState.BottomBlueToMiddle2);
         }));
     }
 }

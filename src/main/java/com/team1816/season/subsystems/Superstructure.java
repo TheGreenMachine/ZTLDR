@@ -43,7 +43,12 @@ public class Superstructure extends BaseSuperstructure {
         CLIMB_L3,
         CLIMB_DOWN_L1,
 
-        DROP_HEIGHT
+        DROP_HEIGHT,
+
+
+        BottomBlueToMiddle0,
+        BottomBlueToMiddle1,
+        BottomBlueToMiddle2
     }
 
     public enum ActualSuperState {
@@ -69,7 +74,11 @@ public class Superstructure extends BaseSuperstructure {
         CLIMBING_L3,
         CLIMBING_DOWN_L1,
 
-        DROPPING_HEIGHT
+        DROPPING_HEIGHT,
+
+        BottomBlueToMiddle0,
+        BottomBlueToMiddle1,
+        BottomBlueToMiddle2
     }
 
     public enum ClimbSide {
@@ -156,6 +165,10 @@ public class Superstructure extends BaseSuperstructure {
             case CLIMB_DOWN_L1 -> actualSuperState = ActualSuperState.CLIMBING_DOWN_L1;
 
             case DROP_HEIGHT -> actualSuperState = ActualSuperState.DROPPING_HEIGHT;
+
+            case BottomBlueToMiddle0 ->  actualSuperState = ActualSuperState.BottomBlueToMiddle0;
+            case BottomBlueToMiddle1 ->  actualSuperState = ActualSuperState.BottomBlueToMiddle1;
+            case BottomBlueToMiddle2 ->  actualSuperState = ActualSuperState.BottomBlueToMiddle2;
         }
 
 
@@ -187,6 +200,10 @@ public class Superstructure extends BaseSuperstructure {
             case CLIMBING_DOWN_L1 -> climbingDownL1();
 
             case DROPPING_HEIGHT -> droppingHeight();
+
+            case BottomBlueToMiddle0 ->  setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_OUT_AND_ON, Feeder.FEEDER_STATE.FAST_FEEDING, Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE, Climber.CLIMBER_STATE.IDLING);
+            case BottomBlueToMiddle1 ->  setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_OUT_AND_ON, Feeder.FEEDER_STATE.FAST_FEEDING, Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.DISTANCE_TWO, Climber.CLIMBER_STATE.IDLING);
+            case BottomBlueToMiddle2 ->  setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_OUT_AND_ON, Feeder.FEEDER_STATE.FAST_FEEDING, Gatekeeper.GATEKEEPER_STATE.OPEN, Shooter.SHOOTER_STATE.DISTANCE_TWO, Climber.CLIMBER_STATE.IDLING);
         }
     }
 
