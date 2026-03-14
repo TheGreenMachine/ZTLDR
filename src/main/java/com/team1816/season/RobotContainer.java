@@ -72,7 +72,13 @@ public class RobotContainer extends BaseRobotContainer {
         // Intake
         driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)));
         driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)));
-        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.incrementPullInSuperstructureIntakeState()));
+//        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.incrementPullInSuperstructureIntakeState()));
+        driverController.povUp().whileTrue(Commands.runOnce(() -> superstructure.adjustShooter(.1, 0)));
+        driverController.povDown().whileTrue(Commands.runOnce(() -> superstructure.adjustShooter(-.1, 0)));
+
+        driverController.povRight().whileTrue(Commands.runOnce(() -> superstructure.adjustShooter(0, .1)));
+        driverController.povLeft().whileTrue(Commands.runOnce(() -> superstructure.adjustShooter(0, -.1)));
+
     }
 
     public final void registerCommands() {

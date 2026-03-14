@@ -230,7 +230,7 @@ subsystems:
             feedingDutyCycle: 0.7
             stoppedDutyCycle: 0
     intake:
-        implemented: true
+        implemented: false
         devices:
             intakeMotor:
                 id: 2

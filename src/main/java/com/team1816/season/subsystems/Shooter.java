@@ -235,6 +235,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             calibrateTurretMotor();
         }
 
+        GreenLogger.log(NAME + "/"+wantedState.toString()+"/"+wantedState.getInclineAngleDegrees()+" "+wantedState.getLaunchVelocityRPS());
+
         applyState();
     }
 
@@ -288,6 +290,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public void setWantedState(ShooterState state) {
         this.wantedState = state;
     }
+    public ShooterState getWantedState() {
+        return wantedState;
+    }
+
 
     /**
      * Sets if the incline should duck down to fit under the trench.
@@ -654,7 +660,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         FULLY_AUTOMATIC(-1, -1),
         IDLE(0, 0);
 
-        private final double inclineAngleDegrees, launchVelocityRPS;
+        private double inclineAngleDegrees, launchVelocityRPS;
 
         ShooterState(double inclineAngleDegrees, double launchVelocityRPS) {
             this.inclineAngleDegrees = inclineAngleDegrees;
@@ -668,5 +674,17 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double getLaunchVelocityRPS() {
             return launchVelocityRPS;
         }
+
+        public void adjustInclineAngleDegreesValue(double adjustValue) {
+            this.inclineAngleDegrees += adjustValue;
+        }
+
+        public void adjustLaunchVelocityRPSValue(double adjustValue) {
+            this.launchVelocityRPS += adjustValue;
+        }
+    }
+    public void adjustShooterSetPoint(double adjustValue1, double adjustValue2){
+        getWantedState().adjustInclineAngleDegreesValue(adjustValue1);
+        getWantedState().adjustLaunchVelocityRPSValue(adjustValue2);
     }
 }

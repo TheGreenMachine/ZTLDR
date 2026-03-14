@@ -276,4 +276,8 @@ public class Superstructure extends BaseSuperstructure {
         L1,
         L3
     }
+
+    public void adjustShooter(double value1, double value2){
+        shooter.adjustShooterSetPoint(value1, value2);
+    }
 }
