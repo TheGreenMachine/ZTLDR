@@ -60,6 +60,10 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
         feedMotor.setControl(dutyCycleOut.withOutput(clampedVelocity));
     }
 
+    public FEEDER_STATE getWantedState() {
+        return wantedState;
+    }
+
     public void setWantedState(FEEDER_STATE state) {
         wantedState = state;
     }

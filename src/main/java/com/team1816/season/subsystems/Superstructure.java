@@ -15,7 +15,7 @@ public class Superstructure extends BaseSuperstructure {
     private final Shooter shooter;
     private final Gatekeeper gatekeeper;
     private final Intake intake;
-    private final Feeder feeder;
+    public final Feeder feeder;
     private final Climber climber;
 
     private CommandXboxController controller;
@@ -289,6 +289,15 @@ public class Superstructure extends BaseSuperstructure {
         }
 
         actualSuperState = ActualSuperState.DEFAULTING;
+    }
+
+    private void feederReversingToggle() {
+        if (feeder.getWantedState() == Feeder.FEEDER_STATE.REVERSING){
+            feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
+        } else if (feeder.getWantedState() == Feeder.FEEDER_STATE.FAST_FEEDING){
+            feeder.setWantedState(Feeder.FEEDER_STATE.REVERSING);
+        }
+
     }
 
     private void climbingL1() {
