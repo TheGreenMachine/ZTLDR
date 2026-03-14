@@ -1,10 +1,12 @@
 package com.team1816.lib;
 
 import com.team1816.lib.util.FieldContainer;
+import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.wpilibj.TimedRobot;
 
 public abstract class BaseRobot extends TimedRobot {
     private final BaseRobotContainer baseRobotContainer;
+    private long lastVisionErrorLogMs = 0;
 
     protected BaseRobot() {
         baseRobotContainer = createRobotContainer();
@@ -12,12 +14,25 @@ public abstract class BaseRobot extends TimedRobot {
         // The loop time in seconds for adding the vision measurements to the drivetrain pose
         // estimate. For comparison, the main robot periodic loop time is 0.02 seconds (20
         // milliseconds).
-        final double addVisionMeasurementsLoopTimeSeconds = 0.004;
+        final double addVisionMeasurementsLoopTimeSeconds = 0.02;
         // Add a periodic method to add the vision measurements to the drivetrain pose estimate
         // faster than the main robot loop to make sure we always have the most up-to-date pose
         // estimate.
         addPeriodic(
-            baseRobotContainer::addVisionMeasurementsToDrivetrain,
+            () -> {
+                try {
+                    baseRobotContainer.addVisionMeasurementsToDrivetrain();
+                }
+                catch (Throwable t) {
+                    // Rate-limit error logging to once per second to avoid OOM from
+                    // allocating stack trace strings at 250Hz
+                    long now = System.currentTimeMillis();
+                    if (now - lastVisionErrorLogMs > 1000) {
+                        GreenLogger.log(t);
+                        lastVisionErrorLogMs = now;
+                    }
+                }
+            },
             addVisionMeasurementsLoopTimeSeconds
         );
     }

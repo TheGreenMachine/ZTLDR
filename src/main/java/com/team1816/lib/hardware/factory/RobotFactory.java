@@ -22,6 +22,7 @@ import com.team1816.lib.hardware.components.sensor.CANCoderImpl;
 import com.team1816.lib.hardware.components.sensor.Camera;
 import com.team1816.lib.hardware.components.sensor.CANdiImpl;
 import com.team1816.lib.hardware.components.sensor.CanRangeImpl;
+import com.team1816.lib.subsystems.LedManager;
 import com.team1816.lib.subsystems.drivetrain.CTRESwerveDrivetrainImpl;
 import com.team1816.lib.subsystems.drivetrain.IDrivetrain;
 import com.team1816.lib.util.GreenLogger;
@@ -248,50 +249,54 @@ public class RobotFactory {
 
         List<Camera> cameras = new ArrayList<>();
         for (Map.Entry<String, CameraConfiguration> entry : subsystem.cameras.entrySet()) {
-            String cameraName = entry.getKey();
-            CameraConfiguration cameraConfig = entry.getValue();
-            if (cameraConfig != null) {
-                RobotToCamera robotToCam = cameraConfig.robotToCamera;
-                if (robotToCam != null) {
-                    GreenLogger.log("Creating camera " + cameraName);
-                    GreenLogger.log("  photonVisionUIName: " + cameraConfig.photonVisionUIName);
-                    GreenLogger.log(
-                        "  robotToCamera: xInches=" + robotToCam.xInches +
-                            ", yInches=" + robotToCam.yInches +
-                            ", zInches=" + robotToCam.zInches +
-                            ", rollDegrees=" + robotToCam.rollDegrees +
-                            ", pitchDegrees=" + robotToCam.pitchDegrees +
-                            ", yawDegrees=" + robotToCam.yawDegrees
-                    );
-                    GreenLogger.log("  detectionType: " + cameraConfig.detectionType);
-                    GreenLogger.log("  simCameraProperties: " + cameraConfig.simCameraProperties);
-                    GreenLogger.log("  simulateWithPhysicalCamera: " + cameraConfig.simulateWithPhysicalCamera);
+            try {
+                String cameraName = entry.getKey();
+                CameraConfiguration cameraConfig = entry.getValue();
+                if (cameraConfig != null) {
+                    RobotToCamera robotToCam = cameraConfig.robotToCamera;
+                    if (robotToCam != null) {
+                        GreenLogger.log("Creating camera " + cameraName);
+                        GreenLogger.log("  photonVisionUIName: " + cameraConfig.photonVisionUIName);
+                        GreenLogger.log(
+                            "  robotToCamera: xInches=" + robotToCam.xInches +
+                                ", yInches=" + robotToCam.yInches +
+                                ", zInches=" + robotToCam.zInches +
+                                ", rollDegrees=" + robotToCam.rollDegrees +
+                                ", pitchDegrees=" + robotToCam.pitchDegrees +
+                                ", yawDegrees=" + robotToCam.yawDegrees
+                        );
+                        GreenLogger.log("  detectionType: " + cameraConfig.detectionType);
+                        GreenLogger.log("  simCameraProperties: " + cameraConfig.simCameraProperties);
+                        GreenLogger.log("  simulateWithPhysicalCamera: " + cameraConfig.simulateWithPhysicalCamera);
 
-                    Camera camera = new Camera(
-                        cameraName,
-                        cameraConfig.photonVisionUIName,
-                        new Transform3d(
-                            new Translation3d(
-                                Units.inchesToMeters(robotToCam.xInches),
-                                Units.inchesToMeters(robotToCam.yInches),
-                                Units.inchesToMeters(robotToCam.zInches)
+                        Camera camera = new Camera(
+                            cameraName,
+                            cameraConfig.photonVisionUIName,
+                            new Transform3d(
+                                new Translation3d(
+                                    Units.inchesToMeters(robotToCam.xInches),
+                                    Units.inchesToMeters(robotToCam.yInches),
+                                    Units.inchesToMeters(robotToCam.zInches)
+                                ),
+                                new Rotation3d(
+                                    Units.degreesToRadians(robotToCam.rollDegrees),
+                                    Units.degreesToRadians(robotToCam.pitchDegrees),
+                                    Units.degreesToRadians(robotToCam.yawDegrees)
+                                )
                             ),
-                            new Rotation3d(
-                                Units.degreesToRadians(robotToCam.rollDegrees),
-                                Units.degreesToRadians(robotToCam.pitchDegrees),
-                                Units.degreesToRadians(robotToCam.yawDegrees)
-                            )
-                        ),
-                        cameraConfig.detectionType,
-                        cameraProp,
-                        cameraConfig.simulateWithPhysicalCamera
-                    );
+                            cameraConfig.detectionType,
+                            cameraProp,
+                            cameraConfig.simulateWithPhysicalCamera
+                        );
 
-                    cameras.add(camera);
+                        cameras.add(camera);
 
-                    String logPath = subsystemName + "/" + cameraName + "/";
-                    camera.setUpPeriodicLogging(logPath);
+                        String logPath = subsystemName + "/" + cameraName + "/";
+                        camera.setUpPeriodicLogging(logPath);
+                    }
                 }
+            } catch (Exception e) {
+                GreenLogger.log("Failed to create camera " + entry.getKey() + ": " + e.getMessage());
             }
         }
 

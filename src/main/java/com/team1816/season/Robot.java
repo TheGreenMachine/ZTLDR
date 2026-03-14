@@ -40,6 +40,10 @@ public class Robot extends BaseRobot {
     @Override
     public void disabledInit() {
         try {
+            if (autonomousCommand != null) {
+                autonomousCommand.cancel();
+            }
+            CommandScheduler.getInstance().cancelAll();
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.DISABLED);
             Elastic.selectTab("Autonomous");
         } catch (Throwable t) {
@@ -50,7 +54,12 @@ public class Robot extends BaseRobot {
 
     @Override
     public void disabledPeriodic() {
-        robotContainer.updateInitialPose();
+        try {
+            robotContainer.updateInitialPose();
+        } catch (Throwable t) {
+            robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
+            GreenLogger.log(t);
+        }
     }
 
     @Override
@@ -99,8 +108,8 @@ public class Robot extends BaseRobot {
 
     @Override
     public void robotPeriodic() {
-        super.robotPeriodic();
         try {
+            super.robotPeriodic();
             Threads.setCurrentThreadPriority(true, 99);
             double start = HALUtil.getFPGATime();
             CommandScheduler.getInstance().run();
@@ -116,7 +125,12 @@ public class Robot extends BaseRobot {
 
     @Override
     public void teleopExit() {
-        robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
+        try {
+            robotContainer.getSuperstructure().setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
+        } catch (Throwable t) {
+            robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
+            GreenLogger.log(t);
+        }
     }
 
     @Override
