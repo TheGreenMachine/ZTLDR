@@ -39,12 +39,12 @@ public class GreenLogger {
         }
 
         // this will log the robot modes i.e., auto enabled estop
-        DriverStation.startDataLog(DataLogManager.getLog(), false);
+        //DriverStation.startDataLog(DataLogManager.getLog(), false);
         // Log network tables then we can use advantage scope on a live robot
         // and use the same layout for the logs
-        DataLogManager.logNetworkTables(true);
+        //DataLogManager.logNetworkTables(true);
         // don't log console since we output to network tables
-        DataLogManager.logConsoleOutput(false);
+        //DataLogManager.logConsoleOutput(false);
         netTable = NetworkTableInstance.getDefault().getTable("");
         msg = netTable.getStringTopic("messages").publish();
     }
@@ -169,7 +169,7 @@ public class GreenLogger {
             // For NTSendables, log using the SmartDashboard. This will automatically hand periodic
             // updating based on the NTSendable's internal state. Note that this will not work
             // properly if the result of the supplier changes after the initial call.
-            SmartDashboard.putData(name, (NTSendable) result);
+            //SmartDashboard.putData(name, (NTSendable) result);
             // The publisher is null for NTSendables, since we use the SmartDashboard instead.
             pub = null;
         } else {

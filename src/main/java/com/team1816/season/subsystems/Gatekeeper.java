@@ -57,7 +57,7 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
 
         if (wantedState != previousWantedState) {
             GreenLogger.log("Gatekeeper state: " + wantedState.toString());
-            SmartDashboard.putString("Gatekeeper state: ", wantedState.toString());
+            //SmartDashboard.putString("Gatekeeper state: ", wantedState.toString());
             previousWantedState = wantedState;
         }
     }

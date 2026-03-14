@@ -106,8 +106,6 @@ public class Superstructure extends BaseSuperstructure {
     private FeederControlState feederControlState = FeederControlState.DEFAULTING; //What to do with this?
     private boolean isAutonomous = false;
 
-    // TODO: remove this
-    public static boolean isIntakePushingIn = false;
 
     private ClimbSide climbSide = ClimbSide.LEFT;
 
@@ -131,7 +129,7 @@ public class Superstructure extends BaseSuperstructure {
         if (wantedSuperState != previousWantedSuperState) {
             GreenLogger.log("Wanted Superstate " + wantedSuperState);
             GreenLogger.log("Actual Superstate " + actualSuperState);
-            SmartDashboard.putString("Super state: ", wantedSuperState.toString());
+            //SmartDashboard.putString("Super state: ", wantedSuperState.toString());
             previousWantedSuperState = wantedSuperState;
         }
     }
@@ -343,11 +341,11 @@ public class Superstructure extends BaseSuperstructure {
         }
     }
 
-    public void pushIntakeIn() {
-        isIntakePushingIn = true;
+    public void incrementFlipperInwards() {
+        intake.incrementFlipperInwards();
     }
 
-    public void stopPushingIntakeIn() {
-        isIntakePushingIn = false;
+    public void resetFlipperOut() {
+        intake.resetFlipperOut();
     }
 }

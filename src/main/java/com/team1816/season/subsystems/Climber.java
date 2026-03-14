@@ -44,7 +44,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
 
     public Climber () {
         super();
-        SmartDashboard.putData("Climber", climberMech);
+        //SmartDashboard.putData("Climber", climberMech);
     }
 
     @Override

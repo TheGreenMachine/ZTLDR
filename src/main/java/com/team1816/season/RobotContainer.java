@@ -59,6 +59,8 @@ public class RobotContainer extends BaseRobotContainer {
         driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_OUT_AND_ON)));
         driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setWantedSuperState(Superstructure.WantedSuperState.INTAKE_IN_AND_OFF)));
 
+        driverController.povLeft().onTrue(Commands.runOnce(() -> superstructure.incrementFlipperInwards()));
+        driverController.povRight().onTrue(Commands.runOnce(() -> superstructure.resetFlipperOut()));
 
         //agitate button TBD
         //add manual shooter speed adjustments

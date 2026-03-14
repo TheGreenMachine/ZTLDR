@@ -44,7 +44,7 @@ public abstract class BaseRobotContainer {
 
     public void buildAutoChooser() {
         autoChooser = AutoBuilder.buildAutoChooser(Singleton.factory.getDefaultAuto());
-        SmartDashboard.putData("Auto Mode", autoChooser);
+        //SmartDashboard.putData("Auto Mode", autoChooser);
         autoChooser.onChange(this::updatePoseOnSelection);
     }
 

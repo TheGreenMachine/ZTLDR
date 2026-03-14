@@ -49,7 +49,7 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
 
         if (wantedState != previousWantedState) {
             GreenLogger.log("Feeder state: " + wantedState.toString());
-            SmartDashboard.putString("Feeder state: ", wantedState.toString());
+            //SmartDashboard.putString("Feeder state: ", wantedState.toString());
             previousWantedState = wantedState;
         }
     }
