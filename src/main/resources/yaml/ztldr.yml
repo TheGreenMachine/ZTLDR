@@ -227,8 +227,8 @@ subsystems:
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
         constants:
-            fastFeeding: 0.296
-            slowFeeding: 0.086
+            fastFeeding: 0.7
+            slowFeeding: 0
             reversing: 0
             idling: 0
     intake:
@@ -255,9 +255,9 @@ subsystems:
             intakeOnSpeed: .35
             intakeOffSpeed: 0
             flipperMotorOutMinimumPosition: 0.0058
-            flipperMotorRetractCurrentAmperes: -1
+            flipperMotorRetractCurrentAmperes: -20
             flipperMotorExtendCurrentAmperes: 30
-            flipperMotorHoldOutCurrentAmperes: 15
+            flipperMotorHoldOutCurrentAmperes: 8
     gatekeeper:
         canBusName: shootercanivore
         devices:

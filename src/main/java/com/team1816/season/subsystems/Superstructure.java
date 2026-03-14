@@ -342,4 +342,12 @@ public class Superstructure extends BaseSuperstructure {
             setWantedSuperState(WantedSuperState.SHOOTER_AUTOMATIC_HUB);
         }
     }
+
+    public void incrementFlipperInwards() {
+        intake.incrementFlipperInwards();
+    }
+
+    public void resetFlipperOut() {
+        intake.resetFlipperOut();
+    }
 }
