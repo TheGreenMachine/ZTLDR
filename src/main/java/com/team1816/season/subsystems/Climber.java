@@ -29,12 +29,6 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
 
     private final PositionVoltage positionReq = new PositionVoltage(0);
 
-    //PHYSICAL SUBSYSTEM DEPENDENT CONSTANTS
-    private static final double MAX_FLIP_MOTOR_CLAMP = 100;
-    private static final double MIN_FLIP_MOTOR_CLAMP = 0;
-    private static final double MAX_LINEAR_SLIDE_MOTOR_CLAMP = 100;
-    private static final double MIN_LINEAR_SLIDE_MOTOR_CLAMP = 0;
-
     //MECHANISMS
     private double linearSlidePosition;
     private final Mechanism2d climberMech = new Mechanism2d(3, 3, new Color8Bit(50, 15, 50));
@@ -56,7 +50,7 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     @Override
     public void readFromHardware() {
         linearSlidePosition = linearSlideMotor.getMotorPosition();
-        linearSlide.setLength(linearSlidePosition/(MAX_LINEAR_SLIDE_MOTOR_CLAMP-MIN_LINEAR_SLIDE_MOTOR_CLAMP));
+        linearSlide.setLength(linearSlidePosition); //TODO divide by max soft limit if we add that
     }
 
     public void adjustCurrentFlipMotorSetPoint(double adjustValue){
@@ -82,15 +76,11 @@ public class Climber extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void setFlipMotor(double position){
-        double clampedPosition = MathUtil.clamp(position, MIN_FLIP_MOTOR_CLAMP, MAX_FLIP_MOTOR_CLAMP);
-
-        flipMotor.setControl(positionReq.withPosition(clampedPosition));
+        flipMotor.setControl(positionReq.withPosition(position));
     }
 
     private void setLinearSlideMotor(double position){
-        double clampedPosition = MathUtil.clamp(position, MIN_LINEAR_SLIDE_MOTOR_CLAMP, MAX_LINEAR_SLIDE_MOTOR_CLAMP);
-
-        linearSlideMotor.setControl(positionReq.withPosition(clampedPosition));
+        linearSlideMotor.setControl(positionReq.withPosition(position));
     }
 
     public void setWantedState(CLIMBER_STATE wantedState) {

@@ -24,10 +24,6 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
 
     private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
 
-    //PHYSICAL SUBSYSTEM DEPENDENT CONSTANTS
-    private static final double MIN_FEED_MOTOR_CLAMP = -80;
-    private static final double MAX_FEED_MOTOR_CLAMP = 80;
-
     @Override
     public void periodic() {
         readFromHardware();
@@ -54,10 +50,8 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
         }
     }
 
-    private void setFeedVelocity(double feedVelocity){
-        double clampedVelocity = MathUtil.clamp(feedVelocity, MIN_FEED_MOTOR_CLAMP, MAX_FEED_MOTOR_CLAMP);
-
-        feedMotor.setControl(dutyCycleOut.withOutput(clampedVelocity));
+    private void setFeedVelocity(double velocity){
+        feedMotor.setControl(dutyCycleOut.withOutput(velocity));
     }
 
     public void setWantedState(FEEDER_STATE state) {

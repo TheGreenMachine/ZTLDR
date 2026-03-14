@@ -23,12 +23,6 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
 
     private final VelocityVoltage voltageReq = new VelocityVoltage(0);
 
-    //PHYSICAL SUBSYSTEM DEPENDENT CONSTANTS
-    private static final double MIN_TOP_MOTOR_CLAMP = 0;
-    private static final double MAX_TOP_MOTOR_CLAMP = 80;
-    private static final double MIN_BOTTOM_MOTOR_CLAMP = 0;
-    private static final double MAX_BOTTOM_MOTOR_CLAMP = 80;
-
     @Override
     public void periodic() {
         readFromHardware();
@@ -63,15 +57,11 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void setTopVelocity(double velocity) {
-        double clampedVelocity = MathUtil.clamp(velocity, MIN_TOP_MOTOR_CLAMP, MAX_TOP_MOTOR_CLAMP);
-
-        topMotor.setControl(voltageReq.withVelocity(clampedVelocity));
+        topMotor.setControl(voltageReq.withVelocity(velocity));
     }
 
     private void setBottomVelocity(double velocity) {
-        double clampedVelocity = MathUtil.clamp(velocity, MIN_BOTTOM_MOTOR_CLAMP, MAX_BOTTOM_MOTOR_CLAMP);
-
-        bottomMotor.setControl(voltageReq.withVelocity(clampedVelocity));
+        bottomMotor.setControl(voltageReq.withVelocity(velocity));
     }
     public GATEKEEPER_STATE getWantedState() {
         return wantedState;

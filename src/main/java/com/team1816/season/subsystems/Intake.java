@@ -28,16 +28,6 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
     private final TorqueCurrentFOC flipperMotorTorqueCurrentRequest = new TorqueCurrentFOC(0);
 
-
-    //PHYSICAL SUBSYSTEM DEPENDENT CONSTANTS
-    private static final double MIN_INTAKE_MOTOR_CLAMP = -80;
-    private static final double MAX_INTAKE_MOTOR_CLAMP = 80;
-    private static final double MIN_FLIPPER_MOTOR_CLAMP = -0.11;
-    private static final double MAX_FLIPPER_MOTOR_CLAMP = -0.033;
-    /**
-     * The minimum position of the flipper motor to count it as far enough out to switch to our
-     * lower current to just hold it out instead of pushing it out.
-     */
     private final double FLIPPER_MOTOR_OUT_MINIMUM_POSITION;
     private final double FLIPPER_MOTOR_RETRACT_CURRENT_AMPERES;
     private final double FLIPPER_MOTOR_EXTEND_CURRENT_AMPERES;
