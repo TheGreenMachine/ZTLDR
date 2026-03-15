@@ -1,5 +1,5 @@
 defaultAuto: "Simple S"
-shooterSettings:
+shooterSettings: # TODO
     distancesInches:
         - 2
         - 3
@@ -75,6 +75,7 @@ subsystems:
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 41
                 remoteOffest: -0.300537
+                statorCurrentLimit: 60
             flCoder:
                 id: 41
                 deviceType: CANcoder
@@ -90,6 +91,7 @@ subsystems:
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 43
                 remoteOffest: -0.439453
+                statorCurrentLimit: 60
             frCoder:
                 id: 43
                 deviceType: CANcoder
@@ -104,6 +106,7 @@ subsystems:
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 42
                 remoteOffest: -0.351074   # Negative Absolute Position No Offset CanCoder
+                statorCurrentLimit: 60
             blCoder:
                 id: 42
                 deviceType: CANcoder
@@ -119,6 +122,7 @@ subsystems:
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 40
                 remoteOffest: -0.383301
+                statorCurrentLimit: 60
             brCoder:
                 id: 40
                 deviceType: CANcoder
@@ -244,14 +248,16 @@ subsystems:
                 id: 10
                 deviceType: CANcoder
         constants: # TODO: all of these
-            intakeOnSpeed: .35
+            intakeOnSpeed: .4
             intakeOffSpeed: 0
-            flipperMotorOutMinimumPosition: 0.166
+            flipperMotorOutPosition: 0.166
             flipperMotorPullInOnePosition: 0.1
             flipperMotorPullInTwoPosition: 0.05
-            flipperMotorRetractCurrentAmperes: -20
-            flipperMotorExtendCurrentAmperes: 30
+            flipperMotorInPosition: 0.025
+            flipperMotorRetractCurrentAmperes: -25
+            flipperMotorExtendCurrentAmperes: 25
             flipperMotorHoldOutCurrentAmperes: 8
+            flipperMotorHoldInCurrentAmperes: -8
     gatekeeper:
         canBusName: shootercanivore
         devices:
@@ -289,7 +295,7 @@ subsystems:
                     slot0:
                         kS: 0.28
                         kV: 0.115
-                        kP: 3
+                        kP: 0.3
             bottomLaunchMotor:
                 deviceType: TalonFX
                 id: 26
@@ -298,7 +304,7 @@ subsystems:
                     slot0:
                         kS: 0.28
                         kV: 0.115
-                        kP: 3
+                        kP: 0.3
             inclineMotor:
                 deviceType: TalonFXS
                 motorType: NEO550_JST
@@ -306,7 +312,7 @@ subsystems:
                 remoteSensorId: 29
                 id: 27
                 motorRotation: Clockwise_Positive
-                reverseSoftLimit: 0.046
+                reverseSoftLimit: 0.0405
                 forwardSoftLimit: 0.109
                 statorCurrentLimit: 35
                 pidConfig: # TODO: Tune this one.
@@ -321,7 +327,7 @@ subsystems:
                 pidConfig:
                     slot0:
                         kS: 0.29
-                        kP: 1
+                        kP: 0.5
                         kD: 0.05
                         staticFeedforwardSign: UseClosedLoopSign
             inclineCoder:
@@ -337,20 +343,20 @@ subsystems:
             leftTurretSensorChannel: 0
             rightTurretSensorChannel: 1
             motorRotationsPerTurretRotation: 15.625 # 250/16 gear ratio
-            shooterOffsetXMeters: 0
-            shooterOffsetYMeters: 0
-            shooterOffsetZMeters: 0.5588
-            inclineDuckingLimitRotations: 0.0472
-            distanceOneInclineAngleRotations: 0.0611
-            distanceOneLaunchVelocityRPS: 54
-            distanceTwoInclineAngleRotations: 0.0611
-            distanceTwoLaunchVelocityRPS: 53
-            distanceThreeInclineAngleRotations: 0.0611
-            distanceThreeLaunchVelocityRPS: 52
+            shooterOffsetXMeters: -0.11303
+            shooterOffsetYMeters: -0.112268
+            shooterOffsetZMeters: 0.508
+            inclineDuckingLimitRotations: 0.052
+            distanceOneInclineAngleRotations: 0.0611 # TODO
+            distanceOneLaunchVelocityRPS: 54 # TODO
+            distanceTwoInclineAngleRotations: 0.0611 # TODO
+            distanceTwoLaunchVelocityRPS: 53 # TODO
+            distanceThreeInclineAngleRotations: 0.0611 # TODO
+            distanceThreeLaunchVelocityRPS: 52 # TODO
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570
             secondLowestBeamBreakToZero: 7.65625
-            turretRotationToleranceDegrees: 2
+            turretRotationToleranceDegrees: 3
             inclineAngleToleranceDegrees: 2
             launcherVelocityToleranceRPS: 2
     vision:
@@ -395,9 +401,9 @@ subsystems:
                     pitchDegrees: 0
                     yawDegrees: -155
                 detectionType: APRIL_TAG
-#            fuelDetector:
-#                photonVisionUIName: Fuel_Detector
-#                detectionType: NONE # TODO: Object detection
+            fuelDetector:
+                photonVisionUIName: Fuel_Detector
+                detectionType: NONE # TODO: Object detection
 
 autopathing:
     paths:

@@ -2,6 +2,7 @@ package com.team1816.season;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.team1816.lib.BaseRobotContainer;
+import com.team1816.lib.BaseRobotState;
 import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.wpilibj2.command.Commands;
 
@@ -30,7 +31,7 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
         superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.AUTOMATIC_DRIVING);
         superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE);
-        superstructure.setInclineDucking(false);
+        superstructure.setInclineDucking(true);
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
@@ -43,6 +44,7 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
         superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.MANUAL_DRIVING);
         superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE);
+        superstructure.setInclineDucking(true);
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
@@ -68,6 +70,7 @@ public class RobotContainer extends BaseRobotContainer {
         operatorController.y().onTrue(Commands.runOnce(() ->
             superstructure.forceAllowGatekeeperControl(true))
         );
+        driverController.povUp().onTrue(Commands.runOnce(() -> BaseRobotState.hasAccuratePoseEstimate = false));
 
         // Shooter
         driverController.x().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE)));
@@ -85,7 +88,8 @@ public class RobotContainer extends BaseRobotContainer {
         // Intake
         driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)));
         driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)));
-        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.incrementPullInSuperstructureIntakeState()));
+        // For now, we just plan on retracting all the way, but we can add this back if we need it.
+//        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.incrementPullInSuperstructureIntakeState()));
     }
 
     public final void registerCommands() {
