@@ -340,12 +340,12 @@ subsystems:
             shooterOffsetXMeters: 0
             shooterOffsetYMeters: 0
             shooterOffsetZMeters: 0.5588
-            inclineDuckingLimitDegrees: 17
-            distanceOneInclineAngleDegrees: 22
+            inclineDuckingLimitRotations: 17
+            distanceOneInclineAngleRotations: 0.611
             distanceOneLaunchVelocityRPS: 54
-            distanceTwoInclineAngleDegrees: 22
+            distanceTwoInclineAngleRotations: 0.611
             distanceTwoLaunchVelocityRPS: 53
-            distanceThreeInclineAngleDegrees: 22
+            distanceThreeInclineAngleRotations: 0.611
             distanceThreeLaunchVelocityRPS: 52
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570

@@ -114,9 +114,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      */
     private final double LAUNCHER_VELOCITY_TOLERANCE_RPS;
     /**
-     * The maximum angle the incline can go up to for fitting under the trench (in degrees).
+     * The maximum angle the incline can go up to for fitting under the trench (in rotations).
      */
-    private final double INCLINE_DUCKING_LIMIT_DEGREES;
+    private final double INCLINE_DUCKING_LIMIT_ROTATIONS;
     /**
      * The turret position opposite the dead zone, in turret rotations.
      */
@@ -200,7 +200,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         INCLINE_ANGLE_TOLERANCE_DEGREES = factory.getConstant(NAME, "inclineAngleToleranceDegrees", 0);
         LAUNCHER_VELOCITY_TOLERANCE_RPS = factory.getConstant(NAME, "launcherVelocityToleranceRPS", 0);
 
-        INCLINE_DUCKING_LIMIT_DEGREES = factory.getConstant(NAME, "inclineDuckingLimitDegrees", 0);
+        INCLINE_DUCKING_LIMIT_ROTATIONS = factory.getConstant(NAME, "inclineDuckingLimitRotations", 0);
 
         GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
         GreenLogger.periodicLog(NAME + "/Aimed", this::isAimed);
@@ -536,7 +536,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         if (isInclineDucking) {
             // If we are trying to duck under the trench, restrict the angle of the incline to be
             // below the limit.
-            rotations = Math.min(rotations, INCLINE_DUCKING_LIMIT_DEGREES);
+            rotations = Math.min(rotations, INCLINE_DUCKING_LIMIT_ROTATIONS);
         }
         inclineMotor.setControl(inclineMotorPositionRequest.withPosition(rotations));
     }
@@ -662,15 +662,15 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public enum ShooterState {
         PRESET_CLOSE(
-            factory.getConstant(NAME,"distanceOneInclineAngleDegrees",0),
+            Units.rotationsToDegrees(factory.getConstant(NAME,"distanceOneInclineAngleRotations",0)),
             factory.getConstant(NAME,"distanceOneLaunchVelocityRPS",0)
         ),
         PRESET_MIDDLE(
-            factory.getConstant(NAME,"distanceTwoInclineAngleDegrees",0),
+            Units.rotationsToDegrees(factory.getConstant(NAME,"distanceTwoInclineAngleRotations",0)),
             factory.getConstant(NAME,"distanceTwoLaunchVelocityRPS",0)
         ),
         PRESET_FAR(
-            factory.getConstant(NAME,"distanceThreeInclineAngleDegrees",0),
+            Units.rotationsToDegrees(factory.getConstant(NAME,"distanceThreeInclineAngleRotations",0)),
             factory.getConstant(NAME,"distanceThreeLaunchVelocityRPS",0)
         ),
         FULLY_AUTOMATIC(-1, -1),
