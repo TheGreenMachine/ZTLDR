@@ -47,6 +47,13 @@ public class Superstructure extends BaseSuperstructure {
     private WantedFeederState wantedFeederState = WantedFeederState.FEED;
     private WantedClimberState wantedClimberState = WantedClimberState.STOW;
 
+    /**
+     * If the gatekeeper should directly accept control from outside without first checking that
+     * the shooter is ready. This is so we can still shoot if something is wrong with the shooter,
+     * and it thinks it is never aimed.
+     */
+    private boolean forceAllowGatekeeperControl = false;
+
     public Superstructure(Swerve swerve, Vision vision) {
         super(swerve, vision);
         this.shooter = Singleton.CreateSubSystem(Shooter.class);
@@ -57,6 +64,7 @@ public class Superstructure extends BaseSuperstructure {
 
         GreenLogger.periodicLog("Superstructure/Wanted Super State", () -> wantedSuperState);
         GreenLogger.periodicLog("Superstructure/Actual Super State", () -> actualSuperState);
+        GreenLogger.periodicLog("Superstructure/Force Allowing Gatekeeper Control", () -> forceAllowGatekeeperControl);
     }
 
     @Override
@@ -151,6 +159,17 @@ public class Superstructure extends BaseSuperstructure {
         shooter.setAutoAimTurret(shouldAutoAimTurret);
     }
 
+    /**
+     * Sets if the gatekeeper should directly accept control from outside without first checking
+     * that the shooter is ready. This is so we can still shoot if something is wrong with the
+     * shooter, and it thinks it is never aimed.
+     *
+     * @param shouldForceAllowGatekeeperControl If the gatekeeper should accept controls without
+     *                                          waiting for the shooter to be ready.
+     */
+    public void forceAllowGatekeeperControl(boolean shouldForceAllowGatekeeperControl) {
+        forceAllowGatekeeperControl = shouldForceAllowGatekeeperControl;
+    }
     private void setWantedSubsystemStates(
         Intake.IntakeState intakeState,
         Feeder.FeederState feederState,
@@ -182,7 +201,9 @@ public class Superstructure extends BaseSuperstructure {
             }
         );
         gatekeeper.setWantedState(
-            shooter.isAimed()
+            // Only let fuel into the shooter if the shooter is ready, or if we are force allowing
+            // control.
+            shooter.isAimed() || forceAllowGatekeeperControl
                 ? switch (wantedGatekeeperState) {
                     case OPEN -> Gatekeeper.GatekeeperState.OPEN;
                     case CLOSE -> Gatekeeper.GatekeeperState.CLOSED;

@@ -59,6 +59,15 @@ public class RobotContainer extends BaseRobotContainer {
                 superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
                 superstructure.setInclineDucking(true);
             }));
+        // TODO: Put these on the buttons we actually want, or remove this feature if we don't
+        //  think it is necessary. We should only have to use these if something is broken with
+        //  the shooter aiming or determining when it is aimed correctly.
+        operatorController.x().onTrue(Commands.runOnce(() ->
+            superstructure.forceAllowGatekeeperControl(false))
+        );
+        operatorController.y().onTrue(Commands.runOnce(() ->
+            superstructure.forceAllowGatekeeperControl(true))
+        );
 
         // Shooter
         driverController.x().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE)));
