@@ -3,60 +3,26 @@
     "title": "Shooter Settings Config",
     "additionalProperties": false,
     "properties": {
-        "distances": {
+        "distancesInches": {
             "type": "array",
-            "default": 0,
+            "default": null,
             "items": {
                 "type": "number"
             }
         },
-        "angles": {
+        "inclineAnglesRotations": {
             "type": "array",
-            "default": 0,
+            "default": null,
             "items": {
                 "type": "number"
             }
         },
-        "powers": {
+        "launchVelocitiesRPS": {
             "type": "array",
-            "default": 0,
+            "default": null,
             "items": {
                 "type": "number"
             }
-        },
-        "minimumDefaultAngle": {
-            "type": "number",
-            "default": 0
-        },
-        "minimumDefaultPower": {
-            "type": "number",
-            "default": 0
-        },
-        "mediumDefaultAngle": {
-            "type": "number",
-            "default": 0
-        },
-        "mediumDefaultPower": {
-            "type": "number",
-            "default": 0
-        },
-        "maximumDefaultAngle": {
-            "type": "number",
-            "default": 0
-        },
-        "maximumDefaultPower": {
-            "type": "number",
-            "default": 0
         }
-    },
-    "anyOf": [
-        {
-            "required": [
-                "distances",
-                "angles",
-                "topMotorVelocity",
-                "bottomMotorVelocity"
-            ]
-        }
-    ]
+    }
 }

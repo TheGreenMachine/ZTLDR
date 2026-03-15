@@ -11,7 +11,6 @@ import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.FieldContainer;
 import com.team1816.lib.util.GreenLogger;
-import com.team1816.lib.util.ShooterDistanceSetting;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
@@ -409,10 +408,13 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      */
     private void aimInclineAndLaunchersAtTarget(Translation2d targetTranslation2d) {
         Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
-        double distanceToTarget = shooterTranslation2d.getDistance(targetTranslation2d);
-        ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator.getShooterDistanceSetting(distanceToTarget);
-        double inclineAngleDegrees = shooterDistanceSetting.getAngle();
-        double launchVelocityRPS = shooterDistanceSetting.getPower();
+        double distanceToTargetMeters = shooterTranslation2d.getDistance(targetTranslation2d);
+        double distanceToTargetInches = Units.metersToInches(distanceToTargetMeters);
+        ShooterTableCalculator.ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator
+            .getShooterDistanceSetting(distanceToTargetInches);
+        double inclineAngleRotations = shooterDistanceSetting.inclineAngleRotations();
+        double inclineAngleDegrees = Units.rotationsToDegrees(inclineAngleRotations);
+        double launchVelocityRPS = shooterDistanceSetting.launchVelocityRPS();
         setInclineAngle(inclineAngleDegrees);
         setLaunchVelocities(launchVelocityRPS);
     }
