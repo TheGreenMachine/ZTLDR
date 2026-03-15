@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -89,6 +90,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private MechanismLigament2d launchAngleML = launchMechRoot.append(
         new MechanismLigament2d("Launch Angle", 1.5, 0));
 
+    private double manualShootingPower;
+    private double manualShootingHoodAngle;
+
     public enum AUTO_AIM_TARGETS{
         // TODO: figure out hub z value
         BLUE_HUB(new Translation3d(4.6228, 3.8608, 40)),
@@ -121,7 +125,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         AIMING_HUB(-1,-1,0),
         SNOWBLOWING(-1, -1, -1),
         AIMING_CORNER(-1,-1,-1),
-        IDLE(0, 0, 0);
+        IDLE(0, 0, 0),
+        // added for manual testing
+        DISTANCE_MANUAL(factory.getConstant(NAME,"distanceTwoLaunchAngle",0), factory.getConstant(NAME,"distanceTwoRotationAngle",0), factory.getConstant(NAME,"distanceTwoLaunchVelocity",0));
 
         private double launchAngle;
         private double rotationAngle;
@@ -252,6 +258,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             launchPower = shooterDistanceSetting.getPower();
             rotationAngle = Math.tan((launcherTranslation.getY()-currentTarget.position.getY())/(launcherTranslation.getX()-currentTarget.position.getX()));
         }
+
         if(wantedState == SHOOTER_STATE.AIMING_HUB || wantedState == SHOOTER_STATE.AIMING_CORNER) {
             if(wantedState == SHOOTER_STATE.AIMING_HUB){
                 if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
@@ -290,6 +297,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             launchPower = shooterDistanceSetting.getPower();
             rotationAngle = Math.tan((launcherTranslation.getY()-currentTarget.position.getY())/(launcherTranslation.getX()-currentTarget.position.getX()));
 
+        }
+
+        if (wantedState == SHOOTER_STATE.DISTANCE_MANUAL) {
+            launchAngle = manualShootingHoodAngle;
+            launchPower = manualShootingPower;
         }
 
         setLaunchAngle(launchAngle);
@@ -457,5 +469,41 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     public boolean isCalibrated() {
         return isCalibrated;
+    }
+
+    public void incrementShooterPower() {
+        manualShootingPower += 2;
+
+        wantedState = SHOOTER_STATE.DISTANCE_MANUAL;
+
+        GreenLogger.log("SHOOTER POWER " + manualShootingPower);
+        SmartDashboard.putNumber("SHOOTER POWER", manualShootingPower);
+    }
+
+    public void decrementShooterPower() {
+        manualShootingPower -= 2;
+
+        wantedState = SHOOTER_STATE.DISTANCE_MANUAL;
+
+        GreenLogger.log("SHOOTER POWER " + manualShootingPower);
+        SmartDashboard.putNumber("SHOOTER POWER", manualShootingPower);
+    }
+
+    public void incrementShooterHoodAngle() {
+        manualShootingHoodAngle += 2;
+
+        wantedState = SHOOTER_STATE.DISTANCE_MANUAL;
+
+        GreenLogger.log("SHOOTER ANGLE " + manualShootingHoodAngle);
+        SmartDashboard.putNumber("SHOOTER ANGLE", manualShootingHoodAngle);
+    }
+
+    public void decrementShooterHoodAngle() {
+        manualShootingHoodAngle -= 2;
+
+        wantedState = SHOOTER_STATE.DISTANCE_MANUAL;
+
+        GreenLogger.log("SHOOTER ANGLE " + manualShootingHoodAngle);
+        SmartDashboard.putNumber("SHOOTER ANGLE", manualShootingHoodAngle);
     }
 }
