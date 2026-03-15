@@ -16,7 +16,6 @@ public class Superstructure extends BaseSuperstructure {
     private final Gatekeeper gatekeeper;
     private final Intake intake;
     private final Feeder feeder;
-    private final Climber climber;
 
     private CommandXboxController controller;
 
@@ -64,12 +63,6 @@ public class Superstructure extends BaseSuperstructure {
 
         GATEKEEPING_ON,
         GATEKEEPING_OFF,
-
-        CLIMBING_L1,
-        CLIMBING_L3,
-        CLIMBING_DOWN_L1,
-
-        DROPPING_HEIGHT
     }
 
     public enum ClimbSide {
@@ -114,7 +107,6 @@ public class Superstructure extends BaseSuperstructure {
         this.gatekeeper = Singleton.CreateSubSystem(Gatekeeper.class);
         this.intake = Singleton.CreateSubSystem(Intake.class);
         this.feeder = Singleton.CreateSubSystem(Feeder.class);
-        this.climber = Singleton.CreateSubSystem(Climber.class);
     }
 
     @Override
@@ -150,12 +142,6 @@ public class Superstructure extends BaseSuperstructure {
 
             case GATEKEEPER_ON -> actualSuperState = ActualSuperState.GATEKEEPING_ON;
             case GATEKEEPER_OFF -> actualSuperState = ActualSuperState.GATEKEEPING_OFF;
-
-            case CLIMB_L1 -> actualSuperState = ActualSuperState.CLIMBING_L1;
-            case CLIMB_L3 -> actualSuperState = ActualSuperState.CLIMBING_L3;
-            case CLIMB_DOWN_L1 -> actualSuperState = ActualSuperState.CLIMBING_DOWN_L1;
-
-            case DROP_HEIGHT -> actualSuperState = ActualSuperState.DROPPING_HEIGHT;
         }
 
 
@@ -181,12 +167,6 @@ public class Superstructure extends BaseSuperstructure {
 
             case GATEKEEPING_ON -> gatekeepingOn();
             case GATEKEEPING_OFF -> gatekeeperingOff();
-
-            case CLIMBING_L1 -> climbingL1();
-            case CLIMBING_L3 -> climbingL3();
-            case CLIMBING_DOWN_L1 -> climbingDownL1();
-
-            case DROPPING_HEIGHT -> droppingHeight();
         }
     }
 
@@ -195,13 +175,11 @@ public class Superstructure extends BaseSuperstructure {
     }
 
     private void setWantedSubsystemStates(Intake.INTAKE_STATE intakeState, Feeder.FEEDER_STATE feederState,
-                                          Gatekeeper.GATEKEEPER_STATE gatekeeperState, Shooter.SHOOTER_STATE shooterState,
-                                          Climber.CLIMBER_STATE climbState)  {
+                                          Gatekeeper.GATEKEEPER_STATE gatekeeperState, Shooter.SHOOTER_STATE shooterState)  {
         intake.setWantedState(intakeState);
         feeder.setWantedState(feederState);
         gatekeeper.setWantedState(gatekeeperState);
         shooter.setWantedState(shooterState);
-        climber.setWantedState(climbState);
     }
 
     private void defaulting() {
@@ -288,30 +266,6 @@ public class Superstructure extends BaseSuperstructure {
         }
 
         actualSuperState = ActualSuperState.DEFAULTING;
-    }
-
-    private void climbingL1() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF, Feeder.FEEDER_STATE.SLOW_FEEDING,
-            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
-            Climber.CLIMBER_STATE.L1_UP_CLIMBING);
-    }
-
-    private void climbingL3() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF, Feeder.FEEDER_STATE.SLOW_FEEDING,
-            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
-            Climber.CLIMBER_STATE.L3_UP_CLIMBING);
-    }
-
-    private void climbingDownL1() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF, Feeder.FEEDER_STATE.SLOW_FEEDING,
-            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
-            Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
-    }
-
-    private void droppingHeight() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF, Feeder.FEEDER_STATE.SLOW_FEEDING,
-            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
-            Climber.CLIMBER_STATE.IDLING);
     }
 
     public void setClimbSide(ClimbSide climbSide) {
