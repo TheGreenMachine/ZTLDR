@@ -337,6 +337,7 @@ subsystems:
             launchVelocityAdjustmentAmountRPS: 0.04
             inclineAngleAdjustmentAmountDegrees: 0.02
             turretAngleAdjustmentAmountDegrees: 0.04
+            topLaunchMotorBackspinMultiplier: 0.9 # Less than one for backspin.
     vision:
         cameras:
             forwardLeft: # Pi IP: 10.18.16.11

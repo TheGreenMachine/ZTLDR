@@ -171,6 +171,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * #decreaseTurretAngleAdjustment()} (in degrees).
      */
     private final double TURRET_ANGLE_ADJUSTMENT_AMOUNT_DEGREES;
+    /**
+     * A multiplier on all requests to the {@link #topLaunchMotor} to create backspin on the fuel.
+     * Values less than one will cause backspin.
+     */
+    private final double TOP_LAUNCH_MOTOR_BACKSPIN_MULTIPLIER;
 
     //CALIBRATION
     /**
@@ -235,6 +240,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         LAUNCH_VELOCITY_ADJUSTMENT_AMOUNT_RPS = factory.getConstant(NAME, "launchVelocityAdjustmentAmountRPS", 0);
         INCLINE_ANGLE_ADJUSTMENT_AMOUNT_DEGREES = factory.getConstant(NAME, "inclineAngleAdjustmentAmountDegrees", 0);
         TURRET_ANGLE_ADJUSTMENT_AMOUNT_DEGREES = factory.getConstant(NAME, "turretAngleAdjustmentAmountDegrees", 0);
+
+        TOP_LAUNCH_MOTOR_BACKSPIN_MULTIPLIER = factory.getConstant(NAME, "topLaunchMotorBackspinMultiplier", 1);
 
         GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
         GreenLogger.periodicLog(NAME + "/Aimed", this::isAimed);
@@ -575,7 +582,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private void setLaunchVelocities(double wantedVelocityRPS) {
         wantedLaunchVelocityRPS = wantedVelocityRPS + launchVelocityAdjustmentRPS;
         if (spinUpLaunchMotors) {
-            topLaunchMotor.setControl(topLaunchMotorVelocityRequest.withVelocity(wantedLaunchVelocityRPS));
+            topLaunchMotor.setControl(topLaunchMotorVelocityRequest.withVelocity(
+                wantedLaunchVelocityRPS * TOP_LAUNCH_MOTOR_BACKSPIN_MULTIPLIER
+            ));
             bottomLaunchMotor.setControl(bottomLaunchMotorVelocityRequest.withVelocity(wantedLaunchVelocityRPS));
         }
         else {
