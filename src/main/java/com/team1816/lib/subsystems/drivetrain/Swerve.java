@@ -9,8 +9,10 @@ import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -28,6 +30,13 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     private final SlewRateLimiter yLimiter = new SlewRateLimiter(3);    // strafe
     private final SlewRateLimiter rotLimiter = new SlewRateLimiter(6);  // rotation
     private static double maxAngularRate = 0;
+
+    // Blue alliance sees forward as 0 degrees (toward red alliance wall).
+    private static final Rotation2d blueAlliancePerspectiveRotation = Rotation2d.kZero;
+    // Red alliance sees forward as 180 degrees (toward blue alliance wall).
+    private static final Rotation2d redAlliancePerspectiveRotation = Rotation2d.k180deg;
+    // Keep track if we've ever applied the operator perspective before or not.
+    private boolean hasAppliedOperatorPerspective = false;
 
     private SwerveState wantedState = SwerveState.IDLING;
 
@@ -65,6 +74,7 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     public void periodic() {
         readFromHardware();
         applyStates();
+        setForwardPerspective();
     }
 
     private SwerveRequest GetSwerverCommand(SwerveRequest.FieldCentric drive) {
@@ -104,6 +114,26 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
         return drive.withVelocityX(x * drivetrain.maxSpd) // Drive forward with negative Y (forward)
             .withVelocityY(y * drivetrain.maxSpd) // Drive left with negative X (left)
             .withRotationalRate(rot * maxAngularRate); // Drive counterclockwise with negative X (left)
+    }
+
+    private void setForwardPerspective() {
+        /*
+         * Periodically try to apply the operator perspective.
+         * If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
+         * This allows us to correct the perspective in case the robot code restarts mid-match.
+         * Otherwise, only check and apply the operator perspective if the DS is disabled.
+         * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
+         */
+        if (!hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
+            DriverStation.getAlliance().ifPresent(allianceColor -> {
+                drivetrain.setOperatorPerspectiveForward(
+                    allianceColor == DriverStation.Alliance.Red
+                        ? redAlliancePerspectiveRotation
+                        : blueAlliancePerspectiveRotation
+                );
+                hasAppliedOperatorPerspective = true;
+            });
+        }
     }
 
     private void applyStates() {
