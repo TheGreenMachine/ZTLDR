@@ -200,8 +200,9 @@ public class Superstructure extends BaseSuperstructure {
         // TODO: Declimb if necessary, else set the subsystem wanted states
         swerve.setWantedState(
             switch (wantedSwerveState) {
-                case MANUAL_DRIVING -> Swerve.ActualState.MANUAL_DRIVING;
-                case AUTOMATIC_DRIVING -> Swerve.ActualState.AUTOMATIC_DRIVING;
+                case MANUAL_DRIVING -> Swerve.SwerveState.MANUAL_DRIVING;
+                case AUTOMATIC_DRIVING -> Swerve.SwerveState.AUTOMATIC_DRIVING;
+                case BRAKE -> Swerve.SwerveState.BRAKE;
             }
         );
         shooter.setWantedState(
@@ -270,7 +271,8 @@ public class Superstructure extends BaseSuperstructure {
 
     public enum WantedSwerveState {
         MANUAL_DRIVING,
-        AUTOMATIC_DRIVING
+        AUTOMATIC_DRIVING,
+        BRAKE
     }
 
     public enum WantedShooterState {

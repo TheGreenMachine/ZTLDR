@@ -11,8 +11,6 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.networktables.*;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -31,8 +29,11 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     private final SlewRateLimiter rotLimiter = new SlewRateLimiter(6);  // rotation
     private static double maxAngularRate = 0;
 
-    private ActualState wantedState = ActualState.IDLING;
-    private ActualState previousWantedState = ActualState.IDLING;
+    private SwerveState wantedState = SwerveState.IDLING;
+
+    private final SwerveRequest.FieldCentric manualDriveRequest = new SwerveRequest.FieldCentric()
+        .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+    private final SwerveRequest.SwerveDriveBrake brakeRequest = new SwerveRequest.SwerveDriveBrake();
 
     private final double NORMAL_MODE_TRANSLATIONAL_MULTIPLIER;
     private final double NORMAL_MODE_ROTATIONAL_MULTIPLIER;
@@ -56,12 +57,8 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
         // and Y is defined as to the left according to WPILib convention.
         // setup teleop drivetrain command
         maxAngularRate = RotationsPerSecond.of(kinematics.maxAngularRate).in(RadiansPerSecond);
-    }
 
-    public enum ActualState {
-        MANUAL_DRIVING,
-        AUTOMATIC_DRIVING,
-        IDLING
+        GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
     }
 
     @Override
@@ -111,29 +108,17 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
 
     private void applyStates() {
         switch (wantedState) {
-            case MANUAL_DRIVING:
-                SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-                    .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-                drivetrain.setSwerveState(GetSwerverCommand(drive));
-                break;
-            case AUTOMATIC_DRIVING:
+            case MANUAL_DRIVING -> drivetrain.setSwerveState(GetSwerverCommand(manualDriveRequest));
+            case AUTOMATIC_DRIVING -> {
                 // TODO: something here, idk
-                break;
-            case IDLING:
-                break;
-            default:
-                drivetrain.setSwerveState(new SwerveRequest.Idle());
-                break;
-        }
-
-        if (wantedState != previousWantedState) {
-            GreenLogger.log("Swerve state: " + wantedState.toString());
-            SmartDashboard.putString("Swerve state: ", wantedState.toString());
-            previousWantedState = wantedState;
+            }
+            case BRAKE -> drivetrain.setSwerveState(brakeRequest);
+            case IDLING -> {}
+            default -> drivetrain.setSwerveState(new SwerveRequest.Idle());
         }
     }
 
-    public void setWantedState(ActualState state) {
+    public void setWantedState(SwerveState state) {
         this.wantedState = state;
     }
 
@@ -179,5 +164,22 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
 
     public void simTeleportRobot(Pose2d pose) {
         drivetrain.simTeleportRobot(pose);
+    }
+
+    public enum SwerveState {
+        /**
+         * Driving with joystick inputs.
+         */
+        MANUAL_DRIVING,
+        /**
+         * Following PathPlanner path commands.
+         */
+        AUTOMATIC_DRIVING,
+        /**
+         * Sends a {@link com.ctre.phoenix6.swerve.SwerveRequest.SwerveDriveBrake} request to the
+         * drivetrain ("X-mode").
+         */
+        BRAKE,
+        IDLING
     }
 }

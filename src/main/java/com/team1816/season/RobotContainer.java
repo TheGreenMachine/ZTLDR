@@ -52,6 +52,14 @@ public class RobotContainer extends BaseRobotContainer {
 
     private void configureBindings() {
         // DRIVER CONTROLLER
+        // Swerve
+        driverController.povDown().onTrue(Commands.runOnce(() ->
+            superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.BRAKE)
+        ))
+            .onFalse(Commands.runOnce(() ->
+                superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.MANUAL_DRIVING)
+            ));
+
         // Gatekeeper
         driverController.rightTrigger().onTrue(Commands.runOnce(() -> {
             superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
