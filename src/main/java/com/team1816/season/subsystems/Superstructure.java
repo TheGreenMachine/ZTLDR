@@ -19,7 +19,6 @@ public class Superstructure extends BaseSuperstructure {
     private WantedShooterState wantedShooterState = WantedShooterState.PRESET_CLOSE;
     private WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSE;
     private WantedIntakeState wantedIntakeState = WantedIntakeState.INTAKE;
-    private WantedFeederState wantedFeederState = WantedFeederState.FEED;
 
     /**
      * If the gatekeeper should directly accept control from outside without first checking that
@@ -28,6 +27,13 @@ public class Superstructure extends BaseSuperstructure {
      */
     private boolean forceAllowGatekeeperControl = false;
 
+    /**
+     * If the gatekeeper and feeder should reverse to try to unjam. This is separate from the main
+     * state for the gatekeeper because it should take priority over any other conflicting button
+     * presses telling the gatekeeper to do something.
+     */
+    private boolean gatekeeperAndFeederReversing = false;
+
     public Superstructure(Swerve swerve, Vision vision) {
         super(swerve, vision);
         this.shooter = Singleton.CreateSubSystem(Shooter.class);
@@ -35,9 +41,10 @@ public class Superstructure extends BaseSuperstructure {
         this.intake = Singleton.CreateSubSystem(Intake.class);
         this.feeder = Singleton.CreateSubSystem(Feeder.class);
 
-        GreenLogger.periodicLog("Superstructure/Wanted Super State", () -> wantedSuperState);
-        GreenLogger.periodicLog("Superstructure/Actual Super State", () -> actualSuperState);
-        GreenLogger.periodicLog("Superstructure/Force Allowing Gatekeeper Control", () -> forceAllowGatekeeperControl);
+        GreenLogger.periodicLog("superstructure/Wanted Super State", () -> wantedSuperState);
+        GreenLogger.periodicLog("superstructure/Actual Super State", () -> actualSuperState);
+        GreenLogger.periodicLog("superstructure/Force Allowing Gatekeeper Control", () -> forceAllowGatekeeperControl);
+        GreenLogger.periodicLog("superstructure/Gatekeeper and Feeder Reversing", () -> gatekeeperAndFeederReversing);
     }
 
     @Override
@@ -91,10 +98,6 @@ public class Superstructure extends BaseSuperstructure {
             case PULL_IN_ONE -> WantedIntakeState.PULL_IN_TWO;
             case PULL_IN_TWO, STOW -> WantedIntakeState.STOW;
         };
-    }
-
-    public void setSuperstructureWantedFeederState(WantedFeederState feederState) {
-        this.wantedFeederState = feederState;
     }
 
     /**
@@ -182,6 +185,17 @@ public class Superstructure extends BaseSuperstructure {
         shooter.decreaseTurretAngleAdjustment();
     }
 
+    /**
+     * Sets if the gatekeeper and feeder should reverse to try to unjam. This is separate from
+     * setting the main state for the gatekeeper because it should take priority over any other
+     * conflicting button presses telling the gatekeeper to do something.
+     *
+     * @param shouldGatekeeperAndFeederReverse If the gatekeeper and feeder should reverse.
+     */
+    public void setGatekeeperAndFeederReversing(boolean shouldGatekeeperAndFeederReverse) {
+        gatekeeperAndFeederReversing = shouldGatekeeperAndFeederReverse;
+    }
+
     private void defaulting() {
         // TODO: Declimb if necessary, else set the subsystem wanted states
         swerve.setWantedState(
@@ -199,14 +213,20 @@ public class Superstructure extends BaseSuperstructure {
             }
         );
         gatekeeper.setWantedState(
-            // Only let fuel into the shooter if the shooter is ready, or if we are force allowing
-            // control.
-            shooter.isAimed() || forceAllowGatekeeperControl
-                ? switch (wantedGatekeeperState) {
-                    case OPEN -> Gatekeeper.GatekeeperState.OPEN;
-                    case CLOSE -> Gatekeeper.GatekeeperState.CLOSED;
-                }
-                : Gatekeeper.GatekeeperState.CLOSED
+            gatekeeperAndFeederReversing
+                // If we are trying to reverse the gatekeeper to unjam, that request should always
+                // take priority.
+                ? Gatekeeper.GatekeeperState.REVERSING
+                : (
+                    // Only let fuel into the shooter if the shooter is ready, or if we are force
+                    // allowing control.
+                    shooter.isAimed() || forceAllowGatekeeperControl
+                        ? switch (wantedGatekeeperState) {
+                        case OPEN -> Gatekeeper.GatekeeperState.OPEN;
+                        case CLOSE -> Gatekeeper.GatekeeperState.CLOSED;
+                    }
+                        : Gatekeeper.GatekeeperState.CLOSED
+                )
         );
         // Only spin up the launch motors if we are trying to shoot to save battery.
         shooter.setSpinUpLaunchMotors(gatekeeper.getState() == Gatekeeper.GatekeeperState.OPEN);
@@ -219,13 +239,12 @@ public class Superstructure extends BaseSuperstructure {
             }
         );
         feeder.setWantedState(
-            gatekeeper.getState() == Gatekeeper.GatekeeperState.OPEN
-                ? switch (wantedFeederState) {
-                    case FEED -> Feeder.FeederState.FEEDING;
-                    case STOP -> Feeder.FeederState.STOPPED;
-                }
-                // If the gatekeeper isn't running, keep the feeder stopped to avoid jamming.
-                : Feeder.FeederState.STOPPED
+            // Have the feeder just follow what the gatekeepers are doing.
+            switch (gatekeeper.getState()) {
+                case OPEN -> Feeder.FeederState.FEEDING;
+                case CLOSED -> Feeder.FeederState.STOPPED;
+                case REVERSING -> Feeder.FeederState.REVERSING;
+            }
         );
     }
 
@@ -271,10 +290,5 @@ public class Superstructure extends BaseSuperstructure {
         STOW,
         PULL_IN_ONE,
         PULL_IN_TWO
-    }
-
-    public enum WantedFeederState {
-        FEED,
-        STOP
     }
 }

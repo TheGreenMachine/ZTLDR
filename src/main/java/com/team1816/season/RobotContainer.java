@@ -35,8 +35,8 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
+        superstructure.setGatekeeperAndFeederReversing(false);
         superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE);
-        superstructure.setSuperstructureWantedFeederState(Superstructure.WantedFeederState.FEED);
     }
 
     public void teleopInit() {
@@ -46,8 +46,8 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setInclineDucking(true);
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
+        superstructure.setGatekeeperAndFeederReversing(false);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
-        superstructure.setSuperstructureWantedFeederState(Superstructure.WantedFeederState.FEED);
     }
 
     private void configureBindings() {
@@ -88,6 +88,12 @@ public class RobotContainer extends BaseRobotContainer {
         operatorController.y().onTrue(Commands.runOnce(() ->
             superstructure.forceAllowGatekeeperControl(true))
         );
+        operatorController.rightTrigger().onTrue(Commands.runOnce(() ->
+            superstructure.setGatekeeperAndFeederReversing(true)
+        ))
+            .onFalse(Commands.runOnce(() ->
+                superstructure.setGatekeeperAndFeederReversing(false)
+            ));
 
         // Shooter
         // TODO: Put these on the buttons we actually want. We should only have to use these if something is broken with the auto turret aiming.

@@ -4,7 +4,6 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.GreenLogger;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.team1816.lib.Singleton.factory;
@@ -60,7 +59,8 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
 
     public enum GatekeeperState {
         OPEN(factory.getConstant(NAME, "topOpenVelocity", 0), factory.getConstant(NAME, "bottomOpenVelocity", 0)),
-        CLOSED(factory.getConstant(NAME, "topClosedVelocity", 0), factory.getConstant(NAME, "bottomClosedVelocity", 0));
+        CLOSED(factory.getConstant(NAME, "topClosedVelocity", 0), factory.getConstant(NAME, "bottomClosedVelocity", 0)),
+        REVERSING(factory.getConstant(NAME, "topReversingVelocity", 0), factory.getConstant(NAME, "bottomReversingVelocity", 0));
 
         private double topMotorValue, bottomMotorValue;
 

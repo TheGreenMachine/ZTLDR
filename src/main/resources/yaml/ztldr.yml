@@ -199,6 +199,7 @@ subsystems:
         constants:
             feedingDutyCycle: 0.7
             stoppedDutyCycle: 0
+            reversingDutyCycle: -0.4
     intake:
         implemented: true
         devices:
@@ -254,8 +255,10 @@ subsystems:
         constants:
             topClosedVelocity: 0
             topOpenVelocity: 40
+            topReversingVelocity: -10
             bottomClosedVelocity: 0
             bottomOpenVelocity: 40
+            bottomReversingVelocity: -10
     shooter:
         canBusName: shootercanivore
         devices:
