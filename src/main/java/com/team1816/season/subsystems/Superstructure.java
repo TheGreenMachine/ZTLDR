@@ -5,37 +5,12 @@ import com.team1816.lib.subsystems.BaseSuperstructure;
 import com.team1816.lib.subsystems.Vision;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
-import edu.wpi.first.math.geometry.Pose2d;
 
 public class Superstructure extends BaseSuperstructure {
     private final Shooter shooter;
     private final Gatekeeper gatekeeper;
     private final Intake intake;
     private final Feeder feeder;
-    private final Climber climber;
-
-    // TODO: Reconsider this climb side stuff.
-    public enum ClimbSide {
-        // TODO: Get these poses from Choreo.
-        LEFT(Pose2d.kZero),
-        RIGHT(Pose2d.kZero);
-
-        private final Pose2d climbPose;
-
-        ClimbSide(Pose2d climbPose) {
-            this.climbPose = climbPose;
-        }
-
-        public Pose2d getClimbPose() {
-            return climbPose;
-        }
-    }
-
-    private ClimbSide climbSide = ClimbSide.LEFT;
-
-    public void setClimbSide(ClimbSide climbSide) {
-        this.climbSide = climbSide;
-    }
 
     private WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
     private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
@@ -45,7 +20,6 @@ public class Superstructure extends BaseSuperstructure {
     private WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSE;
     private WantedIntakeState wantedIntakeState = WantedIntakeState.INTAKE;
     private WantedFeederState wantedFeederState = WantedFeederState.FEED;
-    private WantedClimberState wantedClimberState = WantedClimberState.STOW;
 
     /**
      * If the gatekeeper should directly accept control from outside without first checking that
@@ -60,7 +34,6 @@ public class Superstructure extends BaseSuperstructure {
         this.gatekeeper = Singleton.CreateSubSystem(Gatekeeper.class);
         this.intake = Singleton.CreateSubSystem(Intake.class);
         this.feeder = Singleton.CreateSubSystem(Feeder.class);
-        this.climber = Singleton.CreateSubSystem(Climber.class);
 
         GreenLogger.periodicLog("Superstructure/Wanted Super State", () -> wantedSuperState);
         GreenLogger.periodicLog("Superstructure/Actual Super State", () -> actualSuperState);
@@ -124,10 +97,6 @@ public class Superstructure extends BaseSuperstructure {
         this.wantedFeederState = feederState;
     }
 
-    public void setSuperstructureWantedClimberState(WantedClimberState climberState) {
-        this.wantedClimberState = climberState;
-    }
-
     /**
      * Sets if the incline of the shooter should duck down to fit under the trench.
      *
@@ -169,19 +138,6 @@ public class Superstructure extends BaseSuperstructure {
      */
     public void forceAllowGatekeeperControl(boolean shouldForceAllowGatekeeperControl) {
         forceAllowGatekeeperControl = shouldForceAllowGatekeeperControl;
-    }
-    private void setWantedSubsystemStates(
-        Intake.IntakeState intakeState,
-        Feeder.FeederState feederState,
-        Gatekeeper.GatekeeperState gatekeeperState,
-        Shooter.ShooterState shooterState,
-        Climber.ClimberState climbState
-    )  {
-        intake.setWantedState(intakeState);
-        feeder.setWantedState(feederState);
-        gatekeeper.setWantedState(gatekeeperState);
-        shooter.setWantedState(shooterState);
-        climber.setWantedState(climbState);
     }
 
     private void defaulting() {
@@ -229,27 +185,14 @@ public class Superstructure extends BaseSuperstructure {
                 // If the gatekeeper isn't running, keep the feeder stopped to avoid jamming.
                 : Feeder.FeederState.STOPPED
         );
-        climber.setWantedState(
-            switch (wantedClimberState) {
-                case STOW, UP -> Climber.ClimberState.IDLING;
-                case L1 -> Climber.ClimberState.L1_UP_CLIMBING;
-                case L3 -> Climber.ClimberState.L3_UP_CLIMBING;
-            }
-        );
     }
 
     private void climbingL1() {
         // TODO: Handle Superstructure climbing behavior.
-        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FeederState.FEEDING,
-            Gatekeeper.GatekeeperState.CLOSED, Shooter.ShooterState.IDLE,
-            Climber.ClimberState.L1_UP_CLIMBING);
     }
 
     private void climbingL3() {
         // TODO: Handle Superstructure climbing behavior.
-        setWantedSubsystemStates(Intake.IntakeState.STOW, Feeder.FeederState.FEEDING,
-            Gatekeeper.GatekeeperState.CLOSED, Shooter.ShooterState.IDLE,
-            Climber.ClimberState.L3_UP_CLIMBING);
     }
 
     public enum WantedSuperState {
@@ -291,12 +234,5 @@ public class Superstructure extends BaseSuperstructure {
     public enum WantedFeederState {
         FEED,
         STOP
-    }
-
-    public enum WantedClimberState {
-        STOW,
-        UP,
-        L1,
-        L3
     }
 }

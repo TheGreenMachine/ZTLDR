@@ -37,7 +37,6 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
         superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE);
         superstructure.setSuperstructureWantedFeederState(Superstructure.WantedFeederState.FEED);
-        superstructure.setSuperstructureWantedClimberState(Superstructure.WantedClimberState.STOW);
     }
 
     public void teleopInit() {
