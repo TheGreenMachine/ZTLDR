@@ -9,11 +9,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 
+/**
+ * Manages SmartDashboard and logging of autos. Does NOT interact directly with {@link CommandScheduler} or the drivetrain.
+ */
 public class AutoModeManager {
+    /**
+     * Puts dropdown in SmartDashboard and adds all autos.
+     */
     public AutoModeManager() {
         autoChooser = new SendableChooser<>();
         SmartDashboard.putData("Auto Mode", autoChooser);
@@ -29,7 +36,7 @@ public class AutoModeManager {
                 startingPose = FlippingUtil.flipFieldPose(startingPose);
             }
             GreenLogger.log("Auto Mode Manager- starting pose: " + startingPose);
-            // why is this not PPLibTelemetry.setCurrentPose? look into this after Pittsburgh
+            // TODO: why is this not PPLibTelemetry.setCurrentPose? look into this after Pittsburgh
             PPLibTelemetry.setTargetPose(startingPose);
 
             if (listener != null) listener.accept(a);
@@ -44,10 +51,16 @@ public class AutoModeManager {
     private final SendableChooser<PathPlannerAuto> autoChooser;
     private Consumer<PathPlannerAuto> listener;
 
+    /**
+     * Retrieves currently selected auto. May be null if "None" is selected.
+     */
     public PathPlannerAuto getSelectedAuto() {
         return autoChooser.getSelected();
     }
 
+    /**
+     * Registers a single listener to changes to the auto choosers.
+     */
     public void onChange(Consumer<PathPlannerAuto> listener) {
         this.listener = listener;
     }
