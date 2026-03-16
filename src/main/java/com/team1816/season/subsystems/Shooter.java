@@ -42,6 +42,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * If the launch motors should be enabled to spin up.
      */
     private boolean spinUpLaunchMotors = false;
+    /**
+     * An adjustment value added to all requests to the launch motors (in RPS).
+     */
+    private double launchVelocityAdjustmentRPS = 0;
 
     /**
      * The angle we want the incline of the shooter to go to, assuming it is not ducking (in
@@ -49,6 +53,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      */
     private double wantedInclineAngleDegrees = 0;
     private boolean isInclineDucking = false;
+    /**
+     * An adjustment value added to all requests to the incline (in degrees).
+     */
+    private double inclineAngleAdjustmentDegrees = 0;
 
     /**
      * The angle we want the turret to point at, assuming it is calibrated and not in the dead zone
@@ -71,6 +79,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * estimate.
      */
     private boolean isAutoAiming = true;
+    /**
+     * An adjustment value added to all requests to the turret (in degrees).
+     */
+    private double turretAngleAdjustmentDegrees = 0;
 
     //MOTORS
     private final IMotor topLaunchMotor = (IMotor) factory.getDevice(NAME, "topLaunchMotor");
@@ -141,6 +153,24 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * where we would see beam break values change, in motor rotations.
      */
     private final double FOURTH_BEAM_BREAK_POSITION_MOTOR_ROTATIONS;
+    /**
+     * The amount by which to increase or decrease the {@link #launchVelocityAdjustmentRPS} per
+     * call to {@link #increaseLaunchVelocityAdjustment()} or {@link
+     * #decreaseLaunchVelocityAdjustment()} (in RPS).
+     */
+    private final double LAUNCH_VELOCITY_ADJUSTMENT_AMOUNT_RPS;
+    /**
+     * The amount by which to increase or decrease the {@link #inclineAngleAdjustmentDegrees} per
+     * call to {@link #increaseInclineAngleAdjustment()} or {@link
+     * #decreaseInclineAngleAdjustment()} (in degrees).
+     */
+    private final double INCLINE_ANGLE_ADJUSTMENT_AMOUNT_DEGREES;
+    /**
+     * The amount by which to increase or decrease the {@link #turretAngleAdjustmentDegrees} per
+     * call to {@link #increaseTurretAngleAdjustment()} or {@link
+     * #decreaseTurretAngleAdjustment()} (in degrees).
+     */
+    private final double TURRET_ANGLE_ADJUSTMENT_AMOUNT_DEGREES;
 
     //CALIBRATION
     /**
@@ -202,14 +232,19 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         INCLINE_DUCKING_LIMIT_ROTATIONS = factory.getConstant(NAME, "inclineDuckingLimitRotations", 0);
 
+        LAUNCH_VELOCITY_ADJUSTMENT_AMOUNT_RPS = factory.getConstant(NAME, "launchVelocityAdjustmentAmountRPS", 0);
+        INCLINE_ANGLE_ADJUSTMENT_AMOUNT_DEGREES = factory.getConstant(NAME, "inclineAngleAdjustmentAmountDegrees", 0);
+        TURRET_ANGLE_ADJUSTMENT_AMOUNT_DEGREES = factory.getConstant(NAME, "turretAngleAdjustmentAmountDegrees", 0);
+
         GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
         GreenLogger.periodicLog(NAME + "/Aimed", this::isAimed);
         GreenLogger.periodicLog(NAME + "/Is Auto Aiming", () -> isAutoAiming);
 
         // The current launch velocities (in RPS) are already logged by the motor, so we don't need to log them here.
-        GreenLogger.periodicLog(NAME + "/launchMotors/Wanted Launch Velocity RPS", () -> wantedLaunchVelocityRPS);
+        GreenLogger.periodicLog(NAME + "/launchMotors/Wanted Velocity RPS", () -> wantedLaunchVelocityRPS);
         GreenLogger.periodicLog(NAME + "/launchMotors/Aimed", this::areLaunchMotorsAimed);
         GreenLogger.periodicLog(NAME + "/launchMotors/Spinning Up", () -> spinUpLaunchMotors);
+        GreenLogger.periodicLog(NAME + "/launchMotors/Velocity Adjustment RPS", () -> launchVelocityAdjustmentRPS);
 
         // Because this first one is a Mechanism2d, it will be under the SmartDashboard section of the NetworkTables.
         GreenLogger.periodicLog("Shooter Incline", () -> inclineMech2d);
@@ -217,10 +252,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.periodicLog(NAME + "/incline/Wanted Angle Degrees", () -> wantedInclineAngleDegrees);
         GreenLogger.periodicLog(NAME + "/incline/Aimed", this::isInclineAimed);
         GreenLogger.periodicLog(NAME + "/incline/Ducking", () -> isInclineDucking);
+        GreenLogger.periodicLog(NAME + "/incline/Angle Adjustment Degrees", () -> inclineAngleAdjustmentDegrees);
 
         GreenLogger.periodicLog(NAME + "/turret/Field Pose", this::getCurrentTurretPose2d, Pose2d.struct);
         GreenLogger.periodicLog(NAME + "/turret/Current Robot Relative Turret Rotation", this::getCurrentRobotRelativeTurretRotation2d);
-        GreenLogger.periodicLog(NAME + "/turret/Wanted Turret Angle Degrees", () -> wantedTurretAngleDegrees);
+        GreenLogger.periodicLog(NAME + "/turret/Wanted Angle Degrees", () -> wantedTurretAngleDegrees);
         GreenLogger.periodicLog(NAME + "/turret/Aimed", this::isTurretAimed);
         GreenLogger.periodicLog(NAME + "/turret/Calibrated", () -> isTurretCalibrated);
         GreenLogger.periodicLog(NAME + "/turret/Aiming in Dead Zone", () -> isTurretAimingInDeadZone);
@@ -229,6 +265,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.periodicLog(NAME + "/turret/Motor Offset Rotations", () -> turretMotorOffsetRotations);
         GreenLogger.periodicLog(NAME + "/turret/Fixed Angle Degrees", () -> turretFixedAngleDegrees);
         GreenLogger.periodicLog(NAME + "/turret/Auto Aiming Turret", () -> autoAimTurret);
+        GreenLogger.periodicLog(NAME + "/turret/Angle Adjustment Degrees", () -> turretAngleAdjustmentDegrees);
     }
 
     public void periodic() {
@@ -334,6 +371,48 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      */
     public void setSpinUpLaunchMotors(boolean shouldSpinUpLaunchMotors) {
         spinUpLaunchMotors = shouldSpinUpLaunchMotors;
+    }
+
+    /**
+     * Increases the adjustment value to all requests to the launch motors.
+     */
+    public void increaseLaunchVelocityAdjustment() {
+        launchVelocityAdjustmentRPS += LAUNCH_VELOCITY_ADJUSTMENT_AMOUNT_RPS;
+    }
+
+    /**
+     * Decreases the adjustment value to all requests to the launch motors.
+     */
+    public void decreaseLaunchVelocityAdjustment() {
+        launchVelocityAdjustmentRPS -= LAUNCH_VELOCITY_ADJUSTMENT_AMOUNT_RPS;
+    }
+
+    /**
+     * Increases the adjustment value to all requests to the incline.
+     */
+    public void increaseInclineAngleAdjustment() {
+        inclineAngleAdjustmentDegrees += INCLINE_ANGLE_ADJUSTMENT_AMOUNT_DEGREES;
+    }
+
+    /**
+     * Decreases the adjustment value to all requests to the incline.
+     */
+    public void decreaseInclineAngleAdjustment() {
+        inclineAngleAdjustmentDegrees -= INCLINE_ANGLE_ADJUSTMENT_AMOUNT_DEGREES;
+    }
+
+    /**
+     * Increases the adjustment value to all requests to the turret.
+     */
+    public void increaseTurretAngleAdjustment() {
+        turretAngleAdjustmentDegrees += TURRET_ANGLE_ADJUSTMENT_AMOUNT_DEGREES;
+    }
+
+    /**
+     * Decreases the adjustment value to all requests to the turret.
+     */
+    public void decreaseTurretAngleAdjustment() {
+        turretAngleAdjustmentDegrees -= TURRET_ANGLE_ADJUSTMENT_AMOUNT_DEGREES;
     }
 
     /**
@@ -494,7 +573,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param wantedVelocityRPS The desired velocity of the launch motors (in RPS).
      */
     private void setLaunchVelocities(double wantedVelocityRPS) {
-        wantedLaunchVelocityRPS = wantedVelocityRPS;
+        wantedLaunchVelocityRPS = wantedVelocityRPS + launchVelocityAdjustmentRPS;
         if (spinUpLaunchMotors) {
             topLaunchMotor.setControl(topLaunchMotorVelocityRequest.withVelocity(wantedLaunchVelocityRPS));
             bottomLaunchMotor.setControl(bottomLaunchMotorVelocityRequest.withVelocity(wantedLaunchVelocityRPS));
@@ -531,7 +610,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param wantedAngleDegrees The desired angle of the incline (in degrees).
      */
     private void setInclineAngle(double wantedAngleDegrees) {
-        wantedInclineAngleDegrees = wantedAngleDegrees;
+        wantedInclineAngleDegrees = wantedAngleDegrees + inclineAngleAdjustmentDegrees;
         double rotations = Units.degreesToRotations(wantedInclineAngleDegrees);
         if (isInclineDucking) {
             // If we are trying to duck under the trench, restrict the angle of the incline to be
@@ -573,7 +652,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      *                           degrees counterclockwise from forward.
      */
     private void setTurretAngle(double wantedAngleDegrees) {
-        wantedTurretAngleDegrees = wantedAngleDegrees;
+        wantedTurretAngleDegrees = wantedAngleDegrees + turretAngleAdjustmentDegrees;
         if (isTurretCalibrated) {
             double wantedTurretRotations = Units.degreesToRotations(wantedTurretAngleDegrees);
 

@@ -140,6 +140,48 @@ public class Superstructure extends BaseSuperstructure {
         forceAllowGatekeeperControl = shouldForceAllowGatekeeperControl;
     }
 
+    /**
+     * Increases the adjustment value to all requests to the launch motors.
+     */
+    public void increaseLaunchVelocityAdjustment() {
+        shooter.increaseLaunchVelocityAdjustment();
+    }
+
+    /**
+     * Decreases the adjustment value to all requests to the launch motors.
+     */
+    public void decreaseLaunchVelocityAdjustment() {
+        shooter.decreaseLaunchVelocityAdjustment();
+    }
+
+    /**
+     * Increases the adjustment value to all requests to the incline.
+     */
+    public void increaseInclineAngleAdjustment() {
+        shooter.increaseInclineAngleAdjustment();
+    }
+
+    /**
+     * Decreases the adjustment value to all requests to the incline.
+     */
+    public void decreaseInclineAngleAdjustment() {
+        shooter.decreaseInclineAngleAdjustment();
+    }
+
+    /**
+     * Increases the adjustment value to all requests to the turret.
+     */
+    public void increaseTurretAngleAdjustment() {
+        shooter.increaseTurretAngleAdjustment();
+    }
+
+    /**
+     * Decreases the adjustment value to all requests to the turret.
+     */
+    public void decreaseTurretAngleAdjustment() {
+        shooter.decreaseTurretAngleAdjustment();
+    }
+
     private void defaulting() {
         // TODO: Declimb if necessary, else set the subsystem wanted states
         swerve.setWantedState(

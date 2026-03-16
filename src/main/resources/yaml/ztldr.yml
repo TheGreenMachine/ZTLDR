@@ -327,6 +327,9 @@ subsystems:
             turretRotationToleranceDegrees: 3
             inclineAngleToleranceDegrees: 2
             launcherVelocityToleranceRPS: 2
+            launchVelocityAdjustmentAmountRPS: 0.04
+            inclineAngleAdjustmentAmountDegrees: 0.02
+            turretAngleAdjustmentAmountDegrees: 0.04
     vision:
         cameras:
             forwardLeft: # Pi IP: 10.18.16.11

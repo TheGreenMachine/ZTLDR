@@ -51,6 +51,7 @@ public class RobotContainer extends BaseRobotContainer {
     }
 
     private void configureBindings() {
+        // DRIVER CONTROLLER
         // Gatekeeper
         driverController.rightTrigger().onTrue(Commands.runOnce(() -> {
             superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
@@ -60,6 +61,24 @@ public class RobotContainer extends BaseRobotContainer {
                 superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
                 superstructure.setInclineDucking(true);
             }));
+        driverController.povUp().onTrue(Commands.runOnce(() -> BaseRobotState.hasAccuratePoseEstimate = false));
+
+        // Shooter
+        driverController.x().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE)));
+        driverController.y().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_MIDDLE)));
+        driverController.b().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_FAR)));
+        // TODO: Verify that auto distance calculations (using the lookup table) actually work. If they don't, we can just remove this control for now.
+        driverController.a().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.FULLY_AUTOMATIC)));
+
+        // Intake
+        driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)));
+        driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)));
+        // For now, we just plan on retracting all the way, but we can add this back if we need it.
+//        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.incrementPullInSuperstructureIntakeState()));
+
+
+        // OPERATOR CONTROLLER
+        // Gatekeeper
         // TODO: Put these on the buttons we actually want, or remove this feature if we don't
         //  think it is necessary. We should only have to use these if something is broken with
         //  the shooter aiming or determining when it is aimed correctly.
@@ -69,14 +88,8 @@ public class RobotContainer extends BaseRobotContainer {
         operatorController.y().onTrue(Commands.runOnce(() ->
             superstructure.forceAllowGatekeeperControl(true))
         );
-        driverController.povUp().onTrue(Commands.runOnce(() -> BaseRobotState.hasAccuratePoseEstimate = false));
 
         // Shooter
-        driverController.x().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE)));
-        driverController.y().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_MIDDLE)));
-        driverController.b().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_FAR)));
-        // TODO: Verify that auto distance calculations (using the lookup table) actually work. If they don't, we can just remove this control for now.
-        driverController.a().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.FULLY_AUTOMATIC)));
         // TODO: Put these on the buttons we actually want. We should only have to use these if something is broken with the auto turret aiming.
         operatorController.a().onTrue(Commands.runOnce(() -> superstructure.setAutoAimTurret(true)));
         operatorController.b().onTrue(Commands.runOnce(() -> {
@@ -84,11 +97,15 @@ public class RobotContainer extends BaseRobotContainer {
             superstructure.setAutoAimTurret(false);
         }));
 
-        // Intake
-        driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)));
-        driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)));
-        // For now, we just plan on retracting all the way, but we can add this back if we need it.
-//        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.incrementPullInSuperstructureIntakeState()));
+
+        // BUTTON BOARD
+        // Shooter
+        buttonBoard.middleLeft().whileTrue(Commands.run(() -> superstructure.increaseLaunchVelocityAdjustment()));
+        buttonBoard.bottomLeft().whileTrue(Commands.run(() -> superstructure.decreaseLaunchVelocityAdjustment()));
+        buttonBoard.middleCenter().whileTrue(Commands.run(() -> superstructure.increaseInclineAngleAdjustment()));
+        buttonBoard.bottomCenter().whileTrue(Commands.run(() -> superstructure.decreaseInclineAngleAdjustment()));
+        buttonBoard.middleRight().whileTrue(Commands.run(() -> superstructure.increaseTurretAngleAdjustment()));
+        buttonBoard.bottomRight().whileTrue(Commands.run(() -> superstructure.decreaseTurretAngleAdjustment()));
     }
 
     public final void registerCommands() {
