@@ -196,6 +196,13 @@ public class Superstructure extends BaseSuperstructure {
         gatekeeperAndFeederReversing = shouldGatekeeperAndFeederReverse;
     }
 
+    /**
+     * Sets the turret back into calibration mode.
+     */
+    public void recalibrateTurret() {
+        shooter.recalibrateTurret();
+    }
+
     private void defaulting() {
         // TODO: Declimb if necessary, else set the subsystem wanted states
         swerve.setWantedState(

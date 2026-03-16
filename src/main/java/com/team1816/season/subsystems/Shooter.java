@@ -423,6 +423,13 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     /**
+     * Sets the turret back into calibration mode.
+     */
+    public void recalibrateTurret() {
+        isTurretCalibrated = false;
+    }
+
+    /**
      * Gets the {@link Translation2d} of the target that we should aim at, based on the location of
      * the robot on the field. Specifically, determines if we should aim at the hub or the corner
      * of the alliance zone, determines which corner to aim at if aiming at the corner, and gets

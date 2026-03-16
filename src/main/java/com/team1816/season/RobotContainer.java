@@ -110,6 +110,7 @@ public class RobotContainer extends BaseRobotContainer {
             superstructure.setTurretFixedAngle(0);
             superstructure.setAutoAimTurret(false);
         }));
+        operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.recalibrateTurret()));
 
 
         // BUTTON BOARD
