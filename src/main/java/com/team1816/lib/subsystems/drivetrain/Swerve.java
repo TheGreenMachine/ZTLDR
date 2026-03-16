@@ -34,11 +34,21 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     private ActualState wantedState = ActualState.IDLING;
     private ActualState previousWantedState = ActualState.IDLING;
 
+    private final double NORMAL_MODE_TRANSLATIONAL_MULTIPLIER;
+    private final double NORMAL_MODE_ROTATIONAL_MULTIPLIER;
+    private final double SLOW_MODE_TRANSLATIONAL_MULTIPLIER;
+    private final double SLOW_MODE_ROTATIONAL_MULTIPLIER;
+
     public Swerve(CommandXboxController controller) {
         // TODO: This Singleton.get stuff is a temporary workaround until I fix a bug with the
         //  static factory member from the Singleton not initializing properly for the first
         //  subsystem that is created.
         drivetrain = Singleton.get(RobotFactory.class).getSwerveDrivetrain(NAME);
+
+        NORMAL_MODE_TRANSLATIONAL_MULTIPLIER = factory.getConstant(NAME, "normalModeTranslationalMultiplier", 0);
+        NORMAL_MODE_ROTATIONAL_MULTIPLIER = factory.getConstant(NAME, "normalModeRotationalMultiplier", 0);
+        SLOW_MODE_TRANSLATIONAL_MULTIPLIER = factory.getConstant(NAME, "slowModeTranslationalMultiplier", 0);
+        SLOW_MODE_ROTATIONAL_MULTIPLIER = factory.getConstant(NAME, "slowModeRotationalMultiplier", 0);
 
         this.controller = controller;
         var kinematics = drivetrain.getKinematicsConfig();
@@ -82,11 +92,16 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
         y   = yLimiter.calculate(y);
         rot = rotLimiter.calculate(rot);
 
-        // 5. Slow mode (right bumper = precision mode)
+        // 5. Multipliers to slow down movement based on driver preference. Slow mode and normal mode.
         if (controller.leftTrigger().getAsBoolean()) {
-            x   *= 0.35;
-            y   *= 0.35;
-            rot *= 0.45;
+            x   *= SLOW_MODE_TRANSLATIONAL_MULTIPLIER;
+            y   *= SLOW_MODE_TRANSLATIONAL_MULTIPLIER;
+            rot *= SLOW_MODE_ROTATIONAL_MULTIPLIER;
+        }
+        else {
+            x   *= NORMAL_MODE_TRANSLATIONAL_MULTIPLIER;
+            y   *= NORMAL_MODE_TRANSLATIONAL_MULTIPLIER;
+            rot *= NORMAL_MODE_ROTATIONAL_MULTIPLIER;
         }
 
         return drive.withVelocityX(x * drivetrain.maxSpd) // Drive forward with negative Y (forward)

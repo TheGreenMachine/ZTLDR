@@ -172,6 +172,10 @@ subsystems:
             rotationKp: 10
             rotationKi: 0
             rotationKd: 0
+            normalModeTranslationalMultiplier: 1
+            normalModeRotationalMultiplier: 1
+            slowModeTranslationalMultiplier: 0.35
+            slowModeRotationalMultiplier: 0.45
     ledManager:
         implemented: false
         devices:
