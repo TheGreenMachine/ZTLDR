@@ -30,16 +30,6 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
         applyState();
     }
 
-    @Override
-    public void readFromHardware() {
-    }
-
-    public void adjustCurrentFeedMotorSetPoint(double adjustValue){
-        wantedState.adjustFeedMotorValue(adjustValue);
-
-        GreenLogger.log(NAME+"/feedMotor/"+wantedState.name()+"_adjusted_value/"+wantedState.getFeedMotorDutyCycle());
-    }
-
     private void applyState() {
         feedMotor.setControl(feedMotorDutyCycle.withOutput(wantedState.getFeedMotorDutyCycle()));
     }
