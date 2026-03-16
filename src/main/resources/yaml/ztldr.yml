@@ -1,65 +1,26 @@
 defaultAuto: "Simple S"
-shooterSettings: # TODO
+shooterSettings:
     distancesInches:
-        - 2
-        - 3
-        - 4
-        - 5
-        - 6
-        - 7
-        - 8
-        - 9
-        - 10
-        - 11
-        - 12
-        - 13
-        - 14
-        - 15
-        - 16
-        - 17
-        - 18
-        - 19
-        - 20
+        - 48
+        - 96
+        - 156
+        - 204
+        - 264
+        - 360 # Maximum distance shot
     inclineAnglesRotations:
-        - 17 #2
-        - 17 #3
-        - 20 #4
-        - 20 #5
-        - 20 #6
-        - 21 #7
-        - 21 #8
-        - 22 #9
-        - 22 #10
-        - 22 #11
-        - 22 #12
-        - 22 #13
-        - 22 #14
-        - 22 #15
-        - 22 #16
-        - 21 #17
-        - 21 #18
-        - 22 #19
-        - 22 #20
+        - 0.0405 # 48
+        - 0.0555 # 96
+        - 0.07425 # 156
+        - 0.08925 # 204
+        - 0.108 # 264
+        - 0.108 # 360
     launchVelocitiesRPS:
-        - 30 #2
-        - 33 #3
-        - 31 #4
-        - 33 #5
-        - 35 #6
-        - 36 #7
-        - 39 #8
-        - 41 #9
-        - 43 #10
-        - 44 #11
-        - 46 #12
-        - 47 #13
-        - 49 #14
-        - 55 #15
-        - 57 #16
-        - 62 #17
-        - 63 #18
-        - 65 #19
-        - 65 #20
+        - 35 # 48
+        - 47 # 96
+        - 49 # 156
+        - 52 # 204
+        - 58 # 264
+        - 100 # 360
 subsystems:
     drivetrain:
         implemented: true
@@ -197,7 +158,7 @@ subsystems:
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
         constants:
-            feedingDutyCycle: 0.7
+            feedingDutyCycle: 0.8
             stoppedDutyCycle: 0
             reversingDutyCycle: -0.4
     intake:
@@ -322,12 +283,12 @@ subsystems:
             shooterOffsetYMeters: -0.112268
             shooterOffsetZMeters: 0.508
             inclineDuckingLimitRotations: 0.052
-            distanceOneInclineAngleRotations: 0.0611 # TODO
-            distanceOneLaunchVelocityRPS: 54 # TODO
-            distanceTwoInclineAngleRotations: 0.0611 # TODO
-            distanceTwoLaunchVelocityRPS: 53 # TODO
-            distanceThreeInclineAngleRotations: 0.0611 # TODO
-            distanceThreeLaunchVelocityRPS: 52 # TODO
+            distanceOneInclineAngleRotations: 0.0405
+            distanceOneLaunchVelocityRPS: 35
+            distanceTwoInclineAngleRotations: 0.0555
+            distanceTwoLaunchVelocityRPS: 47
+            distanceThreeInclineAngleRotations: 0.07425
+            distanceThreeLaunchVelocityRPS: 49
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570
             secondLowestBeamBreakToZero: 7.65625
@@ -337,7 +298,7 @@ subsystems:
             launchVelocityAdjustmentAmountRPS: 0.04
             inclineAngleAdjustmentAmountDegrees: 0.02
             turretAngleAdjustmentAmountDegrees: 0.04
-            topLaunchMotorBackspinMultiplier: 0.9 # Less than one for backspin.
+            topLaunchMotorBackspinMultiplier: 0.8 # Less than one for backspin.
     vision:
         cameras:
             forwardLeft: # Pi IP: 10.18.16.11
