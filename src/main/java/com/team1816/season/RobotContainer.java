@@ -69,14 +69,18 @@ public class RobotContainer extends BaseRobotContainer {
                 superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
                 superstructure.setInclineDucking(true);
             }));
-        driverController.povUp().onTrue(Commands.runOnce(() -> BaseRobotState.hasAccuratePoseEstimate = false));
 
         // Shooter
-        driverController.x().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE)));
-        driverController.y().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_MIDDLE)));
-        driverController.b().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_FAR)));
+        driverController.a().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE)));
+        driverController.b().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_MIDDLE)));
+        driverController.y().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_FAR)));
         // TODO: Verify that auto distance calculations (using the lookup table) actually work. If they don't, we can just remove this control for now.
-        driverController.a().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.FULLY_AUTOMATIC)));
+        driverController.x().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.FULLY_AUTOMATIC)));
+        driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setAutoAimTurret(true)));
+        driverController.povRight().onTrue(Commands.runOnce(() -> {
+            superstructure.setTurretFixedAngle(0);
+            superstructure.setAutoAimTurret(false);
+        }));
 
         // Intake
         driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)));
@@ -105,12 +109,9 @@ public class RobotContainer extends BaseRobotContainer {
 
         // Shooter
         // TODO: Put these on the buttons we actually want. We should only have to use these if something is broken with the auto turret aiming.
-        operatorController.a().onTrue(Commands.runOnce(() -> superstructure.setAutoAimTurret(true)));
-        operatorController.b().onTrue(Commands.runOnce(() -> {
-            superstructure.setTurretFixedAngle(0);
-            superstructure.setAutoAimTurret(false);
-        }));
         operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.recalibrateTurret()));
+
+        operatorController.povUp().onTrue(Commands.runOnce(() -> BaseRobotState.hasAccuratePoseEstimate = false));
 
 
         // BUTTON BOARD
