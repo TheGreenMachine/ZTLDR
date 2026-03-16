@@ -14,8 +14,6 @@ public class RobotContainer extends BaseRobotContainer {
         // i.e. subsystems that always exist like the drivetrain and path planner
         initializeLibSubSystems();
 
-        buildAutoChooser();
-
         configureBindings();
         registerCommands();
     }
