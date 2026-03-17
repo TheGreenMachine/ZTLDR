@@ -290,6 +290,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     @Override
+    public void simulationPeriodic() {
+        turretMotor.updateSimState();
+    }
+
+    @Override
     public void readFromHardware() {
         // Beam Break Sensor Reading
         if (sensorValuesHaveBeenSet) {

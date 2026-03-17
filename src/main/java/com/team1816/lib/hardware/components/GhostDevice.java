@@ -40,6 +40,9 @@ public class GhostDevice implements IMotor {
     }
 
     @Override
+    public void updateSimState() {}
+
+    @Override
     public double getMotorPosition() {
         return 0;
     }

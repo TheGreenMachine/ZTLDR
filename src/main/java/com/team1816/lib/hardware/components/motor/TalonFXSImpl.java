@@ -62,6 +62,9 @@ public class TalonFXSImpl extends TalonFXS implements ICTREDevice, IMotor {
     }
 
     @Override
+    public void updateSimState() {}
+
+    @Override
     public double getMotorPosition() {
         return getPosition().getValueAsDouble();
     }
