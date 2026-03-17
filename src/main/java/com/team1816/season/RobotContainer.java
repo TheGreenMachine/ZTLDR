@@ -124,6 +124,12 @@ public class RobotContainer extends BaseRobotContainer {
         buttonBoard.bottomCenter().whileTrue(Commands.run(() -> superstructure.decreaseInclineAngleAdjustment()));
         buttonBoard.middleRight().whileTrue(Commands.run(() -> superstructure.increaseTurretAngleAdjustment()));
         buttonBoard.bottomRight().whileTrue(Commands.run(() -> superstructure.decreaseTurretAngleAdjustment()));
+
+
+        // FOOT SWITCH
+        footSwitch.left().whileTrue(Commands.run(() -> System.out.println("Left!")));
+        footSwitch.center().whileTrue(Commands.run(() -> System.out.println("Center!")));
+        footSwitch.right().whileTrue(Commands.run(() -> System.out.println("Right!")));
     }
 
     public final void registerCommands() {

@@ -1,10 +1,8 @@
 package com.team1816.lib.inputs;
 
 import edu.wpi.first.wpilibj.event.EventLoop;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-@SuppressWarnings("MethodName")
 public class CommandButtonBoard {
 
     private final ButtonBoard m_hid;

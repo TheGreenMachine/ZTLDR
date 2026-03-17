@@ -5,8 +5,8 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.FlippingUtil;
 import com.pathplanner.lib.util.PPLibTelemetry;
 import com.team1816.lib.auto.PathfindManager;
-import com.team1816.lib.inputs.ButtonBoard;
 import com.team1816.lib.inputs.CommandButtonBoard;
+import com.team1816.lib.inputs.CommandFootSwitch;
 import com.team1816.lib.subsystems.BaseSuperstructure;
 import com.team1816.lib.subsystems.LedManager;
 import com.team1816.lib.subsystems.Vision;
@@ -24,6 +24,7 @@ public abstract class BaseRobotContainer {
     protected CommandXboxController driverController = new CommandXboxController(0);
     protected CommandXboxController operatorController = new CommandXboxController(1);
     protected CommandButtonBoard buttonBoard = new CommandButtonBoard(2);
+    protected CommandFootSwitch footSwitch = new CommandFootSwitch(3);
 
     public SendableChooser<Command> autoChooser;
     protected final Swerve swerve = new Swerve(driverController);
