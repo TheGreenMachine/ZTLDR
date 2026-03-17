@@ -13,32 +13,29 @@ public class ShooterTableCalculator {
     public ShooterTableCalculator() {
         ShooterSettingsConfig shooterSettings = factory.getShooterSettingsConfig();
 
-        List<Double> distances = shooterSettings.distances;
-        List<Double> angles = shooterSettings.angles;
-        List<Double> velocities = shooterSettings.powers;
+        List<Double> distancesInches = shooterSettings.distancesInches;
+        List<Double> inclineAnglesRotations = shooterSettings.inclineAnglesRotations;
+        List<Double> launchVelocitiesRPS = shooterSettings.launchVelocitiesRPS;
 
-        double minimumDefaultAngle = shooterSettings.minimumDefaultAngle;
-        double minimumDefaultPower = shooterSettings.minimumDefaultPower;
-        double mediumDefaultAngle = shooterSettings.mediumDefaultAngle;
-        double mediumDefaultPower = shooterSettings.mediumDefaultPower;
-        double maximumDefaultAngle = shooterSettings.maximumDefaultAngle;
-        double maximumDefaultPower = shooterSettings.maximumDefaultPower;
-
-        double[] distancesArray = distances.stream()
+        double[] distancesInchesArray = distancesInches.stream()
             .mapToDouble(Double::doubleValue)
             .toArray();
-        double[] anglesArray = angles.stream()
+        double[] inclineAnglesRotationsArray = inclineAnglesRotations.stream()
             .mapToDouble(Double::doubleValue)
             .toArray();
-        double[] velocitiesArray = velocities.stream()
+        double[] launchVelocitiesRPSArray = launchVelocitiesRPS.stream()
             .mapToDouble(Double::doubleValue)
             .toArray();
 
-        shotLookup = new ShotLookup(distancesArray, anglesArray, velocitiesArray, minimumDefaultAngle, minimumDefaultPower, mediumDefaultAngle, mediumDefaultPower, maximumDefaultAngle, maximumDefaultPower);
+        shotLookup = new ShotLookup(distancesInchesArray, inclineAnglesRotationsArray, launchVelocitiesRPSArray);
     }
 
-    public ShooterDistanceSetting getShooterDistanceSetting(double distance) {
-        return new ShooterDistanceSetting(shotLookup.getAngle(distance), shotLookup.getPower(distance));
+    public ShooterDistanceSetting getShooterDistanceSetting(double distanceInches) {
+        return new ShooterDistanceSetting(
+            shotLookup.getInclineAngleRotations(distanceInches),
+            shotLookup.getLaunchVelocityRPS(distanceInches)
+        );
     }
 
+    public record ShooterDistanceSetting(double inclineAngleRotations, double launchVelocityRPS) {}
 }
