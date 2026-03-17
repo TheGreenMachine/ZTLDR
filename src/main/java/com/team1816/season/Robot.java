@@ -1,5 +1,6 @@
 package com.team1816.season;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.team1816.lib.BaseRobot;
 import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.Singleton;
@@ -8,7 +9,6 @@ import com.team1816.lib.events.PubSubHandler;
 import com.team1816.lib.subsystems.LedManager;
 import com.team1816.lib.util.Elastic;
 import com.team1816.lib.util.GreenLogger;
-import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -31,6 +31,7 @@ public class Robot extends BaseRobot {
             // used to serve elastic dashboards must be port 5800
             WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
             GreenLogger.periodicLog("timings/RobotLoop (ms)", () -> periodicLoopTime);
+            SignalLogger.enableAutoLogging(false);
         } catch (Throwable t) {
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
             GreenLogger.log(t);

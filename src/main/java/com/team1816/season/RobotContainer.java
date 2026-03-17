@@ -3,6 +3,7 @@ package com.team1816.season;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.BaseRobotState;
+import com.team1816.lib.util.GreenLogger;
 import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.wpilibj2.command.Commands;
 
@@ -15,10 +16,11 @@ public class RobotContainer extends BaseRobotContainer {
         // i.e. subsystems that always exist like the drivetrain and path planner
         initializeLibSubSystems();
 
+        registerCommands();
+
         buildAutoChooser();
 
         configureBindings();
-        registerCommands();
     }
 
     @Override
@@ -30,7 +32,7 @@ public class RobotContainer extends BaseRobotContainer {
     public void autonomousInit() {
         superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
         superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.AUTOMATIC_DRIVING);
-        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE);
+        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.FULLY_AUTOMATIC);
         superstructure.setInclineDucking(true);
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
@@ -42,7 +44,7 @@ public class RobotContainer extends BaseRobotContainer {
     public void teleopInit() {
         superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
         superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.MANUAL_DRIVING);
-        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE);
+        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.FULLY_AUTOMATIC);
         superstructure.setInclineDucking(true);
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
@@ -59,6 +61,8 @@ public class RobotContainer extends BaseRobotContainer {
             .onFalse(Commands.runOnce(() ->
                 superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.MANUAL_DRIVING)
             ));
+
+        driverController.povLeft().onTrue(Commands.runOnce(() -> BaseRobotState.hasAccuratePoseEstimate = false));
 
         // Gatekeeper
         driverController.rightTrigger().onTrue(Commands.runOnce(() -> {
@@ -111,8 +115,6 @@ public class RobotContainer extends BaseRobotContainer {
         // TODO: Put these on the buttons we actually want. We should only have to use these if something is broken with the auto turret aiming.
         operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.recalibrateTurret()));
 
-        operatorController.povUp().onTrue(Commands.runOnce(() -> BaseRobotState.hasAccuratePoseEstimate = false));
-
 
         // BUTTON BOARD
         // Shooter
@@ -125,6 +127,24 @@ public class RobotContainer extends BaseRobotContainer {
     }
 
     public final void registerCommands() {
+        NamedCommands.registerCommand("shoot", Commands.sequence(
+            Commands.runOnce(() -> GreenLogger.log("Shoot command running")),
+            Commands.runOnce(() -> superstructure.setInclineDucking(false)),
+            Commands.runOnce(() -> superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)),
+            Commands.race(
+                Commands.repeatingSequence(
+                    Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)),
+                    Commands.waitSeconds(0.5),
+                    Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)),
+                    Commands.waitSeconds(0.5)
+                ),
+                Commands.waitSeconds(5)
+            ),
+            Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)),
+            Commands.runOnce(() -> superstructure.setInclineDucking(true)),
+            Commands.runOnce(() -> superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE))
+        ));
+
         // Gatekeeper
         NamedCommands.registerCommand("gatekeeper/open", Commands.runOnce(() ->
             superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)

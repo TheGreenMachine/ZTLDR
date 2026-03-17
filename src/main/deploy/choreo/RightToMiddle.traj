@@ -1,5 +1,5 @@
 {
- "name":"BottomBlueToMiddle",
+ "name":"RightToMiddle",
  "version":3,
  "snapshot":{
   "waypoints":[
@@ -20,11 +20,11 @@
  },
  "params":{
   "waypoints":[
-    {"x":{"exp":"Start.x", "val":4.425225734710693}, "y":{"exp":"Start.y", "val":0.5559637546539307}, "heading":{"exp":"Start.heading", "val":0.0}, "intervals":59, "split":true, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"5.70665979385376 m", "val":5.70665979385376}, "y":{"exp":"Start.y", "val":0.5559637546539307}, "heading":{"exp":"FreeGate.heading", "val":0.0}, "intervals":158, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"RightStart.x", "val":4.425225734710693}, "y":{"exp":"RightStart.y", "val":0.5559637546539307}, "heading":{"exp":"RightStart.heading", "val":0.0}, "intervals":59, "split":true, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"5.70665979385376 m", "val":5.70665979385376}, "y":{"exp":"RightStart.y", "val":0.5559637546539307}, "heading":{"exp":"RightFreeGate.heading", "val":0.0}, "intervals":158, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"7.803466320037842 m", "val":7.803466320037842}, "y":{"exp":"1.7300883531570435 m", "val":1.7300883531570437}, "heading":{"exp":"90 deg", "val":1.5707963267948966}, "intervals":82, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"7.803466320037842 m", "val":7.803466320037842}, "y":{"exp":"3.601128578186035 m", "val":3.601128578186035}, "heading":{"exp":"90 deg", "val":1.5707963267948966}, "intervals":202, "split":true, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"End.x", "val":5.696086883544922}, "y":{"exp":"End.y", "val":0.7283875346183777}, "heading":{"exp":"End.heading", "val":0.0}, "intervals":75, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"RightFuel.x", "val":5.696086883544922}, "y":{"exp":"RightFuel.y", "val":0.7283875346183777}, "heading":{"exp":"RightFuel.heading", "val":0.0}, "intervals":75, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"4.002538681030273 m", "val":4.002538681030273}, "y":{"exp":"0.652698278427124 m", "val":0.652698278427124}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":16, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},

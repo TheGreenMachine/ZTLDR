@@ -134,9 +134,9 @@ subsystems:
             rotationKi: 0
             rotationKd: 0
             normalModeTranslationalMultiplier: 1
-            normalModeRotationalMultiplier: 1
+            normalModeRotationalMultiplier: 0.4
             slowModeTranslationalMultiplier: 0.35
-            slowModeRotationalMultiplier: 0.45
+            slowModeRotationalMultiplier: 0.15
     ledManager:
         implemented: false
         devices:
@@ -181,7 +181,7 @@ subsystems:
             flipCoder:
                 id: 10
                 deviceType: CANcoder
-        constants: # TODO: all of these
+        constants:
             intakeOnSpeed: .4
             intakeOffSpeed: 0
             flipperMotorOutPosition: 0.166
@@ -251,10 +251,10 @@ subsystems:
                 reverseSoftLimit: 0.0405
                 forwardSoftLimit: 0.109
                 statorCurrentLimit: 35
-                pidConfig: # TODO: Tune this one.
+                pidConfig:
                     slot0:
                         kS: 0.3
-                        kP: 200
+                        kP: 800
                         staticFeedforwardSign: UseClosedLoopSign
             turretMotor:
                 deviceType: TalonFX
@@ -263,7 +263,7 @@ subsystems:
                 pidConfig:
                     slot0:
                         kS: 0.29
-                        kP: 0.5
+                        kP: 1
                         kD: 0.05
                         staticFeedforwardSign: UseClosedLoopSign
             inclineCoder:

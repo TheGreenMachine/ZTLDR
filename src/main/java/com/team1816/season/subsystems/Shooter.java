@@ -262,7 +262,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.periodicLog(NAME + "/incline/Angle Adjustment Degrees", () -> inclineAngleAdjustmentDegrees);
 
         GreenLogger.periodicLog(NAME + "/turret/Field Pose", this::getCurrentTurretPose2d, Pose2d.struct);
-        GreenLogger.periodicLog(NAME + "/turret/Current Robot Relative Turret Rotation", this::getCurrentRobotRelativeTurretRotation2d);
+        GreenLogger.periodicLog(NAME + "/turret/Current Robot Relative Angle Degrees", () -> getCurrentRobotRelativeTurretRotation2d().getDegrees());
         GreenLogger.periodicLog(NAME + "/turret/Wanted Angle Degrees", () -> wantedTurretAngleDegrees);
         GreenLogger.periodicLog(NAME + "/turret/Aimed", this::isTurretAimed);
         GreenLogger.periodicLog(NAME + "/turret/Calibrated", () -> isTurretCalibrated);
