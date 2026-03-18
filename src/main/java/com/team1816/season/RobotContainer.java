@@ -126,7 +126,7 @@ public class RobotContainer extends BaseRobotContainer {
 
     public final void registerCommands() {
         NamedCommands.registerCommand("shoot", Commands.sequence(
-            Commands.runOnce(() -> GreenLogger.log("Shoot command running")),
+            Commands.runOnce(() -> GreenLogger.log("Running named command: shoot")),
             Commands.runOnce(() -> superstructure.setInclineDucking(false)),
             Commands.runOnce(() -> superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)),
             Commands.race(
@@ -144,8 +144,26 @@ public class RobotContainer extends BaseRobotContainer {
         ));
 
         NamedCommands.registerCommand("waitForDucking", Commands.parallel(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: waitForDucking")),
             Commands.runOnce(() -> superstructure.setInclineDucking(true)),
             Commands.waitUntil(superstructure::isInclineDucked)
+        ));
+
+        NamedCommands.registerCommand("duck", Commands.parallel(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: duck")),
+            Commands.runOnce(() -> superstructure.setInclineDucking(true))
+        ));
+
+        NamedCommands.registerCommand("unduck", Commands.parallel(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: unduck")),
+            Commands.runOnce(() -> superstructure.setInclineDucking(false))
+        ));
+
+        NamedCommands.registerCommand("gatekeeper/open", Commands.parallel(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: gatekeeper/open")),
+            Commands.runOnce(() ->
+                superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)
+            )
         ));
     }
 }

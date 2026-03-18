@@ -7,7 +7,7 @@
   "poses":{
    "EnterFuel":{
     "x":{
-     "exp":"7.803466320037842 m",
+     "exp":"FuelCenter.x",
      "val":7.803466320037842
     },
     "y":{
@@ -16,6 +16,20 @@
     },
     "heading":{
      "exp":"270 deg",
+     "val":4.71238898038469
+    }
+   },
+   "EnterRecollect":{
+    "x":{
+     "exp":"RecollectCenter.x",
+     "val":6.5
+    },
+    "y":{
+     "exp":"EnterFuel.y",
+     "val":6.33991164684
+    },
+    "heading":{
+     "exp":"EnterFuel.heading",
      "val":4.71238898038469
     }
    },
@@ -44,6 +58,90 @@
     },
     "heading":{
      "exp":"270 deg",
+     "val":4.71238898038469
+    }
+   },
+   "GreedyEnterFuel":{
+    "x":{
+     "exp":"8.6 m",
+     "val":8.6
+    },
+    "y":{
+     "exp":"EnterFuel.y",
+     "val":6.33991164684
+    },
+    "heading":{
+     "exp":"EnterFuel.heading",
+     "val":4.71238898038469
+    }
+   },
+   "GreedyExitFuel":{
+    "x":{
+     "exp":"GreedyEnterFuel.x",
+     "val":8.6
+    },
+    "y":{
+     "exp":"2.1 m",
+     "val":2.1
+    },
+    "heading":{
+     "exp":"270 deg",
+     "val":4.71238898038469
+    }
+   },
+   "GreedyExitFuelFar":{
+    "x":{
+     "exp":"GreedyExitFuel.x",
+     "val":8.6
+    },
+    "y":{
+     "exp":"1.3 m",
+     "val":1.3
+    },
+    "heading":{
+     "exp":"GreedyExitFuel.heading",
+     "val":4.71238898038469
+    }
+   },
+   "OppositeEnterFuel":{
+    "x":{
+     "exp":"EnterFuel.x",
+     "val":7.803466320037842
+    },
+    "y":{
+     "exp":"1.730089 m",
+     "val":1.730089
+    },
+    "heading":{
+     "exp":"90 deg",
+     "val":1.5707963267948966
+    }
+   },
+   "OppositeExitFuel":{
+    "x":{
+     "exp":"OppositeEnterFuel.x",
+     "val":7.803466320037842
+    },
+    "y":{
+     "exp":"5.97 m",
+     "val":5.97
+    },
+    "heading":{
+     "exp":"90 deg",
+     "val":1.5707963267948966
+    }
+   },
+   "RecollectCenter":{
+    "x":{
+     "exp":"6.5 m",
+     "val":6.5
+    },
+    "y":{
+     "exp":"FuelCenter.y",
+     "val":4.46887142181
+    },
+    "heading":{
+     "exp":"FuelCenter.heading",
      "val":4.71238898038469
     }
    },
