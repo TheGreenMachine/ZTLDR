@@ -5,6 +5,20 @@
  "variables":{
   "expressions":{},
   "poses":{
+   "CenterStart":{
+    "x":{
+     "exp":"3.6 m",
+     "val":3.6
+    },
+    "y":{
+     "exp":"8.07 / 2 m",
+     "val":4.035
+    },
+    "heading":{
+     "exp":"180 deg",
+     "val":3.141592653589793
+    }
+   },
    "EnterFuel":{
     "x":{
      "exp":"FuelCenter.x",

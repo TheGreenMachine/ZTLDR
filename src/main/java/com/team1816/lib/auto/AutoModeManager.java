@@ -31,6 +31,12 @@ public class AutoModeManager {
             autos -> autos.flatMap(auto -> {
                 // Get the name of the original auto for PathPlanner to look for.
                 String autoName = auto.getName();
+                // Don't create a mirrored version if marked with "[DM]" (Don't Mirror).
+                if (autoName.startsWith("[DM]")) {
+                    // Remove the "[DM]" marker for the display name, and any spaces.
+                    auto.setName(autoName.substring(5).stripLeading());
+                    return Stream.of(auto);
+                }
                 // Rename the original auto to specify it is the left version.
                 auto.setName("Left " + autoName);
                 // Create a mirrored version of the auto.

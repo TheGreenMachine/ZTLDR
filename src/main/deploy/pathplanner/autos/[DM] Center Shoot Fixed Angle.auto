@@ -5,27 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "StartCenterShoot"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "waitForDucking"
+            "name": "fixTurretAngle180"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ShootCenterShoot"
+            "pathName": "CenterstartBackup"
           }
         },
         {

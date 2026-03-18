@@ -165,5 +165,11 @@ public class RobotContainer extends BaseRobotContainer {
                 superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)
             )
         ));
+
+        NamedCommands.registerCommand("fixTurretAngle180", Commands.parallel(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: fixTurretAngle180")),
+            Commands.runOnce(() -> superstructure.setAutoAimTurret(false)),
+            Commands.runOnce(() -> superstructure.setTurretFixedAngle(180))
+        ));
     }
 }
