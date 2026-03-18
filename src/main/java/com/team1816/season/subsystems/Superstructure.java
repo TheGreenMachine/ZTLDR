@@ -203,6 +203,15 @@ public class Superstructure extends BaseSuperstructure {
         shooter.recalibrateTurret();
     }
 
+    /**
+     * Gets if the incline is ducked low enough to go under the trench.
+     *
+     * @return If the incline is ducked low enough to go under the trench.
+     */
+    public boolean isInclineDucked() {
+        return shooter.isInclineDucked();
+    }
+
     private void defaulting() {
         // TODO: Declimb if necessary, else set the subsystem wanted states
         swerve.setWantedState(

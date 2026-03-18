@@ -275,6 +275,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.periodicLog(NAME + "/turret/Angle Adjustment Degrees", () -> turretAngleAdjustmentDegrees);
     }
 
+    @Override
     public void periodic() {
         readFromHardware();
 
@@ -427,6 +428,17 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      */
     public void recalibrateTurret() {
         isTurretCalibrated = false;
+    }
+
+    /**
+     * Gets if the incline is ducked low enough to go under the trench.
+     *
+     * @return If the incline is ducked low enough to go under the trench.
+     */
+    public boolean isInclineDucked() {
+        return getCurrentInclineAngleDegrees() <
+            Units.rotationsToDegrees(INCLINE_DUCKING_LIMIT_ROTATIONS)
+                + INCLINE_ANGLE_TOLERANCE_DEGREES;
     }
 
     /**

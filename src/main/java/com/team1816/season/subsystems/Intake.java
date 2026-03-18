@@ -19,7 +19,9 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     public static final String NAME = "intake";
 
     private IntakeState wantedState = IntakeState.STOW;
-    private IntakeState previousWantedState = IntakeState.STOW;
+
+    private FlipperPosition wantedFlipperPosition = FlipperPosition.IN;
+    private double wantedIntakeDutyCycle = 0;
 
     //MOTORS
     private final IMotor intakeMotor = (IMotor) factory.getDevice(NAME, "intakeMotor");
@@ -62,6 +64,8 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         FLIPPER_MOTOR_HOLD_IN_CURRENT_AMPERES = factory.getConstant(NAME, "flipperMotorHoldInCurrentAmperes", 0);
 
         GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
+        GreenLogger.periodicLog(NAME + "/Wanted Flipper Position", () -> wantedFlipperPosition);
+        GreenLogger.periodicLog(NAME + "/Wanted Intake Duty Cycle", () -> wantedIntakeDutyCycle);
     }
 
     @Override
@@ -78,22 +82,11 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void applyState() {
-        double intakeSpeed = wantedState.getIntakeMotorValue();
-        FlipperPosition flipperPosition = wantedState.getFlipperMotorPosition();
+        wantedIntakeDutyCycle = wantedState.getIntakeMotorValue();
+        wantedFlipperPosition = wantedState.getFlipperMotorPosition();
 
-        setIntakeSpeed(intakeSpeed);
-        setFlipperPosition(flipperPosition);
-
-        if (wantedState != previousWantedState) {
-            GreenLogger.log("Intake state: " + wantedState.toString());
-            GreenLogger.log("Intake speed: " + intakeSpeed);
-            GreenLogger.log("Intake position: " + flipperPosition);
-
-            SmartDashboard.putString("Intake state: ", wantedState.toString());
-            SmartDashboard.putNumber("Intake speed: ", intakeSpeed);
-            SmartDashboard.putString("Intake position: ", String.valueOf(flipperPosition));
-            previousWantedState = wantedState;
-        }
+        setIntakeSpeed(wantedIntakeDutyCycle);
+        setFlipperPosition(wantedFlipperPosition);
     }
 
     private void setIntakeSpeed(double velocity) {

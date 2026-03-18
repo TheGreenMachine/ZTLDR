@@ -132,9 +132,9 @@ public class RobotContainer extends BaseRobotContainer {
             Commands.race(
                 Commands.repeatingSequence(
                     Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)),
-                    Commands.waitSeconds(0.5),
+                    Commands.waitSeconds(0.3),
                     Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)),
-                    Commands.waitSeconds(0.5)
+                    Commands.waitSeconds(0.3)
                 ),
                 Commands.waitSeconds(5)
             ),
@@ -143,26 +143,9 @@ public class RobotContainer extends BaseRobotContainer {
             Commands.runOnce(() -> superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE))
         ));
 
-        // Gatekeeper
-        NamedCommands.registerCommand("gatekeeper/open", Commands.runOnce(() ->
-            superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)
-        ));
-        NamedCommands.registerCommand("gatekeeper/close", Commands.runOnce(() ->
-            superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE)
-        ));
-
-        // Shooter
-        NamedCommands.registerCommand("shooter/automatic", Commands.runOnce(() ->
-             superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.FULLY_AUTOMATIC)
-        ));
-        NamedCommands.registerCommand("shooter/presetClose", Commands.runOnce(() ->
-            superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE)
-        ));
-        NamedCommands.registerCommand("shooter/presetMiddle", Commands.runOnce(() ->
-            superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_MIDDLE)
-        ));
-        NamedCommands.registerCommand("shooter/presetFar", Commands.runOnce(() ->
-            superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_FAR)
+        NamedCommands.registerCommand("waitForDucking", Commands.parallel(
+            Commands.runOnce(() -> superstructure.setInclineDucking(true)),
+            Commands.waitUntil(superstructure::isInclineDucked)
         ));
     }
 }

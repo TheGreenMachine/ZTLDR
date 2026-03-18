@@ -31,10 +31,12 @@ public class AutoModeManager {
             autos -> autos.flatMap(auto -> {
                 // Get the name of the original auto for PathPlanner to look for.
                 String autoName = auto.getName();
+                // Rename the original auto to specify it is the left version.
+                auto.setName("Left " + autoName);
                 // Create a mirrored version of the auto.
                 PathPlannerAuto mirroredAuto = new PathPlannerAuto(autoName, true);
-                // Give the mirrored auto a different name so we know which is which in the chooser.
-                mirroredAuto.setName("(MIRROR) " + autoName);
+                // Rename the mirrored auto to specify it is the right version.
+                mirroredAuto.setName("Right " + autoName);
                 // Return both the original and the mirrored auto.
                 return Stream.of(auto, mirroredAuto);
             })
