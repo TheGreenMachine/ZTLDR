@@ -12,12 +12,13 @@ public class RobotContainer extends BaseRobotContainer {
 
     public RobotContainer() {
         NamedCommands.registerCommand("InTheZone", new InTheZoneCommand());
-        // call the base to initialize library objects
-        // i.e. subsystems that always exist like the drivetrain and path planner
-        initializeLibSubSystems();
 
         configureBindings();
         registerCommands();
+
+        // call the base to initialize library objects
+        // i.e. subsystems that always exist like the drivetrain and path planner
+        initializeLibSubSystems();
     }
 
     @Override

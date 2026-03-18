@@ -9,28 +9,45 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Manages SmartDashboard and logging of autos. Does NOT interact directly with {@link CommandScheduler} or the drivetrain.
  */
 public class AutoModeManager {
+    private final SendableChooser<Command> autoChooser;
+    private Consumer<Command> listener;
+
     /**
      * Puts dropdown in SmartDashboard and adds all autos.
      */
     public AutoModeManager() {
-        autoChooser = new SendableChooser<>();
+        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
+            autos -> autos.flatMap(auto -> {
+                // Get the name of the original auto for PathPlanner to look for.
+                String autoName = auto.getName();
+                // Create a mirrored version of the auto.
+                PathPlannerAuto mirroredAuto = new PathPlannerAuto(autoName, true);
+                // Give the mirrored auto a different name so we know which is which in the chooser.
+                mirroredAuto.setName("(MIRROR) " + autoName);
+                // Return both the original and the mirrored auto.
+                return Stream.of(auto, mirroredAuto);
+            })
+        );
         SmartDashboard.putData("Auto Mode", autoChooser);
-        autoChooser.setDefaultOption("None", null);
 
         listener = a -> {};
 
         autoChooser.onChange(a -> {
             // log starting pose
-            Pose2d startingPose = a.getStartingPose();
+            Pose2d startingPose = a instanceof PathPlannerAuto
+                ? ((PathPlannerAuto) a).getStartingPose()
+                : Pose2d.kZero;
             Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
             if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
                 startingPose = FlippingUtil.flipFieldPose(startingPose);
@@ -41,27 +58,19 @@ public class AutoModeManager {
 
             if (listener != null) listener.accept(a);
         });
-
-        for (String autoName : AutoBuilder.getAllAutoNames()) {
-            autoChooser.addOption(autoName, new PathPlannerAuto(autoName, false));
-            autoChooser.addOption("(MIRROR) " + autoName, new PathPlannerAuto(autoName, true));
-        }
     }
 
-    private final SendableChooser<PathPlannerAuto> autoChooser;
-    private Consumer<PathPlannerAuto> listener;
-
     /**
-     * Retrieves currently selected auto. May be null if "None" is selected.
+     * Retrieves currently selected auto.
      */
-    public PathPlannerAuto getSelectedAuto() {
+    public Command getSelectedAuto() {
         return autoChooser.getSelected();
     }
 
     /**
      * Registers a single listener to changes to the auto choosers.
      */
-    public void onChange(Consumer<PathPlannerAuto> listener) {
+    public void onChange(Consumer<Command> listener) {
         this.listener = listener;
     }
 }

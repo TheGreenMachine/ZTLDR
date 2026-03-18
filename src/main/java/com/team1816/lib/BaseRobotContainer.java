@@ -1,12 +1,9 @@
 package com.team1816.lib;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.FlippingUtil;
-import com.pathplanner.lib.util.PPLibTelemetry;
 import com.team1816.lib.auto.AutoModeManager;
 import com.team1816.lib.auto.PathfindManager;
-import com.team1816.lib.inputs.ButtonBoard;
 import com.team1816.lib.inputs.CommandButtonBoard;
 import com.team1816.lib.subsystems.BaseSuperstructure;
 import com.team1816.lib.subsystems.LedManager;
@@ -15,8 +12,6 @@ import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -66,10 +61,9 @@ public abstract class BaseRobotContainer {
     private void updatePoseOnSelection(Command selectedAuto) {
         if (selectedAuto != null) {
             try {
-                // Load the PathPlanner auto
-                PathPlannerAuto auto = (PathPlannerAuto) selectedAuto;
-                // Get the starting pose of the first path in the auto
-                Pose2d startingPose = auto.getStartingPose();
+                Pose2d startingPose = selectedAuto instanceof PathPlannerAuto
+                    ? ((PathPlannerAuto) selectedAuto).getStartingPose()
+                    : Pose2d.kZero;
                 if (startingPose != null) {
                     var alliance = DriverStation.getAlliance();
                     if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {

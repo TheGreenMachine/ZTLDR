@@ -22,7 +22,6 @@ import com.team1816.lib.hardware.components.sensor.CANCoderImpl;
 import com.team1816.lib.hardware.components.sensor.Camera;
 import com.team1816.lib.hardware.components.sensor.CANdiImpl;
 import com.team1816.lib.hardware.components.sensor.CanRangeImpl;
-import com.team1816.lib.subsystems.LedManager;
 import com.team1816.lib.subsystems.drivetrain.CTRESwerveDrivetrainImpl;
 import com.team1816.lib.subsystems.drivetrain.IDrivetrain;
 import com.team1816.lib.util.GreenLogger;
@@ -134,13 +133,6 @@ public class RobotFactory {
             return new ShooterSettingsConfig();
         }
         return config.shooterSettings;
-    }
-
-    /**
-     * Retrieves the name of the default auto.
-     */
-    public String getDefaultAuto() {
-        return config.defaultAuto;
     }
 
     /**
