@@ -290,7 +290,7 @@ subsystems:
             distanceThreeLaunchVelocityRPS: 49
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570
-            secondLowestBeamBreakToZero: 7.65625
+            secondLowestBeamBreakToZero: 6.7769
             turretRotationToleranceDegrees: 3
             inclineAngleToleranceDegrees: 2
             launcherVelocityToleranceRPS: 2
