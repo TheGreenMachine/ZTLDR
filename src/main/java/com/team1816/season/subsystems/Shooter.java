@@ -31,7 +31,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public static final String NAME = "shooter";
 
     //STATES
-    private ShooterState wantedState = ShooterState.PRESET_CLOSE;
+    private ShooterDistanceState wantedDistanceState = ShooterDistanceState.PRESET_CLOSE;
 
     /**
      * The velocity we want the launch motors to run at (in RPS), assuming {@link
@@ -243,7 +243,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         TOP_LAUNCH_MOTOR_BACKSPIN_MULTIPLIER = factory.getConstant(NAME, "topLaunchMotorBackspinMultiplier", 1);
 
-        GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
+        GreenLogger.periodicLog(NAME + "/Wanted Distance State", () -> wantedDistanceState);
         GreenLogger.periodicLog(NAME + "/Aimed", this::isAimed);
         GreenLogger.periodicLog(NAME + "/Is Auto Aiming", () -> isAutoAiming);
 
@@ -314,31 +314,33 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void applyState() {
-        switch (wantedState) {
+        Translation2d target = Translation2d.kZero;
+        if (autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC) {
+            isAutoAiming = true;
+            target = getTargetTranslation2d();
+        }
+        else {
+            isAutoAiming = false;
+        }
+
+        if (autoAimTurret) {
+            aimTurretAtTarget(target);
+        }
+        else {
+            setTurretAngle(turretFixedAngleDegrees);
+        }
+
+        switch (wantedDistanceState) {
             case IDLE, PRESET_CLOSE, PRESET_MIDDLE, PRESET_FAR -> {
-                setInclineAngle(wantedState.getInclineAngleDegrees());
-                if (autoAimTurret) {
-                    isAutoAiming = true;
-                    Translation2d target = getTargetTranslation2d();
-                    aimTurretAtTarget(target);
-                }
-                else {
-                    isAutoAiming = false;
-                    setTurretAngle(turretFixedAngleDegrees);
-                }
-                setLaunchVelocities(wantedState.getLaunchVelocityRPS());
+                setInclineAngle(wantedDistanceState.getInclineAngleDegrees());
+                setLaunchVelocities(wantedDistanceState.getLaunchVelocityRPS());
             }
-            case FULLY_AUTOMATIC -> {
-                isAutoAiming = true;
-                Translation2d target = getTargetTranslation2d();
-                aimInclineAndLaunchersAtTarget(target);
-                aimTurretAtTarget(target);
-            }
+            case AUTOMATIC -> aimInclineAndLaunchersAtTarget(target);
         }
     }
 
-    public void setWantedState(ShooterState state) {
-        this.wantedState = state;
+    public void setWantedDistanceState(ShooterDistanceState state) {
+        this.wantedDistanceState = state;
     }
 
     /**
@@ -362,8 +364,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     /**
      * Sets if the turret should automatically point at either the hub or the corners. If false,
-     * the turret will point at the {@link #turretFixedAngleDegrees} instead. Note that this will
-     * be ignored if the state is {@link ShooterState#FULLY_AUTOMATIC}.
+     * the turret will point at the {@link #turretFixedAngleDegrees} instead.
      *
      * @param shouldAutoAimTurret If the turret should aim automatically.
      */
@@ -767,7 +768,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             && !(isAutoAiming && !BaseRobotState.hasAccuratePoseEstimate);
     }
 
-    public enum ShooterState {
+    public enum ShooterDistanceState {
         PRESET_CLOSE(
             Units.rotationsToDegrees(factory.getConstant(NAME,"distanceOneInclineAngleRotations",0)),
             factory.getConstant(NAME,"distanceOneLaunchVelocityRPS",0)
@@ -780,12 +781,12 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             Units.rotationsToDegrees(factory.getConstant(NAME,"distanceThreeInclineAngleRotations",0)),
             factory.getConstant(NAME,"distanceThreeLaunchVelocityRPS",0)
         ),
-        FULLY_AUTOMATIC(-1, -1),
+        AUTOMATIC(-1, -1),
         IDLE(0, 0);
 
         private final double inclineAngleDegrees, launchVelocityRPS;
 
-        ShooterState(double inclineAngleDegrees, double launchVelocityRPS) {
+        ShooterDistanceState(double inclineAngleDegrees, double launchVelocityRPS) {
             this.inclineAngleDegrees = inclineAngleDegrees;
             this.launchVelocityRPS = launchVelocityRPS;
         }

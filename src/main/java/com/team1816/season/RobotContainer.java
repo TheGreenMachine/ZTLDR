@@ -4,7 +4,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.util.GreenLogger;
-import com.team1816.season.subsystems.*;
 import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.wpilibj2.command.Commands;
 
@@ -31,7 +30,7 @@ public class RobotContainer extends BaseRobotContainer {
     public void autonomousInit() {
         superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
         superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.AUTOMATIC_DRIVING);
-        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.FULLY_AUTOMATIC);
+        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.AUTOMATIC);
         superstructure.setInclineDucking(true);
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
@@ -43,7 +42,7 @@ public class RobotContainer extends BaseRobotContainer {
     public void teleopInit() {
         superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
         superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.MANUAL_DRIVING);
-        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.FULLY_AUTOMATIC);
+        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.AUTOMATIC);
         superstructure.setInclineDucking(true);
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
@@ -74,11 +73,11 @@ public class RobotContainer extends BaseRobotContainer {
             }));
 
         // Shooter
-        driverController.a().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_CLOSE)));
-        driverController.b().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_MIDDLE)));
-        driverController.y().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_FAR)));
+        driverController.a().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_CLOSE)));
+        driverController.b().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_MIDDLE)));
+        driverController.y().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_FAR)));
         // TODO: Verify that auto distance calculations (using the lookup table) actually work. If they don't, we can just remove this control for now.
-        driverController.x().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.FULLY_AUTOMATIC)));
+        driverController.x().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.AUTOMATIC)));
         driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setAutoAimTurret(true)));
         driverController.povRight().onTrue(Commands.runOnce(() -> {
             superstructure.setTurretFixedAngle(0);

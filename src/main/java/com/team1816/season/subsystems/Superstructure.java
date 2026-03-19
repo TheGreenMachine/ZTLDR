@@ -16,7 +16,7 @@ public class Superstructure extends BaseSuperstructure {
     private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
     private WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
-    private WantedShooterState wantedShooterState = WantedShooterState.PRESET_CLOSE;
+    private WantedShooterDistanceState wantedShooterDistanceState = WantedShooterDistanceState.PRESET_CLOSE;
     private WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSE;
     private WantedIntakeState wantedIntakeState = WantedIntakeState.INTAKE;
 
@@ -80,8 +80,8 @@ public class Superstructure extends BaseSuperstructure {
         this.wantedSwerveState = swerveState;
     }
 
-    public void setSuperstructureWantedShooterState(WantedShooterState shooterState) {
-        this.wantedShooterState = shooterState;
+    public void setSuperstructureWantedShooterState(WantedShooterDistanceState shooterState) {
+        this.wantedShooterDistanceState = shooterState;
     }
 
     public void setSuperstructureWantedGatekeeperState(WantedGatekeeperState gatekeeperState) {
@@ -122,8 +122,6 @@ public class Superstructure extends BaseSuperstructure {
     /**
      * Sets if the turret should automatically point at either the hub or the corners. If false,
      * the turret will point at the angle set by {@link #setTurretFixedAngle(double)} instead.
-     * Note that this will be ignored if the shooter state is {@link
-     * Shooter.ShooterState#FULLY_AUTOMATIC}.
      *
      * @param shouldAutoAimTurret If the turret of the shooter should aim automatically.
      */
@@ -221,12 +219,12 @@ public class Superstructure extends BaseSuperstructure {
                 case BRAKE -> Swerve.SwerveState.BRAKE;
             }
         );
-        shooter.setWantedState(
-            switch (wantedShooterState) {
-                case FULLY_AUTOMATIC -> Shooter.ShooterState.FULLY_AUTOMATIC;
-                case PRESET_CLOSE -> Shooter.ShooterState.PRESET_CLOSE;
-                case PRESET_MIDDLE -> Shooter.ShooterState.PRESET_MIDDLE;
-                case PRESET_FAR -> Shooter.ShooterState.PRESET_FAR;
+        shooter.setWantedDistanceState(
+            switch (wantedShooterDistanceState) {
+                case AUTOMATIC -> Shooter.ShooterDistanceState.AUTOMATIC;
+                case PRESET_CLOSE -> Shooter.ShooterDistanceState.PRESET_CLOSE;
+                case PRESET_MIDDLE -> Shooter.ShooterDistanceState.PRESET_MIDDLE;
+                case PRESET_FAR -> Shooter.ShooterDistanceState.PRESET_FAR;
             }
         );
         gatekeeper.setWantedState(
@@ -291,8 +289,8 @@ public class Superstructure extends BaseSuperstructure {
         BRAKE
     }
 
-    public enum WantedShooterState {
-        FULLY_AUTOMATIC,
+    public enum WantedShooterDistanceState {
+        AUTOMATIC,
         PRESET_CLOSE,
         PRESET_MIDDLE,
         PRESET_FAR
