@@ -28,6 +28,8 @@ subsystems:
                 id: 35
                 deviceType: TalonFX
                 neutralMode: Brake
+                statorCurrentLimit: 80
+                supplyCurrentLimit: 40
             flAz:
                 id: 30
                 deviceType: TalonFX
@@ -36,6 +38,7 @@ subsystems:
                 remoteSensorId: 41
                 remoteOffest: -0.300537
                 statorCurrentLimit: 60
+                supplyCurrentLimit: 40
             flCoder:
                 id: 41
                 deviceType: CANcoder
@@ -44,6 +47,8 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
+                statorCurrentLimit: 80
+                supplyCurrentLimit: 40
             frAz:
                 id: 31
                 deviceType: TalonFX
@@ -52,6 +57,7 @@ subsystems:
                 remoteSensorId: 43
                 remoteOffest: -0.439453
                 statorCurrentLimit: 60
+                supplyCurrentLimit: 40
             frCoder:
                 id: 43
                 deviceType: CANcoder
@@ -59,6 +65,8 @@ subsystems:
                 id: 37
                 deviceType: TalonFX
                 neutralMode: Brake
+                statorCurrentLimit: 80
+                supplyCurrentLimit: 40
             blAz:
                 id: 33
                 deviceType: TalonFX
@@ -67,6 +75,7 @@ subsystems:
                 remoteSensorId: 42
                 remoteOffest: -0.351074   # Negative Absolute Position No Offset CanCoder
                 statorCurrentLimit: 60
+                supplyCurrentLimit: 40
             blCoder:
                 id: 42
                 deviceType: CANcoder
@@ -75,6 +84,8 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
+                statorCurrentLimit: 80
+                supplyCurrentLimit: 40
             brAz:
                 id: 32
                 deviceType: TalonFX
@@ -83,6 +94,7 @@ subsystems:
                 remoteSensorId: 40
                 remoteOffest: -0.383301
                 statorCurrentLimit: 60
+                supplyCurrentLimit: 40
             brCoder:
                 id: 40
                 deviceType: CANcoder
