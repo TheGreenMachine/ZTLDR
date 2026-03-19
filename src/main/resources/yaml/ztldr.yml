@@ -340,9 +340,9 @@ subsystems:
                     pitchDegrees: 0
                     yawDegrees: -155
                 detectionType: APRIL_TAG
-            fuelDetector:
-                photonVisionUIName: Fuel_Detector
-                detectionType: NONE # TODO: Object detection
+#            fuelDetector:
+#                photonVisionUIName: Fuel_Detector
+#                detectionType: NONE # TODO: Object detection
 
 autopathing:
     paths:
