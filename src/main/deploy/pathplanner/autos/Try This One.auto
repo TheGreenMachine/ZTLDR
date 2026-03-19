@@ -1,0 +1,49 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "gatekeeper/open"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DuckingEthanShoveStartCenterShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "waitForDucking"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Recollect"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": true
+}

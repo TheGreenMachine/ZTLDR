@@ -36,7 +36,7 @@
    "EnterRecollect":{
     "x":{
      "exp":"RecollectCenter.x",
-     "val":6.5
+     "val":6.0
     },
     "y":{
      "exp":"EnterFuel.y",
@@ -147,8 +147,8 @@
    },
    "RecollectCenter":{
     "x":{
-     "exp":"6.5 m",
-     "val":6.5
+     "exp":"6 m",
+     "val":6.0
     },
     "y":{
      "exp":"FuelCenter.y",

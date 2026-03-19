@@ -20,8 +20,8 @@
   "waypoints":[
     {"x":{"exp":"SideShoot.x", "val":4.002538681030273}, "y":{"exp":"SideShoot.y", "val":7.41730172157}, "heading":{"exp":"SideShoot.heading", "val":0.0}, "intervals":15, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"FreeTrench.x", "val":5.696086883544922}, "y":{"exp":"FreeTrench.y", "val":7.34161246538}, "heading":{"exp":"FreeTrench.heading", "val":0.0}, "intervals":25, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"EnterRecollect.x", "val":6.5}, "y":{"exp":"EnterRecollect.y", "val":6.33991164684}, "heading":{"exp":"EnterRecollect.heading", "val":4.71238898038469}, "intervals":17, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"RecollectCenter.x", "val":6.5}, "y":{"exp":"RecollectCenter.y", "val":4.46887142181}, "heading":{"exp":"RecollectCenter.heading", "val":4.71238898038469}, "intervals":36, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"EnterRecollect.x", "val":6.0}, "y":{"exp":"EnterRecollect.y", "val":6.33991164684}, "heading":{"exp":"EnterRecollect.heading", "val":4.71238898038469}, "intervals":17, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"RecollectCenter.x", "val":6.0}, "y":{"exp":"RecollectCenter.y", "val":4.46887142181}, "heading":{"exp":"RecollectCenter.heading", "val":4.71238898038469}, "intervals":36, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"FreeTrench.x", "val":5.696086883544922}, "y":{"exp":"FreeTrench.y", "val":7.34161246538}, "heading":{"exp":"FreeTrench.heading", "val":0.0}, "intervals":15, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"SideShoot.x", "val":4.002538681030273}, "y":{"exp":"SideShoot.y", "val":7.41730172157}, "heading":{"exp":"SideShoot.heading", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
