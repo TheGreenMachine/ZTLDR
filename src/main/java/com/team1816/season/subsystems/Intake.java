@@ -150,6 +150,10 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         this.wantedState = state;
     }
 
+    public boolean isIntaking() { return (wantedState == IntakeState.STOW); }
+
+    public boolean isOutaking() { return (wantedState == IntakeState.INTAKE); }
+
     /**
      * The position of the flipper. This is not just a number, since we are doing a custom current
      * based control, so the behavior is completely different for going in and out.

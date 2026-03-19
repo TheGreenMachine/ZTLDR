@@ -4,6 +4,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.util.GreenLogger;
+import com.team1816.season.subsystems.*;
 import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.wpilibj2.command.Commands;
 
@@ -170,6 +171,30 @@ public class RobotContainer extends BaseRobotContainer {
             Commands.runOnce(() -> GreenLogger.log("Running named command: fixTurretAngle180")),
             Commands.runOnce(() -> superstructure.setAutoAimTurret(false)),
             Commands.runOnce(() -> superstructure.setTurretFixedAngle(180))
+        ));
+
+        // BottomBlueToMiddle
+        NamedCommands.registerCommand("BottomBlueToMiddleStart0", Commands.runOnce(() ->
+            {
+                superstructure.setInclineDucking(true);
+                superstructure.setWantedSubsystemStates(
+                    Intake.IntakeState.PULL_IN_TWO,
+                    Feeder.FeederState.FEEDING,
+                    Gatekeeper.GatekeeperState.CLOSED,
+                    Shooter.ShooterState.IDLE,
+                    Climber.ClimberState.IDLING
+                );
+                superstructure.setTurretFixedAngle(-110);
+            }
+        ));
+        NamedCommands.registerCommand("BottomBlueToMiddleStart1", Commands.runOnce(() ->
+            superstructure.setInclineDucking(false)
+        ));
+        NamedCommands.registerCommand("BottomBlueToMiddleStart2", Commands.runOnce(() ->
+            {
+                superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
+                superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterState.PRESET_MIDDLE);
+            }
         ));
     }
 }
