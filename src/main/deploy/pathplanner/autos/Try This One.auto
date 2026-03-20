@@ -17,15 +17,9 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "waitForDucking"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "RecollectStaymiddle"
+            "pathName": "ShootCenterPark"
           }
         }
       ]
