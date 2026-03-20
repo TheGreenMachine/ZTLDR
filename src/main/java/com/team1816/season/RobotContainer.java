@@ -176,5 +176,12 @@ public class RobotContainer extends BaseRobotContainer {
             Commands.runOnce(() -> superstructure.setAutoAimTurret(false)),
             Commands.runOnce(() -> superstructure.setTurretFixedAngle(180))
         ));
+
+        NamedCommands.registerCommand("distancePresetThree", Commands.parallel(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: distancePresetThree")),
+            Commands.runOnce(() -> {
+                superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_FAR);
+            })
+        ));
     }
 }

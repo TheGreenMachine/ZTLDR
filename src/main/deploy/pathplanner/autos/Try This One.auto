@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "distancePresetThree"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "DuckingEthanShoveStartCenterShoot"
