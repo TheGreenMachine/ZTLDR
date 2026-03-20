@@ -74,15 +74,24 @@ public class RobotContainer extends BaseRobotContainer {
             }));
 
         // Shooter
-        driverController.a().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_CLOSE)));
-        driverController.b().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_MIDDLE)));
-        driverController.y().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_FAR)));
-        // TODO: Verify that auto distance calculations (using the lookup table) actually work. If they don't, we can just remove this control for now.
-        driverController.x().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.AUTOMATIC)));
-        driverController.povUp().onTrue(Commands.runOnce(() -> superstructure.setAutoAimTurret(true)));
-        driverController.povRight().onTrue(Commands.runOnce(() -> {
+        driverController.a().onTrue(Commands.runOnce(() -> {
+            superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_CLOSE);
             superstructure.setTurretFixedAngle(0);
             superstructure.setAutoAimTurret(false);
+        }));
+        driverController.b().onTrue(Commands.runOnce(() -> {
+            superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_MIDDLE);
+            superstructure.setTurretFixedAngle(0);
+            superstructure.setAutoAimTurret(false);
+        }));
+        driverController.y().onTrue(Commands.runOnce(() -> {
+            superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_FAR);
+            superstructure.setTurretFixedAngle(0);
+            superstructure.setAutoAimTurret(false);
+        }));
+        driverController.x().onTrue(Commands.runOnce(() -> {
+            superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.AUTOMATIC);
+            superstructure.setAutoAimTurret(true);
         }));
 
         // Intake
@@ -94,9 +103,6 @@ public class RobotContainer extends BaseRobotContainer {
 
         // OPERATOR CONTROLLER
         // Gatekeeper
-        // TODO: Put these on the buttons we actually want, or remove this feature if we don't
-        //  think it is necessary. We should only have to use these if something is broken with
-        //  the shooter aiming or determining when it is aimed correctly.
         operatorController.x().onTrue(Commands.runOnce(() ->
             superstructure.forceAllowGatekeeperControl(false))
         );
@@ -111,7 +117,6 @@ public class RobotContainer extends BaseRobotContainer {
             ));
 
         // Shooter
-        // TODO: Put these on the buttons we actually want. We should only have to use these if something is broken with the auto turret aiming.
         operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.recalibrateTurret()));
 
 
