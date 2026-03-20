@@ -225,6 +225,7 @@ public class Superstructure extends BaseSuperstructure {
                 case PRESET_CLOSE -> Shooter.ShooterDistanceState.PRESET_CLOSE;
                 case PRESET_MIDDLE -> Shooter.ShooterDistanceState.PRESET_MIDDLE;
                 case PRESET_FAR -> Shooter.ShooterDistanceState.PRESET_FAR;
+                case PRESET_AUTO_THING -> Shooter.ShooterDistanceState.PRESET_AUTO_THING;
             }
         );
         gatekeeper.setWantedState(
@@ -293,7 +294,8 @@ public class Superstructure extends BaseSuperstructure {
         AUTOMATIC,
         PRESET_CLOSE,
         PRESET_MIDDLE,
-        PRESET_FAR
+        PRESET_FAR,
+        PRESET_AUTO_THING
     }
 
     public enum WantedGatekeeperState {

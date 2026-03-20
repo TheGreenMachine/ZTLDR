@@ -183,5 +183,11 @@ public class RobotContainer extends BaseRobotContainer {
                 superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_FAR);
             })
         ));
+        NamedCommands.registerCommand("distancePresetAutoThing", Commands.parallel(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: distancePresetAutoThing")),
+            Commands.runOnce(() -> {
+                superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_AUTO_THING);
+            })
+        ));
     }
 }

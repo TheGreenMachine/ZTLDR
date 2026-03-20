@@ -332,7 +332,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         }
 
         switch (wantedDistanceState) {
-            case IDLE, PRESET_CLOSE, PRESET_MIDDLE, PRESET_FAR -> {
+            case IDLE, PRESET_CLOSE, PRESET_MIDDLE, PRESET_FAR, PRESET_AUTO_THING -> {
                 setInclineAngle(wantedDistanceState.getInclineAngleDegrees());
                 setLaunchVelocities(wantedDistanceState.getLaunchVelocityRPS());
             }
@@ -781,6 +781,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         PRESET_FAR(
             Units.rotationsToDegrees(factory.getConstant(NAME,"distanceThreeInclineAngleRotations",0)),
             factory.getConstant(NAME,"distanceThreeLaunchVelocityRPS",0)
+        ),
+        PRESET_AUTO_THING(
+            Units.rotationsToDegrees(factory.getConstant(NAME,"distanceThreeInclineAngleRotations",0)),
+            factory.getConstant(NAME,"distanceAutoThingLaunchVelocityRPS",0)
         ),
         AUTOMATIC(-1, -1),
         IDLE(0, 0);
