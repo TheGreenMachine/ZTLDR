@@ -257,7 +257,7 @@ subsystems:
                 motorType: NEO550_JST
                 remoteSensor: RemoteCANcoder
                 remoteSensorId: 29
-                id: 27
+                id: -1
                 motorRotation: Clockwise_Positive
                 reverseSoftLimit: 0.0405
                 forwardSoftLimit: 0.109
