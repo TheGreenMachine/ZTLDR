@@ -31,13 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Recollect"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "shoot"
+            "pathName": "RecollectStaymiddle"
           }
         }
       ]

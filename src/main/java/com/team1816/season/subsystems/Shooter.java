@@ -199,9 +199,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     // These are all on the blue side, and will be flipped based on alliance. Left and right are
     // from the driver station perspective.
     private final Translation2d HUB_TRANSLATION_2D = new Translation2d(Units.inchesToMeters(182.11), Units.inchesToMeters(158.84));
-    private final Translation2d LEFT_CORNER_TRANSLATION_2D = new Translation2d(2, 6.07);
-    private final Translation2d RIGHT_CORNER_TRANSLATION_2D = new Translation2d(2, 2);
-    private final double ROBOT_STARTING_LINE = Units.inchesToMeters(156.61);
+    private final Translation2d LEFT_CORNER_TRANSLATION_2D = new Translation2d(2, 5.07);
+    private final Translation2d RIGHT_CORNER_TRANSLATION_2D = new Translation2d(2, 3);
+//    private final double ROBOT_STARTING_LINE = Units.inchesToMeters(156.61); True position.
+    private final double ROBOT_STARTING_LINE = 4.2684; // Fudged position to shoot into the hub from only partially over the line.
 
     private final ShooterTableCalculator shooterTableCalculator = new ShooterTableCalculator();
 
