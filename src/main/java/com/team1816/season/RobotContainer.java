@@ -73,6 +73,13 @@ public class RobotContainer extends BaseRobotContainer {
                 superstructure.setInclineDucking(true);
             }));
 
+        driverController.povUp().onTrue(Commands.runOnce(() ->
+                superstructure.setGatekeeperAndFeederReversing(true)
+            ))
+            .onFalse(Commands.runOnce(() ->
+                superstructure.setGatekeeperAndFeederReversing(false)
+            ));
+
         // Shooter
         driverController.a().onTrue(Commands.runOnce(() -> {
             superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_CLOSE);
@@ -97,8 +104,6 @@ public class RobotContainer extends BaseRobotContainer {
         // Intake
         driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)));
         driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)));
-        // For now, we just plan on retracting all the way, but we can add this back if we need it.
-//        driverController.povDown().onTrue(Commands.runOnce(() -> superstructure.incrementPullInSuperstructureIntakeState()));
 
 
         // OPERATOR CONTROLLER
@@ -109,12 +114,6 @@ public class RobotContainer extends BaseRobotContainer {
         operatorController.y().onTrue(Commands.runOnce(() ->
             superstructure.forceAllowGatekeeperControl(true))
         );
-        operatorController.rightTrigger().onTrue(Commands.runOnce(() ->
-            superstructure.setGatekeeperAndFeederReversing(true)
-        ))
-            .onFalse(Commands.runOnce(() ->
-                superstructure.setGatekeeperAndFeederReversing(false)
-            ));
 
         // Shooter
         operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.recalibrateTurret()));
