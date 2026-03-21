@@ -80,8 +80,8 @@ public class Superstructure extends BaseSuperstructure {
         this.wantedSwerveState = swerveState;
     }
 
-    public void setSuperstructureWantedShooterState(WantedShooterDistanceState shooterState) {
-        this.wantedShooterDistanceState = shooterState;
+    public void setSuperstructureWantedShooterDistanceState(WantedShooterDistanceState shooterDistanceState) {
+        this.wantedShooterDistanceState = shooterDistanceState;
     }
 
     public void setSuperstructureWantedGatekeeperState(WantedGatekeeperState gatekeeperState) {

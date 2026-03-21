@@ -5,15 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "distancePresetAutoThing"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "CloserShoveCenterShoot"
+            "pathName": "ShoveCenterShoot"
           }
         },
         {
@@ -23,9 +17,15 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "waitForDucking"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "CloserShootCenterPark"
+            "pathName": "ShootCenterPark"
           }
         }
       ]
