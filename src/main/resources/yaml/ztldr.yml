@@ -131,23 +131,24 @@ subsystems:
         kinematics:
             driveGearing: 6.03
             steerGearing: 26.0909
-            wheelbaseLength: .505 # meters
-            wheelbaseWidth: .505 # meters
-            robotMass: 74.088 # kg
+            wheelbaseLength: 0.4305 # meters
+            wheelbaseWidth: 0.4305 # meters
+            robotMass: 56.7 # kg
             wheelRadius: .04938 # meters (1.944 in)
-            maxDriveRPS: 98 # measured motor max speed rps
-            maxAngularRate: 8.285 # rad/sec
-            wheelCOF: 1.7
+            maxDriveRPS: 80 # measured motor max speed rps
+            maxAngularRate: 1.3 # rot/sec
+            wheelCOF: 1
         constants:
             translationKp: 20
             translationKd: 0
             rotationKp: 10
             rotationKi: 0
             rotationKd: 0
+            #Driver preference options
             normalModeTranslationalMultiplier: 1
-            normalModeRotationalMultiplier: 0.4
-            slowModeTranslationalMultiplier: 0.35
-            slowModeRotationalMultiplier: 0.15
+            normalModeRotationalMultiplier: 1
+            slowModeTranslationalMultiplier: 0.5
+            slowModeRotationalMultiplier: 1
     ledManager:
         implemented: false
         devices:
