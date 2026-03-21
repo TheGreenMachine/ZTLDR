@@ -105,7 +105,6 @@ public class RobotContainer extends BaseRobotContainer {
         driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)));
         driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)));
 
-
         // OPERATOR CONTROLLER
         // Gatekeeper
         operatorController.x().onTrue(Commands.runOnce(() ->
@@ -118,6 +117,11 @@ public class RobotContainer extends BaseRobotContainer {
         // Shooter
         operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.recalibrateTurret()));
 
+        operatorController.rightTrigger().onTrue(Commands.runOnce(() -> superstructure.setShooterAlgorithm(true)));
+        operatorController.rightTrigger().onFalse(Commands.runOnce(() -> superstructure.setShooterAlgorithm(false)));
+
+        operatorController.leftTrigger().onTrue(Commands.runOnce(() -> superstructure.setShooterRobotVelocityAdjustment(true)));
+        operatorController.leftTrigger().onFalse(Commands.runOnce(() -> superstructure.setShooterRobotVelocityAdjustment(false)));
 
         // BUTTON BOARD
         // Shooter

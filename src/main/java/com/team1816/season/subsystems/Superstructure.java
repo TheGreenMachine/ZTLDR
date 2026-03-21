@@ -201,6 +201,19 @@ public class Superstructure extends BaseSuperstructure {
         shooter.recalibrateTurret();
     }
 
+    public void setShooterAlgorithm(boolean useVelocity){
+        shooter.useVelocityAdjustmentAlgorithm = useVelocity;
+    }
+
+    public void setShooterRobotVelocityAdjustment(boolean useVelocityAdjustment){
+        setShooterChassisSpeeds();
+        shooter.useRobotVelocityAdjustment = useVelocityAdjustment;
+    }
+
+    public void setShooterChassisSpeeds() {
+        shooter.chassisSpeeds = swerve.getChassisSpeeds();
+    }
+
     /**
      * Gets if the incline is ducked low enough to go under the trench.
      *

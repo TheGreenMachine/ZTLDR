@@ -23,6 +23,7 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -59,6 +60,10 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
      */
     private final SwerveRequest.ApplyRobotSpeeds pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds().withDriveRequestType(SwerveModule.DriveRequestType.Velocity);
 
+
+    public ChassisSpeeds getChassisSpeeds() {
+        return getState().Speeds;
+    }
     // Creates the CTRE swerve drivetrain.  The getDeviceById calls are made by the CTRE class and are based
     // on the defined values in the getSwerveModuleConstants
     public CTRESwerveDrivetrainImpl(
@@ -184,6 +189,7 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
         });
         m_simNotifier.startPeriodic(SIM_LOOP_PERIOD);
     }
+
 
     private void configureAutoBuilder() {
 
