@@ -40,6 +40,20 @@
               "trajectory_color": 4294967295,
               "show_robot_outside_widget": true
             }
+          },
+          {
+            "title": "active",
+            "x": 1152.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 192.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Mode/active",
+              "period": 0.06,
+              "data_type": "string",
+              "show_submit_button": false
+            }
           }
         ]
       }
