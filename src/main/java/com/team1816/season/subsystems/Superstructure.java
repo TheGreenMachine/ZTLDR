@@ -94,7 +94,7 @@ public class Superstructure extends BaseSuperstructure {
 
     public void incrementPullInSuperstructureIntakeState() {
         wantedIntakeState = switch (wantedIntakeState) {
-            case INTAKE -> WantedIntakeState.PULL_IN_ONE;
+            case INTAKE, OUTTAKE, STOP_OUT -> WantedIntakeState.PULL_IN_ONE;
             case PULL_IN_ONE -> WantedIntakeState.PULL_IN_TWO;
             case PULL_IN_TWO, STOW -> WantedIntakeState.STOW;
         };
@@ -249,6 +249,8 @@ public class Superstructure extends BaseSuperstructure {
         intake.setWantedState(
             switch (wantedIntakeState) {
                 case INTAKE -> Intake.IntakeState.INTAKE;
+                case OUTTAKE -> Intake.IntakeState.OUTTAKE;
+                case STOP_OUT -> Intake.IntakeState.STOP_OUT;
                 case STOW -> Intake.IntakeState.STOW;
                 case PULL_IN_ONE -> Intake.IntakeState.PULL_IN_ONE;
                 case PULL_IN_TWO -> Intake.IntakeState.PULL_IN_TWO;
@@ -306,6 +308,8 @@ public class Superstructure extends BaseSuperstructure {
     public enum WantedIntakeState {
         INTAKE,
         STOW,
+        OUTTAKE,
+        STOP_OUT,
         PULL_IN_ONE,
         PULL_IN_TWO
     }

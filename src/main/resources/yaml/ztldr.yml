@@ -195,6 +195,7 @@ subsystems:
         constants:
             intakeOnSpeed: .4
             intakeOffSpeed: 0
+            outtakeSpeed: -0.6
             flipperMotorOutPosition: 0.166
             flipperMotorPullInOnePosition: 0.1
             flipperMotorPullInTwoPosition: 0.05

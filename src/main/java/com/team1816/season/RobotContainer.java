@@ -189,5 +189,24 @@ public class RobotContainer extends BaseRobotContainer {
                 superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_AUTO_THING);
             })
         ));
+
+        NamedCommands.registerCommand("intake/intake", Commands.parallel(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: intake/intake")),
+            Commands.runOnce(() ->
+                superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)
+            )
+        ));
+        NamedCommands.registerCommand("intake/outtake", Commands.parallel(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: intake/outtake")),
+            Commands.runOnce(() ->
+                superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.OUTTAKE)
+            )
+        ));
+        NamedCommands.registerCommand("intake/stopOut", Commands.parallel(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: intake/stopOut")),
+            Commands.runOnce(() ->
+                superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOP_OUT)
+            )
+        ));
     }
 }

@@ -174,6 +174,14 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
             factory.getConstant(NAME, "intakeOnSpeed", .5, true),
             FlipperPosition.OUT
         ),
+        OUTTAKE(
+            factory.getConstant(NAME, "outtakeSpeed", -0.5, true),
+            FlipperPosition.OUT
+        ),
+        STOP_OUT(
+            0,
+            FlipperPosition.OUT
+        ),
         PULL_IN_ONE(
             factory.getConstant(NAME, "intakeOnSpeed", 0),
             FlipperPosition.PULL_IN_ONE
