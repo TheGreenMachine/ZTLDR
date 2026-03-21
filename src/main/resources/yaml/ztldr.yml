@@ -258,7 +258,7 @@ subsystems:
                 motorType: NEO550_JST
                 remoteSensor: RemoteCANcoder
                 remoteSensorId: 29
-                id: 27
+                id: -1
                 motorRotation: Clockwise_Positive
                 reverseSoftLimit: 0.0405
                 forwardSoftLimit: 0.109
@@ -301,7 +301,7 @@ subsystems:
             distanceTwoLaunchVelocityRPS: 47
             distanceThreeInclineAngleRotations: 0.07425
             distanceThreeLaunchVelocityRPS: 49
-            distanceAutoThingLaunchVelocityRPS: 50
+            distanceAutoThingLaunchVelocityRPS: 60
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570
             secondLowestBeamBreakToZero: 6.7769
