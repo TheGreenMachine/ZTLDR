@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CloserShoveCenterShoot"
+            "pathName": "StartCenterClosershoot"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ClosershootGreedypushQuartercollect_copy1"
+            "pathName": "ClosershootGreedyOutpost"
           }
         }
       ]
