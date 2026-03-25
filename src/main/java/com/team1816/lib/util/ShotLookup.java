@@ -1,54 +1,30 @@
 package com.team1816.lib.util;
 
+import edu.wpi.first.math.MathUtil;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
 public class ShotLookup {
-    private PolynomialSplineFunction angleInterpolator, powerInterpolator;
-    private double minimumDefaultAngle, minimumDefaultPower, mediumDefaultAngle, mediumDefaultPower, maximumDefaultAngle, maximumDefaultPower;
+    private final PolynomialSplineFunction inclineAngleRotationsFunction, launchVelocityRPSFunction;
 
-    public ShotLookup(double[] distances, double[] angles, double[] powers, double minimumDefaultAngle, double minimumDefaultPower, double mediumDefaultAngle, double mediumDefaultPower, double maximumDefaultAngle, double maximumDefaultPower) {
-        LinearInterpolator angleLI = new LinearInterpolator();
-        LinearInterpolator powerLI = new LinearInterpolator();
-        this.angleInterpolator = angleLI.interpolate(distances, angles);
-        this.powerInterpolator = powerLI.interpolate(distances, powers);
-        this.minimumDefaultAngle = minimumDefaultAngle;
-        this.minimumDefaultPower = minimumDefaultPower;
-        this.mediumDefaultAngle = mediumDefaultAngle;
-        this.mediumDefaultPower = mediumDefaultPower;
-        this.maximumDefaultAngle = maximumDefaultAngle;
-        this.maximumDefaultPower = maximumDefaultPower;
+    public ShotLookup(double[] distancesInches, double[] inclineAnglesRotations, double[] launchVelocitiesRPS) {
+        LinearInterpolator inclineAngleRotationsLI = new LinearInterpolator();
+        LinearInterpolator launchVelocityRPSLI = new LinearInterpolator();
+        this.inclineAngleRotationsFunction = inclineAngleRotationsLI.interpolate(distancesInches, inclineAnglesRotations);
+        this.launchVelocityRPSFunction = launchVelocityRPSLI.interpolate(distancesInches, launchVelocitiesRPS);
     }
 
-    public double getAngle(double distance) {
-        var knots = angleInterpolator.getKnots();
-
-        if (knots.length > 0) {
-            if (distance < knots[0]) {
-                return minimumDefaultAngle;
-            } else if (distance > knots[knots.length - 1]) {
-                return maximumDefaultAngle;
-            } else {
-                return angleInterpolator.value(distance);
-            }
-        }
-
-        return mediumDefaultAngle;
+    public double getInclineAngleRotations(double distanceInches) {
+        var knots = inclineAngleRotationsFunction.getKnots();
+        // Clamp the distance to within the interpolation range.
+        double clampedDistanceInches = MathUtil.clamp(distanceInches, knots[0], knots[knots.length - 1]);
+        return inclineAngleRotationsFunction.value(clampedDistanceInches);
     }
 
-    public double getPower(double distance) {
-        var knots = powerInterpolator.getKnots();
-
-        if (knots.length > 0) {
-            if (distance < knots[0]) {
-                return minimumDefaultPower;
-            } else if (distance > knots[knots.length - 1]) {
-                return maximumDefaultPower;
-            } else {
-                return powerInterpolator.value(distance);
-            }
-        }
-
-        return mediumDefaultPower;
+    public double getLaunchVelocityRPS(double distanceInches) {
+        var knots = launchVelocityRPSFunction.getKnots();
+        // Clamp the distance to within the interpolation range.
+        double clampedDistanceInches = MathUtil.clamp(distanceInches, knots[0], knots[knots.length - 1]);
+        return launchVelocityRPSFunction.value(clampedDistanceInches);
     }
 }

@@ -32,7 +32,8 @@ public class TalonFXImpl extends TalonFX implements ICTREDevice, IMotor {
         }
         GreenLogger.periodicLog(logPath + "Reference", this::getDeviceReference);
         GreenLogger.periodicLog(logPath + "Connected", this::isConnected);
-        GreenLogger.periodicLog(logPath + "Stator", ()-> getStatorCurrent().getValueAsDouble());
+        GreenLogger.periodicLog(logPath + "Stator Current (amps)", ()-> getStatorCurrent().getValueAsDouble());
+        GreenLogger.periodicLog(logPath + "Supply Current (amps)", ()-> getSupplyCurrent().getValueAsDouble());
         if(Robot.isSimulation()){
             simState = getSimState();
             var clockwise = ((TalonFXConfiguration) config).MotorOutput.Inverted == InvertedValue.Clockwise_Positive;

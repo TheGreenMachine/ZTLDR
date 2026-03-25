@@ -1,112 +1,38 @@
 package com.team1816.season.subsystems;
 
-import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.BaseSuperstructure;
 import com.team1816.lib.subsystems.Vision;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
-//Some wantedStates are still here since they're tied to aspects of the code I don't 100% understand(ClimbSide & FeederControl) -Ishwaq
 public class Superstructure extends BaseSuperstructure {
     private final Shooter shooter;
     private final Gatekeeper gatekeeper;
     private final Intake intake;
     private final Feeder feeder;
-    private final Climber climber;
 
-    private CommandXboxController controller;
+    private WantedSuperState wantedSuperState = WantedSuperState.DEFAULT;
+    private ActualSuperState actualSuperState = ActualSuperState.DEFAULTING;
 
-    public enum WantedSuperState {
-        DEFAULT,
+    private WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING;
+    private WantedShooterDistanceState wantedShooterDistanceState = WantedShooterDistanceState.PRESET_CLOSE;
+    private WantedGatekeeperState wantedGatekeeperState = WantedGatekeeperState.CLOSE;
+    private WantedIntakeState wantedIntakeState = WantedIntakeState.INTAKE;
 
-        INITIALIZING,
+    /**
+     * If the gatekeeper should directly accept control from outside without first checking that
+     * the shooter is ready. This is so we can still shoot if something is wrong with the shooter,
+     * and it thinks it is never aimed.
+     */
+    private boolean forceAllowGatekeeperControl = false;
 
-        SHOOTER_AUTOMATIC_HUB,
-
-        SHOOTER_DISTANCE_1,
-        SHOOTER_DISTANCE_2,
-        SHOOTER_DISTANCE_3,
-
-        SNOWBLOWER_AUTOMATIC_CORNER,
-
-        INTAKE_IN_AND_OFF,
-        INTAKE_OUT_AND_ON,
-
-        GATEKEEPER_ON,
-        GATEKEEPER_OFF,
-
-        CLIMB_L1,
-        CLIMB_L3,
-        CLIMB_DOWN_L1,
-
-        DROP_HEIGHT
-    }
-
-    public enum ActualSuperState {
-        DEFAULTING,
-
-        INITIALIZING,
-
-        SHOOTING_AUTOMATIC_HUB,
-
-        SHOOTING_DISTANCE_1,
-        SHOOTING_DISTANCE_2,
-        SHOOTING_DISTANCE_3,
-
-        SNOWBLOWING_AUTOMATIC_CORNER,
-
-        INTAKING_IN_AND_OFF,
-        INTAKING_OUT_AND_ON,
-
-        GATEKEEPING_ON,
-        GATEKEEPING_OFF,
-
-        CLIMBING_L1,
-        CLIMBING_L3,
-        CLIMBING_DOWN_L1,
-
-        DROPPING_HEIGHT
-    }
-
-    public enum ClimbSide {
-        // TODO: Get these poses from Choreo.
-        LEFT(Pose2d.kZero),
-        RIGHT(Pose2d.kZero);
-
-        private final Pose2d climbPose;
-
-        ClimbSide(Pose2d climbPose) {
-            this.climbPose = climbPose;
-        }
-
-        public Pose2d getClimbPose() {
-            return climbPose;
-        }
-    }
-
-    public enum WantedSwerveState {
-        AUTOMATIC_DRIVING,
-        MANUAL_DRIVING
-    }
-
-    public enum FeederControlState {
-        OVERRIDING,
-        DEFAULTING
-    }
-
-    private WantedSuperState wantedSuperState = WantedSuperState.INITIALIZING;
-    private WantedSuperState previousWantedSuperState = WantedSuperState.INITIALIZING;
-    private ActualSuperState actualSuperState = ActualSuperState.INITIALIZING;
-
-    private WantedSwerveState wantedSwerveState = WantedSwerveState.MANUAL_DRIVING; //Do we need this??
-    private FeederControlState feederControlState = FeederControlState.DEFAULTING; //What to do with this?
-    private boolean isAutonomous = false;
-
-    private ClimbSide climbSide = ClimbSide.LEFT;
+    /**
+     * If the gatekeeper and feeder should reverse to try to unjam. This is separate from the main
+     * state for the gatekeeper because it should take priority over any other conflicting button
+     * presses telling the gatekeeper to do something.
+     */
+    private boolean gatekeeperAndFeederReversing = false;
 
     public Superstructure(Swerve swerve, Vision vision) {
         super(swerve, vision);
@@ -114,7 +40,11 @@ public class Superstructure extends BaseSuperstructure {
         this.gatekeeper = Singleton.CreateSubSystem(Gatekeeper.class);
         this.intake = Singleton.CreateSubSystem(Intake.class);
         this.feeder = Singleton.CreateSubSystem(Feeder.class);
-        this.climber = Singleton.CreateSubSystem(Climber.class);
+
+        GreenLogger.periodicLog("superstructure/Wanted Super State", () -> wantedSuperState);
+        GreenLogger.periodicLog("superstructure/Actual Super State", () -> actualSuperState);
+        GreenLogger.periodicLog("superstructure/Force Allowing Gatekeeper Control", () -> forceAllowGatekeeperControl);
+        GreenLogger.periodicLog("superstructure/Gatekeeper and Feeder Reversing", () -> gatekeeperAndFeederReversing);
     }
 
     @Override
@@ -124,69 +54,21 @@ public class Superstructure extends BaseSuperstructure {
         actualSuperState = handleStateTransitions();
 
         applyStates();
-
-        if (wantedSuperState != previousWantedSuperState) {
-            GreenLogger.log("Wanted Superstate " + wantedSuperState);
-            GreenLogger.log("Actual Superstate " + actualSuperState);
-            SmartDashboard.putString("Super state: ", wantedSuperState.toString());
-            previousWantedSuperState = wantedSuperState;
-        }
     }
 
     private ActualSuperState handleStateTransitions() {
-        switch (wantedSuperState) {
-            case DEFAULT -> actualSuperState = ActualSuperState.DEFAULTING;
-
-            case INITIALIZING -> actualSuperState = ActualSuperState.INITIALIZING;
-
-            case SHOOTER_AUTOMATIC_HUB -> actualSuperState = ActualSuperState.SHOOTING_AUTOMATIC_HUB;
-
-            case SHOOTER_DISTANCE_1 -> actualSuperState = ActualSuperState.SHOOTING_DISTANCE_1;
-            case SHOOTER_DISTANCE_2 -> actualSuperState = ActualSuperState.SHOOTING_DISTANCE_2;
-            case SHOOTER_DISTANCE_3 -> actualSuperState = ActualSuperState.SHOOTING_DISTANCE_3;
-
-            case INTAKE_OUT_AND_ON -> actualSuperState = ActualSuperState.INTAKING_OUT_AND_ON;
-            case INTAKE_IN_AND_OFF -> actualSuperState = ActualSuperState.INTAKING_IN_AND_OFF;
-
-            case GATEKEEPER_ON -> actualSuperState = ActualSuperState.GATEKEEPING_ON;
-            case GATEKEEPER_OFF -> actualSuperState = ActualSuperState.GATEKEEPING_OFF;
-
-            case CLIMB_L1 -> actualSuperState = ActualSuperState.CLIMBING_L1;
-            case CLIMB_L3 -> actualSuperState = ActualSuperState.CLIMBING_L3;
-            case CLIMB_DOWN_L1 -> actualSuperState = ActualSuperState.CLIMBING_DOWN_L1;
-
-            case DROP_HEIGHT -> actualSuperState = ActualSuperState.DROPPING_HEIGHT;
-        }
-
-
-        return actualSuperState;
+        return switch (wantedSuperState) {
+            case DEFAULT -> ActualSuperState.DEFAULTING;
+            case CLIMB_L1 -> ActualSuperState.CLIMBING_L1;
+            case CLIMB_L3 -> ActualSuperState.CLIMBING_L3;
+        };
     }
 
     private void applyStates() {
         switch (actualSuperState) {
             case DEFAULTING -> defaulting();
-
-            case INITIALIZING -> initializing();
-
-            case SHOOTING_AUTOMATIC_HUB -> shootingAutomaticHub();
-
-            case SHOOTING_DISTANCE_1 -> shootingDistance1();
-            case SHOOTING_DISTANCE_2 -> shootingDistance2();
-            case SHOOTING_DISTANCE_3 -> shootingDistance3();
-
-            case SNOWBLOWING_AUTOMATIC_CORNER -> snowblowingAutomaticCorner();
-
-            case INTAKING_OUT_AND_ON -> intakeOutAndOn();
-            case INTAKING_IN_AND_OFF -> intakeInAndOff();
-
-            case GATEKEEPING_ON -> gatekeepingOn();
-            case GATEKEEPING_OFF -> gatekeeperingOff();
-
             case CLIMBING_L1 -> climbingL1();
             case CLIMBING_L3 -> climbingL3();
-            case CLIMBING_DOWN_L1 -> climbingDownL1();
-
-            case DROPPING_HEIGHT -> droppingHeight();
         }
     }
 
@@ -194,152 +76,241 @@ public class Superstructure extends BaseSuperstructure {
         this.wantedSuperState = superState;
     }
 
-    private void setWantedSubsystemStates(Intake.INTAKE_STATE intakeState, Feeder.FEEDER_STATE feederState,
-                                          Gatekeeper.GATEKEEPER_STATE gatekeeperState, Shooter.SHOOTER_STATE shooterState,
-                                          Climber.CLIMBER_STATE climbState)  {
-        intake.setWantedState(intakeState);
-        feeder.setWantedState(feederState);
-        gatekeeper.setWantedState(gatekeeperState);
-        shooter.setWantedState(shooterState);
-        climber.setWantedState(climbState);
+    public void setSuperstructureWantedSwerveState(WantedSwerveState swerveState) {
+        this.wantedSwerveState = swerveState;
+    }
+
+    public void setSuperstructureWantedShooterDistanceState(WantedShooterDistanceState shooterDistanceState) {
+        this.wantedShooterDistanceState = shooterDistanceState;
+    }
+
+    public void setSuperstructureWantedGatekeeperState(WantedGatekeeperState gatekeeperState) {
+        this.wantedGatekeeperState = gatekeeperState;
+    }
+
+    public void setSuperstructureWantedIntakeState(WantedIntakeState intakeState) {
+        this.wantedIntakeState = intakeState;
+    }
+
+    public void incrementPullInSuperstructureIntakeState() {
+        wantedIntakeState = switch (wantedIntakeState) {
+            case INTAKE, OUTTAKE, STOP_OUT -> WantedIntakeState.PULL_IN_ONE;
+            case PULL_IN_ONE -> WantedIntakeState.PULL_IN_TWO;
+            case PULL_IN_TWO, STOW -> WantedIntakeState.STOW;
+        };
+    }
+
+    /**
+     * Sets if the incline of the shooter should duck down to fit under the trench.
+     *
+     * @param shouldInclineDuck If the incline of the shooter should duck down to fit under the trench.
+     */
+    public void setInclineDucking(boolean shouldInclineDuck) {
+        shooter.setInclineDucking(shouldInclineDuck);
+    }
+
+    /**
+     * Sets the angle to point the turret at when the turret isn't auto aiming (in degrees).
+     *
+     * @param wantedAngleDegrees The angle to point the turret at when the turret isn't auto aiming
+     *                           (in degrees).
+     */
+    public void setTurretFixedAngle(double wantedAngleDegrees) {
+        shooter.setTurretFixedAngle(wantedAngleDegrees);
+    }
+
+    /**
+     * Sets if the turret should automatically point at either the hub or the corners. If false,
+     * the turret will point at the angle set by {@link #setTurretFixedAngle(double)} instead.
+     *
+     * @param shouldAutoAimTurret If the turret of the shooter should aim automatically.
+     */
+    public void setAutoAimTurret(boolean shouldAutoAimTurret) {
+        shooter.setAutoAimTurret(shouldAutoAimTurret);
+    }
+
+    /**
+     * Sets if the gatekeeper should directly accept control from outside without first checking
+     * that the shooter is ready. This is so we can still shoot if something is wrong with the
+     * shooter, and it thinks it is never aimed.
+     *
+     * @param shouldForceAllowGatekeeperControl If the gatekeeper should accept controls without
+     *                                          waiting for the shooter to be ready.
+     */
+    public void forceAllowGatekeeperControl(boolean shouldForceAllowGatekeeperControl) {
+        forceAllowGatekeeperControl = shouldForceAllowGatekeeperControl;
+    }
+
+    /**
+     * Increases the adjustment value to all requests to the launch motors.
+     */
+    public void increaseLaunchVelocityAdjustment() {
+        shooter.increaseLaunchVelocityAdjustment();
+    }
+
+    /**
+     * Decreases the adjustment value to all requests to the launch motors.
+     */
+    public void decreaseLaunchVelocityAdjustment() {
+        shooter.decreaseLaunchVelocityAdjustment();
+    }
+
+    /**
+     * Increases the adjustment value to all requests to the incline.
+     */
+    public void increaseInclineAngleAdjustment() {
+        shooter.increaseInclineAngleAdjustment();
+    }
+
+    /**
+     * Decreases the adjustment value to all requests to the incline.
+     */
+    public void decreaseInclineAngleAdjustment() {
+        shooter.decreaseInclineAngleAdjustment();
+    }
+
+    /**
+     * Increases the adjustment value to all requests to the turret.
+     */
+    public void increaseTurretAngleAdjustment() {
+        shooter.increaseTurretAngleAdjustment();
+    }
+
+    /**
+     * Decreases the adjustment value to all requests to the turret.
+     */
+    public void decreaseTurretAngleAdjustment() {
+        shooter.decreaseTurretAngleAdjustment();
+    }
+
+    /**
+     * Sets if the gatekeeper and feeder should reverse to try to unjam. This is separate from
+     * setting the main state for the gatekeeper because it should take priority over any other
+     * conflicting button presses telling the gatekeeper to do something.
+     *
+     * @param shouldGatekeeperAndFeederReverse If the gatekeeper and feeder should reverse.
+     */
+    public void setGatekeeperAndFeederReversing(boolean shouldGatekeeperAndFeederReverse) {
+        gatekeeperAndFeederReversing = shouldGatekeeperAndFeederReverse;
+    }
+
+    /**
+     * Sets the turret back into calibration mode.
+     */
+    public void recalibrateTurret() {
+        shooter.recalibrateTurret();
+    }
+
+    /**
+     * Gets if the incline is ducked low enough to go under the trench.
+     *
+     * @return If the incline is ducked low enough to go under the trench.
+     */
+    public boolean isInclineDucked() {
+        return shooter.isInclineDucked();
     }
 
     private void defaulting() {
-        // During auto, let PathPlanner have sole control of the drivetrain
-        if (!isAutonomous) {
-            swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
-        }
-    }
-
-    private void initializing() {
-        shooter.setWantedState(Shooter.SHOOTER_STATE.CALIBRATING);
-        if (shooter.isCalibrated()) {
-            setWantedSuperState(WantedSuperState.DEFAULT);
-        }
-    }
-
-    private void shootingAutomaticHub() {
-        if(gatekeeper.getWantedState() == Gatekeeper.GATEKEEPER_STATE.CLOSED) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.AIMING_HUB);
-        } else {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
-        }
-//        actualSuperState = ActualSuperState.DEFAULTING;
-    }
-
-    private void shootingDistance1() {
-        shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
-        actualSuperState = ActualSuperState.DEFAULTING;
-    }
-
-    private void shootingDistance2() {
-        shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_TWO);
-        actualSuperState = ActualSuperState.DEFAULTING;
-    }
-
-    private void shootingDistance3() {
-        shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
-        actualSuperState = ActualSuperState.DEFAULTING;
-    }
-
-    private void snowblowingAutomaticCorner() {
-        if(gatekeeper.getWantedState() == Gatekeeper.GATEKEEPER_STATE.CLOSED) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.AIMING_CORNER);
-        } else {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.SNOWBLOWING);
-        }
-    }
-
-    private void intakeOutAndOn() {
-        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT_AND_ON);
-        feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
-        actualSuperState = ActualSuperState.DEFAULTING;
-    }
-
-    private void intakeInAndOff() {
-        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF);
-        feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-        actualSuperState = ActualSuperState.DEFAULTING;
-    }
-
-    private void gatekeepingOn() {
-        if(shooter.getWantedState() == Shooter.SHOOTER_STATE.AIMING_HUB) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.AUTOMATIC);
-        } else if (shooter.getWantedState() == Shooter.SHOOTER_STATE.AIMING_CORNER) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.SNOWBLOWING);
-        }
-        gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.OPEN);
-        feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
-        actualSuperState = ActualSuperState.DEFAULTING;
-    }
-
-    private void gatekeeperingOff() {
-        if(shooter.getWantedState() == Shooter.SHOOTER_STATE.AUTOMATIC) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.AIMING_HUB);
-        } else if (shooter.getWantedState() == Shooter.SHOOTER_STATE.SNOWBLOWING) {
-            shooter.setWantedState(Shooter.SHOOTER_STATE.AIMING_CORNER);
-        }
-        gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
-
-        if (intake.isIntaking()) {
-            feeder.setWantedState(Feeder.FEEDER_STATE.FAST_FEEDING);
-        } else {
-            feeder.setWantedState(Feeder.FEEDER_STATE.IDLING);
-        }
-
-        actualSuperState = ActualSuperState.DEFAULTING;
+        // TODO: Declimb if necessary, else set the subsystem wanted states
+        swerve.setWantedState(
+            switch (wantedSwerveState) {
+                case MANUAL_DRIVING -> Swerve.SwerveState.MANUAL_DRIVING;
+                case AUTOMATIC_DRIVING -> Swerve.SwerveState.AUTOMATIC_DRIVING;
+                case BRAKE -> Swerve.SwerveState.BRAKE;
+            }
+        );
+        shooter.setWantedDistanceState(
+            switch (wantedShooterDistanceState) {
+                case AUTOMATIC -> Shooter.ShooterDistanceState.AUTOMATIC;
+                case PRESET_CLOSE -> Shooter.ShooterDistanceState.PRESET_CLOSE;
+                case PRESET_MIDDLE -> Shooter.ShooterDistanceState.PRESET_MIDDLE;
+                case PRESET_FAR -> Shooter.ShooterDistanceState.PRESET_FAR;
+                case PRESET_AUTO_THING -> Shooter.ShooterDistanceState.PRESET_AUTO_THING;
+            }
+        );
+        gatekeeper.setWantedState(
+            gatekeeperAndFeederReversing
+                // If we are trying to reverse the gatekeeper to unjam, that request should always
+                // take priority.
+                ? Gatekeeper.GatekeeperState.REVERSING
+                : (
+                    // Only let fuel into the shooter if the shooter is ready, or if we are force
+                    // allowing control.
+                    shooter.isAimed() || forceAllowGatekeeperControl
+                        ? switch (wantedGatekeeperState) {
+                        case OPEN -> Gatekeeper.GatekeeperState.OPEN;
+                        case CLOSE -> Gatekeeper.GatekeeperState.CLOSED;
+                    }
+                        : Gatekeeper.GatekeeperState.CLOSED
+                )
+        );
+        // Only spin up the launch motors if we are trying to shoot to save battery.
+        shooter.setSpinUpLaunchMotors(gatekeeper.getState() == Gatekeeper.GatekeeperState.OPEN);
+        intake.setWantedState(
+            switch (wantedIntakeState) {
+                case INTAKE -> Intake.IntakeState.INTAKE;
+                case OUTTAKE -> Intake.IntakeState.OUTTAKE;
+                case STOP_OUT -> Intake.IntakeState.STOP_OUT;
+                case STOW -> Intake.IntakeState.STOW;
+                case PULL_IN_ONE -> Intake.IntakeState.PULL_IN_ONE;
+                case PULL_IN_TWO -> Intake.IntakeState.PULL_IN_TWO;
+            }
+        );
+        feeder.setWantedState(
+            // Have the feeder just follow what the gatekeepers are doing.
+            switch (gatekeeper.getState()) {
+                case OPEN -> Feeder.FeederState.FEEDING;
+                case CLOSED -> Feeder.FeederState.STOPPED;
+                case REVERSING -> Feeder.FeederState.REVERSING;
+            }
+        );
     }
 
     private void climbingL1() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF, Feeder.FEEDER_STATE.SLOW_FEEDING,
-            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
-            Climber.CLIMBER_STATE.L1_UP_CLIMBING);
+        // TODO: Handle Superstructure climbing behavior.
     }
 
     private void climbingL3() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF, Feeder.FEEDER_STATE.SLOW_FEEDING,
-            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
-            Climber.CLIMBER_STATE.L3_UP_CLIMBING);
+        // TODO: Handle Superstructure climbing behavior.
     }
 
-    private void climbingDownL1() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF, Feeder.FEEDER_STATE.SLOW_FEEDING,
-            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
-            Climber.CLIMBER_STATE.L1_DOWN_CLIMBING);
+    public enum WantedSuperState {
+        DEFAULT,
+        CLIMB_L1,
+        CLIMB_L3
     }
 
-    private void droppingHeight() {
-        setWantedSubsystemStates(Intake.INTAKE_STATE.INTAKE_IN_AND_OFF, Feeder.FEEDER_STATE.SLOW_FEEDING,
-            Gatekeeper.GATEKEEPER_STATE.CLOSED, Shooter.SHOOTER_STATE.IDLE,
-            Climber.CLIMBER_STATE.IDLING);
+    public enum ActualSuperState {
+        DEFAULTING,
+        CLIMBING_L1,
+        CLIMBING_L3
     }
 
-    public void setClimbSide(ClimbSide climbSide) {
-        this.climbSide = climbSide;
+    public enum WantedSwerveState {
+        MANUAL_DRIVING,
+        AUTOMATIC_DRIVING,
+        BRAKE
     }
 
-    public void autonomousInit() {
-        isAutonomous = true;
-        swerve.setWantedState(Swerve.ActualState.IDLING);
-        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT_AND_ON);
-        shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_THREE);
-        gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
+    public enum WantedShooterDistanceState {
+        AUTOMATIC,
+        PRESET_CLOSE,
+        PRESET_MIDDLE,
+        PRESET_FAR,
+        PRESET_AUTO_THING
     }
 
-    public void teleopInit() {
-        isAutonomous = false;
-        swerve.setWantedState(Swerve.ActualState.MANUAL_DRIVING);
-        intake.setWantedState(Intake.INTAKE_STATE.INTAKE_OUT_AND_ON);
-        feeder.setWantedState(Feeder.FEEDER_STATE.SLOW_FEEDING);
-        shooter.setWantedState(Shooter.SHOOTER_STATE.DISTANCE_ONE);
-        gatekeeper.setWantedState(Gatekeeper.GATEKEEPER_STATE.CLOSED);
+    public enum WantedGatekeeperState {
+        OPEN,
+        CLOSE
     }
 
-    public void shootingAutomatic() {  //the shooter position to automatically shoot at hub or corner depending on location
-        if (BaseRobotState.robotPose.getX() >  5) {  //TODO: account for color and fix the number
-            setWantedSuperState(WantedSuperState.SNOWBLOWER_AUTOMATIC_CORNER);
-        } else {
-            setWantedSuperState(WantedSuperState.SHOOTER_AUTOMATIC_HUB);
-        }
+    public enum WantedIntakeState {
+        INTAKE,
+        STOW,
+        OUTTAKE,
+        STOP_OUT,
+        PULL_IN_ONE,
+        PULL_IN_TWO
     }
 }

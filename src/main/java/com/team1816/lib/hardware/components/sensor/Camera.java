@@ -252,6 +252,11 @@ public class Camera {
             () -> latestVisionStdDevs,
             Matrix.getStruct(Nat.N3(), Nat.N1())
         );
+        GreenLogger.periodicLog(
+            logPath + "Camera Pose",
+            () -> new Pose3d(BaseRobotState.robotPose).plus(robotToCamera),
+            Pose3d.struct
+        );
     }
 
     /**

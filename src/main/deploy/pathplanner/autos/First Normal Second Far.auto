@@ -7,25 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "TopGateToFuel"
+            "pathName": "StartCenterShoot"
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 0.5
+            "name": "shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "waitForDucking"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FuelToTopGate"
+            "pathName": "ShootGreedyPark"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Choreo Autos",
+  "folder": null,
   "choreoAuto": true
 }

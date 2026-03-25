@@ -6,6 +6,7 @@ import com.team1816.lib.hardware.SubsystemConfig;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 
@@ -33,6 +34,11 @@ public interface IDrivetrain extends ITestableSubsystem {
     default KinematicsConfig getKinematicsConfig() {
         return config.kinematics;
     }
+
+    /**
+     * Sets the forward perspective for field-centric driving.
+     */
+    void setOperatorPerspectiveForward(Rotation2d fieldDirection);
 
     void resetPose(Pose2d pose);
 

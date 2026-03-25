@@ -9,10 +9,10 @@ import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.networktables.*;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -31,8 +31,23 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     private final SlewRateLimiter rotLimiter = new SlewRateLimiter(6);  // rotation
     private static double maxAngularRate = 0;
 
-    private ActualState wantedState = ActualState.IDLING;
-    private ActualState previousWantedState = ActualState.IDLING;
+    // Blue alliance sees forward as 0 degrees (toward red alliance wall).
+    private static final Rotation2d blueAlliancePerspectiveRotation = Rotation2d.kZero;
+    // Red alliance sees forward as 180 degrees (toward blue alliance wall).
+    private static final Rotation2d redAlliancePerspectiveRotation = Rotation2d.k180deg;
+    // Keep track if we've ever applied the operator perspective before or not.
+    private boolean hasAppliedOperatorPerspective = false;
+
+    private SwerveState wantedState = SwerveState.IDLING;
+
+    private final SwerveRequest.FieldCentric manualDriveRequest = new SwerveRequest.FieldCentric()
+        .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+    private final SwerveRequest.SwerveDriveBrake brakeRequest = new SwerveRequest.SwerveDriveBrake();
+
+    private final double NORMAL_MODE_TRANSLATIONAL_MULTIPLIER;
+    private final double NORMAL_MODE_ROTATIONAL_MULTIPLIER;
+    private final double SLOW_MODE_TRANSLATIONAL_MULTIPLIER;
+    private final double SLOW_MODE_ROTATIONAL_MULTIPLIER;
 
     public Swerve(CommandXboxController controller) {
         // TODO: This Singleton.get stuff is a temporary workaround until I fix a bug with the
@@ -40,24 +55,26 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
         //  subsystem that is created.
         drivetrain = Singleton.get(RobotFactory.class).getSwerveDrivetrain(NAME);
 
+        NORMAL_MODE_TRANSLATIONAL_MULTIPLIER = factory.getConstant(NAME, "normalModeTranslationalMultiplier", 0);
+        NORMAL_MODE_ROTATIONAL_MULTIPLIER = factory.getConstant(NAME, "normalModeRotationalMultiplier", 0);
+        SLOW_MODE_TRANSLATIONAL_MULTIPLIER = factory.getConstant(NAME, "slowModeTranslationalMultiplier", 0);
+        SLOW_MODE_ROTATIONAL_MULTIPLIER = factory.getConstant(NAME, "slowModeRotationalMultiplier", 0);
+
         this.controller = controller;
         var kinematics = drivetrain.getKinematicsConfig();
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         // setup teleop drivetrain command
         maxAngularRate = RotationsPerSecond.of(kinematics.maxAngularRate).in(RadiansPerSecond);
-    }
 
-    public enum ActualState {
-        MANUAL_DRIVING,
-        AUTOMATIC_DRIVING,
-        IDLING
+        GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
     }
 
     @Override
     public void periodic() {
         readFromHardware();
         applyStates();
+        setForwardPerspective();
     }
 
     private SwerveRequest GetSwerverCommand(SwerveRequest.FieldCentric drive) {
@@ -82,11 +99,16 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
         y   = yLimiter.calculate(y);
         rot = rotLimiter.calculate(rot);
 
-        // 5. Slow mode (right bumper = precision mode)
+        // 5. Multipliers to slow down movement based on driver preference. Slow mode and normal mode.
         if (controller.leftTrigger().getAsBoolean()) {
-            x   *= 0.35;
-            y   *= 0.35;
-            rot *= 0.45;
+            x   *= SLOW_MODE_TRANSLATIONAL_MULTIPLIER;
+            y   *= SLOW_MODE_TRANSLATIONAL_MULTIPLIER;
+            rot *= SLOW_MODE_ROTATIONAL_MULTIPLIER;
+        }
+        else {
+            x   *= NORMAL_MODE_TRANSLATIONAL_MULTIPLIER;
+            y   *= NORMAL_MODE_TRANSLATIONAL_MULTIPLIER;
+            rot *= NORMAL_MODE_ROTATIONAL_MULTIPLIER;
         }
 
         return drive.withVelocityX(x * drivetrain.maxSpd) // Drive forward with negative Y (forward)
@@ -94,31 +116,39 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
             .withRotationalRate(rot * maxAngularRate); // Drive counterclockwise with negative X (left)
     }
 
-    private void applyStates() {
-        switch (wantedState) {
-            case MANUAL_DRIVING:
-                SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-                    .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-                drivetrain.setSwerveState(GetSwerverCommand(drive));
-                break;
-            case AUTOMATIC_DRIVING:
-                // TODO: something here, idk
-                break;
-            case IDLING:
-                break;
-            default:
-                drivetrain.setSwerveState(new SwerveRequest.Idle());
-                break;
-        }
-
-        if (wantedState != previousWantedState) {
-            GreenLogger.log("Swerve state: " + wantedState.toString());
-            SmartDashboard.putString("Swerve state: ", wantedState.toString());
-            previousWantedState = wantedState;
+    private void setForwardPerspective() {
+        /*
+         * Periodically try to apply the operator perspective.
+         * If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
+         * This allows us to correct the perspective in case the robot code restarts mid-match.
+         * Otherwise, only check and apply the operator perspective if the DS is disabled.
+         * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
+         */
+        if (!hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
+            DriverStation.getAlliance().ifPresent(allianceColor -> {
+                drivetrain.setOperatorPerspectiveForward(
+                    allianceColor == DriverStation.Alliance.Red
+                        ? redAlliancePerspectiveRotation
+                        : blueAlliancePerspectiveRotation
+                );
+                hasAppliedOperatorPerspective = true;
+            });
         }
     }
 
-    public void setWantedState(ActualState state) {
+    private void applyStates() {
+        switch (wantedState) {
+            case MANUAL_DRIVING -> drivetrain.setSwerveState(GetSwerverCommand(manualDriveRequest));
+            case AUTOMATIC_DRIVING -> {
+                // TODO: something here, idk
+            }
+            case BRAKE -> drivetrain.setSwerveState(brakeRequest);
+            case IDLING -> {}
+            default -> drivetrain.setSwerveState(new SwerveRequest.Idle());
+        }
+    }
+
+    public void setWantedState(SwerveState state) {
         this.wantedState = state;
     }
 
@@ -164,5 +194,22 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
 
     public void simTeleportRobot(Pose2d pose) {
         drivetrain.simTeleportRobot(pose);
+    }
+
+    public enum SwerveState {
+        /**
+         * Driving with joystick inputs.
+         */
+        MANUAL_DRIVING,
+        /**
+         * Following PathPlanner path commands.
+         */
+        AUTOMATIC_DRIVING,
+        /**
+         * Sends a {@link com.ctre.phoenix6.swerve.SwerveRequest.SwerveDriveBrake} request to the
+         * drivetrain ("X-mode").
+         */
+        BRAKE,
+        IDLING
     }
 }

@@ -43,7 +43,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      * The cameras with the {@link Camera.DetectionType#APRIL_TAG APRIL_TAG} detectionType
      */
     private final List<Camera> aprilTagCameras;
-    private final VisionSystemSim visionSim;
+    private VisionSystemSim visionSim;
     /**
      * The base standard deviations to use for non-multi-tag estimates
      */
@@ -68,8 +68,8 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
             camera -> camera.detectionType == Camera.DetectionType.APRIL_TAG
         ).toList();
 
-        visionSim = new VisionSystemSim("VisionSim");
         if (Robot.isSimulation()) {
+            visionSim = new VisionSystemSim("VisionSim");
             visionSim.addAprilTags(aprilTagFieldLayout);
             for (Camera camera : cameras) {
                 camera.addToSim(visionSim);
@@ -87,6 +87,13 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
     public List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> getVisionEstimatedPosesWithStdDevs() {
         List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> posesWithStdDevs = new ArrayList<>();
 
+        // The maximum distance a vision pose estimate can be from the current robot pose
+        // estimate to allow the vision estimate to be used.
+        double visionEstimateDistanceThresholdMeters = 1.0;
+        // The maximum difference the angle of a vision pose estimate can be from the angle
+        // of the current robot pose estimate to allow the vision estimate to be used.
+        double visionEstimateAngleThresholdRadians = Units.degreesToRadians(15.0);
+
         for (Camera camera : aprilTagCameras) {
             for (EstimatedRobotPose estimatedRobotPose : camera.getEstimatedRobotPosesFromAllUnreadResults()) {
                 Pose2d visionEstimatedPose2d = estimatedRobotPose.estimatedPose.toPose2d();
@@ -96,13 +103,6 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 // out unreasonable estimates caused by pose ambiguity (see here:
                 // https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/3D-tracking.html#ambiguity
                 // ).
-
-                // The maximum distance a vision pose estimate can be from the current robot pose
-                // estimate to allow the vision estimate to be used.
-                final double visionEstimateDistanceThresholdMeters = 1.0;
-                // The maximum difference the angle of a vision pose estimate can be from the angle
-                // of the current robot pose estimate to allow the vision estimate to be used.
-                final double visionEstimateAngleThresholdRadians = Units.degreesToRadians(15.0);
 
                 if (
                     // If we don't currently have an accurate pose estimate, we can't use current

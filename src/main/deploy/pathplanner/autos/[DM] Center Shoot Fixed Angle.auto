@@ -5,21 +5,27 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "BottomGateFullFuel"
+            "name": "fixTurretAngle180"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FuelToHangViaTopGate"
+            "pathName": "CenterstartBackup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
           }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Choreo Autos",
+  "folder": null,
   "choreoAuto": true
 }
