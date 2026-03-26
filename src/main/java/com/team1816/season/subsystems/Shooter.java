@@ -451,7 +451,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      *
      * @return The {@link Translation2d} of the target we should aim at.
      */
-    private Translation2d getTargetTranslation2d() {
+    public Translation2d getTargetTranslation2d() {
         Pose2d robotPose = BaseRobotState.robotPose;
         double robotXMeters = robotPose.getX();
         double robotYMeters = robotPose.getY();
@@ -514,11 +514,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
     private void aimInclineAndLaunchersAtTarget(Translation2d targetTranslation2d) {
-        Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
-        double distanceToTargetMeters = shooterTranslation2d.getDistance(targetTranslation2d);
-        double distanceToTargetInches = Units.metersToInches(distanceToTargetMeters);
         ShooterTableCalculator.ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator
-            .getShooterDistanceSetting(distanceToTargetInches);
+            .getShooterDistanceSetting(targetTranslation2d);
         double inclineAngleRotations = shooterDistanceSetting.inclineAngleRotations();
         double inclineAngleDegrees = Units.rotationsToDegrees(inclineAngleRotations);
         double launchVelocityRPS = shooterDistanceSetting.launchVelocityRPS();

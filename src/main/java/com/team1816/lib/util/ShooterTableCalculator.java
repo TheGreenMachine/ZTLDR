@@ -1,6 +1,7 @@
 package com.team1816.lib.util;
 
 import com.team1816.lib.hardware.ShooterSettingsConfig;
+import edu.wpi.first.math.geometry.Translation2d;
 
 import java.util.List;
 
@@ -30,10 +31,10 @@ public class ShooterTableCalculator {
         shotLookup = new ShotLookup(distancesInchesArray, inclineAnglesRotationsArray, launchVelocitiesRPSArray);
     }
 
-    public ShooterDistanceSetting getShooterDistanceSetting(double distanceInches) {
+    public ShooterDistanceSetting getShooterDistanceSetting(Translation2d translation) {
         return new ShooterDistanceSetting(
-            shotLookup.getInclineAngleRotations(distanceInches),
-            shotLookup.getLaunchVelocityRPS(distanceInches)
+            shotLookup.getLaunchAngleRadiansRPSExperiental(translation),
+            shotLookup.getLaunchVelocityRPSExperiental(shotLookup.getLaunchAngleRadiansRPSExperiental(translation),translation)
         );
     }
 
