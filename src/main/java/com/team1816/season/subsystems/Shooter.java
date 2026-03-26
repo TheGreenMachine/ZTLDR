@@ -11,6 +11,7 @@ import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.FieldContainer;
 import com.team1816.lib.util.GreenLogger;
+import com.team1816.lib.util.ShooterCalculatorResponse;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
@@ -83,6 +84,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * An adjustment value added to all requests to the turret (in degrees).
      */
     private double turretAngleAdjustmentDegrees = 0;
+
+    private boolean useChassisSpeedForHoodAngleAndSpeed = false;
 
     //MOTORS
     private final IMotor topLaunchMotor = (IMotor) factory.getDevice(NAME, "topLaunchMotor");
@@ -316,27 +319,19 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         Translation2d target = Translation2d.kZero;
+
         if (autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC) {
-            isAutoAiming = true;
             target = getTargetTranslation2d();
-        }
-        else {
-            isAutoAiming = false;
-        }
-
-        if (autoAimTurret) {
             aimTurretAtTarget(target);
-        }
-        else {
+            aimInclineAndLaunchersAtTarget(target);
+        } else {
             setTurretAngle(turretFixedAngleDegrees);
-        }
-
-        switch (wantedDistanceState) {
-            case IDLE, PRESET_CLOSE, PRESET_MIDDLE, PRESET_FAR, PRESET_AUTO_THING -> {
-                setInclineAngle(wantedDistanceState.getInclineAngleDegrees());
-                setLaunchVelocities(wantedDistanceState.getLaunchVelocityRPS());
+            switch (wantedDistanceState) {
+                case IDLE, PRESET_CLOSE, PRESET_MIDDLE, PRESET_FAR, PRESET_AUTO_THING -> {
+                    setInclineAngle(wantedDistanceState.getInclineAngleDegrees());
+                    setLaunchVelocities(wantedDistanceState.getLaunchVelocityRPS());
+                }
             }
-            case AUTOMATIC -> aimInclineAndLaunchersAtTarget(target);
         }
     }
 
@@ -514,16 +509,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
     private void aimInclineAndLaunchersAtTarget(Translation2d targetTranslation2d) {
-        Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
-        double distanceToTargetMeters = shooterTranslation2d.getDistance(targetTranslation2d);
-        double distanceToTargetInches = Units.metersToInches(distanceToTargetMeters);
-        ShooterTableCalculator.ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator
-            .getShooterDistanceSetting(distanceToTargetInches);
-        double inclineAngleRotations = shooterDistanceSetting.inclineAngleRotations();
-        double inclineAngleDegrees = Units.rotationsToDegrees(inclineAngleRotations);
-        double launchVelocityRPS = shooterDistanceSetting.launchVelocityRPS();
-        setInclineAngle(inclineAngleDegrees);
-        setLaunchVelocities(launchVelocityRPS);
+        ShooterCalculatorResponse response = shooterTableCalculator.getShooterSettings(getCurrentTurretPose2d().getTranslation(),
+            targetTranslation2d, useChassisSpeedForHoodAngleAndSpeed);
+
+        setInclineAngle(response.getInclineAngelDegrees());
+        setLaunchVelocities(response.getLaunchVelocityRPS());
     }
 
     /**
