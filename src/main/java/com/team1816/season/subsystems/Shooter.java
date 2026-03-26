@@ -11,7 +11,7 @@ import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.FieldContainer;
 import com.team1816.lib.util.GreenLogger;
-import com.team1816.lib.util.ShooterCalculatorResponse;
+import com.team1816.lib.util.IShooterCalculator;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
@@ -537,11 +537,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
     private void aimInclineAndLaunchersAtTarget(Translation2d targetTranslation2d) {
-        ShooterCalculatorResponse response = shooterTableCalculator.getShooterSettings(getCurrentTurretPose2d().getTranslation(),
+        IShooterCalculator.ShooterCalculatorResponse response = shooterTableCalculator.getShooterSettings(getCurrentTurretPose2d().getTranslation(),
             targetTranslation2d, useChassisSpeedForHoodAngleAndSpeed);
 
-        setInclineAngle(response.getInclineAngelDegrees());
-        setLaunchVelocities(response.getLaunchVelocityRPS());
+        setInclineAngle(response.inclineAngleRotations());
+        setLaunchVelocities(response.launchVelocityRPS());
     }
 
     /**
