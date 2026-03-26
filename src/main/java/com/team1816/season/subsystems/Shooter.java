@@ -341,29 +341,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             }
             case AUTOMATIC -> aimInclineAndLaunchersAtTarget(target);
         }
-
-/*        Translation2d target = Translation2d.kZero;
-
-        if (autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC) {
-            target = getTargetTranslation2d();
-            ShooterCalculatorResponse response = shooterTableCalculator.getShooterSettings(getCurrentTurretPose2d().getTranslation(),
-                target, useChassisSpeedForHoodAngleAndSpeed);
-
-            double robotRelativeDegreesToTarget = response.getTurrentAngle().getDegrees();
-
-            setTurretAngle(robotRelativeDegreesToTarget);
-            setInclineAngle(response.getInclineAngelDegrees());
-            setLaunchVelocities(response.getLaunchVelocityRPS());
-        } else {
-            setTurretAngle(turretFixedAngleDegrees);
-            switch (wantedDistanceState) {
-                case IDLE, PRESET_CLOSE, PRESET_MIDDLE, PRESET_FAR, PRESET_AUTO_THING -> {
-                    setInclineAngle(wantedDistanceState.getInclineAngleDegrees());
-                    setLaunchVelocities(wantedDistanceState.getLaunchVelocityRPS());
-                }
-            }
-        }
- */
     }
 
     public void setWantedDistanceState(ShooterDistanceState state) {
