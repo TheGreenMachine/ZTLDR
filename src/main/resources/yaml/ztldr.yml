@@ -272,6 +272,7 @@ subsystems:
                 deviceType: TalonFX
                 id: 28
                 motorRotation: Clockwise_Positive
+                sensorToMechanismRatio: 15.625 # 250/16 gear ratio
                 pidConfig:
                     slot0:
                         kS: 0.29
@@ -290,7 +291,6 @@ subsystems:
         constants:
             leftTurretSensorChannel: 0
             rightTurretSensorChannel: 1
-            motorRotationsPerTurretRotation: 15.625 # 250/16 gear ratio
             shooterOffsetXMeters: -0.11303
             shooterOffsetYMeters: -0.112268
             shooterOffsetZMeters: 0.508
@@ -302,9 +302,9 @@ subsystems:
             distanceThreeInclineAngleRotations: 0.07425
             distanceThreeLaunchVelocityRPS: 49
             distanceAutoThingLaunchVelocityRPS: 60
-            closeDistanceBetweenBeamBreaks: 0.419
-            farDistanceBetweenBeamBreaks: 13.570
-            secondLowestBeamBreakToZero: 6.7769
+            closeDistanceBetweenBeamBreaks: 0.026816
+            farDistanceBetweenBeamBreaks: 0.86848
+            secondLowestBeamBreakToZero: 0.4337216
             turretRotationToleranceDegrees: 15
             inclineAngleToleranceDegrees: 2
             launcherVelocityToleranceRPS: 2

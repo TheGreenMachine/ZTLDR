@@ -82,7 +82,11 @@
             "additionalProperties": false
         },
         "rotorToSensor": {
-            "default": 1,
+            "default": null,
+            "type": "number"
+        },
+        "sensorToMechanismRatio": {
+            "default": null,
             "type": "number"
         }
     }
