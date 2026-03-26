@@ -1,14 +1,21 @@
 package com.team1816.lib.util;
 
+import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.ShooterSettingsConfig;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
+import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
+import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
 import java.util.List;
 
 import static com.team1816.lib.Singleton.factory;
 
-public class ShooterTableCalculator {
+public class ShooterTableCalculator extends BaseShooterCalculator {
 
-    private final ShotLookup shotLookup;
+    private final PolynomialSplineFunction inclineAngleRotationsFunction, launchVelocityRPSFunction;
 
     public ShooterTableCalculator() {
         ShooterSettingsConfig shooterSettings = factory.getShooterSettingsConfig();
@@ -16,6 +23,8 @@ public class ShooterTableCalculator {
         List<Double> distancesInches = shooterSettings.distancesInches;
         List<Double> inclineAnglesRotations = shooterSettings.inclineAnglesRotations;
         List<Double> launchVelocitiesRPS = shooterSettings.launchVelocitiesRPS;
+        LinearInterpolator inclineAngleRotationsLI = new LinearInterpolator();
+        LinearInterpolator launchVelocityRPSLI = new LinearInterpolator();
 
         double[] distancesInchesArray = distancesInches.stream()
             .mapToDouble(Double::doubleValue)
@@ -27,15 +36,31 @@ public class ShooterTableCalculator {
             .mapToDouble(Double::doubleValue)
             .toArray();
 
-        shotLookup = new ShotLookup(distancesInchesArray, inclineAnglesRotationsArray, launchVelocitiesRPSArray);
+        this.inclineAngleRotationsFunction = inclineAngleRotationsLI.interpolate(distancesInchesArray, inclineAnglesRotationsArray);
+        this.launchVelocityRPSFunction = launchVelocityRPSLI.interpolate(distancesInchesArray, launchVelocitiesRPSArray);
     }
 
-    public ShooterDistanceSetting getShooterDistanceSetting(double distanceInches) {
-        return new ShooterDistanceSetting(
-            shotLookup.getInclineAngleRotations(distanceInches),
-            shotLookup.getLaunchVelocityRPS(distanceInches)
-        );
+    public ShooterCalculatorResponse getShooterSettings(Translation2d shooter, Translation2d target, boolean useChassisSpeedForHoodAngleAndSpeed) {
+        double distanceToTargetMeters = shooter.getDistance(target);
+        double distanceToTargetInches = Units.metersToInches(distanceToTargetMeters);
+        double inclineAngleRotations = getInclineAngleRotations(distanceToTargetInches);
+        double inclineAngleDegrees = Units.rotationsToDegrees(inclineAngleRotations);
+        double launchVelocityRPS = getLaunchVelocityRPS(distanceToTargetInches);
+
+        return new ShooterCalculatorResponse(inclineAngleDegrees, launchVelocityRPS);
     }
 
-    public record ShooterDistanceSetting(double inclineAngleRotations, double launchVelocityRPS) {}
+    private double getInclineAngleRotations(double distanceInches) {
+        var knots = inclineAngleRotationsFunction.getKnots();
+        // Clamp the distance to within the interpolation range.
+        double clampedDistanceInches = MathUtil.clamp(distanceInches, knots[0], knots[knots.length - 1]);
+        return inclineAngleRotationsFunction.value(clampedDistanceInches);
+    }
+
+    private double getLaunchVelocityRPS(double distanceInches) {
+        var knots = launchVelocityRPSFunction.getKnots();
+        // Clamp the distance to within the interpolation range.
+        double clampedDistanceInches = MathUtil.clamp(distanceInches, knots[0], knots[knots.length - 1]);
+        return launchVelocityRPSFunction.value(clampedDistanceInches);
+    }
 }

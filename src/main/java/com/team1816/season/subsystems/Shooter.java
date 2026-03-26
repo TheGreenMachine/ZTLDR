@@ -11,6 +11,7 @@ import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.FieldContainer;
 import com.team1816.lib.util.GreenLogger;
+import com.team1816.lib.util.IShooterCalculator;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
@@ -83,6 +84,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * An adjustment value added to all requests to the turret (in degrees).
      */
     private double turretAngleAdjustmentDegrees = 0;
+
+    private boolean useChassisSpeedForHoodAngleAndSpeed = false;
 
     //MOTORS
     private final IMotor topLaunchMotor = (IMotor) factory.getDevice(NAME, "topLaunchMotor");
@@ -498,11 +501,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
     private void aimTurretAtTarget(Translation2d targetTranslation2d) {
-        Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
-        Translation2d shooterToTargetTranslation2d = targetTranslation2d.minus(shooterTranslation2d);
-        Rotation2d fieldRelativeRotation2dToTarget = shooterToTargetTranslation2d.getAngle();
-        Rotation2d robotRotation2d = BaseRobotState.robotPose.getRotation();
-        Rotation2d robotRelativeRotation2dToTarget = fieldRelativeRotation2dToTarget.minus(robotRotation2d);
+        Rotation2d robotRelativeRotation2dToTarget = shooterTableCalculator.getTurretAngle(getCurrentTurretPose2d().getTranslation(),
+            targetTranslation2d, useChassisSpeedForHoodAngleAndSpeed);
         double robotRelativeDegreesToTarget = robotRelativeRotation2dToTarget.getDegrees();
         setTurretAngle(robotRelativeDegreesToTarget);
     }
@@ -514,16 +514,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
     private void aimInclineAndLaunchersAtTarget(Translation2d targetTranslation2d) {
-        Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
-        double distanceToTargetMeters = shooterTranslation2d.getDistance(targetTranslation2d);
-        double distanceToTargetInches = Units.metersToInches(distanceToTargetMeters);
-        ShooterTableCalculator.ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator
-            .getShooterDistanceSetting(distanceToTargetInches);
-        double inclineAngleRotations = shooterDistanceSetting.inclineAngleRotations();
-        double inclineAngleDegrees = Units.rotationsToDegrees(inclineAngleRotations);
-        double launchVelocityRPS = shooterDistanceSetting.launchVelocityRPS();
-        setInclineAngle(inclineAngleDegrees);
-        setLaunchVelocities(launchVelocityRPS);
+        IShooterCalculator.ShooterCalculatorResponse response = shooterTableCalculator.getShooterSettings(getCurrentTurretPose2d().getTranslation(),
+            targetTranslation2d, useChassisSpeedForHoodAngleAndSpeed);
+
+        setInclineAngle(response.inclineAngleRotations());
+        setLaunchVelocities(response.launchVelocityRPS());
     }
 
     /**
