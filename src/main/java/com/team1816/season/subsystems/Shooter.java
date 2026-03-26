@@ -545,19 +545,15 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         double distanceToTargetMeters = shooterTranslation2d.getDistance(targetTranslation2d);
         double wantedVelocityMPS = ballisticEquationForVelocity(distanceToTargetMeters, inclineAngleDegrees);
         double launchVelocityRPS = wantedVelocityMPS * (1_METER/CIRCUMFERENCE_METER);
+        setInclineAngle(inclineAngleDegrees);
         setLaunchVelocities(launchVelocityRPS);
     }
 
-    private void aimLaunchersAtTargetVelocityAdjustmentUsingRobotVelocityAdjustment(Translation2d targetTranslation2d, double inclineAngleDegrees, ChassisSpeeds chassisSpeeds) {
+    private void aimLaunchersAtTargetVelocityPitchAndYawAdjustmentUsingRobotVelocity(Translation2d targetTranslation2d, double inclineAngleDegrees, ChassisSpeeds chassisSpeeds) {
         Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
         double distanceToTargetMeters = shooterTranslation2d.getDistance(targetTranslation2d);
-        double wantedVelocityMPS = ballisticEquationForVelocity(distanceToTargetMeters, inclineAngleDegrees);
+        double wantedVelocityMPS =
         double launchVelocityRPS = wantedVelocityMPS * (1_METER/CIRCUMFERENCE_METER);
-        double shotPathTime = distanceToTargetMeters / (wantedVelocityMPS * Math.sin(inclineAngleDegrees));
-        Translation2d adjustedShooterTranslation2d = shooterTranslation2d.plus(new Translation2d(chassisSpeeds.vxMetersPerSecond*shotPathTime, chassisSpeeds.vyMetersPerSecond*shotPathTime));
-        double adjustedDistanceToTargetMeters = shooterTranslation2d.getDistance(adjustedShooterTranslation2d);
-        double adjustedWantedVelocityMPS = ballisticEquationForVelocity(adjustedDistanceToTargetMeters, inclineAngleDegrees);
-        double adjustedLaunchVelocityRPS = adjustedWantedVelocityMPS * (1_METER/CIRCUMFERENCE_METER);
         setLaunchVelocities(adjustedLaunchVelocityRPS);
     }
 
