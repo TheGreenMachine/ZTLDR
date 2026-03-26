@@ -177,6 +177,13 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * Values less than one will cause backspin.
      */
     private final double TOP_LAUNCH_MOTOR_BACKSPIN_MULTIPLIER;
+    /**
+     * The circumference of the shooting wheels in meters, assumes they are all constant
+     */
+    private final double CIRCUMFERENCE_METER = 0.15;
+    private final double PLACEHOLDER_ANGLE_DEGREES = 10;
+    private final double WANTED_INCIDENCE_ANGLE_DEGREES = -50;
+    private double robotVelocityAzimuthalAngleAdjustment = 0;
 
     //CALIBRATION
     /**
@@ -327,13 +334,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             isAutoAiming = false;
         }
 
-        if (autoAimTurret) {
-            aimTurretAtTarget(target);
-        }
-        else {
-            setTurretAngle(turretFixedAngleDegrees);
-        }
-
         switch (wantedDistanceState) {
             case IDLE, PRESET_CLOSE, PRESET_MIDDLE, PRESET_FAR, PRESET_AUTO_THING -> {
                 setInclineAngle(wantedDistanceState.getInclineAngleDegrees());
@@ -341,13 +341,27 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             }
             case AUTOMATIC -> {
                 if(useVelocityAdjustmentAlgorithm) {
-                    useRobotVelocityAdjustment ?
-                        aimLaunchersAtTargetVelocityAdjustmentUsingRobotVelocityAdjustment(target, PLACEHOLDER_ANGLE, chassisSpeeds) :
-                        aimLaunchersAtTargetVelocityAdjustment(target, PLACEHOLDER_ANGLE);
+                    if (useRobotVelocityAdjustment) {
+                        aimLaunchersAtTargetVelocityPitchAndYawAdjustmentUsingRobotVelocity(target, chassisSpeeds, WANTED_INCIDENCE_ANGLE_DEGREES);
+                    } else {
+                        aimLaunchersAtTargetVelocityAdjustment(target, PLACEHOLDER_ANGLE_DEGREES);
+                    }
                 }else {
                     aimInclineAndLaunchersAtTargetShootingTable(target);
                 }
             }
+        }
+
+        if (autoAimTurret) {
+            if (useRobotVelocityAdjustment) {
+                aimTurretAtTargetUsingRobotVelocityAdjustment(target);
+            }
+            else {
+                aimTurretAtTarget(target);
+            }
+        }
+        else {
+            setTurretAngle(turretFixedAngleDegrees);
         }
     }
 
@@ -518,6 +532,16 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         setTurretAngle(robotRelativeDegreesToTarget);
     }
 
+    private void aimTurretAtTargetUsingRobotVelocityAdjustment(Translation2d targetTranslation2d) {
+        Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
+        Translation2d shooterToTargetTranslation2d = targetTranslation2d.minus(shooterTranslation2d);
+        Rotation2d fieldRelativeRotation2dToTarget = shooterToTargetTranslation2d.getAngle();
+        Rotation2d robotRotation2d = BaseRobotState.robotPose.getRotation();
+        Rotation2d robotRelativeRotation2dToTarget = fieldRelativeRotation2dToTarget.minus(robotRotation2d);
+        double robotRelativeDegreesToTarget = robotRelativeRotation2dToTarget.getDegrees();
+        setTurretAngle(robotRelativeDegreesToTarget+ robotVelocityAzimuthalAngleAdjustment);
+    }
+
     /**
      * Automatically points the incline and spins up the launchers to shoot at the passed in target
      * at hub height using the shooter lookup table.
@@ -544,17 +568,26 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
         double distanceToTargetMeters = shooterTranslation2d.getDistance(targetTranslation2d);
         double wantedVelocityMPS = ballisticEquationForVelocity(distanceToTargetMeters, inclineAngleDegrees);
-        double launchVelocityRPS = wantedVelocityMPS * (1_METER/CIRCUMFERENCE_METER);
+        double launchVelocityRPS = wantedVelocityMPS/CIRCUMFERENCE_METER;
         setInclineAngle(inclineAngleDegrees);
         setLaunchVelocities(launchVelocityRPS);
     }
 
-    private void aimLaunchersAtTargetVelocityPitchAndYawAdjustmentUsingRobotVelocity(Translation2d targetTranslation2d, double inclineAngleDegrees, ChassisSpeeds chassisSpeeds) {
+    private void aimLaunchersAtTargetVelocityPitchAndYawAdjustmentUsingRobotVelocity(Translation2d targetTranslation2d, ChassisSpeeds chassisSpeeds, double targetAngleDegrees) {
         Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
         double distanceToTargetMeters = shooterTranslation2d.getDistance(targetTranslation2d);
-        double wantedVelocityMPS =
-        double launchVelocityRPS = wantedVelocityMPS * (1_METER/CIRCUMFERENCE_METER);
-        setLaunchVelocities(adjustedLaunchVelocityRPS);
+
+        //TODO: calculate real speeds of the target relative to the robot, rather than using chassisspeeds
+        double[] solution = BallisticTester.solve(distanceToTargetMeters, 0, 1.38-SHOOTER_OFFSET.getZ(), chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, targetAngleDegrees);
+        double wantedVelocityMPS = solution[0];
+        double launchVelocityRPS = wantedVelocityMPS/CIRCUMFERENCE_METER;
+        setLaunchVelocities(launchVelocityRPS);
+
+        double wantedLaunchPitchDegrees = solution[1];
+        double wantedPitchAdjustedRange = 90-wantedLaunchPitchDegrees;
+        setInclineAngle(wantedPitchAdjustedRange);
+
+        robotVelocityAzimuthalAngleAdjustment = solution[2];
     }
 
     private double ballisticEquationForVelocity(double distanceMeters, double angleDegrees){
