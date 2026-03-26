@@ -1,7 +1,9 @@
 package com.team1816.lib.util;
 
+import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.ShooterSettingsConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
@@ -11,7 +13,7 @@ import java.util.List;
 
 import static com.team1816.lib.Singleton.factory;
 
-public class ShooterTableCalculator implements IShooterCalculator {
+public class ShooterTableCalculator extends BaseShooterCalculator {
 
     private final PolynomialSplineFunction inclineAngleRotationsFunction, launchVelocityRPSFunction;
 
@@ -45,7 +47,7 @@ public class ShooterTableCalculator implements IShooterCalculator {
         double inclineAngleDegrees = Units.rotationsToDegrees(inclineAngleRotations);
         double launchVelocityRPS = getLaunchVelocityRPS(distanceToTargetInches);
 
-        return new ShooterCalculatorResponse(inclineAngleDegrees, launchVelocityRPS);
+        return new ShooterCalculatorResponse(getTurrentAngle(shooter, target), inclineAngleDegrees, launchVelocityRPS);
     }
 
     private double getInclineAngleRotations(double distanceInches) {

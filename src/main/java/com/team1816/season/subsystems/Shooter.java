@@ -322,8 +322,14 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         if (autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC) {
             target = getTargetTranslation2d();
-            aimTurretAtTarget(target);
-            aimInclineAndLaunchersAtTarget(target);
+            ShooterCalculatorResponse response = shooterTableCalculator.getShooterSettings(getCurrentTurretPose2d().getTranslation(),
+                target, useChassisSpeedForHoodAngleAndSpeed);
+
+            double robotRelativeDegreesToTarget = response.getTurrentAngle().getDegrees();
+
+            setTurretAngle(robotRelativeDegreesToTarget);
+            setInclineAngle(response.getInclineAngelDegrees());
+            setLaunchVelocities(response.getLaunchVelocityRPS());
         } else {
             setTurretAngle(turretFixedAngleDegrees);
             switch (wantedDistanceState) {

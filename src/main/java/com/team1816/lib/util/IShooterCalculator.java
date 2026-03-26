@@ -1,5 +1,7 @@
 package com.team1816.lib.util;
 
+import com.team1816.lib.BaseRobotState;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public interface IShooterCalculator {
