@@ -5,10 +5,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 public class ShooterCalculatorResponse {
     private double inclineAngleDegrees = 0;
     private double launchVelocityRPS = 0;
-    private Rotation2d turretAngle = null;
 
-    ShooterCalculatorResponse(Rotation2d turretAngle, double inclineAngleDegrees, double launchVelocityRPS) {
-        this.turretAngle = turretAngle;
+    ShooterCalculatorResponse(double inclineAngleDegrees, double launchVelocityRPS) {
         this.inclineAngleDegrees = inclineAngleDegrees;
         this.launchVelocityRPS = launchVelocityRPS;
     }
@@ -19,9 +17,5 @@ public class ShooterCalculatorResponse {
 
     public double getLaunchVelocityRPS() {
         return launchVelocityRPS;
-    }
-
-    public Rotation2d getTurrentAngle() {
-        return turretAngle;
     }
 }

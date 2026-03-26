@@ -47,7 +47,7 @@ public class ShooterTableCalculator extends BaseShooterCalculator {
         double inclineAngleDegrees = Units.rotationsToDegrees(inclineAngleRotations);
         double launchVelocityRPS = getLaunchVelocityRPS(distanceToTargetInches);
 
-        return new ShooterCalculatorResponse(getTurrentAngle(shooter, target), inclineAngleDegrees, launchVelocityRPS);
+        return new ShooterCalculatorResponse(inclineAngleDegrees, launchVelocityRPS);
     }
 
     private double getInclineAngleRotations(double distanceInches) {

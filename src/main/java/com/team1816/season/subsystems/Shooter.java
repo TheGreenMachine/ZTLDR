@@ -319,6 +319,30 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         Translation2d target = Translation2d.kZero;
+        if (autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC) {
+            isAutoAiming = true;
+            target = getTargetTranslation2d();
+        }
+        else {
+            isAutoAiming = false;
+        }
+
+        if (autoAimTurret) {
+            aimTurretAtTarget(target);
+        }
+        else {
+            setTurretAngle(turretFixedAngleDegrees);
+        }
+
+        switch (wantedDistanceState) {
+            case IDLE, PRESET_CLOSE, PRESET_MIDDLE, PRESET_FAR, PRESET_AUTO_THING -> {
+                setInclineAngle(wantedDistanceState.getInclineAngleDegrees());
+                setLaunchVelocities(wantedDistanceState.getLaunchVelocityRPS());
+            }
+            case AUTOMATIC -> aimInclineAndLaunchersAtTarget(target);
+        }
+
+/*        Translation2d target = Translation2d.kZero;
 
         if (autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC) {
             target = getTargetTranslation2d();
@@ -339,6 +363,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 }
             }
         }
+ */
     }
 
     public void setWantedDistanceState(ShooterDistanceState state) {
@@ -499,11 +524,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
     private void aimTurretAtTarget(Translation2d targetTranslation2d) {
-        Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
-        Translation2d shooterToTargetTranslation2d = targetTranslation2d.minus(shooterTranslation2d);
-        Rotation2d fieldRelativeRotation2dToTarget = shooterToTargetTranslation2d.getAngle();
-        Rotation2d robotRotation2d = BaseRobotState.robotPose.getRotation();
-        Rotation2d robotRelativeRotation2dToTarget = fieldRelativeRotation2dToTarget.minus(robotRotation2d);
+        Rotation2d robotRelativeRotation2dToTarget = shooterTableCalculator.getTurretAngle(getCurrentTurretPose2d().getTranslation(),
+            targetTranslation2d, useChassisSpeedForHoodAngleAndSpeed);
         double robotRelativeDegreesToTarget = robotRelativeRotation2dToTarget.getDegrees();
         setTurretAngle(robotRelativeDegreesToTarget);
     }
