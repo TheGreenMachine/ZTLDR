@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "title": "CANCoder Magnetic Sensor Configuration",
+  "properties": {
+    "sensorDirection": {
+        "default": null,
+        "type": "enum",
+        "existingJavaType": "com.ctre.phoenix6.signals.SensorDirectionValue"
+    },
+    "absoluteSensorDiscontinuityPoint": {
+      "type": "number"
+    },
+    "magnetOffset": {
+      "type": "number"
+    }
+  }
+}
+

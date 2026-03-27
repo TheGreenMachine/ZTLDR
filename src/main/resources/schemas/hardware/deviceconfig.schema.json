@@ -84,6 +84,10 @@
         "rotorToSensor": {
             "default": 1,
             "type": "number"
+        },
+        "magneticSensor" :  {
+            "default": null,
+            "$ref": "cancodermagneticsensorconfig.schema.json"
         }
     }
 }
