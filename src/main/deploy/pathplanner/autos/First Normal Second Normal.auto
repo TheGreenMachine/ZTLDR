@@ -5,15 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "gatekeeper/open"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "Greedy"
+            "pathName": "StartCenterShoot"
           }
         },
         {
@@ -31,13 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ShootRecollectShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "shoot"
+            "pathName": "ShootCenterPark"
           }
         }
       ]

@@ -131,23 +131,24 @@ subsystems:
         kinematics:
             driveGearing: 6.03
             steerGearing: 26.0909
-            wheelbaseLength: .505 # meters
-            wheelbaseWidth: .505 # meters
-            robotMass: 74.088 # kg
+            wheelbaseLength: 0.4305 # meters
+            wheelbaseWidth: 0.4305 # meters
+            robotMass: 56.7 # kg
             wheelRadius: .04938 # meters (1.944 in)
-            maxDriveRPS: 98 # measured motor max speed rps
-            maxAngularRate: 8.285 # rad/sec
-            wheelCOF: 1.7
+            maxDriveRPS: 80 # measured motor max speed rps
+            maxAngularRate: 1.3 # rot/sec
+            wheelCOF: 1
         constants:
             translationKp: 20
             translationKd: 0
             rotationKp: 10
             rotationKi: 0
             rotationKd: 0
+            #Driver preference options
             normalModeTranslationalMultiplier: 1
-            normalModeRotationalMultiplier: 0.4
-            slowModeTranslationalMultiplier: 0.35
-            slowModeRotationalMultiplier: 0.15
+            normalModeRotationalMultiplier: 1
+            slowModeTranslationalMultiplier: 0.5
+            slowModeRotationalMultiplier: 1
     ledManager:
         implemented: false
         devices:
@@ -258,10 +259,10 @@ subsystems:
                 motorType: NEO550_JST
                 remoteSensor: RemoteCANcoder
                 remoteSensorId: 29
-                id: -1
+                id: 27
                 motorRotation: Clockwise_Positive
-                reverseSoftLimit: 0.0405
-                forwardSoftLimit: 0.109
+                reverseSoftLimit: 0.052
+                forwardSoftLimit: 0.1196
                 statorCurrentLimit: 35
                 pidConfig:
                     slot0:
@@ -295,13 +296,13 @@ subsystems:
             shooterOffsetYMeters: -0.112268
             shooterOffsetZMeters: 0.508
             inclineDuckingLimitRotations: 0.052
-            distanceOneInclineAngleRotations: 0.0405
+            distanceOneInclineAngleRotations: 0.052
             distanceOneLaunchVelocityRPS: 35
-            distanceTwoInclineAngleRotations: 0.0555
+            distanceTwoInclineAngleRotations: 0.08
             distanceTwoLaunchVelocityRPS: 47
-            distanceThreeInclineAngleRotations: 0.07425
-            distanceThreeLaunchVelocityRPS: 50.5 #49
-            distanceAutoThingLaunchVelocityRPS: 50
+            distanceThreeInclineAngleRotations: 0.1196
+            distanceThreeLaunchVelocityRPS: 100
+            distanceAutoThingLaunchVelocityRPS: 60
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570
             secondLowestBeamBreakToZero: 6.7769
@@ -311,7 +312,7 @@ subsystems:
             launchVelocityAdjustmentAmountRPS: 0.01
             inclineAngleAdjustmentAmountDegrees: 0.02
             turretAngleAdjustmentAmountDegrees: 0.04
-            topLaunchMotorBackspinMultiplier: 0.8 # Less than one for backspin.
+            topLaunchMotorBackspinMultiplier: 1 # Less than one for backspin.
     vision:
         cameras:
             forwardLeft: # Pi IP: 10.18.16.11
@@ -354,9 +355,13 @@ subsystems:
                     pitchDegrees: 0
                     yawDegrees: -155
                 detectionType: APRIL_TAG
-#            fuelDetector:
-#                photonVisionUIName: Fuel_Detector
-#                detectionType: NONE # TODO: Object detection
+            fuelDetector:
+                photonVisionUIName: Fuel_Detector
+                robotToCamera:
+                    xInches: 12.5
+                    yInches: 0
+                    zInches: 15
+                detectionType: NONE # TODO: Object detection
 
 autopathing:
     paths:

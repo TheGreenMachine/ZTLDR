@@ -23,11 +23,8 @@ public interface IDrivetrain extends ITestableSubsystem {
     double maxSpd = (config.kinematics.maxDriveRPS / config.kinematics.driveGearing) * 2 * Math.PI * config.kinematics.wheelRadius;
     double cof = config.kinematics.wheelCOF;
     double gearing = config.kinematics.driveGearing;
-    double wheelCircumference = 2 * Math.PI * whlRad;
 
-    // MOI = mass * (width^2 + length^2) / 12, with 1.5x multiplier to account for
-    // concentrated perimeter mass (swerve modules, bumpers, battery)
-    double MOI = 1.5 * massKG * (config.kinematics.wheelbaseWidth * config.kinematics.wheelbaseWidth + config.kinematics.wheelbaseLength * config.kinematics.wheelbaseLength) / 12;
+    double MOI = 1.5;
 
     boolean isAllowedToPathPlannerPath = false;
 

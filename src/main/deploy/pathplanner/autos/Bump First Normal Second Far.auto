@@ -7,13 +7,19 @@
         {
           "type": "named",
           "data": {
-            "name": "distancePresetThree"
+            "name": "distancePresetAutoThing"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.5
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DuckingEthanShoveStartCenterShoot"
+            "pathName": "BumpCenterShoot"
           }
         },
         {
@@ -25,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ShootCenterPark"
+            "pathName": "ShootGreedyPark"
           }
         }
       ]

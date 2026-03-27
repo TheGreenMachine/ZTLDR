@@ -30,7 +30,7 @@ public class RobotContainer extends BaseRobotContainer {
     public void autonomousInit() {
         superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
         superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.AUTOMATIC_DRIVING);
-        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.AUTOMATIC);
+        superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.AUTOMATIC);
         superstructure.setInclineDucking(true);
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
@@ -43,7 +43,7 @@ public class RobotContainer extends BaseRobotContainer {
     public void teleopInit() {
         superstructure.setWantedSuperState(Superstructure.WantedSuperState.DEFAULT);
         superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.MANUAL_DRIVING);
-        superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.AUTOMATIC);
+        superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.AUTOMATIC);
         superstructure.setInclineDucking(true);
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
@@ -82,22 +82,22 @@ public class RobotContainer extends BaseRobotContainer {
 
         // Shooter
         driverController.a().onTrue(Commands.runOnce(() -> {
-            superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_CLOSE);
+            superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_CLOSE);
             superstructure.setTurretFixedAngle(0);
             superstructure.setAutoAimTurret(false);
         }));
         driverController.b().onTrue(Commands.runOnce(() -> {
-            superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_MIDDLE);
+            superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_MIDDLE);
             superstructure.setTurretFixedAngle(0);
             superstructure.setAutoAimTurret(false);
         }));
         driverController.y().onTrue(Commands.runOnce(() -> {
-            superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_FAR);
+            superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_FAR);
             superstructure.setTurretFixedAngle(0);
             superstructure.setAutoAimTurret(false);
         }));
         driverController.x().onTrue(Commands.runOnce(() -> {
-            superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.AUTOMATIC);
+            superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.AUTOMATIC);
             superstructure.setAutoAimTurret(true);
         }));
 
@@ -184,13 +184,13 @@ public class RobotContainer extends BaseRobotContainer {
         NamedCommands.registerCommand("distancePresetThree", Commands.parallel(
             Commands.runOnce(() -> GreenLogger.log("Running named command: distancePresetThree")),
             Commands.runOnce(() -> {
-                superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_FAR);
+                superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_FAR);
             })
         ));
         NamedCommands.registerCommand("distancePresetAutoThing", Commands.parallel(
             Commands.runOnce(() -> GreenLogger.log("Running named command: distancePresetAutoThing")),
             Commands.runOnce(() -> {
-                superstructure.setSuperstructureWantedShooterState(Superstructure.WantedShooterDistanceState.PRESET_AUTO_THING);
+                superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_AUTO_THING);
             })
         ));
 

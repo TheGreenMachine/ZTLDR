@@ -25,13 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ShootCenterShoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "shoot"
+            "pathName": "ShootGreedyPark"
           }
         }
       ]

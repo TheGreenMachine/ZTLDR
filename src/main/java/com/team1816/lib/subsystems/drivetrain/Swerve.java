@@ -27,9 +27,9 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     private final IDrivetrain drivetrain;
 
     private final CommandXboxController controller;
-    private final SlewRateLimiter xLimiter = new SlewRateLimiter(3);    // forward/back
-    private final SlewRateLimiter yLimiter = new SlewRateLimiter(3);    // strafe
-    private final SlewRateLimiter rotLimiter = new SlewRateLimiter(6);  // rotation
+    private final SlewRateLimiter xLimiter = new SlewRateLimiter(1);    // forward/back
+    private final SlewRateLimiter yLimiter = new SlewRateLimiter(1);    // strafe
+    private final SlewRateLimiter rotLimiter = new SlewRateLimiter(1);  // rotation
     private static double maxAngularRate = 0;
 
     // Blue alliance sees forward as 0 degrees (toward red alliance wall).
@@ -83,28 +83,24 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     }
 
     private SwerveRequest GetSwerverCommand(SwerveRequest.FieldCentric drive) {
+        double deadBand = 0.05;
 
         // 1. Get raw joystick values (-1.0 to +1.0)
         double rawX    = -controller.getLeftY();    // forward/back  (negative because forward is usually negative Y)
         double rawY    = -controller.getLeftX();    // strafe left/right
         double rawRot  = -controller.getRightX();   // rotation
 
-        // 2. Deadband (remove drift)
-        rawX   = Math.abs(rawX)   < 0.08 ? 0 : rawX;
-        rawY   = Math.abs(rawY)   < 0.08 ? 0 : rawY;
-        rawRot = Math.abs(rawRot) < 0.08 ? 0 : rawRot;
+        // 2. Deadband (remove drift, yet still allow speeds just above 0)
+        double x   = Math.abs(rawX)   < deadBand ? 0 : (rawX-deadBand)/(1-deadBand);
+        double y   = Math.abs(rawY)   < deadBand ? 0 : (rawY-deadBand)/(1-deadBand);
+        double rot = Math.abs(rawRot) < deadBand ? 0 : (rawRot-deadBand)/(1-deadBand);
 
-        // 3. Cube the inputs → insane precision at low speed, full power at full stick
-        double x    = rawX   * rawX   * rawX;
-        double y    = rawY   * rawY   * rawY;
-        double rot  = rawRot * rawRot * rawRot;
+        // 3. Slew rate limit → buttery smooth acceleration
+//        x   = xLimiter.calculate(x);
+//        y   = yLimiter.calculate(y);
+//        rot = rotLimiter.calculate(rot);
 
-        // 4. Slew rate limit → buttery smooth acceleration
-        x   = xLimiter.calculate(x);
-        y   = yLimiter.calculate(y);
-        rot = rotLimiter.calculate(rot);
-
-        // 5. Multipliers to slow down movement based on driver preference. Slow mode and normal mode.
+        // 4. Multipliers to slow down movement based on driver preference. Slow mode and normal mode.
         if (controller.leftTrigger().getAsBoolean()) {
             x   *= SLOW_MODE_TRANSLATIONAL_MULTIPLIER;
             y   *= SLOW_MODE_TRANSLATIONAL_MULTIPLIER;
