@@ -265,9 +265,12 @@ subsystems:
                 statorCurrentLimit: 35
                 pidConfig:
                     slot0:
-                        kS: 0.3
-                        kP: 800
+                        kS: 0.8
+                        kP: 100
                         staticFeedforwardSign: UseClosedLoopSign
+                motionMagic:
+                    expoKV: 1
+                    expoKA: 0.3
             turretMotor:
                 deviceType: TalonFX
                 id: 28
