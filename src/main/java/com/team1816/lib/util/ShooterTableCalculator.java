@@ -13,22 +13,17 @@ public class ShooterTableCalculator {
 
     public ShooterTableCalculator() {
         ShooterSettingsConfig shooterSettings = factory.getShooterSettingsConfig();
+        List<Double> exitVelocity = shooterSettings.exitVelocity;
+        List<String> launchVelocitiesRPS = shooterSettings.launchVelocitiesRPS;
 
-        List<Double> distancesInches = shooterSettings.distancesInches;
-        List<Double> inclineAnglesRotations = shooterSettings.inclineAnglesRotations;
-        List<Double> launchVelocitiesRPS = shooterSettings.launchVelocitiesRPS;
-
-        double[] distancesInchesArray = distancesInches.stream()
+        double[] exitVelocityArray = exitVelocity.stream()
             .mapToDouble(Double::doubleValue)
             .toArray();
-        double[] inclineAnglesRotationsArray = inclineAnglesRotations.stream()
-            .mapToDouble(Double::doubleValue)
-            .toArray();
-        double[] launchVelocitiesRPSArray = launchVelocitiesRPS.stream()
-            .mapToDouble(Double::doubleValue)
-            .toArray();
+        String[] launchVelocitiesRPSArray = launchVelocitiesRPS.stream()
+            .map(String::valueOf)
+            .toArray(String[]::new);
 
-        shotLookup = new ShotLookup(distancesInchesArray, inclineAnglesRotationsArray, launchVelocitiesRPSArray);
+        shotLookup = new ShotLookup(exitVelocityArray, launchVelocitiesRPSArray);
     }
 
     public ShooterDistanceSetting getShooterDistanceSetting(Translation2d translation) {

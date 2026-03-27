@@ -1,12 +1,5 @@
 shooterSettings:
-    distancesInches:
-        - 48
-        - 96
-        - 156
-        - 204
-        - 264
-        - 360 # Maximum distance shot
-    inclineAnglesRotations:
+    exitVelocity:
         - 0.0405 # 48
         - 0.0555 # 96
         - 0.07425 # 156
@@ -14,12 +7,12 @@ shooterSettings:
         - 0.108 # 264
         - 0.108 # 360
     launchVelocitiesRPS:
-        - 35 # 48
-        - 47 # 96
-        - 49 # 156
-        - 52 # 204
-        - 58 # 264
-        - 100 # 360
+        - 2x+3 # 48
+        - 5x+2 # 96
+        - X^2 # 156
+        - 6x # 204
+        - 20x # 264
+        - 100x # 360
 subsystems:
     drivetrain:
         implemented: true
