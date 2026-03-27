@@ -93,6 +93,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final IMotor inclineMotor = (IMotor) factory.getDevice(NAME, "inclineMotor");
     private final IMotor turretMotor = (IMotor) factory.getDevice(NAME, "turretMotor");
     private final IPhoenix6 candi = (IPhoenix6) factory.getDevice(NAME, "candi");
+    private final IPhoenix6 inclineCoder = factory.getDevice(NAME, "inclineCoder");
 
     private final VelocityVoltage topLaunchMotorVelocityRequest = new VelocityVoltage(0);
     private final VelocityVoltage bottomLaunchMotorVelocityRequest = new VelocityVoltage(0);
@@ -517,7 +518,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         IShooterCalculator.ShooterCalculatorResponse response = shooterTableCalculator.getShooterSettings(getCurrentTurretPose2d().getTranslation(),
             targetTranslation2d, useChassisSpeedForHoodAngleAndSpeed);
 
-        setInclineAngle(response.inclineAngleRotations());
+        setInclineAngle(response.inclineAngleDegrees());
         setLaunchVelocities(response.launchVelocityRPS());
     }
 
