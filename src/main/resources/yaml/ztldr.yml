@@ -259,10 +259,10 @@ subsystems:
                 motorType: NEO550_JST
                 remoteSensor: RemoteCANcoder
                 remoteSensorId: 29
-                id: -1
+                id: 27
                 motorRotation: Clockwise_Positive
-                reverseSoftLimit: 0.0405
-                forwardSoftLimit: 0.109
+                reverseSoftLimit: 0.052
+                forwardSoftLimit: 0.1196
                 statorCurrentLimit: 35
                 pidConfig:
                     slot0:
@@ -296,11 +296,11 @@ subsystems:
             shooterOffsetYMeters: -0.112268
             shooterOffsetZMeters: 0.508
             inclineDuckingLimitRotations: 0.052
-            distanceOneInclineAngleRotations: 0.0405
+            distanceOneInclineAngleRotations: 0.052
             distanceOneLaunchVelocityRPS: 35
-            distanceTwoInclineAngleRotations: 0.0555
+            distanceTwoInclineAngleRotations: 0.08
             distanceTwoLaunchVelocityRPS: 47
-            distanceThreeInclineAngleRotations: 0.07425
+            distanceThreeInclineAngleRotations: 0.1196
             distanceThreeLaunchVelocityRPS: 49
             distanceAutoThingLaunchVelocityRPS: 60
             closeDistanceBetweenBeamBreaks: 0.419
