@@ -69,14 +69,6 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
             this.bottomMotorValue = bottomMotorValue;
         }
 
-        private void adjustTopMotorValue(double adjustValue) {
-            this.topMotorValue = adjustValue;
-        }
-
-        private void adjustBottomMotorValue(double adjustValue) {
-            this.bottomMotorValue += adjustValue;
-        }
-
         public double getTopMotorValue() {
             return topMotorValue;
         }
