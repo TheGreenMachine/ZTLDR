@@ -73,9 +73,6 @@ public class ShotLookup {
         return equation.apply(x);
     }
 
-
-    double result = getRPS(0,10.0);
-
 //    public double getInclineAngleRotations(double distanceInches) {
 //        var knots = inclineAngleRotationsFunction.getKnots();
 //        // Clamp the distance to within the interpolation range.
