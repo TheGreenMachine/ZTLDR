@@ -184,6 +184,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final double PLACEHOLDER_ANGLE_DEGREES = 35;
     private final double WANTED_INCIDENCE_ANGLE_DEGREES = -50;
     private double robotVelocityAzimuthalAngleAdjustment = 0;
+    private boolean isUsingWantedVelocity = true;
+    private boolean isUsingWantedAngle = true;
 
     //CALIBRATION
     /**
@@ -276,6 +278,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.periodicLog(NAME + "/turret/Aimed", this::isTurretAimed);
         GreenLogger.periodicLog(NAME + "/turret/Calibrated", () -> isTurretCalibrated);
         GreenLogger.periodicLog(NAME + "/turret/Aiming in Dead Zone", () -> isTurretAimingInDeadZone);
+        GreenLogger.periodicLog(NAME + "/turret/Using Wanted Velocity", () -> isUsingWantedVelocity);
+        GreenLogger.periodicLog(NAME + "/turret/Using Wanted Angle", () -> isUsingWantedAngle);
         GreenLogger.periodicLog(NAME + "/turret/Left Sensor Triggered", () -> leftSensorTriggered);
         GreenLogger.periodicLog(NAME + "/turret/Right Sensor Triggered", () -> rightSensorTriggered);
         GreenLogger.periodicLog(NAME + "/turret/Motor Offset Rotations", () -> turretMotorOffsetRotations);
@@ -573,20 +577,52 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         setLaunchVelocities(launchVelocityRPS);
     }
 
+    /**
+     * Calculates and sets the shooter's velocity, pitch, and yaw compensation
+     * to hit a target while the robot is moving.
+     */
     private void aimLaunchersAtTargetVelocityPitchAndYawAdjustmentUsingRobotVelocity(Translation2d targetTranslation2d, ChassisSpeeds chassisSpeeds, double targetAngleDegrees) {
+        // 1. Determine spatial relationship between shooter and target
         Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
         double distanceToTargetMeters = shooterTranslation2d.getDistance(targetTranslation2d);
 
-        //TODO: calculate real speeds of the target relative to the robot, rather than using chassisspeeds
-        double[] solution = BallisticTester.solve(distanceToTargetMeters, 0, 1.38-SHOOTER_OFFSET.getZ(), chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond, targetAngleDegrees);
+        // 2. Calculate the field-relative and robot-relative angles to the target
+        Translation2d shooterToTargetTranslation2d = targetTranslation2d.minus(shooterTranslation2d);
+        Rotation2d fieldRelativeRotation2dToTarget = shooterToTargetTranslation2d.getAngle();
+        Rotation2d robotRotation2d = BaseRobotState.robotPose.getRotation();
+        Rotation2d robotRelativeRotation2dToTarget = fieldRelativeRotation2dToTarget.minus(robotRotation2d);
+
+        // 3. Convert chassis speeds to a coordinate system relative to the shooter-to-target line
+        // This isolates how much the robot is moving 'toward/away' and 'sideways' relative to the target
+        ChassisSpeeds newChassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, robotRelativeRotation2dToTarget);
+
+        // Negate speeds to find the 'apparent' target velocity from the shooter's perspective
+        double shooterRelativeTargetVelocityX = -newChassisSpeeds.vxMetersPerSecond; // Radial velocity (depth)
+        double shooterRelativeTargetVelocityY = -newChassisSpeeds.vyMetersPerSecond; // Tangential velocity (sideways)
+
+        // 4. Run the ballistic solver
+        // Parameters: distance, horizontal offset(not relevant), vertical offset, radial/tangential relative velocities, and target intercept yaw
+        double[] solution = BallisticTester.solve(
+            distanceToTargetMeters,
+            0,
+            1.38 - SHOOTER_OFFSET.getZ(),
+            shooterRelativeTargetVelocityX,
+            shooterRelativeTargetVelocityY,
+            targetAngleDegrees
+        );
+
+        // 5. Apply Shooter Wheel Speed (converting linear MPS to rotational RPS)
         double wantedVelocityMPS = solution[0];
-        double launchVelocityRPS = wantedVelocityMPS/CIRCUMFERENCE_METER;
+        double launchVelocityRPS = wantedVelocityMPS / CIRCUMFERENCE_METER;
         setLaunchVelocities(launchVelocityRPS);
 
+        // 6. Apply Shooter Hood/Incline Pitch
+        // Converts ballistic launch angle to the mechanical incline setpoint
         double wantedLaunchPitchDegrees = solution[1];
-        double wantedPitchAdjustedRange = 90-wantedLaunchPitchDegrees;
+        double wantedPitchAdjustedRange = 90 - wantedLaunchPitchDegrees;
         setInclineAngle(wantedPitchAdjustedRange);
 
+        // 7. Store the required horizontal (yaw) adjustment for the turret/drive steering
         robotVelocityAzimuthalAngleAdjustment = solution[2];
     }
 
