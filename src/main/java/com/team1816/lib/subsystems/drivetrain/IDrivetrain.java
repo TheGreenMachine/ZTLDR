@@ -23,7 +23,7 @@ public interface IDrivetrain extends ITestableSubsystem {
     double cof = config.kinematics.wheelCOF;
     double gearing = config.kinematics.driveGearing;
 
-    double MOI = 1.5;
+    double MOI = 1.5 * massKG * (config.kinematics.wheelbaseWidth * config.kinematics.wheelbaseWidth + config.kinematics.wheelbaseLength * config.kinematics.wheelbaseLength) / 12;
 
     boolean isAllowedToPathPlannerPath = false;
 
