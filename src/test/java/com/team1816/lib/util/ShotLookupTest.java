@@ -12,7 +12,7 @@ class ShotLookupTest {
         double[] firstlist = {2,3};
         String[] secondlist = {"2x+3","5x+2"};
         ShotLookup shotLookup = new ShotLookup(firstlist,secondlist);
-        assertEquals(shotLookup.getRPS(0, 2.0), 7);
+        assertEquals(17, shotLookup.getRPS(1, 3.0));
     }
 
 }
