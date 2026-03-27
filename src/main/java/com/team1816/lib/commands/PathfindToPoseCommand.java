@@ -24,6 +24,8 @@ public class PathfindToPoseCommand extends GreenCommand {
         this.constraints = constraints;
     }
 
+    private static final double CONTROLLER_DEADBAND = 0.01;
+
     private Command internalCommand;
 
     private final Pose2d targetPose;
@@ -91,8 +93,9 @@ public class PathfindToPoseCommand extends GreenCommand {
     }
 
     private boolean controllerInputDetected() {
-        return controller.getLeftY()  != 0
-            || controller.getLeftX()  != 0
-            || controller.getRightX() != 0;
+        return Math.abs(controller.getLeftX()) >= CONTROLLER_DEADBAND
+            || Math.abs(controller.getLeftY()) >= CONTROLLER_DEADBAND
+            || Math.abs(controller.getRightX()) >= CONTROLLER_DEADBAND
+            || Math.abs(controller.getRightY()) >= CONTROLLER_DEADBAND;
     }
 }
