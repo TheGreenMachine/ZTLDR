@@ -26,9 +26,9 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     private final IDrivetrain drivetrain;
 
     private final CommandXboxController controller;
-    private final SlewRateLimiter xLimiter = new SlewRateLimiter(1);    // forward/back
-    private final SlewRateLimiter yLimiter = new SlewRateLimiter(1);    // strafe
-    private final SlewRateLimiter rotLimiter = new SlewRateLimiter(1);  // rotation
+    private final SlewRateLimiter xLimiter = new SlewRateLimiter(3);    // forward/back
+    private final SlewRateLimiter yLimiter = new SlewRateLimiter(3);    // strafe
+    private final SlewRateLimiter rotLimiter = new SlewRateLimiter(6);  // rotation
     private static double maxAngularRate = 0;
 
     // Blue alliance sees forward as 0 degrees (toward red alliance wall).
