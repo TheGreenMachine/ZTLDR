@@ -180,8 +180,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     /**
      * The circumference of the shooting wheels in meters, assumes they are all constant
      */
-    private final double CIRCUMFERENCE_METER = 0.15;
-    private final double PLACEHOLDER_ANGLE_DEGREES = 10;
+    private final double CIRCUMFERENCE_METER = Units.inchesToMeters(2)*Math.PI;
+    private final double PLACEHOLDER_ANGLE_DEGREES = 35;
     private final double WANTED_INCIDENCE_ANGLE_DEGREES = -50;
     private double robotVelocityAzimuthalAngleAdjustment = 0;
 
