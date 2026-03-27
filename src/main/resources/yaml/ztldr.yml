@@ -301,7 +301,7 @@ subsystems:
             distanceTwoInclineAngleRotations: 0.08
             distanceTwoLaunchVelocityRPS: 47
             distanceThreeInclineAngleRotations: 0.1196
-            distanceThreeLaunchVelocityRPS: 49
+            distanceThreeLaunchVelocityRPS: 100
             distanceAutoThingLaunchVelocityRPS: 60
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570
@@ -312,7 +312,7 @@ subsystems:
             launchVelocityAdjustmentAmountRPS: 0.04
             inclineAngleAdjustmentAmountDegrees: 0.02
             turretAngleAdjustmentAmountDegrees: 0.04
-            topLaunchMotorBackspinMultiplier: 0.8 # Less than one for backspin.
+            topLaunchMotorBackspinMultiplier: 1 # Less than one for backspin.
     vision:
         cameras:
             forwardLeft: # Pi IP: 10.18.16.11
