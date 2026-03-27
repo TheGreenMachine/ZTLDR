@@ -70,17 +70,17 @@ public class TalonFXImpl extends TalonFX implements ICTREDevice, IMotor {
 
     @Override
     public StatusCode setSimRotorVelocity(double rps) {
-        return simState.setRotorVelocity(rps);
+        return (simState == null) ? StatusCode.OK : simState.setRotorVelocity(rps);
     }
 
     @Override
     public StatusCode setSimRotorPosition(double rotations) {
-        return simState.setRawRotorPosition(rotations);
+        return (simState == null) ? StatusCode.OK :  simState.setRawRotorPosition(rotations);
     }
 
     @Override
     public double getSimMotorVoltage() {
-        return simState.getMotorVoltage();
+        return (simState == null) ? 12 :  simState.getMotorVoltage();
     }
 
     @Override
@@ -90,7 +90,7 @@ public class TalonFXImpl extends TalonFX implements ICTREDevice, IMotor {
 
     @Override
     public StatusCode setSimSupplyVoltage(double volts) {
-        return simState.setSupplyVoltage(volts);
+        return (simState == null) ? StatusCode.OK :  simState.setSupplyVoltage(volts);
     }
 }
 
