@@ -514,8 +514,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
     private void aimInclineAndLaunchersAtTarget(Translation2d targetTranslation2d) {
+        // Added var target because I wasn't sure if targetTranslation2d was the translation of the hub, or if it was the difference of the translation of the hub and the robot which is what var target is.
+        var target = getTargetTranslation2d();
         ShooterTableCalculator.ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator
-            .getShooterDistanceSetting(targetTranslation2d);
+            .getShooterDistanceSetting(target);
         double inclineAngleRotations = shooterDistanceSetting.inclineAngleRotations();
         double inclineAngleDegrees = Units.rotationsToDegrees(inclineAngleRotations);
         double launchVelocityRPS = shooterDistanceSetting.launchVelocityRPS();

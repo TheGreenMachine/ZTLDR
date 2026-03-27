@@ -1,8 +1,10 @@
 package com.team1816.lib.util;
 
+import com.team1816.lib.BaseRobotState;
 import com.team1816.season.subsystems.Shooter;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 import java.util.function.Function;
@@ -15,13 +17,13 @@ import java.util.regex.Pattern;
 
 
 public class ShotLookup {
+    BaseRobotState baseRobotState;
     private final double[] exitVelocity;
     private final List<Function<Double, Double>> rpsFunctions = new ArrayList<>();
 //    private final PolynomialSplineFunction inclineAngleRotationsFunction, launchVelocityRPSFunction;
     private Shooter shooter;
     public ShotLookup(double[] exitVelocity, String[] launchVelocitiesRPS) {
         this.exitVelocity = exitVelocity;
-
         // Initialize the storage list
         //this.rpsFunctions = new ArrayList<>();
 
@@ -87,17 +89,32 @@ public class ShotLookup {
 //        return launchVelocityRPSFunction.value(clampedDistanceInches);
 //    }
     public double getLaunchAngleRadiansRPSExperiental(Translation2d translation) {
+        // TODO: add gearing for the motors
+        double launchAngleGearing = 0;
         var xDistance = translation.getX();
         var yDistance = translation.getY();
         // Gives a Launch angle in radians the enter angle is in degrees
         double launchAngle = Math.atan((2*yDistance/xDistance) - Math.tan((Math.PI/180) * (-45)));
-        return launchAngle;
+        double motorLaunchAngle = launchAngle * launchAngleGearing;
+        return motorLaunchAngle;
     }
     public double getLaunchVelocityRPSExperiental(double launchAngle,Translation2d translation) {
         var xDistance = translation.getX();
         var yDistance = translation.getY();
+        int index = 0;
+        int formulaIndex = 0;
         // Everything is in Meters
-        double launchVelocity = (xDistance/Math.cos(launchAngle)) * Math.sqrt((9.81)/(2*(xDistance*Math.tan(launchAngle)) - yDistance));
-        return launchVelocity;
+        double Velocity = (xDistance/Math.cos(launchAngle)) * Math.sqrt((9.81)/(2*(xDistance*Math.tan(launchAngle)) - yDistance));
+        for (double velocity:exitVelocity) {
+            if (exitVelocity[index]>velocity){
+                formulaIndex = index;
+            }
+            index = index + 1;
+        }
+        double launchVelocityStatic = getRPS(formulaIndex,Velocity);
+        ChassisSpeeds robotSpeed = BaseRobotState.robotSpeeds;
+        double velocity = robotSpeed.vxMetersPerSecond;
+        double launchVelocityRPS = launchVelocityStatic - velocity;
+        return launchVelocityRPS;
     }
 }
