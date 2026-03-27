@@ -518,7 +518,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         IShooterCalculator.ShooterCalculatorResponse response = shooterTableCalculator.getShooterSettings(getCurrentTurretPose2d().getTranslation(),
             targetTranslation2d, useChassisSpeedForHoodAngleAndSpeed);
 
-        setInclineAngle(response.inclineAngleRotations());
+        setInclineAngle(response.inclineAngleDegrees());
         setLaunchVelocities(response.launchVelocityRPS());
     }
 
