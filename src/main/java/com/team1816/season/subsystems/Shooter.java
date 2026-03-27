@@ -180,8 +180,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     /**
      * The circumference of the shooting wheels in meters, assumes they are all constant
      */
-    private final double CIRCUMFERENCE_METER = Units.inchesToMeters(2)*Math.PI;
-    private final double PLACEHOLDER_ANGLE_DEGREES = 35;
+    private final double CIRCUMFERENCE_METER = 0.15;
+    private final double PLACEHOLDER_ANGLE_DEGREES = 10;
     private final double WANTED_INCIDENCE_ANGLE_DEGREES = -50;
     private double robotVelocityAzimuthalAngleAdjustment = 0;
 
@@ -464,7 +464,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      */
     public boolean isInclineDucked() {
         return getCurrentInclineAngleDegrees() <
-            360 * INCLINE_DUCKING_LIMIT_ROTATIONS
+            Units.rotationsToDegrees(INCLINE_DUCKING_LIMIT_ROTATIONS)
                 + INCLINE_ANGLE_TOLERANCE_DEGREES;
     }
 
@@ -710,11 +710,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private void setInclineAngle(double wantedAngleDegrees) {
         wantedInclineAngleDegrees = wantedAngleDegrees + inclineAngleAdjustmentDegrees;
         double rotations = Units.degreesToRotations(wantedInclineAngleDegrees);
-//        if (isInclineDucking) {
-//            // If we are trying to duck under the trench, restrict the angle of the incline to be
-//            // below the limit.
-//            rotations = Math.min(rotations, INCLINE_DUCKING_LIMIT_ROTATIONS);
-//        }
+        if (isInclineDucking) {
+            // If we are trying to duck under the trench, restrict the angle of the incline to be
+            // below the limit.
+            rotations = Math.min(rotations, INCLINE_DUCKING_LIMIT_ROTATIONS);
+        }
         inclineMotor.setControl(inclineMotorPositionRequest.withPosition(rotations));
     }
 
@@ -834,7 +834,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             && isTurretAimed()
             // If we are auto trying to auto aim but don't actually know where we are, we are
             // probably not aimed correctly.
-            && !(isAutoAiming/* && !BaseRobotState.hasAccuratePoseEstimate*/);
+            && !(isAutoAiming && !BaseRobotState.hasAccuratePoseEstimate);
     }
 
     public enum ShooterDistanceState {
