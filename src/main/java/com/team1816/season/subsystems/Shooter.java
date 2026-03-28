@@ -1,9 +1,6 @@
 package com.team1816.season.subsystems;
 
-import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.*;
 import com.pathplanner.lib.util.FlippingUtil;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.IPhoenix6;
@@ -93,12 +90,13 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final IMotor inclineMotor = (IMotor) factory.getDevice(NAME, "inclineMotor");
     private final IMotor turretMotor = (IMotor) factory.getDevice(NAME, "turretMotor");
     private final IPhoenix6 candi = (IPhoenix6) factory.getDevice(NAME, "candi");
-    private final IPhoenix6 inclineCoder = factory.getDevice(NAME, "inclineCoder");
+    // put this back in if we want to set the magneticsensor information as this will force the load from yaml to happen
+    // private final IPhoenix6 inclineCoder = factory.getDevice(NAME, "inclineCoder");
 
     private final VelocityVoltage topLaunchMotorVelocityRequest = new VelocityVoltage(0);
     private final VelocityVoltage bottomLaunchMotorVelocityRequest = new VelocityVoltage(0);
     private final NeutralOut neutralModeRequest = new NeutralOut();
-    private final PositionVoltage inclineMotorPositionRequest = new PositionVoltage(0);
+    private final MotionMagicExpoVoltage inclineMotorPositionRequest = new MotionMagicExpoVoltage(0);
     private final PositionVoltage turretMotorPositionRequest = new PositionVoltage(0);
 
     //DEVICES
@@ -638,11 +636,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private void setInclineAngle(double wantedAngleDegrees) {
         wantedInclineAngleDegrees = wantedAngleDegrees + inclineAngleAdjustmentDegrees;
         double rotations = Units.degreesToRotations(wantedInclineAngleDegrees);
-        if (isInclineDucking) {
-            // If we are trying to duck under the trench, restrict the angle of the incline to be
-            // below the limit.
-            rotations = Math.min(rotations, INCLINE_DUCKING_LIMIT_ROTATIONS);
-        }
+//        if (isInclineDucking) {
+//            // If we are trying to duck under the trench, restrict the angle of the incline to be
+//            // below the limit.
+//            rotations = Math.min(rotations, INCLINE_DUCKING_LIMIT_ROTATIONS);
+//        }
         inclineMotor.setControl(inclineMotorPositionRequest.withPosition(rotations));
     }
 
@@ -762,7 +760,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             && isTurretAimed()
             // If we are auto trying to auto aim but don't actually know where we are, we are
             // probably not aimed correctly.
-            && !(isAutoAiming && !BaseRobotState.hasAccuratePoseEstimate);
+            && !(isAutoAiming && false /*!BaseRobotState.hasAccuratePoseEstimate*/);
     }
 
     public enum ShooterDistanceState {
