@@ -15,9 +15,11 @@ import com.team1816.lib.util.IShooterCalculator;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -319,6 +321,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void applyState() {
+        Pose2d robotPose = BaseRobotState.robotPose;
+        ChassisSpeeds groundSpeed = BaseRobotState.robotSpeeds;
         Translation2d target = Translation2d.kZero;
         if (autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC) {
             isAutoAiming = true;
@@ -340,7 +344,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 setInclineAngle(wantedDistanceState.getInclineAngleDegrees());
                 setLaunchVelocities(wantedDistanceState.getLaunchVelocityRPS());
             }
-            case AUTOMATIC -> aimInclineAndLaunchersAtTarget(target);
+            case AUTOMATIC -> aimInclineAndLaunchersAtTarget(robotPose,groundSpeed,target);
         }
     }
 
@@ -514,9 +518,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      *
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
-    private void aimInclineAndLaunchersAtTarget(Translation2d targetTranslation2d) {
-        IShooterCalculator.ShooterCalculatorResponse response = shooterTableCalculator.getShooterSettings(getCurrentTurretPose2d().getTranslation(),
-            targetTranslation2d, useChassisSpeedForHoodAngleAndSpeed);
+    private void aimInclineAndLaunchersAtTarget(Pose2d robotPose, ChassisSpeeds fieldSpeeds, Translation2d targetTranslation2d) {
+        IShooterCalculator.ShooterCalculatorResponse response = shooterTableCalculator.getShooterSettings(robotPose, fieldSpeeds, targetTranslation2d);
 
         setInclineAngle(response.inclineAngleDegrees());
         setLaunchVelocities(response.launchVelocityRPS());

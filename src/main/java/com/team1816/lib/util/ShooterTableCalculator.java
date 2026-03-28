@@ -1,11 +1,16 @@
 package com.team1816.lib.util;
 
-import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.ShooterSettingsConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.DoubleArrayTopic;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
@@ -16,6 +21,7 @@ import static com.team1816.lib.Singleton.factory;
 public class ShooterTableCalculator extends BaseShooterCalculator {
 
     private final PolynomialSplineFunction inclineAngleRotationsFunction, launchVelocityRPSFunction;
+    private double lookaheadTime = 1.0;
 
     public ShooterTableCalculator() {
         ShooterSettingsConfig shooterSettings = factory.getShooterSettingsConfig();
@@ -40,14 +46,25 @@ public class ShooterTableCalculator extends BaseShooterCalculator {
         this.launchVelocityRPSFunction = launchVelocityRPSLI.interpolate(distancesInchesArray, launchVelocitiesRPSArray);
     }
 
-    public ShooterCalculatorResponse getShooterSettings(Translation2d shooter, Translation2d target, boolean useChassisSpeedForHoodAngleAndSpeed) {
-        double distanceToTargetMeters = shooter.getDistance(target);
+    public ShooterCalculatorResponse getShooterSettings(Pose2d robotPose, ChassisSpeeds groundSpeed, Translation2d target) {
+        double predictedX = robotPose.getX() + (groundSpeed.vxMetersPerSecond * lookaheadTime);
+        double predictedY = robotPose.getY() + (groundSpeed.vyMetersPerSecond * lookaheadTime);
+        Translation2d predictedPose = new Translation2d(predictedX, predictedY);
+        Translation2d robotToTargetVector = target.minus(predictedPose);
+
+        NetworkTable netTable = NetworkTableInstance.getDefault().getTable("");
+        DoubleArrayPublisher pub = netTable.getDoubleArrayTopic("Field/PredictedPose").publish();
+        pub.set(new double[] {
+            predictedX, predictedY, predictedPose.getAngle().getDegrees()
+        });
+
+        double distanceToTargetMeters = robotToTargetVector.getNorm();
         double distanceToTargetInches = Units.metersToInches(distanceToTargetMeters);
         double inclineAngleRotations = getInclineAngleRotations(distanceToTargetInches);
         double inclineAngleDegrees = Units.rotationsToDegrees(inclineAngleRotations);
         double launchVelocityRPS = getLaunchVelocityRPS(distanceToTargetInches);
-
-        return new ShooterCalculatorResponse(inclineAngleDegrees, launchVelocityRPS);
+        Rotation2d targetHeading = target.minus(predictedPose).getAngle();
+        return new ShooterCalculatorResponse(inclineAngleDegrees, launchVelocityRPS, targetHeading);
     }
 
     private double getInclineAngleRotations(double distanceInches) {
