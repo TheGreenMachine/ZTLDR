@@ -636,11 +636,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private void setInclineAngle(double wantedAngleDegrees) {
         wantedInclineAngleDegrees = wantedAngleDegrees + inclineAngleAdjustmentDegrees;
         double rotations = Units.degreesToRotations(wantedInclineAngleDegrees);
-//        if (isInclineDucking) {
-//            // If we are trying to duck under the trench, restrict the angle of the incline to be
-//            // below the limit.
-//            rotations = Math.min(rotations, INCLINE_DUCKING_LIMIT_ROTATIONS);
-//        }
+        if (isInclineDucking) {
+            // If we are trying to duck under the trench, restrict the angle of the incline to be
+            // below the limit.
+            rotations = Math.min(rotations, INCLINE_DUCKING_LIMIT_ROTATIONS);
+        }
         inclineMotor.setControl(inclineMotorPositionRequest.withPosition(rotations));
     }
 
@@ -760,7 +760,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             && isTurretAimed()
             // If we are auto trying to auto aim but don't actually know where we are, we are
             // probably not aimed correctly.
-            && !(isAutoAiming && false /*!BaseRobotState.hasAccuratePoseEstimate*/);
+            && !(isAutoAiming && !BaseRobotState.hasAccuratePoseEstimate);
     }
 
     public enum ShooterDistanceState {
