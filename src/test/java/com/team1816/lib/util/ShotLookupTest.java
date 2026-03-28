@@ -12,7 +12,7 @@ class ShotLookupTest {
         double[] firstlist = {2,3};
         String[] secondlist = {"2x^3+x^2+x+3","+20x^5+5x^2+2"};
         ShotLookup shotLookup = new ShotLookup(firstlist,secondlist);
-        assertEquals(62627, shotLookup.getRPS(1, 5));
+        assertEquals(283, shotLookup.getRPS(0, 5));
     }
 
 }

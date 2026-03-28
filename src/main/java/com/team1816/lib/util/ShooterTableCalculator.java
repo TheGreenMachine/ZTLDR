@@ -29,8 +29,9 @@ public class ShooterTableCalculator {
     public ShooterDistanceSetting getShooterDistanceSetting(Translation2d translation) {
         return new ShooterDistanceSetting(
             shotLookup.getLaunchAngleRadiansRPSExperiental(translation),
-            shotLookup.getLaunchVelocityRPSExperiental(shotLookup.getLaunchAngleRadiansRPSExperiental(translation),translation)
+            shotLookup.getLaunchVelocityRPSExperiental(shotLookup.getLaunchAngleRadiansRPSExperiental(translation),translation, shotLookup.getXVelocity(shotLookup.getLaunchAngleRadiansRPSExperiental(translation),translation),shotLookup.getYVelocity(shotLookup.getLaunchAngleRadiansRPSExperiental(translation),translation))
         );
+
     }
 
     public record ShooterDistanceSetting(double inclineAngleRotations, double launchVelocityRPS) {}

@@ -3,6 +3,7 @@ package com.team1816.lib.util;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.season.subsystems.Shooter;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
@@ -17,11 +18,11 @@ import java.util.regex.Pattern;
 
 
 public class ShotLookup {
+    Shooter shooter;
     BaseRobotState baseRobotState;
     private final double[] exitVelocity;
     private final List<Function<Double, Double>> rpsFunctions = new ArrayList<>();
 //    private final PolynomialSplineFunction inclineAngleRotationsFunction, launchVelocityRPSFunction;
-    private Shooter shooter;
     public ShotLookup(double[] exitVelocity, String[] launchVelocitiesRPS) {
         this.exitVelocity = exitVelocity;
         // Initialize the storage list
@@ -98,26 +99,55 @@ public class ShotLookup {
         double motorLaunchAngle = launchAngle * launchAngleGearing;
         return motorLaunchAngle;
     }
-    public double getLaunchVelocityRPSExperiental(double launchAngle,Translation2d translation) {
+    public double getXVelocity(double launchAngle,Translation2d translation){
+        ChassisSpeeds robotSpeed = BaseRobotState.robotSpeeds;
+        double robotVelocityX = robotSpeed.vxMetersPerSecond;
+
+        Translation2d shooterTranslation2d = shooter.getCurrentTurretPose2d().getTranslation();
+        Translation2d shooterToTargetTranslation2d = translation.minus(shooterTranslation2d);
+        Rotation2d fieldRelativeRotation2dToTarget = shooterToTargetTranslation2d.getAngle();
+        // in degrees
+        double fieldRelativeDegrees = fieldRelativeRotation2dToTarget.getDegrees();
+
         var xDistance = translation.getX();
         var yDistance = translation.getY();
+        // Everything is in Meters
+        double Velocity = (xDistance/Math.cos(launchAngle)) * Math.sqrt((9.81)/(2*(xDistance*Math.tan(launchAngle)) - yDistance));
+        double launchVelocityStaticX = (Math.cos(fieldRelativeDegrees) * Velocity);
+        double launchVelocityX = launchVelocityStaticX- robotVelocityX;
+        return launchVelocityX;
+    }
+    public double getYVelocity(double launchAngle,Translation2d translation){
+        Translation2d shooterTranslation2d = shooter.getCurrentTurretPose2d().getTranslation();
+        Translation2d shooterToTargetTranslation2d = translation.minus(shooterTranslation2d);
+
+        Rotation2d fieldRelativeRotation2dToTarget = shooterToTargetTranslation2d.getAngle();
+        // in degrees
+        double fieldRelativeDegrees = fieldRelativeRotation2dToTarget.getDegrees();
+
+        ChassisSpeeds robotSpeed = BaseRobotState.robotSpeeds;
+        double robotVelocityY = robotSpeed.vyMetersPerSecond;
+
+        var xDistance = shooterToTargetTranslation2d.getX();
+        var yDistance = shooterToTargetTranslation2d.getY();
+        // Everything is in Meters
+        double Velocity = (xDistance/Math.cos(launchAngle)) * Math.sqrt((9.81)/(2*(xDistance*Math.tan(launchAngle)) - yDistance));
+        double launchVelocityStaticY = (Math.sin(fieldRelativeDegrees) * Velocity);
+        double launchVelocity = launchVelocityStaticY - robotVelocityY;
+        return launchVelocity;
+    }
+    public double getLaunchVelocityRPSExperiental(double launchAngle,Translation2d translation, double YVelocity, double XVelocity) {
         int index = 0;
         int formulaIndex = 0;
         // Everything is in Meters
-        double Velocity = (xDistance/Math.cos(launchAngle)) * Math.sqrt((9.81)/(2*(xDistance*Math.tan(launchAngle)) - yDistance));
-        for (double velocity:exitVelocity) {
-            if (exitVelocity[index]>velocity){
+        double launchVelocityStatic = Math.sqrt(((XVelocity * XVelocity) + (YVelocity * YVelocity)));
+        for (double launchVelocity:exitVelocity) {
+            if (exitVelocity[index]>launchVelocityStatic){
                 formulaIndex = index;
             }
             index = index + 1;
         }
-        double launchVelocityStatic = getRPS(formulaIndex,Velocity);
-        ChassisSpeeds robotSpeed = BaseRobotState.robotSpeeds;
-        double velocityX = robotSpeed.vxMetersPerSecond;
-        double velocityY = robotSpeed.vyMetersPerSecond;
-        // TODO: Not sure if my moving vector subtraction is correct
-        double velocity = Math.sqrt((velocityX * velocityX) + (velocityY*velocityY));
-        double launchVelocityRPS = launchVelocityStatic - velocity;
+        double launchVelocityRPS = getRPS(formulaIndex,launchVelocityStatic);
         return launchVelocityRPS;
     }
 }

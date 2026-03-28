@@ -12,6 +12,7 @@ import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.FieldContainer;
 import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.ShooterTableCalculator;
+import com.team1816.lib.util.ShotLookup;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
@@ -26,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static com.team1816.lib.Singleton.factory;
 public class Shooter extends SubsystemBase implements ITestableSubsystem {
-
+    ShotLookup shotLookup;
     //CLASS
     public static final String NAME = "shooter";
 
@@ -498,11 +499,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
     private void aimTurretAtTarget(Translation2d targetTranslation2d) {
-        Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
-        Translation2d shooterToTargetTranslation2d = targetTranslation2d.minus(shooterTranslation2d);
-        Rotation2d fieldRelativeRotation2dToTarget = shooterToTargetTranslation2d.getAngle();
+        double turretAngleFieldRelative = Math.atan((shotLookup.getYVelocity(shotLookup.getLaunchAngleRadiansRPSExperiental(targetTranslation2d),targetTranslation2d))/(shotLookup.getYVelocity(shotLookup.getLaunchAngleRadiansRPSExperiental(targetTranslation2d),targetTranslation2d)));
+        Rotation2d turretAngleFieldRelativeRotation = new Rotation2d(turretAngleFieldRelative);
         Rotation2d robotRotation2d = BaseRobotState.robotPose.getRotation();
-        Rotation2d robotRelativeRotation2dToTarget = fieldRelativeRotation2dToTarget.minus(robotRotation2d);
+        Rotation2d robotRelativeRotation2dToTarget = turretAngleFieldRelativeRotation.minus(robotRotation2d);
         double robotRelativeDegreesToTarget = robotRelativeRotation2dToTarget.getDegrees();
         setTurretAngle(robotRelativeDegreesToTarget);
     }
@@ -713,7 +713,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      *
      * @return The current field-relative {@link Pose2d} of the turret.
      */
-    private Pose2d getCurrentTurretPose2d() {
+    public Pose2d getCurrentTurretPose2d() {
         Translation2d robotToTurretTranslation2d = SHOOTER_OFFSET.toTranslation2d();
         Rotation2d robotToTurretRotation2d = getCurrentRobotRelativeTurretRotation2d();
 
