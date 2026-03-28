@@ -341,25 +341,12 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 setLaunchVelocities(wantedDistanceState.getLaunchVelocityRPS());
             }
             case AUTOMATIC -> {
-                if(useVelocityAdjustmentAlgorithm) {
-                    if (useRobotVelocityAdjustment) {
-                        aimLaunchersAtTargetVelocityPitchAndYawAdjustmentUsingRobotVelocity(target, chassisSpeeds, WANTED_INCIDENCE_ANGLE_DEGREES);
-                    } else {
-                        aimLaunchersAtTargetVelocityAdjustment(target, PLACEHOLDER_ANGLE_DEGREES);
-                    }
-                }else {
-                    aimInclineAndLaunchersAtTargetShootingTable(target);
-                }
+                aimLaunchersAtTargetVelocityPitchAndYawAdjustmentUsingRobotVelocity(target, chassisSpeeds, WANTED_INCIDENCE_ANGLE_DEGREES);
             }
         }
 
         if (autoAimTurret) {
-            if (useRobotVelocityAdjustment) {
-                aimTurretAtTargetUsingRobotVelocityAdjustment(target);
-            }
-            else {
-                aimTurretAtTarget(target);
-            }
+            aimTurretAtTargetUsingRobotVelocityAdjustment(target);
         }
         else {
             setTurretAngle(turretFixedAngleDegrees);
@@ -867,7 +854,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             && isTurretAimed()
             // If we are auto trying to auto aim but don't actually know where we are, we are
             // probably not aimed correctly.
-            && !(isAutoAiming/* && !BaseRobotState.hasAccuratePoseEstimate*/);
+            && !(isAutoAiming && false/* && !BaseRobotState.hasAccuratePoseEstimate*/);
     }
 
     public enum ShooterDistanceState {
