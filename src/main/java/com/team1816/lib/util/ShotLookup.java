@@ -113,7 +113,10 @@ public class ShotLookup {
         }
         double launchVelocityStatic = getRPS(formulaIndex,Velocity);
         ChassisSpeeds robotSpeed = BaseRobotState.robotSpeeds;
-        double velocity = robotSpeed.vxMetersPerSecond;
+        double velocityX = robotSpeed.vxMetersPerSecond;
+        double velocityY = robotSpeed.vyMetersPerSecond;
+        // TODO: Not sure if my moving vector subtraction is correct
+        double velocity = Math.sqrt((velocityX * velocityX) + (velocityY*velocityY));
         double launchVelocityRPS = launchVelocityStatic - velocity;
         return launchVelocityRPS;
     }
