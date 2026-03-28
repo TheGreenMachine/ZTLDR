@@ -54,6 +54,11 @@ public class PathfindManager {
     }
 
     public void startPathfinding() {
+        if (currentPathCommand != null) {
+            GreenLogger.log("Canceled current path command");
+            currentPathCommand.cancel();
+        }
+
         currentPathCommand =  commandChooser.getSelected();
 
         if (currentPathCommand == null) {
