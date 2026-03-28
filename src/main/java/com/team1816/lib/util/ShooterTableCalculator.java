@@ -47,16 +47,20 @@ public class ShooterTableCalculator extends BaseShooterCalculator {
     }
 
     public ShooterCalculatorResponse getShooterSettings(Pose2d robotPose, ChassisSpeeds groundSpeed, Translation2d target) {
-        double predictedX = robotPose.getX() + (groundSpeed.vxMetersPerSecond * lookaheadTime);
-        double predictedY = robotPose.getY() + (groundSpeed.vyMetersPerSecond * lookaheadTime);
+
+        // Convert from robot-relative speed to field relative speed
+        ChassisSpeeds fieldSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(groundSpeed, robotPose.getRotation());
+
+        double predictedX = robotPose.getX() + (fieldSpeeds.vxMetersPerSecond * lookaheadTime);
+        double predictedY = robotPose.getY() + (fieldSpeeds.vyMetersPerSecond * lookaheadTime);
         Translation2d predictedPose = new Translation2d(predictedX, predictedY);
         Translation2d robotToTargetVector = target.minus(predictedPose);
-
-        NetworkTable netTable = NetworkTableInstance.getDefault().getTable("");
-        DoubleArrayPublisher pub = netTable.getDoubleArrayTopic("Field/PredictedPose").publish();
-        pub.set(new double[] {
-            predictedX, predictedY, predictedPose.getAngle().getDegrees()
-        });
+//
+//        NetworkTable netTable = NetworkTableInstance.getDefault().getTable("");
+//        DoubleArrayPublisher pub = netTable.getDoubleArrayTopic("Field/PredictedPose").publish();
+//        pub.set(new double[] {
+//            predictedX, predictedY, predictedPose.getAngle().getDegrees()
+//        });
 
         double distanceToTargetMeters = robotToTargetVector.getNorm();
         double distanceToTargetInches = Units.metersToInches(distanceToTargetMeters);
