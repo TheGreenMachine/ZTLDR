@@ -295,8 +295,8 @@ subsystems:
             shooterOffsetXMeters: -0.11303
             shooterOffsetYMeters: -0.112268
             shooterOffsetZMeters: 0.508
-            inclineDuckingLimitRotations: 0.052
-            distanceOneInclineAngleRotations: 0.052
+            inclineDuckingLimitRotations: 0.058
+            distanceOneInclineAngleRotations: 0.058
             distanceOneLaunchVelocityRPS: 35
             distanceTwoInclineAngleRotations: 0.08
             distanceTwoLaunchVelocityRPS: 47

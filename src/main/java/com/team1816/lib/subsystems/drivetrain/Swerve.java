@@ -83,7 +83,7 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     }
 
     private SwerveRequest GetSwerverCommand(SwerveRequest.FieldCentric drive) {
-        double deadBand = 0.05;
+        double deadBand = 0.1;
 
         // 1. Get raw joystick values (-1.0 to +1.0)
         double rawX    = -controller.getLeftY();    // forward/back  (negative because forward is usually negative Y)
