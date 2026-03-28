@@ -7,11 +7,18 @@ public class InTheZoneCommand extends GreenCommand {
 
     private final LedManager.RobotLEDStateEvent robotStateEvent = pubsub.GetEvent(LedManager.RobotLEDStateEvent.class);
 
+    @Override
     public void initialize() {
         robotStateEvent.Publish(LedManager.LEDControlState.BLINK);
     }
 
+    @Override
     public void end(boolean interrupted) {
         robotStateEvent.Publish(LedManager.LEDControlState.SOLID);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return true;
     }
 }

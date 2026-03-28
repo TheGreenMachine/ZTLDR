@@ -284,9 +284,10 @@ subsystems:
             inclineCoder:
                 id: 29
                 deviceType: CANcoder
-                sensorDirection: Clockwise_Positive # TODO: Make this actually get applied to the config. See #153 in the GitHub Project.
-                absoluteSensorDiscontinuityPoint: 0.625 # See above TODO.
-                magnetOffset: -0.35748674479 # See above TODO.
+                magneticSensor:
+                    sensorDirection: Clockwise_Positive
+                    absoluteSensorDiscontinuityPoint: 0.625
+                    magnetOffset: -0.35748674479
             candi:
                 id: 6
                 deviceType: CANdi
