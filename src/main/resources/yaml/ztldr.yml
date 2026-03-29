@@ -260,7 +260,7 @@ subsystems:
                 remoteSensorId: 29
                 id: 27
                 motorRotation: Clockwise_Positive
-                reverseSoftLimit: 0.052
+                reverseSoftLimit: 0.062
                 forwardSoftLimit: 0.1196
                 statorCurrentLimit: 35
                 pidConfig:
