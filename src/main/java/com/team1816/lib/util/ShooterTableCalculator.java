@@ -51,8 +51,25 @@ public class ShooterTableCalculator extends BaseShooterCalculator {
         // Convert from robot-relative speed to field relative speed
         ChassisSpeeds fieldSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(groundSpeed, robotPose.getRotation());
 
-        double predictedX = robotPose.getX() + (fieldSpeeds.vxMetersPerSecond * lookaheadTime);
-        double predictedY = robotPose.getY() + (fieldSpeeds.vyMetersPerSecond * lookaheadTime);
+        double vx = fieldSpeeds.vxMetersPerSecond;
+        double vy = fieldSpeeds.vyMetersPerSecond;
+        double omega = fieldSpeeds.omegaRadiansPerSecond;
+
+        double predictedX, predictedY;
+
+        // Use arc extrapolation when rotating, linear when going straight
+        if (Math.abs(omega) > 1e-3) {
+            // Constant-curvature arc: integrate the rotating velocity vector over lookahead time
+            double sinOmegaT = Math.sin(omega * lookaheadTime);
+            double cosOmegaT = Math.cos(omega * lookaheadTime);
+            predictedX = robotPose.getX() + (vx * sinOmegaT - vy * (1 - cosOmegaT)) / omega;
+            predictedY = robotPose.getY() + (vx * (1 - cosOmegaT) + vy * sinOmegaT) / omega;
+        } else {
+            // Near-zero rotation: linear extrapolation (avoids division by ~0)
+            predictedX = robotPose.getX() + (vx * lookaheadTime);
+            predictedY = robotPose.getY() + (vy * lookaheadTime);
+        }
+
         Translation2d predictedPose = new Translation2d(predictedX, predictedY);
         Translation2d robotToTargetVector = target.minus(predictedPose);
 //
