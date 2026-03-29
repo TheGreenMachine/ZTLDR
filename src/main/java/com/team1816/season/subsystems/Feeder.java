@@ -14,6 +14,10 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
 
     private FeederState wantedState = FeederState.STOPPED;
 
+    private boolean hasCycleBeenSetForTheFirstTime = false;
+
+    private double previousDutyCycle = 20;
+
     //MOTORS
     private final IMotor feedMotor = (IMotor)factory.getDevice(NAME, "feedMotor");
 
@@ -31,7 +35,12 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
     }
 
     private void applyState() {
-        feedMotor.setControl(feedMotorDutyCycle.withOutput(wantedState.getFeedMotorDutyCycle()));
+        if (!hasCycleBeenSetForTheFirstTime || previousDutyCycle != wantedState.getFeedMotorDutyCycle()) {
+
+            feedMotor.setControl(feedMotorDutyCycle.withOutput(wantedState.getFeedMotorDutyCycle()));
+            previousDutyCycle = wantedState.getFeedMotorDutyCycle();
+            hasCycleBeenSetForTheFirstTime = true;
+        }
     }
 
     public void setWantedState(FeederState state) {

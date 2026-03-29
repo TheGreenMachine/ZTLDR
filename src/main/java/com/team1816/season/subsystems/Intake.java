@@ -23,6 +23,12 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
     private FlipperPosition wantedFlipperPosition = FlipperPosition.IN;
     private double wantedIntakeDutyCycle = 0;
 
+    private boolean hasCycleBeenSetForTheFirstTime = false;
+
+    private double previousDutyCycle = 20;
+
+    private FlipperPosition previousPosition = FlipperPosition.OUT;
+
     //MOTORS
     private final IMotor intakeMotor = (IMotor) factory.getDevice(NAME, "intakeMotor");
     private final IMotor flipperMotor = (IMotor) factory.getDevice(NAME, "flipperMotor");
@@ -85,8 +91,15 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         wantedIntakeDutyCycle = wantedState.getIntakeMotorValue();
         wantedFlipperPosition = wantedState.getFlipperMotorPosition();
 
-        setIntakeSpeed(wantedIntakeDutyCycle);
-        setFlipperPosition(wantedFlipperPosition);
+        if (!hasCycleBeenSetForTheFirstTime || previousDutyCycle != wantedIntakeDutyCycle && previousPosition != wantedFlipperPosition) {
+
+            setIntakeSpeed(wantedIntakeDutyCycle);
+            setFlipperPosition(wantedFlipperPosition);
+
+            previousPosition = wantedFlipperPosition;
+            previousDutyCycle = wantedIntakeDutyCycle;
+            hasCycleBeenSetForTheFirstTime = true;
+        }
     }
 
     private void setIntakeSpeed(double velocity) {
