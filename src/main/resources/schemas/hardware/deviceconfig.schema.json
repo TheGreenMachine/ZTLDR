@@ -88,6 +88,10 @@
         "sensorToMechanismRatio": {
             "default": null,
             "type": "number"
+        },
+        "magneticSensor" :  {
+            "default": null,
+            "$ref": "cancodermagneticsensorconfig.schema.json"
         }
     }
 }

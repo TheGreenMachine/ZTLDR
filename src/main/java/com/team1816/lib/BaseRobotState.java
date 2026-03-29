@@ -8,19 +8,19 @@ public class BaseRobotState {
      * The pose of the robot on the field estimated from odometry and vision data, measured at the
      * robot's center.
      */
-    public static Pose2d robotPose = Pose2d.kZero;
+    public static volatile Pose2d robotPose = Pose2d.kZero;
 
     /**
      * The robot-centric speeds of the robot.
      */
-    public static ChassisSpeeds robotSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
+    public static volatile ChassisSpeeds robotSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
     /**
      * The tilt of the robot relative to the field, in radians. Measured as the angle between a
      * vector pointing up in the field reference frame and a vector pointing up in the robot
      * reference frame.
      */
-    public static double robotTiltRadians = 0.0;
+    public static volatile double robotTiltRadians = 0.0;
 
     /**
      * If the {@link #robotPose} is believed to be an accurate estimate of the robot's pose on the
@@ -29,7 +29,7 @@ public class BaseRobotState {
      * its pose. Other cases might be if we leave the ground while climbing, or if we had to use a
      * default auto without the correct starting pose.
      */
-    public static boolean hasAccuratePoseEstimate = true;
+    public static volatile boolean hasAccuratePoseEstimate = true;
 
     /**
      * If you are trying to get the pose of the robot on the field, you probably want to use the
@@ -42,7 +42,7 @@ public class BaseRobotState {
      * as the source of truth during simulation, while the raw odometry position is just supposed
      * to be the pre-vision position estimate of the real robot.
      */
-    public static Pose2d simActualOrRawOdometryPose = Pose2d.kZero;
+    public static volatile Pose2d simActualOrRawOdometryPose = Pose2d.kZero;
 
     /**
      * If autonomous has ever been initialized.

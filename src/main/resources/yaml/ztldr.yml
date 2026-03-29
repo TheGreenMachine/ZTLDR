@@ -258,16 +258,19 @@ subsystems:
                 motorType: NEO550_JST
                 remoteSensor: RemoteCANcoder
                 remoteSensorId: 29
-                id: -1
+                id: 27
                 motorRotation: Clockwise_Positive
-                reverseSoftLimit: 0.0405
-                forwardSoftLimit: 0.109
+                reverseSoftLimit: 0.052
+                forwardSoftLimit: 0.1196
                 statorCurrentLimit: 35
                 pidConfig:
                     slot0:
-                        kS: 0.3
-                        kP: 800
+                        kS: 0.8
+                        kP: 100
                         staticFeedforwardSign: UseClosedLoopSign
+                motionMagic:
+                    expoKV: 1
+                    expoKA: 0.3
             turretMotor:
                 deviceType: TalonFX
                 id: 28
@@ -282,9 +285,10 @@ subsystems:
             inclineCoder:
                 id: 29
                 deviceType: CANcoder
-                sensorDirection: Clockwise_Positive # TODO: Make this actually get applied to the config. See #153 in the GitHub Project.
-                absoluteSensorDiscontinuityPoint: 0.625 # See above TODO.
-                magnetOffset: -0.35748674479 # See above TODO.
+                magneticSensor:
+                    sensorDirection: Clockwise_Positive
+                    absoluteSensorDiscontinuityPoint: 0.625
+                    magnetOffset: -0.35748674479
             candi:
                 id: 6
                 deviceType: CANdi
@@ -294,24 +298,24 @@ subsystems:
             shooterOffsetXMeters: -0.11303
             shooterOffsetYMeters: -0.112268
             shooterOffsetZMeters: 0.508
-            inclineDuckingLimitRotations: 0.052
-            distanceOneInclineAngleRotations: 0.0405
+            inclineDuckingLimitRotations: 0.058
+            distanceOneInclineAngleRotations: 0.058
             distanceOneLaunchVelocityRPS: 35
-            distanceTwoInclineAngleRotations: 0.0555
+            distanceTwoInclineAngleRotations: 0.08
             distanceTwoLaunchVelocityRPS: 47
-            distanceThreeInclineAngleRotations: 0.07425
-            distanceThreeLaunchVelocityRPS: 49
+            distanceThreeInclineAngleRotations: 0.1196
+            distanceThreeLaunchVelocityRPS: 100
             distanceAutoThingLaunchVelocityRPS: 60
             closeDistanceBetweenBeamBreaks: 0.026816
             farDistanceBetweenBeamBreaks: 0.86848
             secondLowestBeamBreakToZero: 0.4337216
-            turretRotationToleranceDegrees: 15
+            turretRotationToleranceDegrees: 5
             inclineAngleToleranceDegrees: 2
             launcherVelocityToleranceRPS: 2
-            launchVelocityAdjustmentAmountRPS: 0.04
+            launchVelocityAdjustmentAmountRPS: 0.01
             inclineAngleAdjustmentAmountDegrees: 0.02
             turretAngleAdjustmentAmountDegrees: 0.04
-            topLaunchMotorBackspinMultiplier: 0.8 # Less than one for backspin.
+            topLaunchMotorBackspinMultiplier: .9 # Less than one for backspin.
     vision:
         cameras:
             forwardLeft: # Pi IP: 10.18.16.11

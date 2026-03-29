@@ -1,9 +1,6 @@
 package com.team1816.season.subsystems;
 
-import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.*;
 import com.pathplanner.lib.util.FlippingUtil;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.IPhoenix6;
@@ -11,6 +8,7 @@ import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.FieldContainer;
 import com.team1816.lib.util.GreenLogger;
+import com.team1816.lib.util.IShooterCalculator;
 import com.team1816.lib.util.ShooterTableCalculator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
@@ -84,17 +82,21 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      */
     private double turretAngleAdjustmentDegrees = 0;
 
+    private boolean useChassisSpeedForHoodAngleAndSpeed = false;
+
     //MOTORS
     private final IMotor topLaunchMotor = (IMotor) factory.getDevice(NAME, "topLaunchMotor");
     private final IMotor bottomLaunchMotor = (IMotor) factory.getDevice(NAME, "bottomLaunchMotor");
     private final IMotor inclineMotor = (IMotor) factory.getDevice(NAME, "inclineMotor");
     private final IMotor turretMotor = (IMotor) factory.getDevice(NAME, "turretMotor");
     private final IPhoenix6 candi = (IPhoenix6) factory.getDevice(NAME, "candi");
+    // put this back in if we want to set the magneticsensor information as this will force the load from yaml to happen
+    // private final IPhoenix6 inclineCoder = factory.getDevice(NAME, "inclineCoder");
 
     private final VelocityVoltage topLaunchMotorVelocityRequest = new VelocityVoltage(0);
     private final VelocityVoltage bottomLaunchMotorVelocityRequest = new VelocityVoltage(0);
     private final NeutralOut neutralModeRequest = new NeutralOut();
-    private final PositionVoltage inclineMotorPositionRequest = new PositionVoltage(0);
+    private final MotionMagicExpoVoltage inclineMotorPositionRequest = new MotionMagicExpoVoltage(0);
     private final PositionVoltage turretMotorPositionRequest = new PositionVoltage(0);
 
     //DEVICES
@@ -488,11 +490,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
     private void aimTurretAtTarget(Translation2d targetTranslation2d) {
-        Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
-        Translation2d shooterToTargetTranslation2d = targetTranslation2d.minus(shooterTranslation2d);
-        Rotation2d fieldRelativeRotation2dToTarget = shooterToTargetTranslation2d.getAngle();
-        Rotation2d robotRotation2d = BaseRobotState.robotPose.getRotation();
-        Rotation2d robotRelativeRotation2dToTarget = fieldRelativeRotation2dToTarget.minus(robotRotation2d);
+        Rotation2d robotRelativeRotation2dToTarget = shooterTableCalculator.getTurretAngle(getCurrentTurretPose2d().getTranslation(),
+            targetTranslation2d, useChassisSpeedForHoodAngleAndSpeed);
         double robotRelativeDegreesToTarget = robotRelativeRotation2dToTarget.getDegrees();
         setTurretAngle(robotRelativeDegreesToTarget);
     }
@@ -504,16 +503,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
     private void aimInclineAndLaunchersAtTarget(Translation2d targetTranslation2d) {
-        Translation2d shooterTranslation2d = getCurrentTurretPose2d().getTranslation();
-        double distanceToTargetMeters = shooterTranslation2d.getDistance(targetTranslation2d);
-        double distanceToTargetInches = Units.metersToInches(distanceToTargetMeters);
-        ShooterTableCalculator.ShooterDistanceSetting shooterDistanceSetting = shooterTableCalculator
-            .getShooterDistanceSetting(distanceToTargetInches);
-        double inclineAngleRotations = shooterDistanceSetting.inclineAngleRotations();
-        double inclineAngleDegrees = Units.rotationsToDegrees(inclineAngleRotations);
-        double launchVelocityRPS = shooterDistanceSetting.launchVelocityRPS();
-        setInclineAngle(inclineAngleDegrees);
-        setLaunchVelocities(launchVelocityRPS);
+        IShooterCalculator.ShooterCalculatorResponse response = shooterTableCalculator.getShooterSettings(getCurrentTurretPose2d().getTranslation(),
+            targetTranslation2d, useChassisSpeedForHoodAngleAndSpeed);
+
+        setInclineAngle(response.inclineAngleDegrees());
+        setLaunchVelocities(response.launchVelocityRPS());
     }
 
     /**
@@ -633,11 +627,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private void setInclineAngle(double wantedAngleDegrees) {
         wantedInclineAngleDegrees = wantedAngleDegrees + inclineAngleAdjustmentDegrees;
         double rotations = Units.degreesToRotations(wantedInclineAngleDegrees);
-        if (isInclineDucking) {
-            // If we are trying to duck under the trench, restrict the angle of the incline to be
-            // below the limit.
-            rotations = Math.min(rotations, INCLINE_DUCKING_LIMIT_ROTATIONS);
-        }
+//        if (isInclineDucking) {
+//            // If we are trying to duck under the trench, restrict the angle of the incline to be
+//            // below the limit.
+//            rotations = Math.min(rotations, INCLINE_DUCKING_LIMIT_ROTATIONS);
+//        }
         inclineMotor.setControl(inclineMotorPositionRequest.withPosition(rotations));
     }
 
@@ -752,7 +746,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             && isTurretAimed()
             // If we are auto trying to auto aim but don't actually know where we are, we are
             // probably not aimed correctly.
-            && !(isAutoAiming && !BaseRobotState.hasAccuratePoseEstimate);
+            && !(isAutoAiming && false /*!BaseRobotState.hasAccuratePoseEstimate*/);
     }
 
     public enum ShooterDistanceState {

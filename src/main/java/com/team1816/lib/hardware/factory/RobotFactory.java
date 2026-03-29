@@ -446,6 +446,14 @@ public class RobotFactory {
             case CANrange -> {
                 var clazz = (CANrangeConfiguration) parentConfig;
             }
+            case CANcoder -> {
+                var clazz = (CANcoderConfiguration) parentConfig;
+                if (deviceConfig.magneticSensor != null) {
+                    clazz.MagnetSensor.SensorDirection = deviceConfig.magneticSensor.sensorDirection;
+                    clazz.MagnetSensor.AbsoluteSensorDiscontinuityPoint = deviceConfig.magneticSensor.absoluteSensorDiscontinuityPoint;
+                    clazz.MagnetSensor.MagnetOffset = deviceConfig.magneticSensor.magnetOffset;
+                }
+            }
         }
     }
 
