@@ -9,16 +9,16 @@ shooterSettings:
     inclineAnglesRotations:
         - 0.0405 # 48
         - 0.0555 # 96
-        - 0.07425 # 156
-        - 0.08925 # 204
-        - 0.108 # 264
+        - 0.08 # 156
+        - 0.09 # 204
+        - 0.1196 # 264
         - 0.108 # 360
     launchVelocitiesRPS:
         - 35 # 48
         - 47 # 96
-        - 49 # 156
-        - 52 # 204
-        - 58 # 264
+        - 46 # 156
+        - 48 # 204
+        - 54 # 264
         - 100 # 360
 subsystems:
     drivetrain:
@@ -260,7 +260,7 @@ subsystems:
                 remoteSensorId: 29
                 id: 27
                 motorRotation: Clockwise_Positive
-                reverseSoftLimit: 0.052
+                reverseSoftLimit: 0.062
                 forwardSoftLimit: 0.1196
                 statorCurrentLimit: 35
                 pidConfig:
@@ -315,7 +315,7 @@ subsystems:
             launchVelocityAdjustmentAmountRPS: 0.01
             inclineAngleAdjustmentAmountDegrees: 0.02
             turretAngleAdjustmentAmountDegrees: 0.04
-            topLaunchMotorBackspinMultiplier: .9 # Less than one for backspin.
+            topLaunchMotorBackspinMultiplier: .95 # Less than one for backspin.
     vision:
         cameras:
             forwardLeft: # Pi IP: 10.18.16.11
