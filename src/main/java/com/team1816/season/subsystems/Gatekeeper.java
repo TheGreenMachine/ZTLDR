@@ -16,7 +16,7 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
 
     //MOTORS
     private final IMotor topMotor = (IMotor)factory.getDevice(NAME, "topMotor");
-    private final IMotor bottomMotor = (IMotor)factory.getDevice(NAME, "bottomMotor");
+   // private final IMotor bottomMotor = (IMotor)factory.getDevice(NAME, "bottomMotor");
 
     private final VelocityVoltage voltageReq = new VelocityVoltage(0);
 
@@ -33,16 +33,16 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         setTopVelocity(wantedState.getTopMotorValue());
-        setBottomVelocity(wantedState.getBottomMotorValue());
+        //setBottomVelocity(wantedState.getBottomMotorValue());
     }
 
     private void setTopVelocity(double velocity) {
         topMotor.setControl(voltageReq.withVelocity(velocity));
     }
 
-    private void setBottomVelocity(double velocity) {
-        bottomMotor.setControl(voltageReq.withVelocity(velocity));
-    }
+//    private void setBottomVelocity(double velocity) {
+//        bottomMotor.setControl(voltageReq.withVelocity(velocity));
+//    }
 
     public void setWantedState(GatekeeperState state) {
         wantedState = state;
@@ -58,9 +58,9 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
     }
 
     public enum GatekeeperState {
-        OPEN(factory.getConstant(NAME, "topOpenVelocity", 0), factory.getConstant(NAME, "bottomOpenVelocity", 0)),
-        CLOSED(factory.getConstant(NAME, "topClosedVelocity", 0), factory.getConstant(NAME, "bottomClosedVelocity", 0)),
-        REVERSING(factory.getConstant(NAME, "topReversingVelocity", 0), factory.getConstant(NAME, "bottomReversingVelocity", 0));
+        OPEN(factory.getConstant(NAME, "topOpenVelocity", 0), 0),
+        CLOSED(factory.getConstant(NAME, "topClosedVelocity", 0), 0),
+        REVERSING(factory.getConstant(NAME, "topReversingVelocity", 0), 0);
 
         private double topMotorValue, bottomMotorValue;
 
@@ -73,8 +73,8 @@ public class Gatekeeper extends SubsystemBase implements ITestableSubsystem {
             return topMotorValue;
         }
 
-        public double getBottomMotorValue() {
-            return bottomMotorValue;
-        }
+//        public double getBottomMotorValue() {
+//            return bottomMotorValue;
+//        }
     }
 }

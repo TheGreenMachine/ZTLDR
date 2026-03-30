@@ -169,7 +169,7 @@ subsystems:
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
         constants:
-            feedingDutyCycle: 0.8
+            feedingDutyCycle: 0.7
             stoppedDutyCycle: 0
             reversingDutyCycle: -0.4
     intake:
@@ -216,22 +216,10 @@ subsystems:
                         kP: 0.5
                         kS: 0.31
                         kV: 0.081
-            bottomMotor:
-                deviceType: TalonFX
-                id: 24
-                motorRotation: Clockwise_Positive
-                pidConfig:
-                    slot0:
-                        kP: 0.5
-                        kS: 0.31
-                        kV: 0.08
         constants:
             topClosedVelocity: 0
             topOpenVelocity: 40
             topReversingVelocity: -10
-            bottomClosedVelocity: 0
-            bottomOpenVelocity: 40
-            bottomReversingVelocity: -10
     shooter:
         canBusName: shootercanivore
         devices:
