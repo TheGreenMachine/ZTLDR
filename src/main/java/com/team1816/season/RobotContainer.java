@@ -37,6 +37,7 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
         superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE);
         superstructure.forceAllowGatekeeperControl(true);
+        superstructure.setServeSlowMode(false);
     }
 
     public void teleopInit() {
@@ -47,6 +48,7 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
+        superstructure.setServeSlowMode(false);
     }
 
     private void configureBindings() {
