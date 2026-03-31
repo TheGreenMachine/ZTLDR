@@ -183,6 +183,8 @@ subsystems:
             flipperMotor:
                 id: 3
                 deviceType: TalonFX
+                supplyCurrentLimit: 35
+                statorCurrentLimit: 60
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
@@ -194,7 +196,7 @@ subsystems:
                 deviceType: CANcoder
         constants:
             intakeOnSpeed: .4
-            intakeOffSpeed: 0
+            intakeSlowSpeed: .1
             outtakeSpeed: -0.6
             flipperMotorOutPosition: 0.166
             flipperMotorPullInOnePosition: 0.1
