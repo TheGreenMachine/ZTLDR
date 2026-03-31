@@ -35,7 +35,6 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
-        superstructure.setGatekeeperAndFeederReversing(false);
         superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE);
         superstructure.forceAllowGatekeeperControl(true);
     }
@@ -47,7 +46,6 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setInclineDucking(true);
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
-        superstructure.setGatekeeperAndFeederReversing(false);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
     }
 
@@ -67,18 +65,13 @@ public class RobotContainer extends BaseRobotContainer {
         driverController.rightTrigger().onTrue(Commands.runOnce(() -> {
             superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
             superstructure.setInclineDucking(false);
+            superstructure.setServeSlowMode(true);
         }))
             .onFalse(Commands.runOnce(() -> {
                 superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
                 superstructure.setInclineDucking(true);
+                superstructure.setServeSlowMode(false);
             }));
-
-        driverController.povUp().onTrue(Commands.runOnce(() ->
-                superstructure.setGatekeeperAndFeederReversing(true)
-            ))
-            .onFalse(Commands.runOnce(() ->
-                superstructure.setGatekeeperAndFeederReversing(false)
-            ));
 
         // Shooter
         driverController.a().onTrue(Commands.runOnce(() -> {

@@ -221,7 +221,6 @@ subsystems:
         constants:
             topClosedVelocity: 0
             topOpenVelocity: 40
-            topReversingVelocity: -10
     shooter:
         canBusName: shootercanivore
         devices:
