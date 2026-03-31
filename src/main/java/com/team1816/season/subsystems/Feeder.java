@@ -41,6 +41,10 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
         agitateMotor.setControl(agitateMotorDutyCycle.withOutput(wantedState.getAgitateMotorDutyCycle()));
     }
 
+    public FeederState getState() {
+        return wantedState;
+    }
+
     public void setWantedState(FeederState state) {
         wantedState = state;
     }

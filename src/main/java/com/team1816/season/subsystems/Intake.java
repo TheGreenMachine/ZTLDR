@@ -77,6 +77,10 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         intakeMotor.setControl(dutyCycleOut.withOutput(velocity));
     }
 
+    public IntakeState getState() {
+        return wantedState;
+    }
+
     private void setFlipperPosition(FlipperPosition position) {
         switch (position) {
             case IN -> flipperMotor.setControl(flipperMotorPositionRequest.withPosition(FLIPPER_MOTOR_IN_POSITION));
