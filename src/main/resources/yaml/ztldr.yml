@@ -168,10 +168,20 @@ subsystems:
                 id: 22
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
+            agitateMotor:
+                deviceType: TalonFX
+                id: 24
+                supplyCurrentLimit: 10
+                statorCurrentLimit: 15
+                neutralMode: Coast
+                motorRotation: CounterClockwise_Positive
         constants:
             feedingDutyCycle: 0.7
             stoppedDutyCycle: 0
             reversingDutyCycle: -0.4
+            agitateForwardDutyCycle: -0.05
+            agitateCycleTime: 3000
+            agitateReverseDutyCycle: -0.05
     intake:
         implemented: true
         devices:
