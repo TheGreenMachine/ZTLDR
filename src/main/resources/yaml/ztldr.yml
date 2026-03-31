@@ -271,10 +271,13 @@ subsystems:
                 motorRotation: Clockwise_Positive
                 pidConfig:
                     slot0:
-                        kS: 0.29
-                        kP: 1
-                        kD: 0.05
+                        kS: 0.29 # static friction - increase if turret won't move at small errors
+                        kP: 3 # position error gain - increase if still lagging, decrease if oscillating at setpoint
+                        kD: 0.15 # damping - increase if oscillating, keep roughly kP/20
                         staticFeedforwardSign: UseClosedLoopSign
+                motionMagic:
+                    expoKV: 0.12 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
+                    expoKA: 0.3 # acceleration smoothness - increase if dead zone reversals are too violent, decrease if turret feels mushy
             inclineCoder:
                 id: 29
                 deviceType: CANcoder
