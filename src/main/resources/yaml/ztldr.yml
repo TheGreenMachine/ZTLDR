@@ -197,8 +197,8 @@ subsystems:
                         kP: 50 # position error gain - increase if not reaching target, decrease if oscillating
                         staticFeedforwardSign: UseClosedLoopSign
                 motionMagic:
-                    expoKV: 2 # cruise speed - lower = faster, higher = slower
-                    expoKA: 0.5 # acceleration smoothness - higher = gentler ramp, lower = snappier
+                    expoKV: 10 # cruise speed - lower = faster, higher = slower
+                    expoKA: 5.0 # acceleration smoothness - higher = gentler ramp, lower = snappier
             flipCoder:
                 id: 10
                 deviceType: CANcoder
@@ -206,7 +206,7 @@ subsystems:
             intakeOnSpeed: .4
             intakeSlowSpeed: .1
             outtakeSpeed: -0.6
-            flipperMotorOutPosition: 0.166
+            flipperMotorOutPosition: 0.135 #0.166
             flipperMotorPullInOnePosition: 0.1
             flipperMotorPullInTwoPosition: 0.05
             flipperMotorInPosition: 0.025
@@ -271,13 +271,13 @@ subsystems:
                 motorRotation: Clockwise_Positive
                 pidConfig:
                     slot0:
-                        kS: 0.29 # static friction - increase if turret won't move at small errors
-                        kP: 3 # position error gain - increase if still lagging, decrease if oscillating at setpoint
-                        kD: 0.15 # damping - increase if oscillating, keep roughly kP/20
+                        kS: 0.1 # static friction - increase if turret won't move at small errors
+                        kP: 4 # position error gain - increase if still lagging, decrease if oscillating at setpoint
+                        kD: 0.28 # damping - increase if oscillating, keep roughly kP/20
                         staticFeedforwardSign: UseClosedLoopSign
                 motionMagic:
-                    expoKV: 0.12 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
-                    expoKA: 0.3 # acceleration smoothness - increase if dead zone reversals are too violent, decrease if turret feels mushy
+                    expoKV: 0.04 #0.10 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
+                    expoKA: 0.1 #0.2 # acceleration smoothness - increase if dead zone reversals are too violent, decrease if turret feels mushy
             inclineCoder:
                 id: 29
                 deviceType: CANcoder
