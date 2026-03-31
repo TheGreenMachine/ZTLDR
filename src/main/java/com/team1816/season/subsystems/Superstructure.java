@@ -92,14 +92,6 @@ public class Superstructure extends BaseSuperstructure {
         this.wantedIntakeState = intakeState;
     }
 
-    public void incrementPullInSuperstructureIntakeState() {
-        wantedIntakeState = switch (wantedIntakeState) {
-            case INTAKE, OUTTAKE, STOP_OUT -> WantedIntakeState.PULL_IN_ONE;
-            case PULL_IN_ONE -> WantedIntakeState.PULL_IN_TWO;
-            case PULL_IN_TWO, STOW -> WantedIntakeState.STOW;
-        };
-    }
-
     /**
      * Sets if the incline of the shooter should duck down to fit under the trench.
      *
@@ -252,8 +244,6 @@ public class Superstructure extends BaseSuperstructure {
                 case OUTTAKE -> Intake.IntakeState.OUTTAKE;
                 case STOP_OUT -> Intake.IntakeState.STOP_OUT;
                 case STOW -> Intake.IntakeState.STOW;
-                case PULL_IN_ONE -> Intake.IntakeState.PULL_IN_ONE;
-                case PULL_IN_TWO -> Intake.IntakeState.PULL_IN_TWO;
             }
         );
         feeder.setWantedState(
@@ -310,7 +300,5 @@ public class Superstructure extends BaseSuperstructure {
         STOW,
         OUTTAKE,
         STOP_OUT,
-        PULL_IN_ONE,
-        PULL_IN_TWO
     }
 }
