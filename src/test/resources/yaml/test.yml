@@ -11,6 +11,7 @@ subsystems:
         devices:
             range:
                 deviceType: CANrange
+                id: 7
             leftMain:
                 deviceType: TalonFX
                 id: 1
