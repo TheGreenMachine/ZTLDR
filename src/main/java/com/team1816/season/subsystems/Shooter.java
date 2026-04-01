@@ -330,7 +330,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private void applyState() {
         Pose2d robotPose = BaseRobotState.robotPose;
         ChassisSpeeds groundSpeed = BaseRobotState.robotSpeeds;
-        Translation2d target = Translation2d.kZero;
         if (autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC) {
             isAutoAiming = true;
             turretTarget = getTargetTranslation2d();
@@ -344,7 +343,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             // use the same predicted turret position for consistency
             Translation2d turretFieldPosition = getCurrentTurretPose2d().getTranslation();
             IShooterCalculator.ShooterCalculatorResponse response =
-                shooterTableCalculator.getShooterSettings(robotPose, groundSpeed, turretFieldPosition, target);
+                shooterTableCalculator.getShooterSettings(robotPose, groundSpeed, turretFieldPosition, turretTarget);
 
             if (autoAimTurret) {
                 // Convert predicted field-relative heading to robot-relative for turret motor
