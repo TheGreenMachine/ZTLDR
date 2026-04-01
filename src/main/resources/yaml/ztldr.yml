@@ -9,16 +9,16 @@ shooterSettings:
     inclineAnglesRotations:
         - 0.0405 # 48
         - 0.0555 # 96
-        - 0.07425 # 156
-        - 0.08925 # 204
-        - 0.108 # 264
+        - 0.08 # 156
+        - 0.09 # 204
+        - 0.1196 # 264
         - 0.108 # 360
     launchVelocitiesRPS:
         - 35 # 48
         - 47 # 96
-        - 49 # 156
-        - 52 # 204
-        - 58 # 264
+        - 46 # 156
+        - 48 # 204
+        - 54 # 264
         - 100 # 360
 subsystems:
     drivetrain:
@@ -169,7 +169,7 @@ subsystems:
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
         constants:
-            feedingDutyCycle: 0.8
+            feedingDutyCycle: 0.7
             stoppedDutyCycle: 0
             reversingDutyCycle: -0.4
     intake:
@@ -183,27 +183,33 @@ subsystems:
             flipperMotor:
                 id: 3
                 deviceType: TalonFX
+                supplyCurrentLimit: 35
+                statorCurrentLimit: 60
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
                 remoteSensor: RemoteCANcoder # ExternalFeedbackSensorSourceValue
                 remoteSensorId: 10
                 remoteOffest: 0
                 rotorToSensor: 0.1
+                pidConfig:
+                    slot0:
+                        kS: 0.3 # static friction - increase if stalling near setpoint
+                        kP: 50 # position error gain - increase if not reaching target, decrease if oscillating
+                        staticFeedforwardSign: UseClosedLoopSign
+                motionMagic:
+                    expoKV: 10 # cruise speed - lower = faster, higher = slower
+                    expoKA: 5.0 # acceleration smoothness - higher = gentler ramp, lower = snappier
             flipCoder:
                 id: 10
                 deviceType: CANcoder
         constants:
             intakeOnSpeed: .4
-            intakeOffSpeed: 0
+            intakeSlowSpeed: .1
             outtakeSpeed: -0.6
-            flipperMotorOutPosition: 0.166
+            flipperMotorOutPosition: 0.135 #0.166
             flipperMotorPullInOnePosition: 0.1
             flipperMotorPullInTwoPosition: 0.05
             flipperMotorInPosition: 0.025
-            flipperMotorRetractCurrentAmperes: -25
-            flipperMotorExtendCurrentAmperes: 25
-            flipperMotorHoldOutCurrentAmperes: 8
-            flipperMotorHoldInCurrentAmperes: -8
     gatekeeper:
         canBusName: shootercanivore
         devices:
@@ -216,22 +222,10 @@ subsystems:
                         kP: 0.5
                         kS: 0.31
                         kV: 0.081
-            bottomMotor:
-                deviceType: TalonFX
-                id: 24
-                motorRotation: Clockwise_Positive
-                pidConfig:
-                    slot0:
-                        kP: 0.5
-                        kS: 0.31
-                        kV: 0.08
         constants:
             topClosedVelocity: 0
             topOpenVelocity: 40
             topReversingVelocity: -10
-            bottomClosedVelocity: 0
-            bottomOpenVelocity: 40
-            bottomReversingVelocity: -10
     shooter:
         canBusName: shootercanivore
         devices:
@@ -260,7 +254,7 @@ subsystems:
                 remoteSensorId: 29
                 id: 27
                 motorRotation: Clockwise_Positive
-                reverseSoftLimit: 0.052
+                reverseSoftLimit: 0.062
                 forwardSoftLimit: 0.1196
                 statorCurrentLimit: 35
                 pidConfig:
@@ -278,10 +272,13 @@ subsystems:
                 sensorToMechanismRatio: 15.625 # 250/16 gear ratio
                 pidConfig:
                     slot0:
-                        kS: 0.29
-                        kP: 1
-                        kD: 0.05
+                        kS: 0.1 # static friction - increase if turret won't move at small errors
+                        kP: 4 # position error gain - increase if still lagging, decrease if oscillating at setpoint
+                        kD: 0.28 # damping - increase if oscillating, keep roughly kP/20
                         staticFeedforwardSign: UseClosedLoopSign
+                motionMagic:
+                    expoKV: 0.04 #0.10 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
+                    expoKA: 0.1 #0.2 # acceleration smoothness - increase if dead zone reversals are too violent, decrease if turret feels mushy
             inclineCoder:
                 id: 29
                 deviceType: CANcoder
@@ -295,11 +292,11 @@ subsystems:
         constants:
             leftTurretSensorChannel: 0
             rightTurretSensorChannel: 1
-            shooterOffsetXMeters: -0.11303
+            shooterOffsetXMeters: -0.111303
             shooterOffsetYMeters: -0.112268
             shooterOffsetZMeters: 0.508
-            inclineDuckingLimitRotations: 0.058
-            distanceOneInclineAngleRotations: 0.058
+            inclineDuckingLimitRotations: 0.064
+            distanceOneInclineAngleRotations: 0.064
             distanceOneLaunchVelocityRPS: 35
             distanceTwoInclineAngleRotations: 0.08
             distanceTwoLaunchVelocityRPS: 47
@@ -315,7 +312,7 @@ subsystems:
             launchVelocityAdjustmentAmountRPS: 0.01
             inclineAngleAdjustmentAmountDegrees: 0.02
             turretAngleAdjustmentAmountDegrees: 0.04
-            topLaunchMotorBackspinMultiplier: .9 # Less than one for backspin.
+            topLaunchMotorBackspinMultiplier: .95 # Less than one for backspin.
     vision:
         cameras:
             forwardLeft: # Pi IP: 10.18.16.11

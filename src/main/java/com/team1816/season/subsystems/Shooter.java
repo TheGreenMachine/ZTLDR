@@ -97,7 +97,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final VelocityVoltage bottomLaunchMotorVelocityRequest = new VelocityVoltage(0);
     private final NeutralOut neutralModeRequest = new NeutralOut();
     private final MotionMagicExpoVoltage inclineMotorPositionRequest = new MotionMagicExpoVoltage(0);
-    private final PositionVoltage turretMotorPositionRequest = new PositionVoltage(0);
+    private final MotionMagicExpoVoltage turretMotorPositionRequest = new MotionMagicExpoVoltage(0);
 
     //DEVICES
     private final DigitalInput leftTurretSensor = new DigitalInput((int) factory.getConstant(NAME, "leftTurretSensorChannel", 0));
@@ -627,11 +627,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private void setInclineAngle(double wantedAngleDegrees) {
         wantedInclineAngleDegrees = wantedAngleDegrees + inclineAngleAdjustmentDegrees;
         double rotations = Units.degreesToRotations(wantedInclineAngleDegrees);
-//        if (isInclineDucking) {
-//            // If we are trying to duck under the trench, restrict the angle of the incline to be
-//            // below the limit.
-//            rotations = Math.min(rotations, INCLINE_DUCKING_LIMIT_ROTATIONS);
-//        }
+        if (isInclineDucking) {
+            // If we are trying to duck under the trench, restrict the angle of the incline to be
+            // below the limit.
+            rotations = Math.min(rotations, INCLINE_DUCKING_LIMIT_ROTATIONS);
+        }
         inclineMotor.setControl(inclineMotorPositionRequest.withPosition(rotations));
     }
 

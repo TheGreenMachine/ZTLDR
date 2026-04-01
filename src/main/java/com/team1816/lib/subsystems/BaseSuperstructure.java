@@ -51,7 +51,7 @@ public abstract class BaseSuperstructure extends SubsystemBase {
      * and both methods access {@code goodVisionEstimatesSincePoseLoss} and
      * {@link BaseRobotState#hasAccuratePoseEstimate}.
      */
-    private synchronized void handlePoseLossFromTilting() {
+    private void handlePoseLossFromTilting() {
         // The threshold of how far the robot can be tilted before we decide we don't have an
         // accurate pose estimate. Mainly to account for gyro noise.
         final double tiltPoseLossThresholdRadians = Units.degreesToRadians(5.0);
@@ -75,7 +75,7 @@ public abstract class BaseSuperstructure extends SubsystemBase {
      * ({@code goodVisionEstimatesSincePoseLoss}, {@code visionEstimateSincePoseLossVarianceSum},
      * and {@link BaseRobotState#hasAccuratePoseEstimate}).
      */
-    public synchronized void addVisionMeasurementsToDrivetrain() {
+    public void addVisionMeasurementsToDrivetrain() {
         List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> visionMeasurements = vision
             .getVisionEstimatedPosesWithStdDevs();
 
