@@ -172,16 +172,16 @@ subsystems:
                 deviceType: TalonFX
                 id: 24
                 supplyCurrentLimit: 10
-                statorCurrentLimit: 15
+                statorCurrentLimit: 25
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
         constants:
             feedingDutyCycle: 0.7
             stoppedDutyCycle: 0
             reversingDutyCycle: -0.4
-            agitateForwardDutyCycle: -0.05
+            agitateForwardDutyCycle: 0.15
             agitateCycleTime: 3000
-            agitateReverseDutyCycle: -0.05
+            agitateReverseDutyCycle: 0.15
     intake:
         implemented: true
         devices:

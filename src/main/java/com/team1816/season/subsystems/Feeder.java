@@ -62,15 +62,11 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         feedMotor.setControl(feedMotorDutyCycle.withOutput(wantedState.getFeedMotorDutyCycle()));
-        agitateMotor.setControl(agitateMotorDutyCycle.withOutput(wantedState.getAgitateMotorDutyCycle()));
-
     }
 
     public void setWantedState(FeederState state) {
         wantedState = state;
     }
-
-
 
     public enum FeederState {
         FEEDING(factory.getConstant(NAME, "feedingDutyCycle", 0)),
@@ -78,21 +74,13 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
         REVERSING(factory.getConstant(NAME, "reversingDutyCycle", 0));
 
         private double feedMotorDutyCycle;
-        private double agitateMotorDutyCycle;
 
         FeederState(double feedMotorDutyCycle){
             this.feedMotorDutyCycle = feedMotorDutyCycle;
         }
 
-        private void adjustFeedMotorValue(double adjustValue) {
-            this.feedMotorDutyCycle += adjustValue;
-        }
-
         public double getFeedMotorDutyCycle() {
             return feedMotorDutyCycle;
-        }
-        public double getAgitateMotorDutyCycle() {
-            return agitateMotorDutyCycle;
         }
     }
 }
