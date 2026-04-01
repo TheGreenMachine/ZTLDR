@@ -325,6 +325,38 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         inclineMotorML.setAngle(getCurrentInclineAngleDegrees());
     }
 
+    public boolean getLeftSensorState() { //todo: find a better place for these
+        return leftSensorTriggered;
+    }
+
+    public boolean getRightSensorState() {
+        return rightSensorTriggered;
+    }
+
+    public void setLeftSensorState(boolean leftSensorState) { //Is this forbidden??
+        leftSensorState = leftSensorTriggered;
+    }
+
+    public void setRightSensorState(boolean rightSensorState) {
+        rightSensorState = rightSensorTriggered;
+    }
+
+    public boolean getLeftPreviousState() {
+        return previousLeftSensorTriggered;
+    }
+
+    public boolean getRightPreviousState() {
+        return previousRightSensorTriggered;
+    }
+
+    public void setSensorValuesHaveBeenSet(boolean sensorValuesHaveBeenSet) {
+        this.sensorValuesHaveBeenSet = sensorValuesHaveBeenSet;
+    }
+
+    public boolean getSensorValuesHaveBeenSet() {
+        return sensorValuesHaveBeenSet;
+    }
+
     private void applyState() {
         turretTarget = Translation2d.kZero;
         if (autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC) {
@@ -590,6 +622,14 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             }
         }
     }
+
+    public double getInitialCalibrationStallingTimestamp () {
+        return initialCalibrationStallingTimestamp;
+    }
+
+//    public boolean getCurrentCalibrationSpeed() {
+//        if()
+//    }
 
     private void finishCalibration(double beamBreakPositionMotorRotations) {
         turretMotorOffsetRotations = turretMotor.getMotorPosition() - beamBreakPositionMotorRotations;
