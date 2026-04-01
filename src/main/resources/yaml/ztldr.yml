@@ -302,7 +302,7 @@ subsystems:
             rightTurretSensorChannel: 1
             motorRotationsPerTurretRotation: 15.625 # 250/16 gear ratio
             shooterOffsetXMeters: -0.111381
-            shooterOffsetYMeters: 0.113049
+            shooterOffsetYMeters: -0.113049
             shooterOffsetZMeters: 0.288781
             inclineDuckingLimitRotations: 0.064
             distanceOneInclineAngleRotations: 0.064
