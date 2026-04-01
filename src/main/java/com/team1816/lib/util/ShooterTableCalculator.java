@@ -21,7 +21,7 @@ import static com.team1816.lib.Singleton.factory;
 public class ShooterTableCalculator extends BaseShooterCalculator {
 
     private final PolynomialSplineFunction inclineAngleRotationsFunction, launchVelocityRPSFunction;
-    private double lookaheadTime = 1.0;
+    private double lookaheadTime = 0.5; // seconds from hopper retrieval to ball exiting shooter
 
     public ShooterTableCalculator() {
         ShooterSettingsConfig shooterSettings = factory.getShooterSettingsConfig();
@@ -46,7 +46,7 @@ public class ShooterTableCalculator extends BaseShooterCalculator {
         this.launchVelocityRPSFunction = launchVelocityRPSLI.interpolate(distancesInchesArray, launchVelocitiesRPSArray);
     }
 
-    public ShooterCalculatorResponse getShooterSettings(Pose2d robotPose, ChassisSpeeds groundSpeed, Translation2d target) {
+    public ShooterCalculatorResponse getShooterSettings(Pose2d robotPose, ChassisSpeeds groundSpeed, Translation2d turretFieldPosition, Translation2d target) {
 
         // Convert from robot-relative speed to field relative speed
         ChassisSpeeds fieldSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(groundSpeed, robotPose.getRotation());
@@ -57,21 +57,22 @@ public class ShooterTableCalculator extends BaseShooterCalculator {
 
         double predictedX, predictedY;
 
-        // Use arc extrapolation when rotating, linear when going straight
+        // Predict from the turret's field position, not robot center, so distance
+        // and angle calculations are correct for the actual launch point
         if (Math.abs(omega) > 1e-3) {
             // Constant-curvature arc: integrate the rotating velocity vector over lookahead time
             double sinOmegaT = Math.sin(omega * lookaheadTime);
             double cosOmegaT = Math.cos(omega * lookaheadTime);
-            predictedX = robotPose.getX() + (vx * sinOmegaT - vy * (1 - cosOmegaT)) / omega;
-            predictedY = robotPose.getY() + (vx * (1 - cosOmegaT) + vy * sinOmegaT) / omega;
+            predictedX = turretFieldPosition.getX() + (vx * sinOmegaT - vy * (1 - cosOmegaT)) / omega;
+            predictedY = turretFieldPosition.getY() + (vx * (1 - cosOmegaT) + vy * sinOmegaT) / omega;
         } else {
             // Near-zero rotation: linear extrapolation (avoids division by ~0)
-            predictedX = robotPose.getX() + (vx * lookaheadTime);
-            predictedY = robotPose.getY() + (vy * lookaheadTime);
+            predictedX = turretFieldPosition.getX() + (vx * lookaheadTime);
+            predictedY = turretFieldPosition.getY() + (vy * lookaheadTime);
         }
 
-        Translation2d predictedPose = new Translation2d(predictedX, predictedY);
-        Translation2d robotToTargetVector = target.minus(predictedPose);
+        Translation2d predictedTurretPosition = new Translation2d(predictedX, predictedY);
+        Translation2d turretToTargetVector = target.minus(predictedTurretPosition);
 //
 //        NetworkTable netTable = NetworkTableInstance.getDefault().getTable("");
 //        DoubleArrayPublisher pub = netTable.getDoubleArrayTopic("Field/PredictedPose").publish();
@@ -79,12 +80,12 @@ public class ShooterTableCalculator extends BaseShooterCalculator {
 //            predictedX, predictedY, predictedPose.getAngle().getDegrees()
 //        });
 
-        double distanceToTargetMeters = robotToTargetVector.getNorm();
+        double distanceToTargetMeters = turretToTargetVector.getNorm();
         double distanceToTargetInches = Units.metersToInches(distanceToTargetMeters);
         double inclineAngleRotations = getInclineAngleRotations(distanceToTargetInches);
         double inclineAngleDegrees = Units.rotationsToDegrees(inclineAngleRotations);
         double launchVelocityRPS = getLaunchVelocityRPS(distanceToTargetInches);
-        Rotation2d targetHeading = target.minus(predictedPose).getAngle();
+        Rotation2d targetHeading = turretToTargetVector.getAngle();
         return new ShooterCalculatorResponse(inclineAngleDegrees, launchVelocityRPS, targetHeading);
     }
 

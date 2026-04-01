@@ -330,10 +330,26 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             isAutoAiming = false;
         }
 
-        if (autoAimTurret) {
-            aimTurretAtTarget(target);
+        if (autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC) {
+            // Compute predicted aiming solution once — turret, incline, and launch all
+            // use the same predicted turret position for consistency
+            Translation2d turretFieldPosition = getCurrentTurretPose2d().getTranslation();
+            IShooterCalculator.ShooterCalculatorResponse response =
+                shooterTableCalculator.getShooterSettings(robotPose, groundSpeed, turretFieldPosition, target);
+
+            if (autoAimTurret) {
+                // Convert predicted field-relative heading to robot-relative for turret motor
+                Rotation2d robotRelativeAngle = response.targetHeading().minus(robotPose.getRotation());
+                setTurretAngle(robotRelativeAngle.getDegrees());
+            }
+
+            if (wantedDistanceState == ShooterDistanceState.AUTOMATIC) {
+                setInclineAngle(response.inclineAngleDegrees());
+                setLaunchVelocities(response.launchVelocityRPS());
+            }
         }
-        else {
+
+        if (!autoAimTurret) {
             setTurretAngle(turretFixedAngleDegrees);
         }
 
@@ -342,7 +358,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 setInclineAngle(wantedDistanceState.getInclineAngleDegrees());
                 setLaunchVelocities(wantedDistanceState.getLaunchVelocityRPS());
             }
-            case AUTOMATIC -> aimInclineAndLaunchersAtTarget(robotPose,groundSpeed,target);
+            case AUTOMATIC -> {} // already handled above
         }
     }
 
@@ -516,8 +532,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      *
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
-    private void aimInclineAndLaunchersAtTarget(Pose2d robotPose, ChassisSpeeds fieldSpeeds, Translation2d targetTranslation2d) {
-        IShooterCalculator.ShooterCalculatorResponse response = shooterTableCalculator.getShooterSettings(robotPose, fieldSpeeds, targetTranslation2d);
+    private void aimInclineAndLaunchersAtTarget(Pose2d robotPose, ChassisSpeeds groundSpeed, Translation2d targetTranslation2d) {
+        Translation2d turretFieldPosition = getCurrentTurretPose2d().getTranslation();
+        IShooterCalculator.ShooterCalculatorResponse response = shooterTableCalculator.getShooterSettings(robotPose, groundSpeed, turretFieldPosition, targetTranslation2d);
 
         setInclineAngle(response.inclineAngleDegrees());
         setLaunchVelocities(response.launchVelocityRPS());

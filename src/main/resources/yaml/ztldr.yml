@@ -276,7 +276,7 @@ subsystems:
                         kD: 0.28 # damping - increase if oscillating, keep roughly kP/20
                         staticFeedforwardSign: UseClosedLoopSign
                 motionMagic:
-                    expoKV: 0.04 #0.10 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
+                    expoKV: 0.01 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
                     expoKA: 0.1 #0.2 # acceleration smoothness - increase if dead zone reversals are too violent, decrease if turret feels mushy
             inclineCoder:
                 id: 29
@@ -292,9 +292,9 @@ subsystems:
             leftTurretSensorChannel: 0
             rightTurretSensorChannel: 1
             motorRotationsPerTurretRotation: 15.625 # 250/16 gear ratio
-            shooterOffsetXMeters: -0.111303
-            shooterOffsetYMeters: -0.112268
-            shooterOffsetZMeters: 0.508
+            shooterOffsetXMeters: -0.111381
+            shooterOffsetYMeters: 0.113049
+            shooterOffsetZMeters: 0.288781
             inclineDuckingLimitRotations: 0.064
             distanceOneInclineAngleRotations: 0.064
             distanceOneLaunchVelocityRPS: 35
