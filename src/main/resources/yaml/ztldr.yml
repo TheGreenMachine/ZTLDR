@@ -1,21 +1,21 @@
 shooterSettings:
     distancesInches:
-        - 48
+        - 64
         - 96
         - 156
         - 204
         - 264
         - 360 # Maximum distance shot
     inclineAnglesRotations:
-        - 0.0405 # 48
-        - 0.0555 # 96
+        - 0.064 # 48
+        - 0.064 # 96
         - 0.08 # 156
         - 0.09 # 204
         - 0.1196 # 264
         - 0.108 # 360
     launchVelocitiesRPS:
-        - 35 # 48
-        - 47 # 96
+        - 33 # 48
+        - 41 # 96
         - 46 # 156
         - 48 # 204
         - 54 # 264
@@ -285,7 +285,7 @@ subsystems:
                         kD: 0.28 # damping - increase if oscillating, keep roughly kP/20
                         staticFeedforwardSign: UseClosedLoopSign
                 motionMagic:
-                    expoKV: 0.04 #0.10 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
+                    expoKV: 0.02 #0.10 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
                     expoKA: 0.1 #0.2 # acceleration smoothness - increase if dead zone reversals are too violent, decrease if turret feels mushy
             inclineCoder:
                 id: 29
