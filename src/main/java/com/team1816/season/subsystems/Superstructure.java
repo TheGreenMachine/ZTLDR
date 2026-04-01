@@ -5,6 +5,8 @@ import com.team1816.lib.subsystems.BaseSuperstructure;
 import com.team1816.lib.subsystems.Vision;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 public class Superstructure extends BaseSuperstructure {
     private final Shooter shooter;
@@ -64,6 +66,10 @@ public class Superstructure extends BaseSuperstructure {
         }
     }
 
+//    public void setRobotPose (){
+//        swerve.resetPose(new Pose2d(0.4318, 0.4318, new Rotation2d(0)));
+//    }
+
     public void setWantedSuperState(WantedSuperState superState) {
         this.wantedSuperState = superState;
     }
@@ -91,10 +97,6 @@ public class Superstructure extends BaseSuperstructure {
      */
     public void setInclineDucking(boolean shouldInclineDuck) {
         shooter.setInclineDucking(shouldInclineDuck);
-    }
-
-    public void setServeSlowMode(boolean slowMode) {
-        swerve.setSlowMode(slowMode);
     }
 
     /**

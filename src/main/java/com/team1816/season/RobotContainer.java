@@ -37,7 +37,6 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
         superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE);
         superstructure.forceAllowGatekeeperControl(true);
-        superstructure.setServeSlowMode(false);
     }
 
     public void teleopInit() {
@@ -45,10 +44,11 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.MANUAL_DRIVING);
         superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.AUTOMATIC);
         superstructure.setInclineDucking(true);
+        //superstructure.setRobotPose();
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
-        superstructure.setServeSlowMode(false);
+        superstructure.forceAllowGatekeeperControl(true);
     }
 
     private void configureBindings() {
@@ -67,12 +67,10 @@ public class RobotContainer extends BaseRobotContainer {
         driverController.rightTrigger().onTrue(Commands.runOnce(() -> {
             superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
             superstructure.setInclineDucking(false);
-            superstructure.setServeSlowMode(true);
         }))
             .onFalse(Commands.runOnce(() -> {
                 superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
                 superstructure.setInclineDucking(true);
-                superstructure.setServeSlowMode(false);
             }));
 
         // Shooter

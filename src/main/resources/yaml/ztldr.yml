@@ -327,9 +327,9 @@ subsystems:
             forwardLeft: # Pi IP: 10.18.16.11
                 photonVisionUIName: Forward_Left
                 robotToCamera:
-                    xInches: -12.5
-                    yInches: 13
-                    zInches: 16.75
+                    xInches: -12.66
+                    yInches: 12.1
+                    zInches: 18
                     rollDegrees: 0
                     pitchDegrees: 0
                     yawDegrees: 55
@@ -337,9 +337,9 @@ subsystems:
             forwardRight: # Pi IP: 10.18.16.12.
                 photonVisionUIName: Forward_Right
                 robotToCamera:
-                    xInches: -12.5
-                    yInches: -13
-                    zInches: 16.75
+                    xInches: -12.66
+                    yInches: -12.1
+                    zInches: 18
                     rollDegrees: 0
                     pitchDegrees: 0
                     yawDegrees: -55
@@ -347,9 +347,9 @@ subsystems:
             backwardLeft: # Pi IP: 10.18.16.13
                 photonVisionUIName: Backward_Left
                 robotToCamera:
-                    xInches: -12.5
-                    yInches: 13
-                    zInches: 15
+                    xInches: -12.66
+                    yInches: 12.1
+                    zInches: 16
                     rollDegrees: 0
                     pitchDegrees: 0
                     yawDegrees: 155
@@ -357,9 +357,9 @@ subsystems:
             backwardRight: # Pi IP: 10.18.16.14
                 photonVisionUIName: Backward_Right
                 robotToCamera:
-                    xInches: -12.5
-                    yInches: -13
-                    zInches: 15
+                    xInches: -12.66
+                    yInches: -12.1
+                    zInches: 16
                     rollDegrees: 0
                     pitchDegrees: 0
                     yawDegrees: -155
