@@ -210,6 +210,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private final ShooterTableCalculator shooterTableCalculator = new ShooterTableCalculator();
 
+    private Translation2d turretTarget = Translation2d.kZero;
+    private Pose2d turretPose = Pose2d.kZero;
+    private boolean isBlueAlliance = false;
+
     public Shooter() {
         super();
         // if the turret is ghosted we can say we are calibrated because the motors will not move
@@ -266,9 +270,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.periodicLog(NAME + "/incline/Ducking", () -> isInclineDucking);
         GreenLogger.periodicLog(NAME + "/incline/Angle Adjustment Degrees", () -> inclineAngleAdjustmentDegrees);
 
-        GreenLogger.periodicLog(NAME + "/turret/Field Pose", this::getCurrentTurretPose2d, Pose2d.struct);
         GreenLogger.periodicLog(NAME + "/turret/Current Robot Relative Angle Degrees", () -> getCurrentRobotRelativeTurretRotation2d().getDegrees());
-        GreenLogger.periodicLog(NAME + "/turret/Wanted Angle Degrees", () -> wantedTurretAngleDegrees);
         GreenLogger.periodicLog(NAME + "/turret/Aimed", this::isTurretAimed);
         GreenLogger.periodicLog(NAME + "/turret/Calibrated", () -> isTurretCalibrated);
         GreenLogger.periodicLog(NAME + "/turret/Aiming in Dead Zone", () -> isTurretAimingInDeadZone);
@@ -278,6 +280,13 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.periodicLog(NAME + "/turret/Fixed Angle Degrees", () -> turretFixedAngleDegrees);
         GreenLogger.periodicLog(NAME + "/turret/Auto Aiming Turret", () -> autoAimTurret);
         GreenLogger.periodicLog(NAME + "/turret/Angle Adjustment Degrees", () -> turretAngleAdjustmentDegrees);
+        GreenLogger.periodicLog(NAME + "/turret/Is Blue Alliance", () -> isBlueAlliance);
+        GreenLogger.periodicLog(NAME + "/turret/calc/Turret Pose", () -> turretPose, Pose2d.struct);
+        GreenLogger.periodicLog(NAME + "/turret/calc/Target Pose", () -> turretTarget, Translation2d.struct);
+        GreenLogger.periodicLog(NAME + "/turret/calc/Robot Pose", () -> BaseRobotState.robotPose, Pose2d.struct);
+        GreenLogger.periodicLog(NAME + "/turret/calc/Shooter Offset", () -> SHOOTER_OFFSET, Translation3d.struct);
+        GreenLogger.periodicLog(NAME + "/turret/calc/Distance to Target", () -> turretPose.getTranslation().getDistance(turretTarget));
+        GreenLogger.periodicLog(NAME + "/turret/calc/Wanted Angle Degrees", () -> wantedTurretAngleDegrees);
     }
 
     @Override
@@ -324,7 +333,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         Translation2d target = Translation2d.kZero;
         if (autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC) {
             isAutoAiming = true;
-            target = getTargetTranslation2d();
+            turretTarget = getTargetTranslation2d();
         }
         else {
             isAutoAiming = false;
@@ -477,7 +486,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         Pose2d robotPose = BaseRobotState.robotPose;
         double robotXMeters = robotPose.getX();
         double robotYMeters = robotPose.getY();
-        boolean isBlueAlliance = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
+        isBlueAlliance = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
         boolean isInAllianceZone = isBlueAlliance
             ? robotXMeters < ROBOT_STARTING_LINE
             : robotXMeters > FlippingUtil.fieldSizeX - ROBOT_STARTING_LINE;
@@ -739,7 +748,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         Pose2d robotPose2d = BaseRobotState.robotPose;
 
-        return robotPose2d.transformBy(robotToTurretTransform2d);
+        turretPose = robotPose2d.transformBy(robotToTurretTransform2d);
+
+        return turretPose;
     }
 
     /**

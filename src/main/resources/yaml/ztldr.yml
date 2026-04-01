@@ -168,10 +168,20 @@ subsystems:
                 id: 22
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
+            agitateMotor:
+                deviceType: TalonFX
+                id: 24
+                supplyCurrentLimit: 10
+                statorCurrentLimit: 25
+                neutralMode: Coast
+                motorRotation: CounterClockwise_Positive
         constants:
             feedingDutyCycle: 0.7
             stoppedDutyCycle: 0
             reversingDutyCycle: -0.4
+            agitateForwardDutyCycle: 0.15
+            agitateCycleTime: 3000
+            agitateReverseDutyCycle: 0.15
     intake:
         implemented: true
         devices:
@@ -225,7 +235,6 @@ subsystems:
         constants:
             topClosedVelocity: 0
             topOpenVelocity: 40
-            topReversingVelocity: -10
     shooter:
         canBusName: shootercanivore
         devices:
