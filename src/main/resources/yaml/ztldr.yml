@@ -195,7 +195,6 @@ subsystems:
                     slot0:
                         kS: 0.3 # static friction - increase if stalling near setpoint
                         kP: 50 # position error gain - increase if not reaching target, decrease if oscillating
-                        staticFeedforwardSign: UseClosedLoopSign
                 motionMagic:
                     expoKV: 10 # cruise speed - lower = faster, higher = slower
                     expoKA: 5.0 # acceleration smoothness - higher = gentler ramp, lower = snappier
