@@ -178,10 +178,8 @@ subsystems:
         constants:
             feedingDutyCycle: 0.7
             stoppedDutyCycle: 0
-            reversingDutyCycle: -0.4
             agitateForwardDutyCycle: 0.15
-            agitateCycleTime: 3000
-            agitateReverseDutyCycle: 0.15
+            agitateStoppedDutyCycle: 0
     intake:
         implemented: true
         devices:
