@@ -35,7 +35,6 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
-        superstructure.setGatekeeperAndFeederReversing(false);
         superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE);
         superstructure.forceAllowGatekeeperControl(true);
     }
@@ -45,10 +44,11 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.MANUAL_DRIVING);
         superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.AUTOMATIC);
         superstructure.setInclineDucking(true);
+        //superstructure.setRobotPose();
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
-        superstructure.setGatekeeperAndFeederReversing(false);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
+        superstructure.forceAllowGatekeeperControl(true);
     }
 
     private void configureBindings() {
@@ -72,13 +72,6 @@ public class RobotContainer extends BaseRobotContainer {
                 superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
                 superstructure.setInclineDucking(true);
             }));
-
-        driverController.povUp().onTrue(Commands.runOnce(() ->
-                superstructure.setGatekeeperAndFeederReversing(true)
-            ))
-            .onFalse(Commands.runOnce(() ->
-                superstructure.setGatekeeperAndFeederReversing(false)
-            ));
 
         // Shooter
         driverController.a().onTrue(Commands.runOnce(() -> {

@@ -328,7 +328,7 @@ public class RobotFactory {
             if (device.id == id) {
                 // ensure the name is set
                 if (device.name == null) device.name = key;
-                return getDevInst(device, config, true);
+                return getDevInst(device, config, false);
             }
         }
         return null;
