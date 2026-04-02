@@ -5,6 +5,7 @@ import com.team1816.lib.subsystems.drivetrain.Swerve;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -30,6 +31,28 @@ public abstract class BaseSuperstructure extends SubsystemBase {
      * state standard deviation calculations.
      */
     private Matrix<N3, N1> visionEstimateSincePoseLossVarianceSum = VecBuilder.fill(0, 0, 0);
+
+    /**
+     * The number of initial agreeing vision estimates required before we start trusting
+     * vision after pose loss. This prevents a single bad reading from snapping the pose
+     * to a wrong location.
+     */
+    private static final int MIN_AGREEING_ESTIMATES_BEFORE_TRUST = 3;
+
+    /**
+     * Stores the first vision estimate after pose loss for agreement checking.
+     */
+    private Pose2d firstEstimateAfterPoseLoss = null;
+
+    /**
+     * Count of consecutive agreeing estimates after pose loss (before we start using them).
+     */
+    private int agreeingEstimatesCount = 0;
+
+    /**
+     * Max distance between consecutive vision estimates to consider them "agreeing".
+     */
+    private static final double AGREEMENT_DISTANCE_THRESHOLD_METERS = 1.0;
 
     protected BaseSuperstructure(Swerve swerve, Vision vision) {
         this.swerve = swerve;
@@ -61,6 +84,9 @@ public abstract class BaseSuperstructure extends SubsystemBase {
             // If we are still tilted after starting to count up, reset our count of good vision
             // estimates toward regaining a good estimate.
             goodVisionEstimatesSincePoseLoss = 0;
+            // Also reset the agreement tracking so we don't carry stale data.
+            firstEstimateAfterPoseLoss = null;
+            agreeingEstimatesCount = 0;
         }
     }
 
@@ -81,22 +107,55 @@ public abstract class BaseSuperstructure extends SubsystemBase {
 
         for (Pair<EstimatedRobotPose, Matrix<N3, N1>> visionMeasurement : visionMeasurements) {
             Matrix<N3, N1> visionStdDevs = visionMeasurement.getSecond();
+            Pose2d visionPose = visionMeasurement.getFirst().estimatedPose.toPose2d();
 
+            // --- Pose loss recovery: require multiple agreeing estimates before trusting ---
+            // Instead of immediately snapping to the first vision reading after pose loss
+            // (which could be a bad single-tag solve), we require MIN_AGREEING_ESTIMATES_BEFORE_TRUST
+            // consecutive estimates that agree with each other before we start using them.
             if (!BaseRobotState.hasAccuratePoseEstimate && goodVisionEstimatesSincePoseLoss == 0) {
-                // If we just lost pose and haven't had any good vision estimates since, assume
-                // very little trust in the current state estimate. This will essentially make the
-                // next vision measurement added set the pose almost completely.
+                if (firstEstimateAfterPoseLoss == null) {
+                    // First estimate after pose loss — store it but don't use it yet.
+                    firstEstimateAfterPoseLoss = visionPose;
+                    agreeingEstimatesCount = 1;
+                    continue;
+                }
+
+                // Check if this estimate agrees with the running reference pose.
+                double distanceFromFirst = visionPose.getTranslation().getDistance(
+                    firstEstimateAfterPoseLoss.getTranslation()
+                );
+
+                if (distanceFromFirst < AGREEMENT_DISTANCE_THRESHOLD_METERS) {
+                    agreeingEstimatesCount++;
+                    // Update reference to the latest agreeing estimate (moving average effect).
+                    firstEstimateAfterPoseLoss = visionPose;
+                } else {
+                    // Disagreement — reset and start over with this new estimate.
+                    firstEstimateAfterPoseLoss = visionPose;
+                    agreeingEstimatesCount = 1;
+                    continue;
+                }
+
+                if (agreeingEstimatesCount < MIN_AGREEING_ESTIMATES_BEFORE_TRUST) {
+                    // Not enough agreeing estimates yet — don't use this one.
+                    continue;
+                }
+
+                // We have enough agreeing estimates. Now open up the state stddevs so vision
+                // can pull the pose to the correct location over the next few readings.
                 swerve.setStateStdDevs(
                     VecBuilder.fill(1000, 1000, 1000)
                 );
-                // Set the sum of the vision estimate variances to zero for performing state
-                // standard deviation calculations.
                 visionEstimateSincePoseLossVarianceSum = VecBuilder.fill(0, 0, 0);
+                // Reset agreement tracking — we're now in the "building confidence" phase.
+                firstEstimateAfterPoseLoss = null;
+                agreeingEstimatesCount = 0;
             }
 
             // Add the vision measurements to the drivetrain.
             swerve.addVisionMeasurement(
-                visionMeasurement.getFirst().estimatedPose.toPose2d(),
+                visionPose,
                 visionMeasurement.getFirst().timestampSeconds,
                 visionStdDevs
             );
@@ -137,16 +196,16 @@ public abstract class BaseSuperstructure extends SubsystemBase {
                 // If we haven't gotten enough good vision pose estimates yet, increase our trust
                 // in the state estimate based on the good estimates we've gotten so far.
                 else {
-                    // If we treat the state pose estimate as the average of each of the vision pose
-                    // estimates since losing pose (the sum of the pose estimates over the number of
-                    // pose estimates added), then according to statistics, the standard deviation
-                    // should be the square root of the sum of the variances (standard deviations
-                    // squared) over the number of pose estimates.
+                    // The state pose estimate is approximately the average of vision estimates
+                    // since pose loss. The standard deviation of the mean is:
+                    //   stddev_mean = sqrt(sum_of_variances) / sqrt(n)
+                    // Previously this divided by n instead of sqrt(n), which made the state
+                    // stddevs shrink too fast and over-trust early readings.
                     visionEstimateSincePoseLossVarianceSum = visionEstimateSincePoseLossVarianceSum
                         .plus(visionStdDevs.elementTimes(visionStdDevs));
                     var stateStdDev = visionEstimateSincePoseLossVarianceSum
                         .elementPower(0.5)
-                        .div(goodVisionEstimatesSincePoseLoss);
+                        .div(Math.sqrt(goodVisionEstimatesSincePoseLoss));
                     swerve.setStateStdDevs(stateStdDev);
                 }
             }

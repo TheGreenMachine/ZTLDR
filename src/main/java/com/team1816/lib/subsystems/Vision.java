@@ -25,6 +25,8 @@ import java.util.Optional;
 import static com.team1816.lib.BaseConstants.VisionConstants.*;
 import static com.team1816.lib.Singleton.factory;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+
 /**
  * This subsystem handles reading and interpreting data from cameras and simulating camera
  * interactions. Currently, we support using cameras for reading <a href=
@@ -60,6 +62,15 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
     );
 
     /**
+     * Field dimensions for bounds checking. Estimates outside the field are rejected.
+     * Uses the AprilTag field layout to determine field size.
+     */
+    private final double fieldLengthMeters;
+    private final double fieldWidthMeters;
+    /** Margin outside the field boundary to still accept (accounts for robot size) */
+    private static final double FIELD_BOUNDARY_MARGIN_METERS = 0.5;
+
+    /**
      * Constructs a Vision subsystem.
      */
     public Vision() {
@@ -67,6 +78,10 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
         aprilTagCameras = cameras.stream().filter(
             camera -> camera.detectionType == Camera.DetectionType.APRIL_TAG
         ).toList();
+
+        // Get field dimensions from the AprilTag field layout
+        fieldLengthMeters = aprilTagFieldLayout.getFieldLength();
+        fieldWidthMeters = aprilTagFieldLayout.getFieldWidth();
 
         if (Robot.isSimulation()) {
             visionSim = new VisionSystemSim("VisionSim");
@@ -88,45 +103,52 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
         List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> posesWithStdDevs = new ArrayList<>();
 
         // The maximum distance a vision pose estimate can be from the current robot pose
-        // estimate to allow the vision estimate to be used.
-        double visionEstimateDistanceThresholdMeters = 1.0;
+        // estimate to allow the vision estimate to be used. Increased from 1.0m to 3.0m
+        // to prevent a death spiral where pose drift causes all cameras to be permanently
+        // ignored (old 1m gate was too tight — a small drift would reject all vision,
+        // causing more drift, rejecting more vision, etc.)
+        double visionEstimateDistanceThresholdMeters = 3.0;
         // The maximum difference the angle of a vision pose estimate can be from the angle
         // of the current robot pose estimate to allow the vision estimate to be used.
-        double visionEstimateAngleThresholdRadians = Units.degreesToRadians(15.0);
+        double visionEstimateAngleThresholdRadians = Units.degreesToRadians(25.0);
 
         for (Camera camera : aprilTagCameras) {
             for (EstimatedRobotPose estimatedRobotPose : camera.getEstimatedRobotPosesFromAllUnreadResults()) {
                 Pose2d visionEstimatedPose2d = estimatedRobotPose.estimatedPose.toPose2d();
 
-                // Only add the vision measurement to the list to return if it is within the
-                // distance and angle thresholds from the current pose estimate. This is to filter
-                // out unreasonable estimates caused by pose ambiguity (see here:
-                // https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/3D-tracking.html#ambiguity
-                // ).
+                // Hard reject: if the estimated pose is outside the field boundaries
+                // (with margin for robot size), the estimate is definitely wrong.
+                if (!isWithinFieldBounds(visionEstimatedPose2d)) {
+                    continue;
+                }
+
+                // Always apply distance and angle gates — even during pose loss.
+                // During normal operation, the tight gate catches bad single-tag solves
+                // (the main source of 3-4m outlier readings that are still on-field).
+                // During pose loss, we widen the gate since odometry may have drifted,
+                // but the agreement logic in BaseSuperstructure provides the real
+                // filtering for that case.
+                double distanceFromCurrentPose = visionEstimatedPose2d.getTranslation()
+                    .getDistance(BaseRobotState.robotPose.getTranslation());
+                double angleFromCurrentPose = Math.abs(
+                    MathUtil.angleModulus(
+                        visionEstimatedPose2d.getRotation()
+                            .minus(BaseRobotState.robotPose.getRotation())
+                            .getRadians()
+                    )
+                );
+
+                // Use a wider gate during pose loss since odometry itself may have drifted
+                double effectiveDistanceThreshold = BaseRobotState.hasAccuratePoseEstimate
+                    ? visionEstimateDistanceThresholdMeters
+                    : visionEstimateDistanceThresholdMeters * 3; // 9m — still rejects cross-field outliers
+                double effectiveAngleThreshold = BaseRobotState.hasAccuratePoseEstimate
+                    ? visionEstimateAngleThresholdRadians
+                    : Math.PI; // Accept any angle during pose loss
 
                 if (
-                    // If we don't currently have an accurate pose estimate, we can't use current
-                    // pose estimate to throw out far off vision estimates, so we'll just add the
-                    // vision estimate to the list no matter where it is.
-                    !BaseRobotState.hasAccuratePoseEstimate
-                        || (
-                            // Check if the vision estimate is within the distance threshold of the
-                            // current pose estimate.
-                            visionEstimatedPose2d.getTranslation().getDistance(
-                                BaseRobotState.robotPose.getTranslation()
-                            ) < visionEstimateDistanceThresholdMeters
-                                // Check if the vision estimate is within the angle threshold of
-                                // the current pose estimate. Get the absolute value of the
-                                // difference between the angles constrained from -pi radians to pi
-                                // radians to find the positive shortest difference.
-                                && Math.abs(
-                                    MathUtil.angleModulus(
-                                        visionEstimatedPose2d.getRotation()
-                                            .minus(BaseRobotState.robotPose.getRotation())
-                                            .getRadians()
-                                    )
-                                ) < visionEstimateAngleThresholdRadians
-                        )
+                    distanceFromCurrentPose < effectiveDistanceThreshold
+                        && angleFromCurrentPose < effectiveAngleThreshold
                 ) {
                     Matrix<N3, N1> standardDeviations = calculateEstimateStandardDeviations(estimatedRobotPose);
                     // If the standard deviations are the noTrustStdDevs, we'll just throw the
@@ -142,6 +164,20 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
         }
 
         return posesWithStdDevs;
+    }
+
+    /**
+     * Checks if a pose estimate is within the field boundaries (with margin).
+     * Rejects any estimate that places the robot outside the field, which is
+     * physically impossible and indicates a bad vision solve.
+     */
+    private boolean isWithinFieldBounds(Pose2d pose) {
+        double x = pose.getX();
+        double y = pose.getY();
+        return x >= -FIELD_BOUNDARY_MARGIN_METERS
+            && x <= fieldLengthMeters + FIELD_BOUNDARY_MARGIN_METERS
+            && y >= -FIELD_BOUNDARY_MARGIN_METERS
+            && y <= fieldWidthMeters + FIELD_BOUNDARY_MARGIN_METERS;
     }
 
     /**
