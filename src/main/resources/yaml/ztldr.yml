@@ -26,7 +26,7 @@ shooterSettings:
         - 47 #210
         - 48 # 264
         - 49 # 360
-subsystems:
+subsystems: #test.yml has subsystem values for the unit tests. It won't break code, but the subsystem unit test will fail if changes are made
     drivetrain:
         implemented: true
         devices:
