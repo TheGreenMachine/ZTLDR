@@ -2,6 +2,7 @@ package com.team1816.season.tests;
 
 import com.team1816.lib.Singleton;
 import com.team1816.season.subsystems.Feeder;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +23,11 @@ public class FeederTest {
         feeder.setWantedState(feederFooState); //<- Foo value
         feeder.periodic();
 
-        assertEquals(40, feeder.getState().getFeedMotorDutyCycle(), 100, "Feed Motor is screwy");
+        assertEquals(.7, feeder.getState().getFeedMotorDutyCycle(), 0, "Feed Motor is screwy");
+    }
+
+    @AfterEach
+    public void clearTest() {
+        feeder = null; //<- Is this okay
     }
 }

@@ -386,6 +386,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     public void setWantedDistanceState(ShooterDistanceState state) {
         this.wantedDistanceState = state;
     }
+    public ShooterDistanceState getWantedShooterDistanceState() {
+        return wantedDistanceState;
+    }
 
     /**
      * Sets if the incline should duck down to fit under the trench.
@@ -838,11 +841,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             this.launchVelocityRPS = launchVelocityRPS;
         }
 
-        double getInclineAngleDegrees() {
+        public double getInclineAngleDegrees() {
             return inclineAngleDegrees;
         }
 
-        double getLaunchVelocityRPS() {
+        public double getLaunchVelocityRPS() {
             return launchVelocityRPS;
         }
     }

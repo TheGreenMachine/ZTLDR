@@ -131,7 +131,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
             return intakeMotorValue;
         }
 
-        private FlipperPosition getFlipperMotorPosition() {
+        public FlipperPosition getFlipperMotorPosition() {
             return flipperMotorPosition;
         }
     }
