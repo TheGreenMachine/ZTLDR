@@ -178,7 +178,7 @@ subsystems:
         constants:
             feedingDutyCycle: 0.7
             stoppedDutyCycle: 0
-            agitateForwardDutyCycle: 0.15
+            agitateForwardDutyCycle: -0.15
             agitateStoppedDutyCycle: 0
     intake:
         implemented: true

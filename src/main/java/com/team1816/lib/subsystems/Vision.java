@@ -47,7 +47,8 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
     /**
      * The base standard deviations to use for non-multi-tag estimates
      */
-    private final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, 8);
+    // Ignore single tag data. Previously set to 4, 4, 8.
+    private final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(999999, 999999, 999999);
     /**
      * The base standard deviations to use for multi-tag estimates
      */
@@ -89,7 +90,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
 
         // The maximum distance a vision pose estimate can be from the current robot pose
         // estimate to allow the vision estimate to be used.
-        double visionEstimateDistanceThresholdMeters = 1.0;
+        double visionEstimateDistanceThresholdMeters = 1.5;
         // The maximum difference the angle of a vision pose estimate can be from the angle
         // of the current robot pose estimate to allow the vision estimate to be used.
         double visionEstimateAngleThresholdRadians = Units.degreesToRadians(15.0);
@@ -105,28 +106,29 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 // ).
 
                 if (
-                    // If we don't currently have an accurate pose estimate, we can't use current
-                    // pose estimate to throw out far off vision estimates, so we'll just add the
-                    // vision estimate to the list no matter where it is.
-                    !BaseRobotState.hasAccuratePoseEstimate
-                        || (
-                            // Check if the vision estimate is within the distance threshold of the
-                            // current pose estimate.
-                            visionEstimatedPose2d.getTranslation().getDistance(
-                                BaseRobotState.robotPose.getTranslation()
-                            ) < visionEstimateDistanceThresholdMeters
-                                // Check if the vision estimate is within the angle threshold of
-                                // the current pose estimate. Get the absolute value of the
-                                // difference between the angles constrained from -pi radians to pi
-                                // radians to find the positive shortest difference.
-                                && Math.abs(
-                                    MathUtil.angleModulus(
-                                        visionEstimatedPose2d.getRotation()
-                                            .minus(BaseRobotState.robotPose.getRotation())
-                                            .getRadians()
-                                    )
-                                ) < visionEstimateAngleThresholdRadians
-                        )
+                    true
+//                    // If we don't currently have an accurate pose estimate, we can't use current
+//                    // pose estimate to throw out far off vision estimates, so we'll just add the
+//                    // vision estimate to the list no matter where it is.
+//                    !BaseRobotState.hasAccuratePoseEstimate
+//                        || (
+//                            // Check if the vision estimate is within the distance threshold of the
+//                            // current pose estimate.
+//                            visionEstimatedPose2d.getTranslation().getDistance(
+//                                BaseRobotState.robotPose.getTranslation()
+//                            ) < visionEstimateDistanceThresholdMeters
+//                                // Check if the vision estimate is within the angle threshold of
+//                                // the current pose estimate. Get the absolute value of the
+//                                // difference between the angles constrained from -pi radians to pi
+//                                // radians to find the positive shortest difference.
+//                                && Math.abs(
+//                                    MathUtil.angleModulus(
+//                                        visionEstimatedPose2d.getRotation()
+//                                            .minus(BaseRobotState.robotPose.getRotation())
+//                                            .getRadians()
+//                                    )
+//                                ) < visionEstimateAngleThresholdRadians
+//                        )
                 ) {
                     Matrix<N3, N1> standardDeviations = calculateEstimateStandardDeviations(estimatedRobotPose);
                     // If the standard deviations are the noTrustStdDevs, we'll just throw the
