@@ -45,6 +45,11 @@
             "type" : "number",
             "default": null,
             "description": "maximum angular rate in radians/sec"
+        },
+        "couplingGearRatio": {
+            "type" : "number",
+            "default": null,
+            "description": "number of rotations of the drive motor caused by a rotation of the azimuth"
         }
     }
 }

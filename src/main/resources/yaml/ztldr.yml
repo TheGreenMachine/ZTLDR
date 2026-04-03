@@ -129,8 +129,9 @@ subsystems:
                 kV: 2.66
                 kS: 0.1
         kinematics:
-            driveGearing: 6.03
-            steerGearing: 26.0909
+            driveGearing: 6.026785714285714
+            steerGearing: 26.09090909090909
+            couplingGearRatio: 3.857142857142857
             wheelbaseLength: .505 # meters
             wheelbaseWidth: .505 # meters
             robotMass: 74.088 # kg
