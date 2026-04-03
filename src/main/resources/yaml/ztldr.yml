@@ -201,8 +201,9 @@ subsystems:
                 rotorToSensor: 0.1
                 pidConfig:
                     slot0:
-                        kS: 0.3 # static friction - increase if stalling near setpoint
-                        kP: 50 # position error gain - increase if not reaching target, decrease if oscillating
+                        kS: 0.1 # static friction - increase if turret won't move at small errors
+                        kP: 30 # position error gain - increase if still lagging, decrease if oscillating at setpoint
+                        kD: 0.28 # position error gain - increase if not reaching target, decrease if oscillating
                         staticFeedforwardSign: UseClosedLoopSign
                 motionMagic:
                     expoKV: 10 # cruise speed - lower = faster, higher = slower
@@ -214,7 +215,7 @@ subsystems:
             intakeOnSpeed: .4
             intakeSlowSpeed: .1
             outtakeSpeed: -0.6
-            flipperMotorOutPosition: 0.135 #0.166
+            flipperMotorOutPosition: 0.164 #0.166
             flipperMotorPullInOnePosition: 0.1
             flipperMotorPullInTwoPosition: 0.05
             flipperMotorInPosition: 0.025
@@ -232,7 +233,7 @@ subsystems:
                         kV: 0.081
         constants:
             topClosedVelocity: 0
-            topOpenVelocity: 40
+            topOpenVelocity: 60
     shooter:
         canBusName: shootercanivore
         devices:
