@@ -329,7 +329,7 @@ subsystems:
                     yInches: 12.1
                     zInches: 18
                     rollDegrees: 0
-                    pitchDegrees: 0
+                    pitchDegrees: -8
                     yawDegrees: 55
                 detectionType: APRIL_TAG
             forwardRight: # Pi IP: 10.18.16.12.
@@ -339,7 +339,7 @@ subsystems:
                     yInches: -12.1
                     zInches: 18
                     rollDegrees: 0
-                    pitchDegrees: 0
+                    pitchDegrees: -8
                     yawDegrees: -55
                 detectionType: APRIL_TAG
             backwardLeft: # Pi IP: 10.18.16.13
@@ -349,7 +349,7 @@ subsystems:
                     yInches: 12.1
                     zInches: 16
                     rollDegrees: 0
-                    pitchDegrees: 0
+                    pitchDegrees: -8
                     yawDegrees: 155
                 detectionType: APRIL_TAG
             backwardRight: # Pi IP: 10.18.16.14
@@ -359,7 +359,7 @@ subsystems:
                     yInches: -12.1
                     zInches: 16
                     rollDegrees: 0
-                    pitchDegrees: 0
+                    pitchDegrees: -8
                     yawDegrees: -155
                 detectionType: APRIL_TAG
             fuelDetector:
