@@ -47,7 +47,8 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
     /**
      * The base standard deviations to use for non-multi-tag estimates
      */
-    private final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, 8);
+    // Ignore single tag data. Previously set to 4, 4, 8.
+    private final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(999999, 999999, 999999);
     /**
      * The base standard deviations to use for multi-tag estimates
      */
@@ -58,6 +59,11 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
     private final Matrix<N3, N1> noTrustStdDevs = VecBuilder.fill(
         Double.NaN, Double.NaN, Double.NaN
     );
+    /**
+     * The number of vision pose estimates we have discarded in a row because they were too far off
+     * from the combined pose estimate.
+     */
+    private int consecutiveDiscardedEstimates = 0;
 
     /**
      * Constructs a Vision subsystem.
@@ -89,7 +95,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
 
         // The maximum distance a vision pose estimate can be from the current robot pose
         // estimate to allow the vision estimate to be used.
-        double visionEstimateDistanceThresholdMeters = 1.0;
+        double visionEstimateDistanceThresholdMeters = 1.5;
         // The maximum difference the angle of a vision pose estimate can be from the angle
         // of the current robot pose estimate to allow the vision estimate to be used.
         double visionEstimateAngleThresholdRadians = Units.degreesToRadians(15.0);
@@ -103,7 +109,6 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 // out unreasonable estimates caused by pose ambiguity (see here:
                 // https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/3D-tracking.html#ambiguity
                 // ).
-
                 if (
                     // If we don't currently have an accurate pose estimate, we can't use current
                     // pose estimate to throw out far off vision estimates, so we'll just add the
@@ -128,6 +133,10 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                                 ) < visionEstimateAngleThresholdRadians
                         )
                 ) {
+                    // We didn't discard this estimate for being too far off from the combined
+                    // estimate, so reset the counter.
+                    consecutiveDiscardedEstimates = 0;
+                    // Calculate the standard deviations for the estimate.
                     Matrix<N3, N1> standardDeviations = calculateEstimateStandardDeviations(estimatedRobotPose);
                     // If the standard deviations are the noTrustStdDevs, we'll just throw the
                     // estimate out. Otherwise, add the estimate to the list to return.
@@ -137,6 +146,20 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                     // Tell the camera what the standard deviations for its latest estimate were,
                     // for logging purposes.
                     camera.latestVisionStdDevs = standardDeviations;
+                }
+                // If we discarded enough estimates in a row because they were too far off from the
+                // current pose estimate, then it is probably because something is wrong with the
+                // current pose estimate (likely due to wheel slippage from hitting something). If
+                // this is the case, say that we don't trust the current estimate to allow vision
+                // to fully recorrect.
+                else {
+                    consecutiveDiscardedEstimates ++;
+                    // The number of estimates to allow to be discarded before determining that we
+                    // have lost a good pose estimate.
+                    int discardsBeforePoseLoss = 5;
+                    if (consecutiveDiscardedEstimates >= discardsBeforePoseLoss) {
+                        BaseRobotState.hasAccuratePoseEstimate = false;
+                    }
                 }
             }
         }
