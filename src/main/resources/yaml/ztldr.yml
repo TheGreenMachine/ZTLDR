@@ -1,6 +1,6 @@
 shooterSettings:
     distancesInches:
-        - 64
+        - 60
         - 96
         - 156
         - 204
@@ -14,7 +14,7 @@ shooterSettings:
         - 0.1196 # 264
         - 0.108 # 360
     launchVelocitiesRPS:
-        - 33 # 48
+        - 30 # 48
         - 41 # 96
         - 46 # 156
         - 48 # 204
@@ -320,7 +320,7 @@ subsystems:
             launchVelocityAdjustmentAmountRPS: 0.01
             inclineAngleAdjustmentAmountDegrees: 0.02
             turretAngleAdjustmentAmountDegrees: 0.04
-            topLaunchMotorBackspinMultiplier: .95 # Less than one for backspin.
+            topLaunchMotorBackspinMultiplier: 1 # Less than one for backspin.
     vision:
         cameras:
             forwardLeft: # Pi IP: 10.18.16.11
