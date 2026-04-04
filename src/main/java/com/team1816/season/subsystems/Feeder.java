@@ -24,34 +24,10 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
     private final DutyCycleOut feedMotorDutyCycle = new DutyCycleOut(0);
     private final DutyCycleOut agitateMotorDutyCycle = new DutyCycleOut(0);
 
-    private final double agitateForwardDutyCycle = factory.getConstant(NAME, "agitateForwardDutyCycle", 0.05);
-    private final double agitateReverseDutyCycle = factory.getConstant(NAME, "agitateReverseDutyCycle", -0.05);
-    private final double agitateCycleTime = factory.getConstant(NAME, "agitateCycleTime", 3000);
-
-    private final Timer agitateTimer = new Timer();
-    private boolean agitateLeft = false;
-    private final TimerTask agitateTimerTask = new TimerTask(){
-        @Override
-        public void run() {
-            if (agitateLeft) {
-                agitateLeft = false;
-                agitateMotor.setControl(agitateMotorDutyCycle.withOutput(agitateForwardDutyCycle));
-            } else {
-                agitateLeft = true;
-                agitateMotor.setControl(agitateMotorDutyCycle.withOutput(agitateReverseDutyCycle));
-            }
-        }
-    };
-
     public Feeder() {
         super();
-        GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
-        GreenLogger.periodicLog(NAME + "/Agitator Timer", () -> agitateCycleTime);
-        GreenLogger.periodicLog(NAME + "/Agitate Left Speed", () -> agitateForwardDutyCycle);
-        GreenLogger.periodicLog(NAME + "/Agitate Right Speed", () -> agitateReverseDutyCycle);
-        GreenLogger.periodicLog(NAME + "/Agitate Left Flag", () -> agitateLeft);
 
-        agitateTimer.schedule(agitateTimerTask, 0, (long)agitateCycleTime);
+        GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
     }
 
     @Override
@@ -62,6 +38,7 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         feedMotor.setControl(feedMotorDutyCycle.withOutput(wantedState.getFeedMotorDutyCycle()));
+        agitateMotor.setControl(agitateMotorDutyCycle.withOutput(wantedState.getAgitateMotorDutyCycle()));
     }
 
     public void setWantedState(FeederState state) {
@@ -69,18 +46,25 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
     }
 
     public enum FeederState {
-        FEEDING(factory.getConstant(NAME, "feedingDutyCycle", 0)),
-        STOPPED(factory.getConstant(NAME, "stoppedDutyCycle", 0)),
-        REVERSING(factory.getConstant(NAME, "reversingDutyCycle", 0));
+        FEEDING(factory.getConstant(NAME, "feedingDutyCycle", 0),
+            factory.getConstant(NAME, "agitateForwardDutyCycle", .15)),
+        STOPPED(factory.getConstant(NAME, "stoppedDutyCycle", 0),
+            factory.getConstant(NAME, "agitateStoppedDutyCycle", 0));
 
-        private double feedMotorDutyCycle;
+        private final double feedMotorDutyCycle;
+        private final double agitateMotorDutyCycle;
 
-        FeederState(double feedMotorDutyCycle){
+        FeederState(double feedMotorDutyCycle, double agitateMotorDutyCycle) {
             this.feedMotorDutyCycle = feedMotorDutyCycle;
+            this.agitateMotorDutyCycle = agitateMotorDutyCycle;
         }
 
         public double getFeedMotorDutyCycle() {
             return feedMotorDutyCycle;
+        }
+
+        public double getAgitateMotorDutyCycle() {
+            return agitateMotorDutyCycle;
         }
     }
 }
