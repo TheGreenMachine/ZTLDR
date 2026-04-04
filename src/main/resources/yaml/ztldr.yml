@@ -178,7 +178,7 @@ subsystems:
         constants:
             feedingDutyCycle: 0.7
             stoppedDutyCycle: 0
-            agitateForwardDutyCycle: 0.15
+            agitateForwardDutyCycle: -0.15
             agitateStoppedDutyCycle: 0
     intake:
         implemented: true
@@ -269,7 +269,6 @@ subsystems:
                     slot0:
                         kS: 0.8
                         kP: 100
-                        staticFeedforwardSign: UseClosedLoopSign
                 motionMagic:
                     expoKV: 1
                     expoKA: 0.3
@@ -282,7 +281,6 @@ subsystems:
                         kS: 0.1 # static friction - increase if turret won't move at small errors
                         kP: 4 # position error gain - increase if still lagging, decrease if oscillating at setpoint
                         kD: 0.28 # damping - increase if oscillating, keep roughly kP/20
-                        staticFeedforwardSign: UseClosedLoopSign
                 motionMagic:
                     expoKV: 0.02 #0.10 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
                     expoKA: 0.1 #0.2 # acceleration smoothness - increase if dead zone reversals are too violent, decrease if turret feels mushy
@@ -330,7 +328,7 @@ subsystems:
                     yInches: 12.1
                     zInches: 18
                     rollDegrees: 0
-                    pitchDegrees: 0
+                    pitchDegrees: -8
                     yawDegrees: 55
                 detectionType: APRIL_TAG
             forwardRight: # Pi IP: 10.18.16.12.
@@ -340,7 +338,7 @@ subsystems:
                     yInches: -12.1
                     zInches: 18
                     rollDegrees: 0
-                    pitchDegrees: 0
+                    pitchDegrees: -8
                     yawDegrees: -55
                 detectionType: APRIL_TAG
             backwardLeft: # Pi IP: 10.18.16.13
@@ -350,7 +348,7 @@ subsystems:
                     yInches: 12.1
                     zInches: 16
                     rollDegrees: 0
-                    pitchDegrees: 0
+                    pitchDegrees: -8
                     yawDegrees: 155
                 detectionType: APRIL_TAG
             backwardRight: # Pi IP: 10.18.16.14
@@ -360,7 +358,7 @@ subsystems:
                     yInches: -12.1
                     zInches: 16
                     rollDegrees: 0
-                    pitchDegrees: 0
+                    pitchDegrees: -8
                     yawDegrees: -155
                 detectionType: APRIL_TAG
             fuelDetector:
