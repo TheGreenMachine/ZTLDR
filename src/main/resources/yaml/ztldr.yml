@@ -179,7 +179,7 @@ subsystems:
             feedingDutyCycle: 0.7
             stoppedDutyCycle: 0
             agitateForwardDutyCycle: -0.15
-            agitateStoppedDutyCycle: 0
+            agitateStoppedDutyCycle: -0.15
     intake:
         implemented: true
         devices:
@@ -202,7 +202,7 @@ subsystems:
                 pidConfig:
                     slot0:
                         kS: 0.1 # static friction - increase if turret won't move at small errors
-                        kP: 30 # position error gain - increase if still lagging, decrease if oscillating at setpoint
+                        kP: 50 # position error gain - increase if still lagging, decrease if oscillating at setpoint
                         kD: 0.28 # position error gain - increase if not reaching target, decrease if oscillating
                         staticFeedforwardSign: UseClosedLoopSign
                 motionMagic:
@@ -313,7 +313,7 @@ subsystems:
             farDistanceBetweenBeamBreaks: 13.570
             secondLowestBeamBreakToZero: 6.7769
             turretRotationToleranceDegrees: 5
-            inclineAngleToleranceDegrees: 2
+            inclineAngleToleranceDegrees: 4
             launcherVelocityToleranceRPS: 2
             launchVelocityAdjustmentAmountRPS: 0.01
             inclineAngleAdjustmentAmountDegrees: 0.02
@@ -324,14 +324,14 @@ subsystems:
             forwardLeft: # Pi IP: 10.18.16.11
                 photonVisionUIName: Forward_Left
                 robotToCamera:
-                    xInches: -12.66
-                    yInches: 12.1
-                    zInches: 18
+                    xInches: -10.114
+                    yInches: 3.587
+                    zInches: 20
                     rollDegrees: 0
                     pitchDegrees: -8
-                    yawDegrees: 55
+                    yawDegrees: 0
                 detectionType: APRIL_TAG
-            forwardRight: # Pi IP: 10.18.16.12.
+            forwardRight: # Pi IP: 10.18.16.12
                 photonVisionUIName: Forward_Right
                 robotToCamera:
                     xInches: -12.66

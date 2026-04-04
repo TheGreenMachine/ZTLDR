@@ -47,7 +47,7 @@ public class Feeder extends SubsystemBase implements ITestableSubsystem {
 
     public enum FeederState {
         FEEDING(factory.getConstant(NAME, "feedingDutyCycle", 0),
-            factory.getConstant(NAME, "agitateForwardDutyCycle", .15)),
+            factory.getConstant(NAME, "agitateForwardDutyCycle", 0)),
         STOPPED(factory.getConstant(NAME, "stoppedDutyCycle", 0),
             factory.getConstant(NAME, "agitateStoppedDutyCycle", 0));
 
