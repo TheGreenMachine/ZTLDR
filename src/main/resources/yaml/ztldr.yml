@@ -1,21 +1,21 @@
 shooterSettings:
     distancesInches:
-        - 48
+        - 64
         - 96
         - 156
         - 204
         - 264
         - 360 # Maximum distance shot
     inclineAnglesRotations:
-        - 0.0405 # 48
-        - 0.0555 # 96
+        - 0.064 # 48
+        - 0.064 # 96
         - 0.08 # 156
         - 0.09 # 204
         - 0.1196 # 264
         - 0.108 # 360
     launchVelocitiesRPS:
-        - 35 # 48
-        - 47 # 96
+        - 33 # 48
+        - 41 # 96
         - 46 # 156
         - 48 # 204
         - 54 # 264
@@ -168,10 +168,18 @@ subsystems:
                 id: 22
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
+            agitateMotor:
+                deviceType: TalonFX
+                id: 24
+                supplyCurrentLimit: 10
+                statorCurrentLimit: 25
+                neutralMode: Coast
+                motorRotation: CounterClockwise_Positive
         constants:
             feedingDutyCycle: 0.7
             stoppedDutyCycle: 0
-            reversingDutyCycle: -0.4
+            agitateForwardDutyCycle: 0.15
+            agitateStoppedDutyCycle: 0
     intake:
         implemented: true
         devices:
@@ -225,7 +233,6 @@ subsystems:
         constants:
             topClosedVelocity: 0
             topOpenVelocity: 40
-            topReversingVelocity: -10
     shooter:
         canBusName: shootercanivore
         devices:
@@ -277,7 +284,7 @@ subsystems:
                         kD: 4.375 # damping - increase if oscillating, keep roughly kP/20
                         staticFeedforwardSign: UseClosedLoopSign
                 motionMagic:
-                    expoKV: 0.625 #0.10 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
+                    expoKV: 0.3125 #0.10 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
                     expoKA: 1.5625 #0.2 # acceleration smoothness - increase if dead zone reversals are too violent, decrease if turret feels mushy
             inclineCoder:
                 id: 29
@@ -318,9 +325,9 @@ subsystems:
             forwardLeft: # Pi IP: 10.18.16.11
                 photonVisionUIName: Forward_Left
                 robotToCamera:
-                    xInches: -12.5
-                    yInches: 13
-                    zInches: 16.75
+                    xInches: -12.66
+                    yInches: 12.1
+                    zInches: 18
                     rollDegrees: 0
                     pitchDegrees: 0
                     yawDegrees: 55
@@ -328,9 +335,9 @@ subsystems:
             forwardRight: # Pi IP: 10.18.16.12.
                 photonVisionUIName: Forward_Right
                 robotToCamera:
-                    xInches: -12.5
-                    yInches: -13
-                    zInches: 16.75
+                    xInches: -12.66
+                    yInches: -12.1
+                    zInches: 18
                     rollDegrees: 0
                     pitchDegrees: 0
                     yawDegrees: -55
@@ -338,9 +345,9 @@ subsystems:
             backwardLeft: # Pi IP: 10.18.16.13
                 photonVisionUIName: Backward_Left
                 robotToCamera:
-                    xInches: -12.5
-                    yInches: 13
-                    zInches: 15
+                    xInches: -12.66
+                    yInches: 12.1
+                    zInches: 16
                     rollDegrees: 0
                     pitchDegrees: 0
                     yawDegrees: 155
@@ -348,9 +355,9 @@ subsystems:
             backwardRight: # Pi IP: 10.18.16.14
                 photonVisionUIName: Backward_Right
                 robotToCamera:
-                    xInches: -12.5
-                    yInches: -13
-                    zInches: 15
+                    xInches: -12.66
+                    yInches: -12.1
+                    zInches: 16
                     rollDegrees: 0
                     pitchDegrees: 0
                     yawDegrees: -155
