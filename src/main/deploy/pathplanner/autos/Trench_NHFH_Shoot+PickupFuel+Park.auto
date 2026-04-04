@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StartCenterShoot"
+            "pathName": "StartIIfuelShoot"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ShootGreedyPark"
+            "pathName": "ShootIfuelPark"
           }
         }
       ]

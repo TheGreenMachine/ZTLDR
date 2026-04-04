@@ -163,6 +163,12 @@ public class RobotContainer extends BaseRobotContainer {
                 superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)
             )
         ));
+        NamedCommands.registerCommand("gatekeeper/close", Commands.parallel(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: gatekeeper/close")),
+            Commands.runOnce(() ->
+                superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE)
+            )
+        ));
 
         NamedCommands.registerCommand("fixTurretAngle180", Commands.parallel(
             Commands.runOnce(() -> GreenLogger.log("Running named command: fixTurretAngle180")),
@@ -172,15 +178,15 @@ public class RobotContainer extends BaseRobotContainer {
 
         NamedCommands.registerCommand("distancePresetThree", Commands.parallel(
             Commands.runOnce(() -> GreenLogger.log("Running named command: distancePresetThree")),
-            Commands.runOnce(() -> {
-                superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_FAR);
-            })
+            Commands.runOnce(() ->
+                superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_FAR)
+            )
         ));
         NamedCommands.registerCommand("distancePresetAutoThing", Commands.parallel(
             Commands.runOnce(() -> GreenLogger.log("Running named command: distancePresetAutoThing")),
-            Commands.runOnce(() -> {
-                superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_AUTO_THING);
-            })
+            Commands.runOnce(() ->
+                superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_AUTO_THING)
+            )
         ));
 
         NamedCommands.registerCommand("intake/intake", Commands.parallel(

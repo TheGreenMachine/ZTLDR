@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StartIIfuelShoot"
+            "pathName": "SnowblowingStartIIfuelShoot"
           }
         },
         {
@@ -20,12 +20,6 @@
           "type": "named",
           "data": {
             "name": "waitForDucking"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ShootIIfuelPark"
           }
         }
       ]
