@@ -48,7 +48,7 @@ public class RobotContainer extends BaseRobotContainer {
         superstructure.setTurretFixedAngle(0);
         superstructure.setAutoAimTurret(true);
         superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
-        //superstructure.forceAllowGatekeeperControl(true);
+        superstructure.forceAllowGatekeeperControl(true);
         superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE);
     }
 
