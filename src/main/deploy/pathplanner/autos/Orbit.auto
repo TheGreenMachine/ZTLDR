@@ -5,15 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "fixTurretAngle180"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "CenterstartBackup"
+            "pathName": "Orbit"
           }
         },
         {

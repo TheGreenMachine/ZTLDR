@@ -630,8 +630,6 @@
   "splits":[0]
  },
  "events":[
-   {"name":"unduck", "from":{"target":1, "targetTimestamp":0.57682, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"unduck"}}},
-   {"name":"duck", "from":{"target":3, "targetTimestamp":2.50007, "offset":{"exp":"0.4 s", "val":0.4}}, "event":{"type":"named", "data":{"name":"duck"}}},
-   {"name":"gatekeeper/open", "from":{"target":1, "targetTimestamp":0.57682, "offset":{"exp":"0.2 s", "val":0.2}}, "event":{"type":"named", "data":{"name":"gatekeeper/open"}}},
-   {"name":"gatekeeper/close", "from":{"target":3, "targetTimestamp":2.50007, "offset":{"exp":"0.4 s", "val":0.4}}, "event":{"type":"named", "data":{"name":"gatekeeper/close"}}}]
+   {"name":"stopShooting", "from":{"target":3, "targetTimestamp":2.50007, "offset":{"exp":"0.4 s", "val":0.4}}, "event":{"type":"named", "data":{"name":"stopShooting"}}},
+   {"name":"startShooting", "from":{"target":1, "targetTimestamp":0.57682, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"startShooting"}}}]
 }

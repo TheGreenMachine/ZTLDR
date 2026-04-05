@@ -52,7 +52,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
     /**
      * The base standard deviations to use for multi-tag estimates
      */
-    private final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+    private final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(1.5, 1.5, 3);
     /**
      * The standard deviations to use for an estimate that we should just throw out
      */
