@@ -768,10 +768,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      */
     public boolean isAimed() {
         return isInclineAimed()
-            && isTurretAimed()
-            // If we are auto trying to auto aim but don't actually know where we are, we are
-            // probably not aimed correctly.
-            && !(isAutoAiming && false /*!BaseRobotState.hasAccuratePoseEstimate*/);
+            && isTurretAimed();
     }
 
     public enum ShooterDistanceState {
