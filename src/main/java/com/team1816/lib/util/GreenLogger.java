@@ -34,6 +34,7 @@ public class GreenLogger {
     // using an empty string here to make the logs and live views consistent
     private static final NetworkTable netTable;
     private static final StringPublisher msg;
+    private static int logLoopCount = 0;
 
     static {
         if (Robot.isSimulation()) {
@@ -337,6 +338,11 @@ public class GreenLogger {
     // Will update all registered periodic loggers
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static void updatePeriodic() {
+        if (logLoopCount <= 2) {
+            logLoopCount ++;
+            return;
+        }
+        logLoopCount = 0;
         for (LogTopic entry : periodicLogs.keySet()) {
             var supplier = periodicLogs.get(entry);
             if (entry.Publisher instanceof DoublePublisher) {
