@@ -2,22 +2,28 @@ shooterSettings:
     distancesInches:
         - 60
         - 96
+        - 120
         - 156
         - 204
+        - 210
         - 264
         - 360 # Maximum distance shot
     inclineAnglesRotations:
-        - 0.064 # 48
-        - 0.064 # 96
+        - 0.057 # 48
+        - 0.064 #96
+        - 0.07 # 120
         - 0.08 # 156
         - 0.09 # 204
+        - 0.09 #210
         - 0.1196 # 264
         - 0.108 # 360
     launchVelocitiesRPS:
-        - 30 # 48
-        - 41 # 96
-        - 46 # 156
+        - 31 # 48
+        - 39 # 96
+        - 41 #120
+        - 43 # 156
         - 48 # 204
+        - 47 #210
         - 54 # 264
         - 100 # 360
 subsystems:
@@ -235,6 +241,7 @@ subsystems:
             topClosedVelocity: 0
             topOpenVelocity: 60
     shooter:
+        implemented: true
         canBusName: shootercanivore
         devices:
             topLaunchMotor:
@@ -267,8 +274,9 @@ subsystems:
                 statorCurrentLimit: 35
                 pidConfig:
                     slot0:
-                        kS: 0.8
-                        kP: 100
+                        kS: 0.01
+                        kP: 700
+                        kD: 0.1
                 motionMagic:
                     expoKV: 1
                     expoKA: 0.3
@@ -301,7 +309,7 @@ subsystems:
             shooterOffsetXMeters: -0.111303
             shooterOffsetYMeters: -0.112268
             shooterOffsetZMeters: 0.508
-            inclineDuckingLimitRotations: 0.064
+            inclineDuckingLimitRotations: 0.057
             distanceOneInclineAngleRotations: 0.064
             distanceOneLaunchVelocityRPS: 35
             distanceTwoInclineAngleRotations: 0.08
