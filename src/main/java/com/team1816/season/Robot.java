@@ -66,6 +66,7 @@ public class Robot extends BaseRobot {
     @Override
     public void autonomousInit() {
         try {
+            RobotState.resetCameraQueue = true;
             robotContainer.autonomousInit();
             // Ensure pose is always initialized before scheduling auto
             robotContainer.forceUpdatePose();
