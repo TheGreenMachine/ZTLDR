@@ -24,7 +24,7 @@ public class GatekeeperTest {
         gatekeeper.setWantedState(gatekeeperFooState); //<- Foo value
         gatekeeper.periodic();
 
-        assertEquals(40, gatekeeper.getState().getTopMotorValue(), 0, "Top Motor is screwy");
+        assertEquals(60.0, gatekeeper.getState().getTopMotorValue(), 0, "Top Motor is screwy");
 //        assertEquals(40, gatekeeper.getState().getBottomMotorValue(), 100, "Bottom Motor is screwy");
     }
 

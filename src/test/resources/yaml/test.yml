@@ -65,10 +65,18 @@ subsystems:
                 id: 22
                 neutralMode: Coast
                 motorRotation: CounterClockwise_Positive
+            agitateMotor:
+                deviceType: TalonFX
+                id: 24
+                supplyCurrentLimit: 10
+                statorCurrentLimit: 25
+                neutralMode: Coast
+                motorRotation: CounterClockwise_Positive
         constants:
             feedingDutyCycle: 0.7
             stoppedDutyCycle: 0
-            reversingDutyCycle: -0.4
+            agitateForwardDutyCycle: -0.15
+            agitateStoppedDutyCycle: -0.15
     intake:
         implemented: true
         devices:
@@ -76,7 +84,7 @@ subsystems:
                 id: 2
                 deviceType: TalonFX
                 neutralMode: Coast
-                motorRotation: CounterClockwise_Positive
+                motorRotation: Clockwise_Positive
             flipperMotor:
                 id: 3
                 deviceType: TalonFX
@@ -88,6 +96,15 @@ subsystems:
                 remoteSensorId: 10
                 remoteOffest: 0
                 rotorToSensor: 0.1
+                pidConfig:
+                    slot0:
+                        kS: 0.1 # static friction - increase if turret won't move at small errors
+                        kP: 50 # position error gain - increase if still lagging, decrease if oscillating at setpoint
+                        kD: 0.28 # position error gain - increase if not reaching target, decrease if oscillating
+                        staticFeedforwardSign: UseClosedLoopSign
+                motionMagic:
+                    expoKV: 10 # cruise speed - lower = faster, higher = slower
+                    expoKA: 5.0 # acceleration smoothness - higher = gentler ramp, lower = snappier
             flipCoder:
                 id: 10
                 deviceType: CANcoder
@@ -95,14 +112,10 @@ subsystems:
             intakeOnSpeed: .4
             intakeSlowSpeed: .1
             outtakeSpeed: -0.6
-            flipperMotorOutPosition: 0.166
+            flipperMotorOutPosition: 0.164 #0.166
             flipperMotorPullInOnePosition: 0.1
             flipperMotorPullInTwoPosition: 0.05
             flipperMotorInPosition: 0.025
-            flipperMotorRetractCurrentAmperes: -25
-            flipperMotorExtendCurrentAmperes: 25
-            flipperMotorHoldOutCurrentAmperes: 8
-            flipperMotorHoldInCurrentAmperes: -8
     gatekeeper:
         canBusName: shootercanivore
         devices:
@@ -117,9 +130,9 @@ subsystems:
                         kV: 0.081
         constants:
             topClosedVelocity: 0
-            topOpenVelocity: 40
-            topReversingVelocity: -10
+            topOpenVelocity: 60
     shooter:
+        implemented: true
         canBusName: shootercanivore
         devices:
             topLaunchMotor:
@@ -152,9 +165,9 @@ subsystems:
                 statorCurrentLimit: 35
                 pidConfig:
                     slot0:
-                        kS: 0.8
-                        kP: 100
-                        staticFeedforwardSign: UseClosedLoopSign
+                        kS: 0.01
+                        kP: 700
+                        kD: 0.1
                 motionMagic:
                     expoKV: 1
                     expoKA: 0.3
@@ -164,10 +177,12 @@ subsystems:
                 motorRotation: Clockwise_Positive
                 pidConfig:
                     slot0:
-                        kS: 0.29
-                        kP: 1
-                        kD: 0.05
-                        staticFeedforwardSign: UseClosedLoopSign
+                        kS: 0.1 # static friction - increase if turret won't move at small errors
+                        kP: 4 # position error gain - increase if still lagging, decrease if oscillating at setpoint
+                        kD: 0.28 # damping - increase if oscillating, keep roughly kP/20
+                motionMagic:
+                    expoKV: 0.02 #0.10 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
+                    expoKA: 0.1 #0.2 # acceleration smoothness - increase if dead zone reversals are too violent, decrease if turret feels mushy
             inclineCoder:
                 id: 29
                 deviceType: CANcoder
@@ -185,7 +200,7 @@ subsystems:
             shooterOffsetXMeters: -0.111303
             shooterOffsetYMeters: -0.112268
             shooterOffsetZMeters: 0.508
-            inclineDuckingLimitRotations: 0.064
+            inclineDuckingLimitRotations: 0.057
             distanceOneInclineAngleRotations: 0.064
             distanceOneLaunchVelocityRPS: 35
             distanceTwoInclineAngleRotations: 0.08
@@ -197,12 +212,61 @@ subsystems:
             farDistanceBetweenBeamBreaks: 13.570
             secondLowestBeamBreakToZero: 6.7769
             turretRotationToleranceDegrees: 5
-            inclineAngleToleranceDegrees: 2
+            inclineAngleToleranceDegrees: 4
             launcherVelocityToleranceRPS: 2
             launchVelocityAdjustmentAmountRPS: 0.01
             inclineAngleAdjustmentAmountDegrees: 0.02
             turretAngleAdjustmentAmountDegrees: 0.04
-            topLaunchMotorBackspinMultiplier: .95 # Less than one for backspin.
+            topLaunchMotorBackspinMultiplier: 1 # Less than one for backspin.
+    vision:
+        cameras:
+            forwardLeft: # Pi IP: 10.18.16.11
+                photonVisionUIName: Forward_Left
+                robotToCamera:
+                    xInches: -10.114
+                    yInches: 3.587
+                    zInches: 20
+                    rollDegrees: 0
+                    pitchDegrees: -8
+                    yawDegrees: 0
+                detectionType: APRIL_TAG
+            forwardRight: # Pi IP: 10.18.16.12
+                photonVisionUIName: Forward_Right
+                robotToCamera:
+                    xInches: -12.66
+                    yInches: -12.1
+                    zInches: 18
+                    rollDegrees: 0
+                    pitchDegrees: -8
+                    yawDegrees: -55
+                detectionType: APRIL_TAG
+            backwardLeft: # Pi IP: 10.18.16.13
+                photonVisionUIName: Backward_Left
+                robotToCamera:
+                    xInches: -12.66
+                    yInches: 12.1
+                    zInches: 16
+                    rollDegrees: 0
+                    pitchDegrees: -8
+                    yawDegrees: 155
+                detectionType: APRIL_TAG
+            backwardRight: # Pi IP: 10.18.16.14
+                photonVisionUIName: Backward_Right
+                robotToCamera:
+                    xInches: -12.66
+                    yInches: -12.1
+                    zInches: 16
+                    rollDegrees: 0
+                    pitchDegrees: -8
+                    yawDegrees: -155
+                detectionType: APRIL_TAG
+            fuelDetector:
+                photonVisionUIName: Fuel_Detector
+                robotToCamera:
+                    xInches: 12.5
+                    yInches: 0
+                    zInches: 15
+                detectionType: NONE # TODO: Object detection
 
 constants:
     foo: 3
