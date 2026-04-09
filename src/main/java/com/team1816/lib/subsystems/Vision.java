@@ -3,6 +3,7 @@ package com.team1816.lib.subsystems;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.sensor.Camera;
 import com.team1816.season.Robot;
+import com.team1816.season.RobotState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
@@ -101,7 +102,9 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
         double visionEstimateAngleThresholdRadians = Units.degreesToRadians(15.0);
 
         for (Camera camera : aprilTagCameras) {
-            for (EstimatedRobotPose estimatedRobotPose : camera.getEstimatedRobotPosesFromAllUnreadResults()) {
+            var results = camera.getEstimatedRobotPosesFromAllUnreadResults();
+            if(results.size() <= 1 || RobotState.resetCameraQueue) continue;
+            for (EstimatedRobotPose estimatedRobotPose : results) {
                 Pose2d visionEstimatedPose2d = estimatedRobotPose.estimatedPose.toPose2d();
 
                 // Only add the vision measurement to the list to return if it is within the
@@ -163,7 +166,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 }
             }
         }
-
+        RobotState.resetCameraQueue = false;
         return posesWithStdDevs;
     }
 
