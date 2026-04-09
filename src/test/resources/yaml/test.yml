@@ -1,3 +1,26 @@
+shooterSettings:
+    distancesInches:
+        - 48
+        - 96
+        - 156
+        - 204
+        - 264
+        - 360 # Maximum distance shot
+    inclineAnglesRotations:
+        - 0.0405 # 48
+        - 0.0555 # 96
+        - 0.08 # 156
+        - 0.09 # 204
+        - 0.1196 # 264
+        - 0.108 # 360
+    launchVelocitiesRPS:
+        - 35 # 48
+        - 47 # 96
+        - 46 # 156
+        - 48 # 204
+        - 54 # 264
+        - 100 # 360
+
 subsystems:
     turret:
         devices:

@@ -48,27 +48,25 @@ public class ShooterTest {
     @Test
     public void testPeriodic() {
         //todo: Seriously fix this
-//        DriverStation.isEnabled(); //<- Is probably not how we want this to work ╮(ᵕ—ᴗ—)╭
-//        Translation2d fooTarget = Translation2d.kZero;
-//
-//        Shooter.ShooterDistanceState fooState = Shooter.ShooterDistanceState.PRESET_CLOSE;
-//
-//        shooter.setWantedDistanceState(fooState);
-//
-//        shooter.periodic();
-//
-//        assertEquals(0.064, shooter.getWantedShooterDistanceState().getInclineAngleDegrees(), 100, "Preset Angles are screwy");
-//        assertEquals(35, shooter.getWantedShooterDistanceState().getLaunchVelocityRPS(), 100, "Preset Velocities are screwy");
-//        //Do we need each preset state to be tested or is one good?
-//
-//        fooState = Shooter.ShooterDistanceState.AUTOMATIC;
-//
-//        shooter.setWantedDistanceState(fooState);
-//        /*todo: Have some way to check that based on the robot pose (not sure how to make foo one with how it currently set up), that it choose the right targe
-//           Also, testing aimInclineAndLaunchersAtTarget to make sure the autoAim is pointing at *roughly* the right direction*/
-//
-//        //Do we need the calibration method test (probably not...)
-//        //Question to Henry: Why did you change the enum distance names, but not the yaml ones?? <- Doesn't need a serious answer
+        DriverStation.isEnabled(); //<- Is probably not how we want this to work ╮(ᵕ—ᴗ—)╭
+        Translation2d fooTarget = Translation2d.kZero;
+
+        Shooter.ShooterDistanceState fooState = Shooter.ShooterDistanceState.PRESET_CLOSE;
+
+        shooter.setWantedDistanceState(fooState);
+
+        shooter.periodic();
+
+        assertEquals(23.04, shooter.getWantedShooterDistanceState().getInclineAngleDegrees(), 0, "Preset Angles are screwy");
+        assertEquals(35, shooter.getWantedShooterDistanceState().getLaunchVelocityRPS(), 0, "Preset Velocities are screwy");
+        //Do we need each preset state to be tested or is one good?
+
+        fooState = Shooter.ShooterDistanceState.AUTOMATIC;
+
+        shooter.setWantedDistanceState(fooState);
+
+//        //Do we want the auto shooting state specifically tested?
+//        //Do we need the calibration tested? (probably not...)
     }
 
     @AfterEach
