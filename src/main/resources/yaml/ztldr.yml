@@ -22,10 +22,10 @@ shooterSettings:
         - 38 # 96
         - 40 #120
         - 42 # 156
-        - 46 # 204
-        - 48 #210
-        - 51 # 264
-        - 60 # 360
+        - 45 # 204
+        - 47 #210
+        - 48 # 264
+        - 49 # 360
 subsystems:
     drivetrain:
         implemented: true
