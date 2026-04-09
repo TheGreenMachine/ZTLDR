@@ -41,6 +41,17 @@ public abstract class BaseRobot extends TimedRobot {
     public void robotPeriodic() {
         // Update the pose of the robot on the field.
         FieldContainer.field.setRobotPose(BaseRobotState.robotPose);
+        // Update the path preview until the match starts.
+        if (!BaseRobotState.hasAutoStarted) {
+            baseRobotContainer.autoModeManager.updateAutoPathPreviewDisplay();
+        }
+    }
+
+    @Override
+    public void autonomousInit() {
+        BaseRobotState.hasAutoStarted = true;
+        // Clear the path preview at the start of the match.
+        baseRobotContainer.autoModeManager.clearAutoPathPreviewDisplay();
     }
 
     /**
