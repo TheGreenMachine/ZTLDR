@@ -1,7 +1,5 @@
 package com.team1816.lib;
 
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.util.FlippingUtil;
 import com.team1816.lib.auto.AutoModeManager;
 import com.team1816.lib.auto.PathfindManager;
 import com.team1816.lib.inputs.CommandButtonBoard;
@@ -9,10 +7,6 @@ import com.team1816.lib.subsystems.BaseSuperstructure;
 import com.team1816.lib.subsystems.LedManager;
 import com.team1816.lib.subsystems.Vision;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
-import com.team1816.lib.util.GreenLogger;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public abstract class BaseRobotContainer {
@@ -23,7 +17,6 @@ public abstract class BaseRobotContainer {
 
     protected final Swerve swerve = new Swerve(driverController);
     protected final Vision vision = new Vision();
-    private boolean poseInitialized;
 
     protected PathfindManager pathfindManager;
     public AutoModeManager autoModeManager;
@@ -36,48 +29,7 @@ public abstract class BaseRobotContainer {
         Singleton.CreateSubSystem(LedManager.class);
 
         pathfindManager = Singleton.get(PathfindManager.class);
-        autoModeManager = Singleton.get(AutoModeManager.class);
-
-        if (autoModeManager != null) {
-            autoModeManager.onChange(this::updatePoseOnSelection);
-        } else {
-            GreenLogger.log("Failed to initialize AutoModeManager!");
-        }
-    }
-
-    public void updateInitialPose(){
-        if(poseInitialized || DriverStation.getAlliance().isEmpty()) return;
-        forceUpdatePose();
-    }
-
-    /**
-     * Forces pose update regardless of poseInitialized state.
-     * Called from autonomousInit to ensure pose is always set before auto starts.
-     */
-    public void forceUpdatePose(){
-        updatePoseOnSelection(autoModeManager.getSelectedAuto());
-    }
-
-    private void updatePoseOnSelection(Command selectedAuto) {
-        if (selectedAuto != null) {
-            try {
-                Pose2d startingPose = selectedAuto instanceof PathPlannerAuto
-                    ? ((PathPlannerAuto) selectedAuto).getStartingPose()
-                    : Pose2d.kZero;
-                if (startingPose != null) {
-                    var alliance = DriverStation.getAlliance();
-                    if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
-                        startingPose = FlippingUtil.flipFieldPose(startingPose);
-                    }
-                    // Reset odometry and update Field2d this is to give drivers clue that the
-                    // proper auto is set prior to auto start
-                    swerve.resetPose(startingPose);
-                    poseInitialized = true;
-                }
-            } catch (Exception e) {
-                GreenLogger.log("Error loading auto pose: " + e.getMessage());
-            }
-        }
+        autoModeManager = new AutoModeManager(swerve::resetPose);
     }
 
     /**

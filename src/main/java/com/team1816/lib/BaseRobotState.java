@@ -43,4 +43,9 @@ public class BaseRobotState {
      * to be the pre-vision position estimate of the real robot.
      */
     public static Pose2d simActualOrRawOdometryPose = Pose2d.kZero;
+
+    /**
+     * If autonomous has ever been initialized.
+     */
+    public static boolean hasAutoStarted = false;
 }
