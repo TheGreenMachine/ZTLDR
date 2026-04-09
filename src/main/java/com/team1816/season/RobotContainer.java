@@ -127,6 +127,7 @@ public class RobotContainer extends BaseRobotContainer {
         NamedCommands.registerCommand("shoot", Commands.sequence(
             Commands.runOnce(() -> GreenLogger.log("Running named command: shoot")),
             Commands.runOnce(() -> superstructure.setInclineDucking(false)),
+            Commands.runOnce(() -> Commands.waitSeconds(1)),
             Commands.runOnce(() -> superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)),
             Commands.race(
                 Commands.repeatingSequence(
@@ -135,7 +136,7 @@ public class RobotContainer extends BaseRobotContainer {
                     Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)),
                     Commands.waitSeconds(0.3)
                 ),
-                Commands.waitSeconds(5)
+                Commands.waitSeconds(4)
             ),
             Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)),
             Commands.runOnce(() -> superstructure.setInclineDucking(true)),
