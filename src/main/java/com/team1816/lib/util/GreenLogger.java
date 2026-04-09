@@ -6,6 +6,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.team1816.season.Robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -40,6 +41,8 @@ public class GreenLogger {
         if (Robot.isSimulation()) {
             DriverStation.silenceJoystickConnectionWarning(true);
         }
+
+        DataLogManager.start();
 
         // this will log the robot modes i.e., auto enabled estop
         DriverStation.startDataLog(DataLogManager.getLog(), false);
