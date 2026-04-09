@@ -24,7 +24,7 @@ shooterSettings:
         - 43 # 156
         - 48 # 204
         - 47 #210
-        - 565 # 264
+        - 56.5 # 264
         - 100 # 360
 subsystems:
     drivetrain:
