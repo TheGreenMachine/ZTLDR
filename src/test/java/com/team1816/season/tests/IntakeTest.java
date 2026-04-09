@@ -29,7 +29,7 @@ public class IntakeTest {
         intake.periodic();
 
         assertEquals(.4, intake.getState().getIntakeMotorValue(), 0, "Intake Motor is screwy");
-//        assertEquals(40, intake.getState().getFlipperMotorPosition(), 100, "Flipper Motor is screwy"); <- Will figure out later (lazy)
+//        assertEquals(40, intake.getState().getFlipperMotorPosition(), 100, "Flipper Motor is screwy"); //<- Will figure out later (lazy)
     }
 
     @AfterEach
