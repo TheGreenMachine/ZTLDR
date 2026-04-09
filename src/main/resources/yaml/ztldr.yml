@@ -15,7 +15,7 @@ shooterSettings:
         - 0.08 # 156
         - 0.09 # 204
         - 0.09 #210
-        - 0.1196 # 264
+        - 0.1113 # 264
         - 0.108 # 360
     launchVelocitiesRPS:
         - 31 # 48
@@ -24,7 +24,7 @@ shooterSettings:
         - 43 # 156
         - 48 # 204
         - 47 #210
-        - 54 # 264
+        - 56.5 # 264
         - 100 # 360
 subsystems:
     drivetrain:
@@ -269,8 +269,8 @@ subsystems:
                 remoteSensorId: 29
                 id: 27
                 motorRotation: Clockwise_Positive
-                reverseSoftLimit: 0.062
-                forwardSoftLimit: 0.1196
+                reverseSoftLimit: 0.057
+                forwardSoftLimit: 0.1113
                 statorCurrentLimit: 35
                 pidConfig:
                     slot0:
@@ -314,7 +314,7 @@ subsystems:
             distanceOneLaunchVelocityRPS: 35
             distanceTwoInclineAngleRotations: 0.08
             distanceTwoLaunchVelocityRPS: 47
-            distanceThreeInclineAngleRotations: 0.1196
+            distanceThreeInclineAngleRotations: 0.1113
             distanceThreeLaunchVelocityRPS: 100
             distanceAutoThingLaunchVelocityRPS: 60
             closeDistanceBetweenBeamBreaks: 0.419

@@ -57,6 +57,7 @@ public class Robot extends BaseRobot {
     public void autonomousInit() {
         try {
             super.autonomousInit();
+            RobotState.resetCameraQueue = true;
             robotContainer.autonomousInit();
             autonomousCommand = robotContainer.autoModeManager.getSelectedAuto();
             // schedule the autonomous command
