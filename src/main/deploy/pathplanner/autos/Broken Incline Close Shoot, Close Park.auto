@@ -7,19 +7,25 @@
         {
           "type": "named",
           "data": {
-            "name": "fixTurretAngle180"
+            "name": "distancePresetBrokenInclineAuto"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CenterstartBackup"
+            "pathName": "StartIIfuelClosershoot"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "shootWithIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CloserShootIIfuelPark"
           }
         }
       ]

@@ -5,27 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "distancePresetAutoThing"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "StartIIfuelClosershoot"
+            "pathName": "CenterstartBackup"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "shootWithIntake"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ClosershootIfuelOutpost"
           }
         }
       ]

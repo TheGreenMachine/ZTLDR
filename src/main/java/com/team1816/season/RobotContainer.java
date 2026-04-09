@@ -178,10 +178,10 @@ public class RobotContainer extends BaseRobotContainer {
             Commands.runOnce(() -> superstructure.setTurretFixedAngle(180))
         ));
 
-        NamedCommands.registerCommand("distancePresetAutoThing", Commands.parallel(
-            Commands.runOnce(() -> GreenLogger.log("Running named command: distancePresetAutoThing")),
+        NamedCommands.registerCommand("distancePresetBrokenInclineAuto", Commands.parallel(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: distancePresetBrokenInclineAuto")),
             Commands.runOnce(() ->
-                superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_AUTO_THING)
+                superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_BROKEN_INCLINE_AUTO)
             )
         ));
 

@@ -5,9 +5,15 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "distancePresetBrokenInclineAuto"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "SnowblowingStartIIfuelShoot"
+            "pathName": "StartIIfuelClosershoot"
           }
         },
         {
@@ -17,9 +23,9 @@
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "waitForDucking"
+            "pathName": "CloserShootIfuelPark"
           }
         }
       ]
