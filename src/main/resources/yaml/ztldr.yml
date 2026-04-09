@@ -19,13 +19,13 @@ shooterSettings:
         - 0.108 # 360
     launchVelocitiesRPS:
         - 31 # 48
-        - 39 # 96
-        - 41 #120
-        - 43 # 156
-        - 48 # 204
-        - 47 #210
-        - 56.5 # 264
-        - 100 # 360
+        - 38 # 96
+        - 40 #120
+        - 42 # 156
+        - 46 # 204
+        - 48 #210
+        - 51 # 264
+        - 60 # 360
 subsystems:
     drivetrain:
         implemented: true
@@ -218,7 +218,7 @@ subsystems:
                 id: 10
                 deviceType: CANcoder
         constants:
-            intakeOnSpeed: .4
+            intakeOnSpeed: .55
             intakeSlowSpeed: .1
             outtakeSpeed: -0.6
             flipperMotorOutPosition: 0.164 #0.166
