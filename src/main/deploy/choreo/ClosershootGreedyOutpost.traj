@@ -42,8 +42,8 @@
     {"from":0, "to":1, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"1 m / s", "val":1.0}}}, "enabled":true},
     {"from":4, "to":5, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"1.8 m / s", "val":1.8}}}, "enabled":true}],
   "targetDt":{
-   "exp":"0.05 s",
-   "val":0.05
+   "exp":"0.01 s",
+   "val":0.01
   }
  },
  "trajectory":{
