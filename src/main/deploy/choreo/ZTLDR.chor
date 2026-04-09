@@ -47,6 +47,34 @@
      "val":3.141592653589793
     }
    },
+   "HubInnerFuel":{
+    "x":{
+     "exp":"HubOuterFuel.x",
+     "val":5.9
+    },
+    "y":{
+     "exp":"5 m",
+     "val":5.0
+    },
+    "heading":{
+     "exp":"250 deg",
+     "val":4.363323129985824
+    }
+   },
+   "HubOuterFuel":{
+    "x":{
+     "exp":"5.9 m",
+     "val":5.9
+    },
+    "y":{
+     "exp":"6.83 m",
+     "val":6.83
+    },
+    "heading":{
+     "exp":"250 deg",
+     "val":4.363323129985824
+    }
+   },
    "IIInnerFuel":{
     "x":{
      "exp":"7.74509859085083 m",
