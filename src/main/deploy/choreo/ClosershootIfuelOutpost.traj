@@ -1,5 +1,5 @@
 {
- "name":"ClosershootGreedyOutpost",
+ "name":"ClosershootIfuelOutpost",
  "version":3,
  "snapshot":{
   "waypoints":[
@@ -27,7 +27,7 @@
     {"x":{"exp":"CloserShoot.x", "val":2.6558}, "y":{"exp":"CloserShoot.y", "val":5.7011}, "heading":{"exp":"CloserShoot.heading", "val":3.141592653589793}, "intervals":37, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"3.358118772506714 m", "val":3.358118772506714}, "y":{"exp":"7.3674116134643555 m", "val":7.3674116134643555}, "heading":{"exp":"180 deg", "val":3.141592653589793}, "intervals":23, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"6.084970951080322 m", "val":6.084970951080322}, "y":{"exp":"7.395205497741699 m", "val":7.395205497741699}, "heading":{"exp":"180 deg", "val":3.141592653589793}, "intervals":32, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"GreedyEnterFuel.x", "val":8.65}, "y":{"exp":"GreedyEnterFuel.y", "val":6.8}, "heading":{"exp":"GreedyEnterFuel.heading", "val":4.363323129985824}, "intervals":26, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"IOuterFuel.x", "val":8.65}, "y":{"exp":"IOuterFuel.y", "val":6.8}, "heading":{"exp":"IOuterFuel.heading", "val":4.363323129985824}, "intervals":26, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"8.675616264343262 m", "val":8.675616264343262}, "y":{"exp":"3.9544076919555664 m", "val":3.9544076919555664}, "heading":{"exp":"240 deg", "val":4.1887902047863905}, "intervals":46, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"8.29848861694336 m", "val":8.29848861694336}, "y":{"exp":"0.6733983755111694 m", "val":0.6733983755111694}, "heading":{"exp":"181 deg", "val":3.1590459461097367}, "intervals":59, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"0.9256463646888733 m", "val":0.9256463646888732}, "y":{"exp":"0.5602601170539856 m", "val":0.5602601170539856}, "heading":{"exp":"180 deg", "val":3.141592653589793}, "intervals":30, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
