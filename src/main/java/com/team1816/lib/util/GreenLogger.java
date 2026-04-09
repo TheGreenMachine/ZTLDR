@@ -42,8 +42,6 @@ public class GreenLogger {
             DriverStation.silenceJoystickConnectionWarning(true);
         }
 
-        DataLogManager.start();
-
         // this will log the robot modes i.e., auto enabled estop
         DriverStation.startDataLog(DataLogManager.getLog(), false);
         // Log network tables then we can use advantage scope on a live robot
