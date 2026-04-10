@@ -1,5 +1,5 @@
 {
- "name":"StartCenterShoot",
+ "name":"SnowblowingStartIIfuelShoot",
  "version":3,
  "snapshot":{
   "waypoints":[
@@ -20,10 +20,10 @@
  "params":{
   "waypoints":[
     {"x":{"exp":"SideStart.x", "val":4.425225734710693}, "y":{"exp":"SideStart.y", "val":7.51403624535}, "heading":{"exp":"SideStart.heading", "val":3.141592653589793}, "intervals":59, "split":true, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"5.70665979385376 m", "val":5.70665979385376}, "y":{"exp":"SideStart.y", "val":7.51403624535}, "heading":{"exp":"SideStart.heading", "val":3.141592653589793}, "intervals":144, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"7.924712657928467 m", "val":7.924712657928467}, "y":{"exp":"6.82694191456 m", "val":6.82694191456}, "heading":{"exp":"250 deg", "val":4.363323129985824}, "intervals":101, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"7.74509859085083 m", "val":7.74509859085083}, "y":{"exp":"8.07 m - 3.343446445465088 m", "val":4.726553554534912}, "heading":{"exp":"240 deg", "val":4.1887902047863905}, "intervals":151, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"6.536667346954346 m", "val":6.536667346954346}, "y":{"exp":"8.07 m - 0.9666962027549744 m", "val":7.103303797245026}, "heading":{"exp":"180 deg", "val":3.141592653589793}, "intervals":108, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"StartExitTrench.x", "val":5.70665979385376}, "y":{"exp":"StartExitTrench.y", "val":7.51403624535}, "heading":{"exp":"StartExitTrench.heading", "val":3.141592653589793}, "intervals":144, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"IIOuterFuel.x", "val":7.924712657928467}, "y":{"exp":"IIOuterFuel.y", "val":6.82694191456}, "heading":{"exp":"IIOuterFuel.heading", "val":4.363323129985824}, "intervals":101, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"IIInnerFuel.x", "val":7.74509859085083}, "y":{"exp":"IIInnerFuel.y", "val":4.726553554534912}, "heading":{"exp":"IIInnerFuel.heading", "val":4.1887902047863905}, "intervals":151, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"ReenterTrench.x", "val":6.536667346954346}, "y":{"exp":"ReenterTrench.y", "val":7.103303797245026}, "heading":{"exp":"ReenterTrench.heading", "val":3.141592653589793}, "intervals":108, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"SideShoot.x", "val":4.002538681030273}, "y":{"exp":"SideShoot.y", "val":7.41730172157}, "heading":{"exp":"SideShoot.heading", "val":3.141592653589793}, "intervals":90, "split":true, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
@@ -629,5 +629,7 @@
     {"t":4.75235, "x":4.00254, "y":7.4173, "heading":3.14159, "vx":0.0, "vy":0.0, "omega":0.0, "ax":0.0, "ay":0.0, "alpha":0.0, "fx":[0.0,0.0,0.0,0.0], "fy":[0.0,0.0,0.0,0.0]}],
   "splits":[0]
  },
- "events":[]
+ "events":[
+   {"name":"stopShooting", "from":{"target":3, "targetTimestamp":2.50007, "offset":{"exp":"0.4 s", "val":0.4}}, "event":{"type":"named", "data":{"name":"stopShooting"}}},
+   {"name":"startShooting", "from":{"target":1, "targetTimestamp":0.57682, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"startShooting"}}}]
 }

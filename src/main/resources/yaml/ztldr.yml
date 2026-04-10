@@ -1,25 +1,31 @@
 shooterSettings:
     distancesInches:
-        - 64
+        - 60
         - 96
+        - 120
         - 156
         - 204
+        - 210
         - 264
         - 360 # Maximum distance shot
     inclineAnglesRotations:
-        - 0.064 # 48
-        - 0.064 # 96
+        - 0.057 # 48
+        - 0.064 #96
+        - 0.07 # 120
         - 0.08 # 156
         - 0.09 # 204
-        - 0.1196 # 264
+        - 0.09 #210
+        - 0.1113 # 264
         - 0.108 # 360
     launchVelocitiesRPS:
-        - 33 # 48
-        - 41 # 96
-        - 46 # 156
-        - 48 # 204
-        - 54 # 264
-        - 100 # 360
+        - 31 # 48
+        - 38 # 96
+        - 40 #120
+        - 42 # 156
+        - 45 # 204
+        - 47 #210
+        - 48 # 264
+        - 49 # 360
 linearMPSToLaunchRPS: # TODO: Actual tune this. For now we are just using the shooterSettings and doing some physics to convert.
     linearVelocitiesMPS:
         - 10
@@ -185,8 +191,8 @@ subsystems:
         constants:
             feedingDutyCycle: 0.7
             stoppedDutyCycle: 0
-            agitateForwardDutyCycle: 0.15
-            agitateStoppedDutyCycle: 0
+            agitateForwardDutyCycle: -0.15
+            agitateStoppedDutyCycle: -0.15
     intake:
         implemented: true
         devices:
@@ -194,7 +200,7 @@ subsystems:
                 id: 2
                 deviceType: TalonFX
                 neutralMode: Coast
-                motorRotation: CounterClockwise_Positive
+                motorRotation: Clockwise_Positive
             flipperMotor:
                 id: 3
                 deviceType: TalonFX
@@ -208,8 +214,9 @@ subsystems:
                 rotorToSensor: 0.1
                 pidConfig:
                     slot0:
-                        kS: 0.3 # static friction - increase if stalling near setpoint
-                        kP: 50 # position error gain - increase if not reaching target, decrease if oscillating
+                        kS: 0.1 # static friction - increase if turret won't move at small errors
+                        kP: 50 # position error gain - increase if still lagging, decrease if oscillating at setpoint
+                        kD: 0.28 # position error gain - increase if not reaching target, decrease if oscillating
                         staticFeedforwardSign: UseClosedLoopSign
                 motionMagic:
                     expoKV: 10 # cruise speed - lower = faster, higher = slower
@@ -218,10 +225,10 @@ subsystems:
                 id: 10
                 deviceType: CANcoder
         constants:
-            intakeOnSpeed: .4
+            intakeOnSpeed: .55
             intakeSlowSpeed: .1
             outtakeSpeed: -0.6
-            flipperMotorOutPosition: 0.135 #0.166
+            flipperMotorOutPosition: 0.164 #0.166
             flipperMotorPullInOnePosition: 0.1
             flipperMotorPullInTwoPosition: 0.05
             flipperMotorInPosition: 0.025
@@ -239,8 +246,9 @@ subsystems:
                         kV: 0.081
         constants:
             topClosedVelocity: 0
-            topOpenVelocity: 40
+            topOpenVelocity: 60
     shooter:
+        implemented: true
         canBusName: shootercanivore
         devices:
             topLaunchMotor:
@@ -268,14 +276,14 @@ subsystems:
                 remoteSensorId: 29
                 id: 27
                 motorRotation: Clockwise_Positive
-                reverseSoftLimit: 0.062
-                forwardSoftLimit: 0.1196
+                reverseSoftLimit: 0.057
+                forwardSoftLimit: 0.1113
                 statorCurrentLimit: 35
                 pidConfig:
                     slot0:
-                        kS: 0.8
-                        kP: 100
-                        staticFeedforwardSign: UseClosedLoopSign
+                        kS: 0.01
+                        kP: 700
+                        kD: 0.1
                 motionMagic:
                     expoKV: 1
                     expoKA: 0.3
@@ -288,7 +296,6 @@ subsystems:
                         kS: 0.1 # static friction - increase if turret won't move at small errors
                         kP: 4 # position error gain - increase if still lagging, decrease if oscillating at setpoint
                         kD: 0.28 # damping - increase if oscillating, keep roughly kP/20
-                        staticFeedforwardSign: UseClosedLoopSign
                 motionMagic:
                     expoKV: 0.02 #0.10 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
                     expoKA: 0.1 #0.2 # acceleration smoothness - increase if dead zone reversals are too violent, decrease if turret feels mushy
@@ -309,44 +316,44 @@ subsystems:
             shooterOffsetXMeters: -0.111303
             shooterOffsetYMeters: -0.112268
             shooterOffsetZMeters: 0.508
-            inclineDuckingLimitRotations: 0.064
+            inclineDuckingLimitRotations: 0.057
             distanceOneInclineAngleRotations: 0.064
             distanceOneLaunchVelocityRPS: 35
             distanceTwoInclineAngleRotations: 0.08
             distanceTwoLaunchVelocityRPS: 47
-            distanceThreeInclineAngleRotations: 0.1196
+            distanceThreeInclineAngleRotations: 0.1113
             distanceThreeLaunchVelocityRPS: 100
-            distanceAutoThingLaunchVelocityRPS: 60
+            brokenInclineAutoLaunchVelocityRPS: 55 # Set to the RPS required to score at a distance from shooter to hub of 101.283 inches.
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570
             secondLowestBeamBreakToZero: 6.7769
             turretRotationToleranceDegrees: 5
-            inclineAngleToleranceDegrees: 2
+            inclineAngleToleranceDegrees: 4
             launcherVelocityToleranceRPS: 2
             launchVelocityAdjustmentAmountRPS: 0.01
             inclineAngleAdjustmentAmountDegrees: 0.02
             turretAngleAdjustmentAmountDegrees: 0.04
-            topLaunchMotorBackspinMultiplier: .95 # Less than one for backspin.
+            topLaunchMotorBackspinMultiplier: 1 # Less than one for backspin.
     vision:
         cameras:
             forwardLeft: # Pi IP: 10.18.16.11
                 photonVisionUIName: Forward_Left
                 robotToCamera:
-                    xInches: -12.66
-                    yInches: 12.1
-                    zInches: 18
+                    xInches: -10.114
+                    yInches: 3.587
+                    zInches: 20
                     rollDegrees: 0
-                    pitchDegrees: 0
-                    yawDegrees: 55
+                    pitchDegrees: -8
+                    yawDegrees: 0
                 detectionType: APRIL_TAG
-            forwardRight: # Pi IP: 10.18.16.12.
+            forwardRight: # Pi IP: 10.18.16.12
                 photonVisionUIName: Forward_Right
                 robotToCamera:
                     xInches: -12.66
                     yInches: -12.1
                     zInches: 18
                     rollDegrees: 0
-                    pitchDegrees: 0
+                    pitchDegrees: -8
                     yawDegrees: -55
                 detectionType: APRIL_TAG
             backwardLeft: # Pi IP: 10.18.16.13
@@ -356,7 +363,7 @@ subsystems:
                     yInches: 12.1
                     zInches: 16
                     rollDegrees: 0
-                    pitchDegrees: 0
+                    pitchDegrees: -8
                     yawDegrees: 155
                 detectionType: APRIL_TAG
             backwardRight: # Pi IP: 10.18.16.14
@@ -366,7 +373,7 @@ subsystems:
                     yInches: -12.1
                     zInches: 16
                     rollDegrees: 0
-                    pitchDegrees: 0
+                    pitchDegrees: -8
                     yawDegrees: -155
                 detectionType: APRIL_TAG
             fuelDetector:

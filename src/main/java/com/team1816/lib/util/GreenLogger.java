@@ -8,10 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.IterativeRobotBase;
-import edu.wpi.first.wpilibj.Watchdog;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,6 +31,7 @@ public class GreenLogger {
     // using an empty string here to make the logs and live views consistent
     private static final NetworkTable netTable;
     private static final StringPublisher msg;
+    private static int logLoopCount = 0;
 
     static {
         if (Robot.isSimulation()) {
@@ -337,6 +335,12 @@ public class GreenLogger {
     // Will update all registered periodic loggers
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static void updatePeriodic() {
+        if(RobotState.isDisabled()) { logLoopCount = 0; return; }
+        if (logLoopCount <= 2) {
+            logLoopCount ++;
+            return;
+        }
+        logLoopCount = 0;
         for (LogTopic entry : periodicLogs.keySet()) {
             var supplier = periodicLogs.get(entry);
             if (entry.Publisher instanceof DoublePublisher) {

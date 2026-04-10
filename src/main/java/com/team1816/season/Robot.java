@@ -54,21 +54,11 @@ public class Robot extends BaseRobot {
     }
 
     @Override
-    public void disabledPeriodic() {
-        try {
-            robotContainer.updateInitialPose();
-        } catch (Throwable t) {
-            robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
-            GreenLogger.log(t);
-        }
-    }
-
-    @Override
     public void autonomousInit() {
         try {
+            super.autonomousInit();
+            RobotState.resetCameraQueue = true;
             robotContainer.autonomousInit();
-            // Ensure pose is always initialized before scheduling auto
-            robotContainer.forceUpdatePose();
             autonomousCommand = robotContainer.autoModeManager.getSelectedAuto();
             // schedule the autonomous command
             if (autonomousCommand != null) {
