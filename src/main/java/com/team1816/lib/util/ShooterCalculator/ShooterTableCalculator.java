@@ -1,10 +1,8 @@
-package com.team1816.lib.util;
+package com.team1816.lib.util.ShooterCalculator;
 
-import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.ShooterSettingsConfig;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
@@ -40,14 +38,23 @@ public class ShooterTableCalculator extends BaseShooterCalculator {
         this.launchVelocityRPSFunction = launchVelocityRPSLI.interpolate(distancesInchesArray, launchVelocitiesRPSArray);
     }
 
-    public ShooterCalculatorResponse getShooterSettings(Translation2d shooter, Translation2d target, boolean useChassisSpeedForHoodAngleAndSpeed) {
-        double distanceToTargetMeters = shooter.getDistance(target);
+    public ShooterCalculatorResponse calculate(Translation3d shooter, Translation3d target, double angleOfEntryDegrees, boolean useChassisSpeedForHoodAngleAndSpeed) {
+        // Get the 2d distance from the shooter to the target.
+        double distanceToTargetMeters = shooter.toTranslation2d().getDistance(target.toTranslation2d());
         double distanceToTargetInches = Units.metersToInches(distanceToTargetMeters);
         double inclineAngleRotations = getInclineAngleRotations(distanceToTargetInches);
         double inclineAngleDegrees = Units.rotationsToDegrees(inclineAngleRotations);
         double launchVelocityRPS = getLaunchVelocityRPS(distanceToTargetInches);
 
-        return new ShooterCalculatorResponse(inclineAngleDegrees, launchVelocityRPS);
+        return new ShooterCalculatorResponse(
+            getTurretAngle(
+                shooter.toTranslation2d(),
+                target.toTranslation2d(),
+                useChassisSpeedForHoodAngleAndSpeed
+            ).getDegrees(),
+            inclineAngleDegrees,
+            launchVelocityRPS
+        );
     }
 
     private double getInclineAngleRotations(double distanceInches) {

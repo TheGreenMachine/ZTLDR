@@ -135,6 +135,42 @@ public class RobotFactory {
         return config.shooterSettings;
     }
 
+    public LinearMPSToLauncherRPSConfig getLinearMPSToLauncherRPSConfig() {
+        if (config.linearMPSToLaunchRPS == null) {
+            GreenLogger.log("Couldn't find the linear mps to launcher rps config");
+            return new LinearMPSToLauncherRPSConfig();
+        }
+        return config.linearMPSToLaunchRPS;
+    }
+
+    public LinearMPSToLauncherRPSConfig stealLinearMPSToLauncherRPSConfigFromShooterSettings(double deltaZInches) {
+        LinearMPSToLauncherRPSConfig linearMPSToLauncherRPSConfig = new LinearMPSToLauncherRPSConfig();
+        if (config.shooterSettings == null) {
+            GreenLogger.log("Couldn't find the shooter settings config");
+            return linearMPSToLauncherRPSConfig;
+        }
+        linearMPSToLauncherRPSConfig.launchVelocitiesRPS = config.shooterSettings.launchVelocitiesRPS;
+        linearMPSToLauncherRPSConfig.linearVelocitiesMPS = new ArrayList<>();
+        double deltaZMeters = Units.inchesToMeters(deltaZInches);
+        for (int i = 0; i < config.shooterSettings.distancesInches.size(); i++) {
+            double distanceMeters = Units.inchesToMeters(config.shooterSettings.distancesInches.get(i));
+            double thetaRadians = Math.PI / 2 - Units.rotationsToRadians(config.shooterSettings.inclineAnglesRotations.get(i));
+            linearMPSToLauncherRPSConfig.linearVelocitiesMPS.add(
+                Math.sqrt(
+                    -0.5 * 9.80665 * distanceMeters * distanceMeters
+                    / (
+                        Math.cos(thetaRadians)
+                        * (
+                            (Math.cos(thetaRadians) * deltaZMeters)
+                            - (distanceMeters * Math.sin(thetaRadians))
+                        )
+                    )
+                )
+            );
+        }
+        return linearMPSToLauncherRPSConfig;
+    }
+
     /**
      * Retrieves the names of all the paths.
      */

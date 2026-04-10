@@ -20,6 +20,13 @@ shooterSettings:
         - 48 # 204
         - 54 # 264
         - 100 # 360
+linearMPSToLaunchRPS: # TODO: Actual tune this. For now we are just using the shooterSettings and doing some physics to convert.
+    linearVelocitiesMPS:
+        - 10
+        - 20
+    launchVelocitiesRPS:
+        - 20
+        - 40
 subsystems:
     drivetrain:
         implemented: true

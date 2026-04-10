@@ -17,6 +17,9 @@
         "shooterSettings": {
             "$ref": "shootersettingsconfig.schema.json"
         },
+        "linearMPSToLaunchRPS": {
+            "$ref": "linearmpstolauncherrpsconfig.schema.json"
+        },
         "autopathing": {
             "type": "object",
             "existingJavaType": "AutopathingConfig"
@@ -31,6 +34,7 @@
                 "constants",
                 "controlboard",
                 "shooterSettings",
+                "linearMPSToLaunchRPS",
                 "autopathing"
             ]
         }
