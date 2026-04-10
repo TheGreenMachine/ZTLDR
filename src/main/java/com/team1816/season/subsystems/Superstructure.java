@@ -5,6 +5,7 @@ import com.team1816.lib.subsystems.BaseSuperstructure;
 import com.team1816.lib.subsystems.Vision;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
+import edu.wpi.first.wpilibj.DriverStation;
 
 public class Superstructure extends BaseSuperstructure {
     private final Shooter shooter;
@@ -217,6 +218,16 @@ public class Superstructure extends BaseSuperstructure {
             );
         } else {
             gatekeeper.setWantedState(Gatekeeper.GatekeeperState.CLOSED);
+        }
+
+        // Limit the drive speed if we are trying to shoot and in teleop. In auto, the speed should
+        // be handled by the path.
+        double shootingSpeedLimitMPS = 3;
+        if (wantedGatekeeperState == WantedGatekeeperState.OPEN && DriverStation.isTeleop()) {
+            swerve.limitDriveSpeed(shootingSpeedLimitMPS);
+        }
+        else {
+            swerve.stopLimitingDriveSpeed();
         }
 
         // Only spin up the launch motors if we are trying to shoot to save battery.
