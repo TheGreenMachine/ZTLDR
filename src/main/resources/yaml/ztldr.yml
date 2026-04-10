@@ -336,7 +336,7 @@ subsystems:
                     yInches: 3.587
                     zInches: 20
                     rollDegrees: 0
-                    pitchDegrees: -8
+                    pitchDegrees: -5
                     yawDegrees: 0
                 detectionType: APRIL_TAG
             forwardRight: # Pi IP: 10.18.16.12
@@ -369,13 +369,6 @@ subsystems:
                     pitchDegrees: -8
                     yawDegrees: -155
                 detectionType: APRIL_TAG
-            fuelDetector:
-                photonVisionUIName: Fuel_Detector
-                robotToCamera:
-                    xInches: 12.5
-                    yInches: 0
-                    zInches: 15
-                detectionType: NONE # TODO: Object detection
 
 autopathing:
     paths:
