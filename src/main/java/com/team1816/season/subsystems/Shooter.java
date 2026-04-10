@@ -337,16 +337,18 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         target = getTargetTranslation3d();
         // TODO: I need to figure out why this needs to be negative, but it does for now.
         final double calculatorAngleOfEntryDegrees = -45;
-        IShooterCalculator.ShooterCalculatorResponse calculatorResponse = shooterTableCalculator.calculate(
-            getCurrentTurretPose3d().getTranslation(),
-            target,
-            calculatorAngleOfEntryDegrees,
-            useChassisSpeedForHoodAngleAndSpeed
-        );
 
         isAutoAiming = autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC;
 
         if (autoAimTurret) {
+            double turretLookAheadTimeSeconds = 0.5;
+            IShooterCalculator.ShooterCalculatorResponse calculatorResponse = shooterTableCalculator.calculate(
+                getCurrentTurretPose3d().getTranslation(),
+                target,
+                calculatorAngleOfEntryDegrees,
+                useChassisSpeedForHoodAngleAndSpeed,
+                turretLookAheadTimeSeconds
+            );
             setTurretAngle(calculatorResponse.turretAngleDegrees());
         }
         else {
@@ -359,6 +361,13 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 setLaunchVelocities(wantedDistanceState.getLaunchVelocityRPS());
             }
             case AUTOMATIC -> {
+                IShooterCalculator.ShooterCalculatorResponse calculatorResponse = shooterTableCalculator.calculate(
+                    getCurrentTurretPose3d().getTranslation(),
+                    target,
+                    calculatorAngleOfEntryDegrees,
+                    useChassisSpeedForHoodAngleAndSpeed,
+                    0
+                );
                 setInclineAngle(calculatorResponse.inclineAngleDegrees());
                 setLaunchVelocities(calculatorResponse.launchVelocityRPS());
             }

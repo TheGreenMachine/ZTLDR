@@ -38,7 +38,13 @@ public class ShooterTableCalculator extends BaseShooterCalculator {
         this.launchVelocityRPSFunction = launchVelocityRPSLI.interpolate(distancesInchesArray, launchVelocitiesRPSArray);
     }
 
-    public ShooterCalculatorResponse calculate(Translation3d shooter, Translation3d target, double angleOfEntryDegrees, boolean useChassisSpeedForHoodAngleAndSpeed) {
+    public ShooterCalculatorResponse calculate(
+        Translation3d shooter,
+        Translation3d target,
+        double angleOfEntryDegrees,
+        boolean useChassisSpeedForHoodAngleAndSpeed,
+        double lookAheadTimeSeconds
+    ) {
         // Get the 2d distance from the shooter to the target.
         double distanceToTargetMeters = shooter.toTranslation2d().getDistance(target.toTranslation2d());
         double distanceToTargetInches = Units.metersToInches(distanceToTargetMeters);

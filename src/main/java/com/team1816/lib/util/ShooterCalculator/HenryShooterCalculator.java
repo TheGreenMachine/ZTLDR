@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 
-public class HenryShooterCalculator implements IShooterCalculator{
+public class HenryShooterCalculator implements IShooterCalculator {
 
     private final LinearMPSToLauncherRPSLookup linearMPSToLauncherRPSLookup = new LinearMPSToLauncherRPSLookup();
 
@@ -20,6 +20,11 @@ public class HenryShooterCalculator implements IShooterCalculator{
      * @param targetTranslation3dMeters The {@link Translation3d} of where to shoot to.
      * @param angleOfEntryDegrees The desired angle of entry of the projectile into the target.
      * @param useChassisSpeedForHoodAngleAndSpeed Unused for this calculator.
+     * @param lookAheadTimeSeconds The time to project forward the shooter's position before
+     *                             performing calculations, in seconds. This can be used to give
+     *                             mechanisms that cannot keep up with the robot's movement a head
+     *                             start. However, it should be used with caution, because it will
+     *                             not behave well while accelerating or turning.
      * @return A {@link com.team1816.lib.util.ShooterCalculator.IShooterCalculator.ShooterCalculatorResponse}
      * describing how to shoot the projectile from the shooter to the target.
      */
@@ -27,13 +32,30 @@ public class HenryShooterCalculator implements IShooterCalculator{
         Translation3d shooterTranslation3dMeters,
         Translation3d targetTranslation3dMeters,
         double angleOfEntryDegrees,
-        boolean useChassisSpeedForHoodAngleAndSpeed
+        boolean useChassisSpeedForHoodAngleAndSpeed,
+        double lookAheadTimeSeconds
     ) {
         // Acceleration due to gravity near earth's surface in m/s² - change this if we are
         // competing on a different planet
         final double g = 9.80665;
 
-        Translation3d deltaTranslation3d = targetTranslation3dMeters.minus(shooterTranslation3dMeters);
+        // Get the field-relative ChassisSpeeds from the robot-relative ChassisSpeeds
+        ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(
+            BaseRobotState.robotSpeeds, BaseRobotState.robotPose.getRotation()
+        );
+        // Current field-relative chassis (robot) velocity components in m/s
+        double vCX = chassisSpeeds.vxMetersPerSecond;
+        double vCY = chassisSpeeds.vyMetersPerSecond;
+
+        // Project ahead where the shooter will be after lookAheadTimeSeconds based on the robot's
+        // velocity
+        Translation3d projectedShooterTranslation3dMeters = shooterTranslation3dMeters.plus(
+            new Translation3d(vCX * lookAheadTimeSeconds, vCY * lookAheadTimeSeconds, 0)
+        );
+
+        Translation3d deltaTranslation3d = targetTranslation3dMeters.minus(
+            projectedShooterTranslation3dMeters
+        );
         // Distance from start to target components in meters
         double deltaX = deltaTranslation3d.getX();
         double deltaY = deltaTranslation3d.getY();
@@ -55,14 +77,6 @@ public class HenryShooterCalculator implements IShooterCalculator{
             )
             / g
         );
-
-        // Get the field-relative ChassisSpeeds from the robot-relative ChassisSpeeds
-        ChassisSpeeds chassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(
-            BaseRobotState.robotSpeeds, BaseRobotState.robotPose.getRotation()
-        );
-        // Current field-relative chassis (robot) velocity components in m/s
-        double vCX = chassisSpeeds.vxMetersPerSecond;
-        double vCY = chassisSpeeds.vyMetersPerSecond;
 
         // Calculated shooter velocity components in m/s
         double vSX = deltaX / time - vCX;

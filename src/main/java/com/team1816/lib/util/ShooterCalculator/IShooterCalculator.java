@@ -15,6 +15,12 @@ public interface IShooterCalculator {
      * @param useChassisSpeedForHoodAngleAndSpeed If the chassis speeds should be factored into
      *                                            calculations for incline angle and launch
      *                                            velocity. Not used by all calculator types.
+     * @param lookAheadTimeSeconds The time to project forward the shooter's position before
+     *                             performing calculations, in seconds. This can be used to give
+     *                             mechanisms that cannot keep up with the robot's movement a head
+     *                             start. However, it should be used with caution, because it will
+     *                             not behave well while accelerating or turning. Not used by all
+     *                             calculator types.
      * @return The {@link ShooterCalculatorResponse} describing how the projectile should be shot
      * to reach the target.
      */
@@ -22,7 +28,8 @@ public interface IShooterCalculator {
         Translation3d shooterTranslation3dMeters,
         Translation3d targetTranslation3dMeters,
         double angleOfEntryDegrees,
-        boolean useChassisSpeedForHoodAngleAndSpeed
+        boolean useChassisSpeedForHoodAngleAndSpeed,
+        double lookAheadTimeSeconds
     );
 
     /**
