@@ -5,7 +5,6 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.team1816.season.Robot;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
@@ -39,14 +38,12 @@ public class GreenLogger {
             DriverStation.silenceJoystickConnectionWarning(true);
         }
 
-        // this will log the robot modes i.e., auto enabled estop
-        //DriverStation.startDataLog(DataLogManager.getLog(), false);
-        // Log network tables then we can use advantage scope on a live robot
+        // Start DatalogManager first Default is to Log network tables then we can use advantage scope on a live robot
         // and use the same layout for the logs
         DataLogManager.start();
-        DataLogManager.logNetworkTables(true);
-        // don't log console since we output to network tables
-        DataLogManager.logConsoleOutput(false);
+        // now tell DS not to log joysticks
+        DriverStation.startDataLog(DataLogManager.getLog(), false);
+
         netTable = NetworkTableInstance.getDefault().getTable("");
         msg = netTable.getStringTopic("messages").publish();
     }
@@ -337,6 +334,7 @@ public class GreenLogger {
     // Will update all registered periodic loggers
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static void updatePeriodic() {
+        if(DriverStation.isDSAttached()) return;
         if (logLoopCount <= 2) {
             logLoopCount ++;
             return;
@@ -420,6 +418,5 @@ public class GreenLogger {
             " kI:" + GetDisplay(pid.kI) +
             " kD:" + GetDisplay(pid.kD));
     }
-    private static final InterpolatingDoubleTreeMap treeMap = new InterpolatingDoubleTreeMap();
 
 }
