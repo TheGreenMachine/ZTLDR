@@ -18,11 +18,11 @@ shooterSettings:
         - 0.1027 # 264
         - 0.1027 # 360
     launchVelocitiesRPS:
-        - 31 # 48
-        - 38 # 96
-        - 40 #120
-        - 42 # 156
-        - 45 # 204
+        - 30.25 # 48
+        - 37.25 # 96
+        - 39.25 #120
+        - 41.25 # 156
+        - 44.25 # 204
         - 47 #210
         - 48 # 264
         - 49 # 360
@@ -336,7 +336,7 @@ subsystems:
                     yInches: 3.587
                     zInches: 20
                     rollDegrees: 0
-                    pitchDegrees: -5
+                    pitchDegrees: -4
                     yawDegrees: 0
                 detectionType: APRIL_TAG
             forwardRight: # Pi IP: 10.18.16.12

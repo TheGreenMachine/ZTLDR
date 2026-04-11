@@ -334,7 +334,7 @@ public class GreenLogger {
     // Will update all registered periodic loggers
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static void updatePeriodic() {
-        if(DriverStation.isDSAttached()) return;
+        if(!DriverStation.isDSAttached()) return;
         if (logLoopCount <= 2) {
             logLoopCount ++;
             return;
