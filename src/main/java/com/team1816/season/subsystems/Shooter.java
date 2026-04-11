@@ -80,7 +80,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     /**
      * An adjustment value added to all requests to the turret (in degrees).
      */
-    private double turretAngleAdjustmentDegrees = 0;
+    private double turretAngleAdjustmentDegrees = 3;
 
     private boolean useChassisSpeedForHoodAngleAndSpeed = false;
 
