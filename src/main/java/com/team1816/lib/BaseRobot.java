@@ -18,23 +18,23 @@ public abstract class BaseRobot extends TimedRobot {
         // Add a periodic method to add the vision measurements to the drivetrain pose estimate
         // faster than the main robot loop to make sure we always have the most up-to-date pose
         // estimate.
-        addPeriodic(
-            () -> {
-                try {
-                    baseRobotContainer.addVisionMeasurementsToDrivetrain();
-                }
-                catch (Throwable t) {
-                    // Rate-limit error logging to once per second to avoid OOM from
-                    // allocating stack trace strings at 250Hz
-                    long now = System.currentTimeMillis();
-                    if (now - lastVisionErrorLogMs > 1000) {
-                        GreenLogger.log(t);
-                        lastVisionErrorLogMs = now;
-                    }
-                }
-            },
-            addVisionMeasurementsLoopTimeSeconds
-        );
+//        addPeriodic(
+//            () -> {
+//                try {
+//                    baseRobotContainer.addVisionMeasurementsToDrivetrain();
+//                }
+//                catch (Throwable t) {
+//                    // Rate-limit error logging to once per second to avoid OOM from
+//                    // allocating stack trace strings at 250Hz
+//                    long now = System.currentTimeMillis();
+//                    if (now - lastVisionErrorLogMs > 1000) {
+//                        GreenLogger.log(t);
+//                        lastVisionErrorLogMs = now;
+//                    }
+//                }
+//            },
+//            addVisionMeasurementsLoopTimeSeconds
+//        );
     }
 
     @Override

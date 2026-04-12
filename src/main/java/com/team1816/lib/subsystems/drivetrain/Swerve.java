@@ -7,6 +7,7 @@ import com.team1816.lib.hardware.factory.RobotFactory;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,6 +25,9 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     private final String NAME = "drivetrain";
 
     private final IDrivetrain drivetrain;
+
+    private final double tiltDebounce = 0.1;
+    private final double tiltThresholdDegrees = 1.0;
 
     private final CommandXboxController controller;
     private final SlewRateLimiter xLimiter = new SlewRateLimiter(3);    // forward/back
@@ -49,6 +53,9 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     private final double SLOW_MODE_TRANSLATIONAL_MULTIPLIER;
     private final double SLOW_MODE_ROTATIONAL_MULTIPLIER;
 
+    private final Debouncer flatDebouncer = new Debouncer(tiltDebounce);
+    private boolean isFlatDebouncedValue = false;
+
     public Swerve(CommandXboxController controller) {
         // TODO: This Singleton.get stuff is a temporary workaround until I fix a bug with the
         //  static factory member from the Singleton not initializing properly for the first
@@ -73,6 +80,9 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     @Override
     public void periodic() {
         readFromHardware();
+
+        isFlatDebouncedValue = flatDebouncer.calculate(isFlat());
+
         applyStates();
         setForwardPerspective();
     }
@@ -194,6 +204,38 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
 
     public void simTeleportRobot(Pose2d pose) {
         drivetrain.simTeleportRobot(pose);
+    }
+
+    public Pose2d getPose() { return drivetrain.getPose(); }
+
+    public boolean isFlatDebounced() {
+        return isFlatDebouncedValue;
+    }
+
+    public Pose2d getPastVisionPose(double timestamp) {
+        try {
+            return drivetrain.samplePoseAt(timestamp).orElse(getPose());
+        } catch (Exception e) {
+            System.err.println("Warning: Could not sample pose at timestamp " + timestamp);
+            return getPose();
+        }
+    }
+
+    public boolean isFlat() {
+        return Math.abs(getPitch().getDegrees()) < tiltThresholdDegrees
+            && Math.abs(getRoll().getDegrees()) < tiltThresholdDegrees;
+    }
+
+    public Rotation2d getPitch() {
+        return Rotation2d.fromDegrees(
+            drivetrain.getPigeon2().getPitch().getValueAsDouble()
+        );
+    }
+
+    public Rotation2d getRoll() {
+        return Rotation2d.fromDegrees(
+            drivetrain.getPigeon2().getRoll().getValueAsDouble()
+        );
     }
 
     public enum SwerveState {

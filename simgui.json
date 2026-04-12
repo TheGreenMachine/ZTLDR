@@ -34,7 +34,8 @@
       "/SmartDashboard/Pathfind Target": "String Chooser",
       "/SmartDashboard/PhotonAlerts": "Alerts",
       "/SmartDashboard/Shooter Incline": "Mechanism2d",
-      "/SmartDashboard/VisionSystemSim-VisionSim/Sim Field": "Field2d"
+      "/SmartDashboard/VisionSystemSim-VisionSim/Sim Field": "Field2d",
+      "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d"
     },
     "windows": {
       "/SmartDashboard/Auto Mode": {

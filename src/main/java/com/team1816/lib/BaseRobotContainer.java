@@ -7,6 +7,8 @@ import com.team1816.lib.subsystems.BaseSuperstructure;
 import com.team1816.lib.subsystems.LedManager;
 import com.team1816.lib.subsystems.Vision;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
+import com.team1816.lib.subsystems.vision.VisionConfiguration;
+import com.team1816.lib.subsystems.vision.VisionSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public abstract class BaseRobotContainer {
@@ -16,6 +18,14 @@ public abstract class BaseRobotContainer {
     protected CommandButtonBoard buttonBoard = new CommandButtonBoard(2);
 
     protected final Swerve swerve = new Swerve(driverController);
+    public final VisionSubsystem visionSubsystem = new VisionSubsystem(
+        BaseConstants.VisionConstants.CameraConstants.cameras,
+        BaseConstants.VisionConstants.aprilTagFieldLayout,
+        new VisionConfiguration(),
+        swerve::addVisionMeasurement,
+        swerve
+    );
+
     protected final Vision vision = new Vision();
 
     protected PathfindManager pathfindManager;

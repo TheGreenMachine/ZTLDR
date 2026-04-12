@@ -2,6 +2,7 @@ package com.team1816.lib.subsystems.drivetrain;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.ParentDevice;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.traits.CommonTalon;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
@@ -22,6 +23,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.numbers.N1;
@@ -29,6 +31,8 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+
+import java.util.Optional;
 
 import static com.team1816.lib.BaseConstants.DrivetrainConstants;
 import static com.team1816.lib.Singleton.factory;
@@ -123,6 +127,16 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
     public void resetPose(Pose2d pose) {
         simActualOdometryOrRawOdometry.resetPose(pose);
         super.resetPose(pose);
+    }
+
+    @Override
+    public Pose2d getPose() {
+        return super.getState().Pose;
+    }
+
+    @Override
+    public Optional<Pose2d> samplePoseAt(double timestampSeconds) {
+        return super.samplePoseAt(timestampSeconds);
     }
 
     @Override

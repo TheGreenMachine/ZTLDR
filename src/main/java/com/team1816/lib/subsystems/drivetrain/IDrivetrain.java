@@ -1,5 +1,6 @@
 package com.team1816.lib.subsystems.drivetrain;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.team1816.lib.hardware.KinematicsConfig;
 import com.team1816.lib.hardware.SubsystemConfig;
@@ -9,6 +10,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+
+import java.util.Optional;
 
 import static com.team1816.lib.Singleton.factory;
 
@@ -41,6 +44,12 @@ public interface IDrivetrain extends ITestableSubsystem {
     void setOperatorPerspectiveForward(Rotation2d fieldDirection);
 
     void resetPose(Pose2d pose);
+
+    Pose2d getPose();
+
+    Pigeon2 getPigeon2();
+
+    Optional<Pose2d> samplePoseAt(double timestampSeconds);
 
     /**
      * Teleport the simulated "actual" position of the robot used as the source of truth for
