@@ -103,7 +103,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
 
         for (Camera camera : aprilTagCameras) {
             var results = camera.getEstimatedRobotPosesFromAllUnreadResults();
-            if(results.size() <= 1 || RobotState.resetCameraQueue) continue;
+            if(RobotState.resetCameraQueue) continue;
             for (EstimatedRobotPose estimatedRobotPose : results) {
                 Pose2d visionEstimatedPose2d = estimatedRobotPose.estimatedPose.toPose2d();
 
@@ -116,8 +116,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                     // If we don't currently have an accurate pose estimate, we can't use current
                     // pose estimate to throw out far off vision estimates, so we'll just add the
                     // vision estimate to the list no matter where it is.
-                    !BaseRobotState.hasAccuratePoseEstimate
-                        || (
+                    (
                             // Check if the vision estimate is within the distance threshold of the
                             // current pose estimate.
                             visionEstimatedPose2d.getTranslation().getDistance(
@@ -156,13 +155,13 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 // this is the case, say that we don't trust the current estimate to allow vision
                 // to fully recorrect.
                 else {
-                    consecutiveDiscardedEstimates ++;
-                    // The number of estimates to allow to be discarded before determining that we
-                    // have lost a good pose estimate.
-                    int discardsBeforePoseLoss = 5;
-                    if (consecutiveDiscardedEstimates >= discardsBeforePoseLoss) {
-                        BaseRobotState.hasAccuratePoseEstimate = false;
-                    }
+//                    consecutiveDiscardedEstimates ++;
+//                    // The number of estimates to allow to be discarded before determining that we
+//                    // have lost a good pose estimate.
+//                    int discardsBeforePoseLoss = 5;
+//                    if (consecutiveDiscardedEstimates >= discardsBeforePoseLoss) {
+//                        BaseRobotState.hasAccuratePoseEstimate = false;
+//                    }
                 }
             }
         }
