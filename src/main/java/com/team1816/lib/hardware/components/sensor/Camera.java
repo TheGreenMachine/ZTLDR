@@ -66,6 +66,8 @@ public class Camera {
      * vision estimates and odometry data.
      */
     private Pose3d latestPoseEstimate = Pose3d.kZero;
+
+    private List<PhotonPipelineResult> photonPipelineResults = List.of();
     /**
      * The latest vision standard deviations from this camera, for logging purposes.
      */
@@ -147,7 +149,11 @@ public class Camera {
 
         // Get position estimates from all the unread PhotonPipelineResults on the PhotonCamera. A
         // PhotonPipelineResult can essentially be thought of as a frame from the camera.
-        for (PhotonPipelineResult pipelineResult : photonCamera.getAllUnreadResults()) {
+        photonPipelineResults = photonCamera.getAllUnreadResults();
+        if (photonPipelineResults.size() > 1) {
+            ;
+        }
+        for (PhotonPipelineResult pipelineResult : photonPipelineResults) {
             int targetsSize = pipelineResult.targets.size();
             if (targetsSize > 0) {
                 Optional<EstimatedRobotPose> poseEstimate = targetsSize > 1 ?
@@ -255,6 +261,9 @@ public class Camera {
         );
         GreenLogger.periodicLog(
             logPath + "Latest Pose Estimate", () -> latestPoseEstimate, Pose3d.struct
+        );
+        GreenLogger.periodicLogList(
+            logPath + "Photon Pipeline Results", () -> photonPipelineResults, PhotonPipelineResult.class
         );
         GreenLogger.periodicLog(
             logPath + "Latest Vision Standard Deviations",

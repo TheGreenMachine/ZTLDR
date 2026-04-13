@@ -2,6 +2,7 @@ package com.team1816.lib.subsystems;
 
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.sensor.Camera;
+import com.team1816.lib.util.GreenLogger;
 import com.team1816.season.Robot;
 import com.team1816.season.RobotState;
 import edu.wpi.first.math.MathUtil;
@@ -82,6 +83,8 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 camera.addToSim(visionSim);
             }
         }
+
+        GreenLogger.periodicLog(NAME + "/HasAccuratePoseEstimate", () -> BaseRobotState.hasAccuratePoseEstimate, null);
     }
 
     /**
