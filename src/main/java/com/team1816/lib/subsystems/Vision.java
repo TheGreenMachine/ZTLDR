@@ -49,11 +49,11 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      * The base standard deviations to use for non-multi-tag estimates
      */
     // Ignore single tag data. Previously set to 4, 4, 8.
-    private final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(999999, 999999, 999999);
+    private final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(0.5, 0.5, 999999);
     /**
      * The base standard deviations to use for multi-tag estimates
      */
-    private final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+    private final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.1, 0.1, 0.5);
     /**
      * The standard deviations to use for an estimate that we should just throw out
      */
@@ -112,7 +112,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 // out unreasonable estimates caused by pose ambiguity (see here:
                 // https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/3D-tracking.html#ambiguity
                 // ).
-                if (
+                if (!BaseRobotState.hasAccuratePoseEstimate ||
                     // If we don't currently have an accurate pose estimate, we can't use current
                     // pose estimate to throw out far off vision estimates, so we'll just add the
                     // vision estimate to the list no matter where it is.
@@ -155,13 +155,13 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 // this is the case, say that we don't trust the current estimate to allow vision
                 // to fully recorrect.
                 else {
-//                    consecutiveDiscardedEstimates ++;
-//                    // The number of estimates to allow to be discarded before determining that we
-//                    // have lost a good pose estimate.
-//                    int discardsBeforePoseLoss = 5;
-//                    if (consecutiveDiscardedEstimates >= discardsBeforePoseLoss) {
-//                        BaseRobotState.hasAccuratePoseEstimate = false;
-//                    }
+                    consecutiveDiscardedEstimates ++;
+                    // The number of estimates to allow to be discarded before determining that we
+                    // have lost a good pose estimate.
+                    int discardsBeforePoseLoss = 3;
+                    if (consecutiveDiscardedEstimates >= discardsBeforePoseLoss) {
+                        BaseRobotState.hasAccuratePoseEstimate = false;
+                    }
                 }
             }
         }
@@ -270,7 +270,9 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
             // readings. I couldn't tell you why we are using the square of the distance over 30,
             // but that's the equation PhotonVision's example project uses, and it works well
             // enough. Again, this is just a heuristic algorithm.
-            return singleTagStdDevs.times(1 + (closestDistance * closestDistance / 30));
+            int numTags = estimatedRobotPose.targetsUsed.size();
+
+            return singleTagStdDevs.times(1 + (closestDistance * closestDistance / 30)).div(numTags);
         }
 
         // Otherwise, if we were able to use multi-tag:
