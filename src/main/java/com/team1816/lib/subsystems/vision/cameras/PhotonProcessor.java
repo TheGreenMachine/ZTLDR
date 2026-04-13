@@ -63,6 +63,10 @@ public class PhotonProcessor implements ProcessorInterface {
      */
     private List<Integer> seenAprilTagIDs = List.of();
 
+    private Matrix<N3, N1> originalCalc;
+
+    private Matrix<N3, N1> greenCalc;
+
     public PhotonProcessor(
         String name,
         AprilTagFieldLayout layout,
@@ -168,12 +172,12 @@ public class PhotonProcessor implements ProcessorInterface {
         double timestamp = Utils.fpgaToCurrentTime(estimatedPose.timestampSeconds);
         double latency = rawResult.metadata.getLatencyMillis();
 
-//        Matrix<N3, N1> stdDevs = stdDevCalculator.calculate(
-//            avgAmbiguity,
-//            avgArea,
-//            latency,
-//            targetCount
-//        );
+        Matrix<N3, N1> stdDevs1 = stdDevCalculator.calculate(
+            avgAmbiguity,
+            avgArea,
+            latency,
+            targetCount
+        );
 
         Matrix<N3, N1> stdDevs = stdDevCalculator.calculateEstimateStandardDeviations(estimatedPose);
 
