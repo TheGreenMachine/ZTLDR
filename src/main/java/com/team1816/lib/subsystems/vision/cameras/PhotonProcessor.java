@@ -11,6 +11,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -63,9 +64,9 @@ public class PhotonProcessor implements ProcessorInterface {
      */
     private List<Integer> seenAprilTagIDs = List.of();
 
-    private Matrix<N3, N1> originalCalc;
+    private Matrix<N3, N1> originalCalc = VecBuilder.fill(0.1, 0.1, 0.1);;
 
-    private Matrix<N3, N1> greenCalc;
+    private Matrix<N3, N1> greenCalc = VecBuilder.fill(0.1, 0.1, 0.1);;
 
     public PhotonProcessor(
         String name,
@@ -172,14 +173,14 @@ public class PhotonProcessor implements ProcessorInterface {
         double timestamp = Utils.fpgaToCurrentTime(estimatedPose.timestampSeconds);
         double latency = rawResult.metadata.getLatencyMillis();
 
-        Matrix<N3, N1> stdDevs1 = stdDevCalculator.calculate(
+        originalCalc = stdDevCalculator.calculate(
             avgAmbiguity,
             avgArea,
             latency,
             targetCount
         );
 
-        Matrix<N3, N1> stdDevs = stdDevCalculator.calculateEstimateStandardDeviations(estimatedPose);
+        greenCalc = stdDevCalculator.calculateEstimateStandardDeviations(estimatedPose);
 
         // Convert PhotonTrackedTarget -> TrackedTag (camera-agnostic).
         tagScratch.clear();
@@ -193,7 +194,7 @@ public class PhotonProcessor implements ProcessorInterface {
             timestamp,
             latency,
             resultantPose,
-            stdDevs,
+            greenCalc,
             tagScratch,
             avgAmbiguity,
             avgArea,
@@ -215,6 +216,16 @@ public class PhotonProcessor implements ProcessorInterface {
             logPath + "Camera Pose",
             () -> new Pose3d(BaseRobotState.robotPose).plus(cameraTransform),
             Pose3d.struct
+        );
+        GreenLogger.periodicLog(
+            logPath + "Their Calc",
+            () -> originalCalc,
+            Matrix.getStruct(Nat.N3(), Nat.N1())
+        );
+        GreenLogger.periodicLog(
+            logPath + "Our Calc",
+            () -> greenCalc,
+            Matrix.getStruct(Nat.N3(), Nat.N1())
         );
     }
     //#region Calculation
