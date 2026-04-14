@@ -7,11 +7,12 @@ public interface IShooterCalculator {
     /**
      * Calculate the necessary settings to shoot from the shooter to the target.
      *
-     * @param shooterTranslation3dMeters The {@link Translation3d} of where the shooter is shooting
-     *                                   from.
-     * @param targetTranslation3dMeters The {@link Translation3d} of where to shoot to.
-     * @param angleOfEntryDegrees The desired angle of entry of the projectile into the target.
-     *                            Not used by all calculator types.
+     * @param shooterTranslation3dMeters The field-relative {@link Translation3d} of where the
+     *                                   shooter is shooting from, in meters.
+     * @param targetTranslation3dMeters The field-relative {@link Translation3d} of where to shoot
+     *                                  to, in meters.
+     * @param angleOfEntryDegrees The desired angle of entry of the projectile into the target, in
+     *                            degrees up from horizontal. Not used by all calculator types.
      * @param useChassisSpeedForHoodAngleAndSpeed If the chassis speeds should be factored into
      *                                            calculations for incline angle and launch
      *                                            velocity. Not used by all calculator types.
@@ -35,11 +36,11 @@ public interface IShooterCalculator {
     /**
      * A response returned by a shooter calculator describing how to shoot the projectile.
      *
-     * @param turretAngleDegrees The robot-relative turret angle to point at in degrees,
+     * @param turretAngleDegrees The robot-relative turret angle to point at, in degrees
      *                           counterclockwise from robot forward.
-     * @param inclineAngleDegrees The incline angle at which the projectile should be launched in
-     *                            degrees, down from straight up.
-     * @param launchVelocityRPS The velocity to spin the launch motors at in rotations per second.
+     * @param inclineAngleDegrees The incline angle at which the projectile should be launched, in
+     *                            degrees down from straight up.
+     * @param launchVelocityRPS The velocity to spin the launch motors at, in rotations per second.
      */
     record ShooterCalculatorResponse(double turretAngleDegrees, double inclineAngleDegrees, double launchVelocityRPS) {}
 }

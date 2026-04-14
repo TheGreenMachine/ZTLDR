@@ -335,8 +335,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private void applyState() {
         target = getTargetTranslation3d();
-        // TODO: I need to figure out why this needs to be negative, but it does for now.
-        final double calculatorAngleOfEntryDegrees = -45;
+        final double calculatorAngleOfEntryDegrees = 45;
 
         isAutoAiming = autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC;
 

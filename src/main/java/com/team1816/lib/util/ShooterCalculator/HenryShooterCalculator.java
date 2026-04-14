@@ -15,10 +15,12 @@ public class HenryShooterCalculator implements IShooterCalculator {
      * in angle of entry as possible. It also uses a lookup table to convert from the calculated
      * linear launch velocity to the necessary launch motor RPS.
      *
-     * @param shooterTranslation3dMeters The {@link Translation3d} of where the shooter is shooting
-     *                                   from.
-     * @param targetTranslation3dMeters The {@link Translation3d} of where to shoot to.
-     * @param angleOfEntryDegrees The desired angle of entry of the projectile into the target.
+     * @param shooterTranslation3dMeters The field-relative {@link Translation3d} of where the
+     *                                   shooter is shooting from, in meters.
+     * @param targetTranslation3dMeters The field-relative {@link Translation3d} of where to shoot
+     *                                  to, in meters.
+     * @param angleOfEntryDegrees The desired angle of entry of the projectile into the target, in
+     *                            degrees up from horizontal, in meters.
      * @param useChassisSpeedForHoodAngleAndSpeed Unused for this calculator.
      * @param lookAheadTimeSeconds The time to project forward the shooter's position before
      *                             performing calculations, in seconds. This can be used to give
@@ -66,7 +68,7 @@ public class HenryShooterCalculator implements IShooterCalculator {
             2
             * (
                 deltaZ
-                - (
+                + (
                     Math.tan(
                         Units.degreesToRadians(angleOfEntryDegrees)
                     )
