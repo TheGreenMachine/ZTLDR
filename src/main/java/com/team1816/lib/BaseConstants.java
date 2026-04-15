@@ -15,6 +15,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import org.photonvision.simulation.SimCameraProperties;
 
+import java.util.List;
 import java.util.Map;
 
 public final class BaseConstants {
@@ -39,13 +40,26 @@ public final class BaseConstants {
             simCameraProperties.setLatencyStdDevMs(0);
         }
 
-        // TODO: Tune these values more (PLEASE!)
+        public static final int maxTagsPerFrame = 8;
+
         public static final class StdDevConstants {
-            public static final double baseXYStdDev = 0.42;  // 0.18
-            public static final double baseThetaStdDev = 0.87;  // 0.5 — heading from vision is still less reliable
-            public static final double ambiguityWeight = 0.3;  // 0.6
-            public static final double areaWeight = 0.8;  // 0.6
-            public static final double latencyWeight = 0.9;  // 0.4
+            public static final double baseXYStdDev = 0.42;
+            public static final double baseThetaStdDev = 0.85;
+            public static final double ambiguityWeight = 0.1;
+            public static final double areaWeight = 0.9;
+            public static final double latencyWeight = 1.0;
+        }
+
+        public static final class FusionConstants {
+            public static final boolean enabled = true;
+            public static final double timestampThresholdSecs = 0.05;
+            public static final int minCameras = 2;
+
+            /**
+             * Results whose normalized distance from the group mean exceeds this
+             * number of sigma are rejected as outliers before fusion.
+             */
+            public static final double outlierSigma = 3.0;
         }
 
         public static final class CameraConstants {
@@ -108,34 +122,37 @@ public final class BaseConstants {
 
             //-----------------------------------------------------
 
-            public static final Map<String, ProcessorInterface> cameras = Map.of(
-                "fl", new PhotonProcessor(
+            public static final List<ProcessorInterface> cameras = List.of(
+                new PhotonProcessor(
                     "Forward_Left",
                     aprilTagFieldLayout,
                     Forward_Left,
-                    new StdDevCalculator(1.3),
-                    simCameraProperties
+                    new StdDevCalculator(),
+                    simCameraProperties, 20
                 ),
-                "fr", new PhotonProcessor(
+                new PhotonProcessor(
                     "Forward_Right",
                     aprilTagFieldLayout,
                     Forward_Right,
-                    new StdDevCalculator(1.3),
-                    simCameraProperties
+                    new StdDevCalculator(),
+                    simCameraProperties,
+                    20
                 ),
-                "bl", new PhotonProcessor(
+                new PhotonProcessor(
                     "Backward_Left",
                     aprilTagFieldLayout,
                     Backward_Left,
-                    new StdDevCalculator(1.3),
-                    simCameraProperties
+                    new StdDevCalculator(),
+                    simCameraProperties,
+                    20
                 ),
-                "br", new PhotonProcessor(
+                new PhotonProcessor(
                     "Backward_Right",
                     aprilTagFieldLayout,
                     Backward_Right,
-                    new StdDevCalculator(1.3),
-                    simCameraProperties
+                    new StdDevCalculator(),
+                    simCameraProperties,
+                    20
                 )
             );
         }
