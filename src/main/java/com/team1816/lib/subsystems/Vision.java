@@ -2,17 +2,18 @@ package com.team1816.lib.subsystems;
 
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.sensor.Camera;
+import com.team1816.lib.util.GreenLogger;
+import com.team1816.lib.util.RectangularBoundingBox;
 import com.team1816.season.Robot;
 import com.team1816.season.RobotState;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonPoseEstimator;
@@ -25,6 +26,7 @@ import java.util.Optional;
 
 import static com.team1816.lib.BaseConstants.VisionConstants.*;
 import static com.team1816.lib.Singleton.factory;
+import static edu.wpi.first.units.Units.Inches;
 
 /**
  * This subsystem handles reading and interpreting data from cameras and simulating camera
@@ -67,12 +69,25 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
         Double.NaN, Double.NaN, Double.NaN
     );
 
+    public static final Distance fieldLength = Inches.of(651.2);
+    public static final Distance fieldWidth =  Inches.of(317.7);
+
+    private final RectangularBoundingBox acceptableFieldBox = new RectangularBoundingBox(
+        new Translation2d(
+
+        ),
+        new Translation2d(
+            fieldLength,
+            fieldWidth
+        )
+    );
     /**
      * The maximum heading disagreement (in radians) between a single-tag vision estimate
      * and the current robot pose before we discard it as an ambiguous reflection.
      */
     private static final double SINGLE_TAG_MAX_HEADING_ERROR_RADIANS = Units.degreesToRadians(60.0);
 
+    private List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> posesWithStdDevs = new ArrayList<>();
     /**
      * Constructs a Vision subsystem.
      */
@@ -89,6 +104,12 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 camera.addToSim(visionSim);
             }
         }
+
+        GreenLogger.periodicLog(
+            "vision/Latest Vision Standard Deviations Size",
+            () -> posesWithStdDevs.size()
+        );
+
     }
 
     /**
@@ -111,14 +132,21 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      * @return All unread vision pose estimates with corresponding standard deviations.
      */
     public List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> getVisionEstimatedPosesWithStdDevs() {
-        List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> posesWithStdDevs = new ArrayList<>();
+        posesWithStdDevs = new ArrayList<>();
 
+        posesWithStdDevs.clear();
         for (Camera camera : aprilTagCameras) {
             var results = camera.getEstimatedRobotPosesFromAllUnreadResults();
-            if (results.size() <= 1 || RobotState.resetCameraQueue) continue;
+            if (RobotState.resetCameraQueue) continue;
 
             for (EstimatedRobotPose estimatedRobotPose : results) {
                 Pose2d visionEstimatedPose2d = estimatedRobotPose.estimatedPose.toPose2d();
+
+                var inField = acceptableFieldBox.withinBounds(estimatedRobotPose.estimatedPose.toPose2d().getTranslation());
+
+                if (!inField){
+                    continue;
+                }
 
                 // For single-tag estimates, reject if heading disagrees with gyro/odometry
                 // by more than 60 degrees. The reflected ambiguous pose from single-tag

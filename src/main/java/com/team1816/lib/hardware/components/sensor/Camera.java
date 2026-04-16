@@ -2,14 +2,17 @@ package com.team1816.lib.hardware.components.sensor;
 
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.util.GreenLogger;
+import com.team1816.lib.util.RectangularBoundingBox;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -26,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.team1816.lib.BaseConstants.VisionConstants.*;
+import static edu.wpi.first.units.Units.Inches;
 
 /**
  * This class holds the properties needed to configure, use, and simulate a camera using <a href=
@@ -70,6 +74,21 @@ public class Camera {
      * The latest vision standard deviations from this camera, for logging purposes.
      */
     public Matrix<N3, N1> latestVisionStdDevs = VecBuilder.fill(0.0, 0.0, 0.0);
+
+    public boolean inField = false;
+
+    public static final Distance fieldLength = Inches.of(651.2);
+    public static final Distance fieldWidth =  Inches.of(317.7);
+
+    private final RectangularBoundingBox acceptableFieldBox = new RectangularBoundingBox(
+        new Translation2d(
+
+        ),
+        new Translation2d(
+            fieldLength,
+            fieldWidth
+        )
+    );
 
     /**
      * Constructs a {@link Camera} with the specified configuration values.
@@ -148,22 +167,18 @@ public class Camera {
         // Get position estimates from all the unread PhotonPipelineResults on the PhotonCamera. A
         // PhotonPipelineResult can essentially be thought of as a frame from the camera.
         for (PhotonPipelineResult pipelineResult : photonCamera.getAllUnreadResults()) {
-            Optional<EstimatedRobotPose> poseEstimate = poseEstimator.estimateCoprocMultiTagPose(pipelineResult);
-
-            // If we weren't able to get a multi-tag estimate (this would happen if there weren't
-            // multiple tags visible), try to get a result using lowest ambiguity. (Technically, it
-            // doesn't matter that it is using the lowest ambiguity tag because at this point we
-            // know there is only one tag, but it has to be some estimation strategy that works
-            // with only one tag.)
-            if (poseEstimate.isEmpty()) {
-                poseEstimate = poseEstimator.estimateLowestAmbiguityPose(pipelineResult);
-            }
-
+            Optional<EstimatedRobotPose> poseEstimate = pipelineResult.targets.size() > 1 ?
+                poseEstimator.estimateCoprocMultiTagPose(pipelineResult) :
+                poseEstimator.estimateLowestAmbiguityPose(pipelineResult);
+            
             // If we got an estimate, add it to the list to return and update the latest pose
             // estimate.
+            inField = false;
             poseEstimate.ifPresent(estimate -> {
                 estimatedRobotPoses.add(estimate);
                 latestPoseEstimate = estimate.estimatedPose;
+
+                inField = acceptableFieldBox.withinBounds(estimate.estimatedPose.toPose2d().getTranslation());
             });
 
             // Set the seen AprilTag poses and IDs based on the tags from the latest pipeline
@@ -256,6 +271,10 @@ public class Camera {
             logPath + "Camera Pose",
             () -> new Pose3d(BaseRobotState.robotPose).plus(robotToCamera),
             Pose3d.struct
+        );
+        GreenLogger.periodicLog(
+            logPath + "Camera InField",
+            () -> inField
         );
     }
 
