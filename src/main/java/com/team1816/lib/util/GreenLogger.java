@@ -38,13 +38,12 @@ public class GreenLogger {
             DriverStation.silenceJoystickConnectionWarning(true);
         }
 
-        // this will log the robot modes i.e., auto enabled estop
-        DriverStation.startDataLog(DataLogManager.getLog(), false);
-        // Log network tables then we can use advantage scope on a live robot
+        // Start DatalogManager first Default is to Log network tables then we can use advantage scope on a live robot
         // and use the same layout for the logs
-        DataLogManager.logNetworkTables(true);
-        // don't log console since we output to network tables
-        DataLogManager.logConsoleOutput(false);
+        DataLogManager.start();
+        // now tell DS not to log joysticks
+        DriverStation.startDataLog(DataLogManager.getLog(), false);
+
         netTable = NetworkTableInstance.getDefault().getTable("");
         msg = netTable.getStringTopic("messages").publish();
     }
@@ -335,7 +334,7 @@ public class GreenLogger {
     // Will update all registered periodic loggers
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static void updatePeriodic() {
-        if(RobotState.isDisabled()) { logLoopCount = 0; return; }
+        if(!DriverStation.isDSAttached()) return;
         if (logLoopCount <= 2) {
             logLoopCount ++;
             return;
@@ -419,4 +418,5 @@ public class GreenLogger {
             " kI:" + GetDisplay(pid.kI) +
             " kD:" + GetDisplay(pid.kD));
     }
+
 }
