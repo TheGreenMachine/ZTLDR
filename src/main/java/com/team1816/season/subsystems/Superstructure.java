@@ -5,8 +5,6 @@ import com.team1816.lib.subsystems.BaseSuperstructure;
 import com.team1816.lib.subsystems.Vision;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 
 public class Superstructure extends BaseSuperstructure {
     private final Shooter shooter;
@@ -204,7 +202,7 @@ public class Superstructure extends BaseSuperstructure {
                 case PRESET_CLOSE -> Shooter.ShooterDistanceState.PRESET_CLOSE;
                 case PRESET_MIDDLE -> Shooter.ShooterDistanceState.PRESET_MIDDLE;
                 case PRESET_FAR -> Shooter.ShooterDistanceState.PRESET_FAR;
-                case PRESET_AUTO_THING -> Shooter.ShooterDistanceState.PRESET_AUTO_THING;
+                case PRESET_BROKEN_INCLINE_AUTO -> Shooter.ShooterDistanceState.PRESET_BROKEN_INCLINE_AUTO;
             }
         );
 
@@ -271,7 +269,7 @@ public class Superstructure extends BaseSuperstructure {
         PRESET_CLOSE,
         PRESET_MIDDLE,
         PRESET_FAR,
-        PRESET_AUTO_THING
+        PRESET_BROKEN_INCLINE_AUTO
     }
 
     public enum WantedGatekeeperState {

@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StartCenterShoot"
+            "pathName": "StartIIfuelShoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "shootWithIntake"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ShootCenterPark"
+            "pathName": "ShootIIfuelPark"
           }
         }
       ]

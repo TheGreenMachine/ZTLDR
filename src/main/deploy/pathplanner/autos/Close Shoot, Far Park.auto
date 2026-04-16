@@ -5,27 +5,27 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "distancePresetAutoThing"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "StartCenterClosershoot"
+            "pathName": "StartIIfuelShoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "shootWithIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "waitForDucking"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ClosershootGreedyOutpost"
+            "pathName": "ShootIfuelPark"
           }
         }
       ]

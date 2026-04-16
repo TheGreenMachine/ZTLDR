@@ -1,5 +1,5 @@
 {
- "name":"ClosershootCenterPark",
+ "name":"CloserShootIIfuelPark",
  "version":3,
  "snapshot":{
   "waypoints":[
@@ -23,8 +23,8 @@
     {"x":{"exp":"CloserShoot.x", "val":2.6558}, "y":{"exp":"CloserShoot.y", "val":5.7011}, "heading":{"exp":"CloserShoot.heading", "val":3.141592653589793}, "intervals":197, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"3.4878811836242676 m", "val":3.4878811836242676}, "y":{"exp":"7.437780857086182 m", "val":7.437780857086182}, "heading":{"exp":"180 deg", "val":3.141592653589793}, "intervals":100, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"5.829519748687744 m", "val":5.829519748687744}, "y":{"exp":"7.437780857086182 m", "val":7.437780857086182}, "heading":{"exp":"180 deg", "val":3.141592653589793}, "intervals":138, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"7.924712657928467 m", "val":7.924712657928467}, "y":{"exp":"6.82694191456 m", "val":6.82694191456}, "heading":{"exp":"250 deg", "val":4.363323129985824}, "intervals":101, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"7.74509859085083 m", "val":7.74509859085083}, "y":{"exp":"8.07 m - 3.343446445465088 m", "val":4.726553554534912}, "heading":{"exp":"240 deg", "val":4.1887902047863905}, "intervals":150, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"IIOuterFuel.x", "val":7.924712657928467}, "y":{"exp":"IIOuterFuel.y", "val":6.82694191456}, "heading":{"exp":"IIOuterFuel.heading", "val":4.363323129985824}, "intervals":101, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"IIInnerFuel.x", "val":7.74509859085083}, "y":{"exp":"IIInnerFuel.y", "val":4.726553554534912}, "heading":{"exp":"IIInnerFuel.heading", "val":4.1887902047863905}, "intervals":150, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"Park.x", "val":6.595874309539795}, "y":{"exp":"Park.y", "val":6.855919361114502}, "heading":{"exp":"Park.heading", "val":-0.7853981633974483}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
