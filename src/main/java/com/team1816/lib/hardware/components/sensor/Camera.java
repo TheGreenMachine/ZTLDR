@@ -258,9 +258,6 @@ public class Camera {
         GreenLogger.periodicLog(
             logPath + "Latest Pose Estimate", () -> latestPoseEstimate, Pose3d.struct
         );
-        GreenLogger.periodicLogList(
-            logPath + "Photon Pipeline Results", () -> photonPipelineResults, PhotonPipelineResult.class
-        );
         GreenLogger.periodicLog(
             logPath + "Latest Vision Standard Deviations",
             () -> latestVisionStdDevs,
