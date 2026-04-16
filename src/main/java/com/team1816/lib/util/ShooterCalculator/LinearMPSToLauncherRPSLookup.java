@@ -13,11 +13,20 @@ public class LinearMPSToLauncherRPSLookup {
 
     private final PolynomialSplineFunction linearMPSToLauncherRPSFunction;
 
-    public LinearMPSToLauncherRPSLookup() {
+    /**
+     * Constructs a {@link LinearMPSToLauncherRPSLookup} to convert from linear exit velocities
+     * of a projectile to launch motor angular velocities.
+     *
+     * @param deltaZMeters The difference between the target height and shooter height used when
+     *                     calibrating the shooterSettings so we can use those settings to
+     *                     determine the relationship between launcher RPS and linear exit
+     *                     velocity, in meters.
+     */
+    public LinearMPSToLauncherRPSLookup(double deltaZMeters) {
         // TODO: If we calibrate this using the linearMPSToLaunchRPS YAML, we can use the line below.
         //  For now we are just trying to use some physics to get data from the shooterSettings table.
 //        LinearMPSToLauncherRPSConfig table = factory.getLinearMPSToLauncherRPSConfig();
-        LinearMPSToLauncherRPSConfig table = factory.stealLinearMPSToLauncherRPSConfigFromShooterSettings(72);
+        LinearMPSToLauncherRPSConfig table = factory.stealLinearMPSToLauncherRPSConfigFromShooterSettings(deltaZMeters);
 
         List<Double> linearVelocitiesMPS = table.linearVelocitiesMPS;
         List<Double> launchVelocitiesRPS = table.launchVelocitiesRPS;

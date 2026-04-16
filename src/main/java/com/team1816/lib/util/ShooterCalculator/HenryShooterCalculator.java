@@ -7,7 +7,20 @@ import edu.wpi.first.math.util.Units;
 
 public class HenryShooterCalculator implements IShooterCalculator {
 
-    private final LinearMPSToLauncherRPSLookup linearMPSToLauncherRPSLookup = new LinearMPSToLauncherRPSLookup();
+    private final LinearMPSToLauncherRPSLookup linearMPSToLauncherRPSLookup;
+
+    /**
+     * Construct a {@link HenryShooterCalculator} to calculate how to shoot a projectile into a
+     * target at a given angle of entry.
+     *
+     * @param deltaZMeters The difference between the target height and shooter height used when
+     *                     calibrating the shooterSettings so we can use those settings to
+     *                     determine the relationship between launcher RPS and linear exit
+     *                     velocity, in meters.
+     */
+    public HenryShooterCalculator(double deltaZMeters) {
+        linearMPSToLauncherRPSLookup = new LinearMPSToLauncherRPSLookup(deltaZMeters);
+    }
 
     /**
      * Calculate the necessary settings to shoot from the shooter to the target. This calculator

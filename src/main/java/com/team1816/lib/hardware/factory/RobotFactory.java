@@ -143,7 +143,18 @@ public class RobotFactory {
         return config.linearMPSToLaunchRPS;
     }
 
-    public LinearMPSToLauncherRPSConfig stealLinearMPSToLauncherRPSConfigFromShooterSettings(double deltaZInches) {
+    /**
+     * Uses the shooterSettings in YAML to create a {@link LinearMPSToLauncherRPSConfig} defining
+     * the relationship between launcher angular velocity and linear exit velocity.
+     *
+     * @param deltaZMeters The difference between the target height and shooter height used when
+     *                     calibrating the shooterSettings so we can use those settings to
+     *                     determine the relationship between launcher RPS and linear exit
+     *                     velocity, in meters.
+     * @return The calculated {@link LinearMPSToLauncherRPSConfig} based on the shooterSettings
+     * in YAML and the passed in deltaZMeters.
+     */
+    public LinearMPSToLauncherRPSConfig stealLinearMPSToLauncherRPSConfigFromShooterSettings(double deltaZMeters) {
         LinearMPSToLauncherRPSConfig linearMPSToLauncherRPSConfig = new LinearMPSToLauncherRPSConfig();
         if (config.shooterSettings == null) {
             GreenLogger.log("Couldn't find the shooter settings config");
@@ -151,7 +162,6 @@ public class RobotFactory {
         }
         linearMPSToLauncherRPSConfig.launchVelocitiesRPS = config.shooterSettings.launchVelocitiesRPS;
         linearMPSToLauncherRPSConfig.linearVelocitiesMPS = new ArrayList<>();
-        double deltaZMeters = Units.inchesToMeters(deltaZInches);
         for (int i = 0; i < config.shooterSettings.distancesInches.size(); i++) {
             double distanceMeters = Units.inchesToMeters(config.shooterSettings.distancesInches.get(i));
             double thetaRadians = Math.PI / 2 - Units.rotationsToRadians(config.shooterSettings.inclineAnglesRotations.get(i));

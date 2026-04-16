@@ -206,8 +206,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 //    private final double ROBOT_STARTING_LINE = Units.inchesToMeters(156.61); True position.
     private final double ROBOT_STARTING_LINE = 4.2684; // Fudged position to shoot into the hub from only partially over the line.
 
-    // Just change this line to use a new ShooterTableCalculator to switch the calculator type.
-    private final IShooterCalculator shooterTableCalculator = new HenryShooterCalculator();
+    private final IShooterCalculator shooterTableCalculator;
 
     private Translation3d target = Translation3d.kZero;
     private Pose3d turretPose = Pose3d.kZero;
@@ -223,6 +222,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             factory.getConstant(NAME, "shooterOffsetYMeters",0),
             factory.getConstant(NAME, "shooterOffsetZMeters",0)
         );
+        // Just change this line to use a new ShooterTableCalculator to switch the calculator type.
+        shooterTableCalculator = new HenryShooterCalculator(HUB_TRANSLATION_3D.getZ() - SHOOTER_OFFSET.getZ());
 
         // Find the turret positions of the four spots that we would see beam break values change,
         // in motor rotations relative robot forward.
