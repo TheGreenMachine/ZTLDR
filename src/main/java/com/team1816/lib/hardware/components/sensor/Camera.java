@@ -149,11 +149,7 @@ public class Camera {
 
         // Get position estimates from all the unread PhotonPipelineResults on the PhotonCamera. A
         // PhotonPipelineResult can essentially be thought of as a frame from the camera.
-        photonPipelineResults = photonCamera.getAllUnreadResults();
-        if (photonPipelineResults.size() > 1) {
-            ;
-        }
-        for (PhotonPipelineResult pipelineResult : photonPipelineResults) {
+        for (PhotonPipelineResult pipelineResult : photonCamera.getAllUnreadResults()) {
             int targetsSize = pipelineResult.targets.size();
             if (targetsSize > 0) {
                 Optional<EstimatedRobotPose> poseEstimate = targetsSize > 1 ?
