@@ -25,14 +25,6 @@ public class TalonFXSImpl extends TalonFXS implements ICTREDevice, IMotor {
     @Override
     public StatusCode applyConfiguration(ParentConfiguration config, String logPath, boolean logDetails) {
         this.config = (TalonFXSConfiguration) config;
-        // add default logging for target and actual position/velocities
-        if (logDetails) {
-            GreenLogger.periodicLog(logPath + "Actual Position (rotations)", this::getMotorPosition);
-            GreenLogger.periodicLog(logPath + "Actual Velocity (rps)", this::getMotorVelocity);
-        }
-        GreenLogger.periodicLog(logPath + "Reference", this::getDeviceReference);
-        GreenLogger.periodicLog(logPath + "Connected", this::isConnected);
-        GreenLogger.periodicLog(logPath + "Stator", ()-> getStatorCurrent().getValueAsDouble());
         if(Robot.isSimulation()){
             simState = getSimState();
             var clockwise = ((TalonFXSConfiguration) config).MotorOutput.Inverted == InvertedValue.Clockwise_Positive;
