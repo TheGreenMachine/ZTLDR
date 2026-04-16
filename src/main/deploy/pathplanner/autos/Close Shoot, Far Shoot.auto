@@ -5,33 +5,33 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "distancePresetAutoThing"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.5
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "BumpCenterShoot"
+            "pathName": "StartIIfuelShoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "shootWithIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "waitForDucking"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ShootGreedyPark"
+            "pathName": "ShootIfuelShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shootWithIntake"
           }
         }
       ]

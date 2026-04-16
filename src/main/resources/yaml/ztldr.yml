@@ -15,14 +15,14 @@ shooterSettings:
         - 0.08 # 156
         - 0.09 # 204
         - 0.09 #210
-        - 0.1113 # 264
-        - 0.108 # 360
+        - 0.1027 # 264
+        - 0.1027 # 360
     launchVelocitiesRPS:
-        - 31 # 48
-        - 38 # 96
-        - 40 #120
-        - 42 # 156
-        - 45 # 204
+        - 30.25 # 48
+        - 37.25 # 96
+        - 39.25 #120
+        - 41.25 # 156
+        - 44.25 # 204
         - 47 #210
         - 48 # 264
         - 49 # 360
@@ -218,7 +218,7 @@ subsystems:
                 id: 10
                 deviceType: CANcoder
         constants:
-            intakeOnSpeed: .55
+            intakeOnSpeed: .52
             intakeSlowSpeed: .1
             outtakeSpeed: -0.6
             flipperMotorOutPosition: 0.164 #0.166
@@ -270,7 +270,7 @@ subsystems:
                 id: 27
                 motorRotation: Clockwise_Positive
                 reverseSoftLimit: 0.057
-                forwardSoftLimit: 0.1113
+                forwardSoftLimit: 0.1029
                 statorCurrentLimit: 35
                 pidConfig:
                     slot0:
@@ -316,7 +316,7 @@ subsystems:
             distanceTwoLaunchVelocityRPS: 47
             distanceThreeInclineAngleRotations: 0.1113
             distanceThreeLaunchVelocityRPS: 100
-            distanceAutoThingLaunchVelocityRPS: 60
+            brokenInclineAutoLaunchVelocityRPS: 55 # Set to the RPS required to score at a distance from shooter to hub of 101.283 inches.
             closeDistanceBetweenBeamBreaks: 0.419
             farDistanceBetweenBeamBreaks: 13.570
             secondLowestBeamBreakToZero: 6.7769
@@ -369,13 +369,6 @@ subsystems:
                     pitchDegrees: -8
                     yawDegrees: -155
                 detectionType: APRIL_TAG
-            fuelDetector:
-                photonVisionUIName: Fuel_Detector
-                robotToCamera:
-                    xInches: 12.5
-                    yInches: 0
-                    zInches: 15
-                detectionType: NONE # TODO: Object detection
 
 autopathing:
     paths:
