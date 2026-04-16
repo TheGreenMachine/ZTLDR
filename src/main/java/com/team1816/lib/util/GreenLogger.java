@@ -31,7 +31,7 @@ public class GreenLogger {
     // using an empty string here to make the logs and live views consistent
     private static final NetworkTable netTable;
     private static final StringPublisher msg;
-    private static int logLoopCount = 0;
+    private static Notifier mLogNotifier;
 
     static {
         if (Robot.isSimulation()) {
@@ -331,15 +331,18 @@ public class GreenLogger {
         Elastic.sendNotification(new Elastic.Notification(elasticNotificationLevel, title, s, 15000, 450, -1));
     }
 
+    public static void startLogging(){
+        if(mLogNotifier != null || !DriverStation.isDSAttached()) return;
+        GreenLogger.log(periodicLogs.size() + " periodic logs registered");
+        mLogNotifier = new Notifier(() -> {
+            updatePeriodic();
+        });
+        mLogNotifier.startPeriodic(.05);
+    }
+
     // Will update all registered periodic loggers
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static void updatePeriodic() {
-        if(!DriverStation.isDSAttached()) return;
-        if (logLoopCount <= 2) {
-            logLoopCount ++;
-            return;
-        }
-        logLoopCount = 0;
+    private static void updatePeriodic() {
         for (LogTopic entry : periodicLogs.keySet()) {
             var supplier = periodicLogs.get(entry);
             if (entry.Publisher instanceof DoublePublisher) {

@@ -105,7 +105,7 @@ public class Robot extends BaseRobot {
             double start = HALUtil.getFPGATime();
             CommandScheduler.getInstance().run();
             // update logs
-            GreenLogger.updatePeriodic();
+            GreenLogger.startLogging();
             double end = HALUtil.getFPGATime();
             periodicLoopTime = (end - start) / 1000;
         } catch (Throwable t) {
