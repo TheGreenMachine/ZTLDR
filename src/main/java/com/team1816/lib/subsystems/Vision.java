@@ -36,6 +36,8 @@ import static com.team1816.lib.Singleton.factory;
  * We use <a href="https://docs.photonvision.org/">PhotonVision</a> for vision processing.
  */
 public class Vision extends SubsystemBase implements ITestableSubsystem {
+    private static final double SINGLE_TAG_MAX_HEADING_ERROR_RADIANS = Units.degreesToRadians(60.0);
+
     private static final String NAME = "vision";
     /**
      * All cameras in the Vision subsystem.
@@ -88,6 +90,14 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
     }
 
     /**
+     * Returns true if the given strategy is a multi-tag strategy.
+     */
+    private static boolean isMultiTag(PhotonPoseEstimator.PoseStrategy strategy) {
+        return strategy == PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR
+            || strategy == PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_RIO;
+    }
+
+    /**
      * Gets all {@link EstimatedRobotPose}s that have not yet been returned by calls to this method
      * from all AprilTag cameras. Estimates are in {@link Pair}s with the standard deviations for
      * the estimate calculated by {@link #calculateEstimateStandardDeviations(EstimatedRobotPose)}.
@@ -110,6 +120,16 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
             for (EstimatedRobotPose estimatedRobotPose : results) {
                 Pose2d visionEstimatedPose2d = estimatedRobotPose.estimatedPose.toPose2d();
 
+                if (!isMultiTag(estimatedRobotPose.strategy)) {
+                    double headingError = Math.abs(MathUtil.angleModulus(
+                        visionEstimatedPose2d.getRotation()
+                            .minus(BaseRobotState.robotPose.getRotation())
+                            .getRadians()
+                    ));
+                    if (headingError > SINGLE_TAG_MAX_HEADING_ERROR_RADIANS) {
+                        continue; // Silently discard ambiguous reflection
+                    }
+                }
                 // Only add the vision measurement to the list to return if it is within the
                 // distance and angle thresholds from the current pose estimate. This is to filter
                 // out unreasonable estimates caused by pose ambiguity (see here:
