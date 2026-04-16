@@ -48,8 +48,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
     /**
      * The base standard deviations to use for non-multi-tag estimates
      */
-    // Ignore single tag data. Previously set to 4, 4, 8.
-    private final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(999999, 999999, 999999);
+    private final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(4, 4, 8);
     /**
      * The base standard deviations to use for multi-tag estimates
      */
@@ -103,7 +102,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
 
         for (Camera camera : aprilTagCameras) {
             var results = camera.getEstimatedRobotPosesFromAllUnreadResults();
-            if(results.size() <= 1 || RobotState.resetCameraQueue) continue;
+            if(RobotState.resetCameraQueue) continue;
             for (EstimatedRobotPose estimatedRobotPose : results) {
                 Pose2d visionEstimatedPose2d = estimatedRobotPose.estimatedPose.toPose2d();
 
