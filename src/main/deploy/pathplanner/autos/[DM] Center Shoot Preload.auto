@@ -5,12 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "fixTurretAngle180"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "CenterstartBackup"
@@ -19,7 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "shootWithIntake"
           }
         }
       ]
