@@ -61,7 +61,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
     /**
      * The base standard deviations to use for multi-tag estimates
      */
-    private final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.1, 0.1, 0.5);
+    private final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.1, 0.1, 999999);
     /**
      * The standard deviations to use for an estimate that we should just throw out
      */
@@ -223,35 +223,15 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 return noTrustStdDevs;
             }
 
-            return singleTagStdDevs.times(1 + (closestDistance * closestDistance / 30));
+            return singleTagStdDevs;
         }
 
-        // Multi-tag:
-        else {
-            double closestDistance = Double.MAX_VALUE;
-            double secondClosestDistance = Double.MAX_VALUE;
-
-            for (PhotonTrackedTarget target : estimatedRobotPose.targetsUsed) {
-                Optional<Pose3d> tagPose = aprilTagFieldLayout.getTagPose(target.getFiducialId());
-                if (tagPose.isEmpty()) continue;
-
-                double distance = tagPose.get().getTranslation().getDistance(
-                    estimatedRobotPose.estimatedPose.getTranslation()
-                );
-                if (distance < closestDistance) {
-                    secondClosestDistance = closestDistance;
-                    closestDistance = distance;
-                }
-                else if (distance < secondClosestDistance) {
-                    secondClosestDistance = distance;
-                }
-            }
-
-            double averageDistance = (closestDistance + secondClosestDistance) / 2;
-            int numTags = estimatedRobotPose.targetsUsed.size();
-
-            return multiTagStdDevs.times(1 + (averageDistance * averageDistance / 30)).div(numTags);
-        }
+        // Multi-tag: use the base std devs directly without distance or tag-count scaling.
+        // Multi-tag PnP accuracy is dominated by systematic bias (camera calibration and
+        // mount tolerance) rather than random noise, so scaling by distance and tag count
+        // gives a false sense of precision that causes the pose estimate to jump when
+        // cameras disagree.
+        return multiTagStdDevs;
     }
 
     @Override
