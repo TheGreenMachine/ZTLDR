@@ -92,9 +92,6 @@
           ],
           "weight": 3.0
         },
-        "apriltag": {
-          "image": "field_images\\apriltag.png"
-        },
         "backwardLeft/visionPoseEstimate": {
           "arrowColor": [
             0.0,
@@ -130,6 +127,20 @@
             255.0
           ],
           "style": "Hidden"
+        },
+        "combinedPoseEstimate": {
+          "arrowColor": [
+            255.0,
+            240.0,
+            0.0,
+            255.0
+          ],
+          "color": [
+            134.9998779296875,
+            0.0,
+            255.0,
+            255.0
+          ]
         },
         "exampleCamera/visionPoseEstimate": {
           "arrowColor": [
@@ -218,9 +229,6 @@
         },
         "right": 3942,
         "top": 118,
-        "visibleTargetPoses": {
-          "image": "field_images\\visible-vision-target.png"
-        },
         "width": 16.54119300842285,
         "window": {
           "visible": true
