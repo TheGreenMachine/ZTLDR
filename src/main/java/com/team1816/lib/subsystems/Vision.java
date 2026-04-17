@@ -143,6 +143,23 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 EstimatedRobotPose estimatedRobotPose = response.estimatedRobotPose();
                 Pose2d visionEstimatedPose2d = estimatedRobotPose.estimatedPose.toPose2d();
 
+                var inField = acceptableFieldBox.withinBounds(estimatedRobotPose.estimatedPose.toPose2d().getTranslation());
+
+                if (!inField){
+                    continue;
+                }
+
+                if (!isMultiTag(estimatedRobotPose.strategy)) {
+                    double headingError = Math.abs(MathUtil.angleModulus(
+                        visionEstimatedPose2d.getRotation()
+                            .minus(BaseRobotState.robotPose.getRotation())
+                            .getRadians()
+                    ));
+                    if (headingError > SINGLE_TAG_MAX_HEADING_ERROR_RADIANS) {
+                        continue; // Silently discard ambiguous reflection
+                    }
+                }
+                
                 if (isShooting) {
                     // we are shooting so let's try and lock to a pose from a camera that is multi tag and has the lowest
                     // ambiguity
@@ -175,22 +192,6 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                     RobotState.shootingPose = RobotState.robotPose;
                 }
 
-                var inField = acceptableFieldBox.withinBounds(estimatedRobotPose.estimatedPose.toPose2d().getTranslation());
-
-                if (!inField){
-                    continue;
-                }
-
-                if (!isMultiTag(estimatedRobotPose.strategy)) {
-                    double headingError = Math.abs(MathUtil.angleModulus(
-                        visionEstimatedPose2d.getRotation()
-                            .minus(BaseRobotState.robotPose.getRotation())
-                            .getRadians()
-                    ));
-                    if (headingError > SINGLE_TAG_MAX_HEADING_ERROR_RADIANS) {
-                        continue; // Silently discard ambiguous reflection
-                    }
-                }
                 // Only add the vision measurement to the list to return if it is within the
                 // distance and angle thresholds from the current pose estimate. This is to filter
                 // out unreasonable estimates caused by pose ambiguity (see here:
