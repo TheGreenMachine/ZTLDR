@@ -220,7 +220,9 @@ public class Superstructure extends BaseSuperstructure {
         }
 
         // Only spin up the launch motors if we are trying to shoot to save battery.
+        vision.setShootingFlag(wantedGatekeeperState == WantedGatekeeperState.OPEN);
         shooter.setSpinUpLaunchMotors(wantedGatekeeperState == WantedGatekeeperState.OPEN);
+
         intake.setWantedState(
             switch (wantedIntakeState) {
                 case INTAKE -> Intake.IntakeState.INTAKE;
@@ -229,17 +231,13 @@ public class Superstructure extends BaseSuperstructure {
                 case STOW -> Intake.IntakeState.STOW;
             }
         );
-
-        switch (gatekeeper.getState()) {
-            case OPEN -> {
-                vision.setShootingFlag(true);
-                feeder.setWantedState(Feeder.FeederState.FEEDING);
+        feeder.setWantedState(
+            // Have the feeder just follow what the gatekeepers are doing.
+            switch (gatekeeper.getState()) {
+                case OPEN -> Feeder.FeederState.FEEDING;
+                case CLOSED -> Feeder.FeederState.STOPPED;
             }
-            case CLOSED -> {
-                vision.setShootingFlag(false);
-                feeder.setWantedState(Feeder.FeederState.STOPPED);
-            }
-        }
+        );
     }
 
     public void setVisionShootingFlag(boolean isShooting) {

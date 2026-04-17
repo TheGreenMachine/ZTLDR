@@ -106,6 +106,8 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
         }
 
         GreenLogger.periodicLog(NAME + "/HasAccuratePoseEstimate", () -> BaseRobotState.hasAccuratePoseEstimate, null);
+        GreenLogger.periodicLog(NAME + "/ShootingCameraName", () -> shootingCameraName);
+        GreenLogger.periodicLog(NAME + "/ShootingCameraPose", () -> BaseRobotState.shootingPose, Pose2d.struct);
     }
 
     /**
@@ -125,7 +127,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      */
     public List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> getVisionEstimatedPosesWithStdDevs() {
         List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> posesWithStdDevs = new ArrayList<>();
-        double highestAverage = Double.MAX_VALUE;
+        double lowestAverage = Double.MAX_VALUE;
         String currentCameraName = "";
         Pose2d currentPose = Pose2d.kZero;
 
@@ -159,7 +161,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                         continue; // Silently discard ambiguous reflection
                     }
                 }
-                
+
                 if (isShooting) {
                     // we are shooting so let's try and lock to a pose from a camera that is multi tag and has the lowest
                     // ambiguity
@@ -170,17 +172,20 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                                 // camera is no longer multi tag so find a new one in the next group or remaining cameras
                                 shootingCameraName = "";
                                 RobotState.shootingPose = RobotState.robotPose;
+                            } else {
+                                currentCameraName = camera.name;
+                                currentPose = visionEstimatedPose2d;
                             }
                         }
                     } else {
                         // we have not identified a camera so let's hunt for one that is multi tag
-                        if (response.photonTrackedTargets().size() > 2) {
+                        if (response.photonTrackedTargets().size() >= 2) {
                             // found one so average the ambiguity and see if it's lower than what we have
                             var currentAverage = response.photonTrackedTargets().stream().
                                 mapToDouble(PhotonTrackedTarget::getPoseAmbiguity).average().orElse(Double.MAX_VALUE);
-                            if (currentAverage < highestAverage) {
+                            if (currentAverage < lowestAverage) {
                                 // new lower value so hold on to this
-                                highestAverage = currentAverage;
+                                lowestAverage = currentAverage;
                                 currentCameraName = camera.name;
                                 currentPose = visionEstimatedPose2d;
                             }
@@ -258,12 +263,12 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 shootingCameraName = currentCameraName;
                 RobotState.shootingPose = currentPose;
             } else {
-                // nothing found so use the robotpose for the shooting pose
+                // nothing found so use the robot pose for the shooting pose
                 shootingCameraName = "";
                 RobotState.shootingPose = RobotState.robotPose;
             }
         } else {
-            // not shooting so use the robotpose for the shooting pose
+            // not shooting so use the robot pose for the shooting pose
             shootingCameraName = "";
             RobotState.shootingPose = RobotState.robotPose;
         }

@@ -10,7 +10,7 @@ public class BaseRobotState {
      */
     public static volatile Pose2d robotPose = Pose2d.kZero;
 
-    public static Pose2d shootingPose = Pose2d.kZero;
+    public static volatile Pose2d shootingPose = Pose2d.kZero;
 
     /**
      * The robot-centric speeds of the robot.
