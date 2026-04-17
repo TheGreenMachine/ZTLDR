@@ -720,6 +720,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @return The current field-relative {@link Pose2d} of the turret.
      */
     private Pose2d getCurrentTurretPose2d() {
+        Pose2d robotPose2d = Pose2d.kZero;
         Translation2d robotToTurretTranslation2d = SHOOTER_OFFSET.toTranslation2d();
         Rotation2d robotToTurretRotation2d = getCurrentRobotRelativeTurretRotation2d();
 
@@ -728,7 +729,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             robotToTurretRotation2d
         );
 
-        Pose2d robotPose2d = BaseRobotState.robotPose;
+        if (spinUpLaunchMotors) {
+            robotPose2d = BaseRobotState.shootingPose;
+        } else {
+            robotPose2d = BaseRobotState.robotPose;
+        }
 
         turretPose = robotPose2d.transformBy(robotToTurretTransform2d);
 

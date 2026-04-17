@@ -229,13 +229,21 @@ public class Superstructure extends BaseSuperstructure {
                 case STOW -> Intake.IntakeState.STOW;
             }
         );
-        feeder.setWantedState(
-            // Have the feeder just follow what the gatekeepers are doing.
-            switch (gatekeeper.getState()) {
-                case OPEN -> Feeder.FeederState.FEEDING;
-                case CLOSED -> Feeder.FeederState.STOPPED;
+
+        switch (gatekeeper.getState()) {
+            case OPEN -> {
+                vision.setShootingFlag(true);
+                feeder.setWantedState(Feeder.FeederState.FEEDING);
             }
-        );
+            case CLOSED -> {
+                vision.setShootingFlag(false);
+                feeder.setWantedState(Feeder.FeederState.STOPPED);
+            }
+        }
+    }
+
+    public void setVisionShootingFlag(boolean isShooting) {
+        vision.setShootingFlag(isShooting);
     }
 
     private void climbingL1() {

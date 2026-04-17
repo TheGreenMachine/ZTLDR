@@ -4,6 +4,7 @@ import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -144,8 +145,9 @@ public class Camera {
      * @return A list of {@link EstimatedRobotPose}s calculated from all unread pipeline results on
      * this {@link Camera}'s {@link PhotonCamera}.
      */
-    public List<EstimatedRobotPose> getEstimatedRobotPosesFromAllUnreadResults() {
+    public List<TargetsAndPosesResponse> getEstimatedRobotPosesFromAllUnreadResults() {
         List<EstimatedRobotPose> estimatedRobotPoses = new ArrayList<>();
+        List<TargetsAndPosesResponse> targetsAndPoses = new ArrayList<>();
 
         // Get position estimates from all the unread PhotonPipelineResults on the PhotonCamera. A
         // PhotonPipelineResult can essentially be thought of as a frame from the camera.
@@ -169,6 +171,7 @@ public class Camera {
                 // If we got an estimate, add it to the list to return and update the latest pose
                 // estimate.
                 poseEstimate.ifPresent(estimate -> {
+                    targetsAndPoses.add(new TargetsAndPosesResponse(pipelineResult.targets, estimate));
                     estimatedRobotPoses.add(estimate);
                     latestPoseEstimate = estimate.estimatedPose;
                 });
@@ -194,8 +197,10 @@ public class Camera {
                 seenAprilTagIDs = List.of();
             }
         }
-        return estimatedRobotPoses;
+        return targetsAndPoses;
     }
+
+    public record TargetsAndPosesResponse(List<PhotonTrackedTarget> photonTrackedTargets, EstimatedRobotPose estimatedRobotPose) {}
 
     /**
      * Updates the field on the passed in {@link VisionSystemSim} with the most recent single-frame

@@ -3,6 +3,7 @@ package com.team1816.lib.subsystems;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.sensor.Camera;
 import com.team1816.lib.util.GreenLogger;
+import com.team1816.lib.util.RectangularBoundingBox;
 import com.team1816.season.Robot;
 import com.team1816.season.RobotState;
 import edu.wpi.first.math.MathUtil;
@@ -11,9 +12,11 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonPoseEstimator;
@@ -26,6 +29,7 @@ import java.util.Optional;
 
 import static com.team1816.lib.BaseConstants.VisionConstants.*;
 import static com.team1816.lib.Singleton.factory;
+import static edu.wpi.first.units.Units.Inches;
 
 /**
  * This subsystem handles reading and interpreting data from cameras and simulating camera
@@ -69,6 +73,21 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      */
     private int consecutiveDiscardedEstimates = 0;
 
+    private boolean isShooting = false;
+    private String shootingCameraName = "";
+
+    public static final Distance fieldLength = Inches.of(651.2);
+    public static final Distance fieldWidth =  Inches.of(317.7);
+
+    private final RectangularBoundingBox acceptableFieldBox = new RectangularBoundingBox(
+        new Translation2d(
+
+        ),
+        new Translation2d(
+            fieldLength,
+            fieldWidth
+        )
+    );
     /**
      * Constructs a Vision subsystem.
      */
@@ -106,6 +125,9 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      */
     public List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> getVisionEstimatedPosesWithStdDevs() {
         List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> posesWithStdDevs = new ArrayList<>();
+        double highestAverage = Double.MAX_VALUE;
+        String currentCameraName = "";
+        Pose2d currentPose = Pose2d.kZero;
 
         // The maximum distance a vision pose estimate can be from the current robot pose
         // estimate to allow the vision estimate to be used.
@@ -117,8 +139,47 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
         for (Camera camera : aprilTagCameras) {
             var results = camera.getEstimatedRobotPosesFromAllUnreadResults();
             if(RobotState.resetCameraQueue) continue;
-            for (EstimatedRobotPose estimatedRobotPose : results) {
+            for (Camera.TargetsAndPosesResponse response : results) {
+                EstimatedRobotPose estimatedRobotPose = response.estimatedRobotPose();
                 Pose2d visionEstimatedPose2d = estimatedRobotPose.estimatedPose.toPose2d();
+
+                if (isShooting) {
+                    // we are shooting so let's try and lock to a pose from a camera that is multi tag and has the lowest
+                    // ambiguity
+                    if (!shootingCameraName.isEmpty()) {
+                        // already locked on a camera so let's find it and see if it is still multi tag
+                        if (camera.name.equals(shootingCameraName)) {
+                            if (response.photonTrackedTargets().size() < 2) {
+                                // camera is no longer multi tag so find a new one in the next group or remaining cameras
+                                shootingCameraName = "";
+                                RobotState.shootingPose = RobotState.robotPose;
+                            }
+                        }
+                    } else {
+                        // we have not identified a camera so let's hunt for one that is multi tag
+                        if (response.photonTrackedTargets().size() > 2) {
+                            // found one so average the ambiguity and see if it's lower than what we have
+                            var currentAverage = response.photonTrackedTargets().stream().
+                                mapToDouble(PhotonTrackedTarget::getPoseAmbiguity).average().orElse(Double.MAX_VALUE);
+                            if (currentAverage < highestAverage) {
+                                // new lower value so hold on to this
+                                highestAverage = currentAverage;
+                                currentCameraName = camera.name;
+                                currentPose = visionEstimatedPose2d;
+                            }
+                        }
+                    }
+                } else {
+                    // not shooting so set the shooting pose to the robot pose
+                    shootingCameraName = "";
+                    RobotState.shootingPose = RobotState.robotPose;
+                }
+
+                var inField = acceptableFieldBox.withinBounds(estimatedRobotPose.estimatedPose.toPose2d().getTranslation());
+
+                if (!inField){
+                    continue;
+                }
 
                 if (!isMultiTag(estimatedRobotPose.strategy)) {
                     double headingError = Math.abs(MathUtil.angleModulus(
@@ -188,8 +249,30 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 }
             }
         }
+
+        if (isShooting) {
+            // we are shooting
+            if (!currentCameraName.isEmpty() && (currentPose != Pose2d.kZero)) {
+                // found a camera so set the shooting pose and camera we used
+                shootingCameraName = currentCameraName;
+                RobotState.shootingPose = currentPose;
+            } else {
+                // nothing found so use the robotpose for the shooting pose
+                shootingCameraName = "";
+                RobotState.shootingPose = RobotState.robotPose;
+            }
+        } else {
+            // not shooting so use the robotpose for the shooting pose
+            shootingCameraName = "";
+            RobotState.shootingPose = RobotState.robotPose;
+        }
+
         RobotState.resetCameraQueue = false;
         return posesWithStdDevs;
+    }
+
+    public void setShootingFlag(boolean isShooting) {
+        this.isShooting = isShooting;
     }
 
     /**
