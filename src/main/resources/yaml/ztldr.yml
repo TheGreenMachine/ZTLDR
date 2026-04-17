@@ -18,8 +18,8 @@ shooterSettings:
         - 0.1027 # 264
         - 0.1027 # 360
     launchVelocitiesRPS:
-        - 37  # 48
-        - 40 # 96
+        - 39 # 48
+        - 42 # 96
         - 45 #120
         - 47 # 156
         - 49 # 204
@@ -239,7 +239,7 @@ subsystems:
                         kV: 0.081
         constants:
             topClosedVelocity: 0
-            topOpenVelocity: 60
+            topOpenVelocity: 40
     shooter:
         implemented: true
         canBusName: shootercanivore
@@ -331,6 +331,16 @@ subsystems:
         cameras:
             forwardLeft: # Pi IP: 10.18.16.11
                 photonVisionUIName: Forward_Left
+                robotToCamera:
+                    xInches: -12.66
+                    yInches: 12.1
+                    zInches: 16
+                    rollDegrees: 0
+                    pitchDegrees: -8
+                    yawDegrees: 55
+                detectionType: APRIL_TAG
+            topCenter: #Pi IP: 10.18.16.13
+                photonVisionUIName: Top_Center
                 robotToCamera:
                     xInches: -10.114
                     yInches: 3.587

@@ -80,42 +80,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     /**
      * An adjustment value added to all requests to the turret (in degrees).
      */
-    private double turretAngleAdjustmentDegrees = 0;
-    /**
-     * The deadzone applied to auto-aim turret commands (in degrees). If a newly computed
-     * aim angle differs from the last commanded aim angle by less than this amount, the
-     * new command is suppressed. This prevents pose estimator jitter from causing turret
-     * jitter. Configurable at runtime via {@link #setTurretAimDeadzoneDegrees}.
-     */
-    private double turretAimDeadzoneDegrees = 0.0;
-    /**
-     * The last auto-aim angle actually commanded to the turret (in degrees). Used to
-     * apply the {@link #turretAimDeadzoneDegrees}.
-     */
-    private double lastCommandedAimAngleDegrees = 0;
-
-    /**
-     * Translational speed (m/s) below which the robot is considered stationary for the
-     * purposes of freezing turret auto-aim.
-     */
-    private double stationaryAimFreezeSpeedMps = 0.15;
-    /**
-     * Angular speed (rad/s) below which the robot is considered rotationally stationary
-     * for the purposes of freezing turret auto-aim.
-     */
-    private double stationaryAimFreezeAngularSpeedRadPerSec = 0.2;
-    /**
-     * If true, turret auto-aim updates are suppressed when the robot is stationary and
-     * {@link BaseRobotState#hasAccuratePoseEstimate} is true. The turret holds the last
-     * commanded aim. This avoids pose-estimator jitter translating to turret jitter when
-     * the robot is physically still.
-     */
-    private boolean freezeAimWhenStationary = true;
-    /**
-     * If the most recent call to {@link #aimTurretAtTarget} froze the turret because the
-     * robot was stationary. Used for logging/debugging.
-     */
-    private boolean aimIsFrozen = false;
+    private double turretAngleAdjustmentDegrees = -1.0;
 
     private boolean useChassisSpeedForHoodAngleAndSpeed = false;
 
@@ -130,7 +95,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private final VelocityVoltage topLaunchMotorVelocityRequest = new VelocityVoltage(0);
     private final VelocityVoltage bottomLaunchMotorVelocityRequest = new VelocityVoltage(0);
-    private final NeutralOut neutralModeRequest = new NeutralOut();
+    //private final NeutralOut neutralModeRequest = new NeutralOut();
+    private final VelocityVoltage neutralModeRequest = new VelocityVoltage(10);
+
     private final MotionMagicExpoVoltage inclineMotorPositionRequest = new MotionMagicExpoVoltage(0);
     private final MotionMagicExpoVoltage turretMotorPositionRequest = new MotionMagicExpoVoltage(0);
 
@@ -283,10 +250,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         INCLINE_ANGLE_ADJUSTMENT_AMOUNT_DEGREES = factory.getConstant(NAME, "inclineAngleAdjustmentAmountDegrees", 0);
         TURRET_ANGLE_ADJUSTMENT_AMOUNT_DEGREES = factory.getConstant(NAME, "turretAngleAdjustmentAmountDegrees", 0);
 
-        turretAimDeadzoneDegrees = factory.getConstant(NAME, "turretAimDeadzoneDegrees", 0.0);
-        stationaryAimFreezeSpeedMps = factory.getConstant(NAME, "stationaryAimFreezeSpeedMps", 0.15);
-        stationaryAimFreezeAngularSpeedRadPerSec = factory.getConstant(NAME, "stationaryAimFreezeAngularSpeedRadPerSec", 0.2);
-
         TOP_LAUNCH_MOTOR_BACKSPIN_MULTIPLIER = factory.getConstant(NAME, "topLaunchMotorBackspinMultiplier", 1);
 
         GreenLogger.periodicLog(NAME + "/Wanted Distance State", () -> wantedDistanceState);
@@ -324,12 +287,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.periodicLog(NAME + "/turret/calc/Distance to Target", () -> turretPose.getTranslation().getDistance(turretTarget));
         GreenLogger.periodicLog(NAME + "/turret/calc/Wanted Angle Degrees", () -> wantedTurretAngleDegrees);
         GreenLogger.periodicLog(NAME + "/turret/calc/Current Angle Degrees", () -> getCurrentRobotRelativeTurretRotation2d().getDegrees());
-        GreenLogger.periodicLog(NAME + "/turret/calc/Aim Deadzone Degrees", () -> turretAimDeadzoneDegrees);
-        GreenLogger.periodicLog(NAME + "/turret/calc/Last Commanded Aim Degrees", () -> lastCommandedAimAngleDegrees);
-        GreenLogger.periodicLog(NAME + "/turret/Aim Frozen", () -> aimIsFrozen);
-        GreenLogger.periodicLog(NAME + "/turret/Freeze Aim When Stationary", () -> freezeAimWhenStationary);
-        GreenLogger.periodicLog(NAME + "/turret/calc/Stationary Freeze Speed MPS", () -> stationaryAimFreezeSpeedMps);
-        GreenLogger.periodicLog(NAME + "/turret/calc/Stationary Freeze Angular Speed RadPerSec", () -> stationaryAimFreezeAngularSpeedRadPerSec);
     }
 
     @Override
@@ -550,105 +507,14 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     /**
      * Automatically points the turret at the passed in target.
-     * <p>
-     * When {@link #freezeAimWhenStationary} is true and both translational and angular
-     * speeds are below their respective thresholds, turret commands are suppressed entirely
-     * as long as {@link BaseRobotState#hasAccuratePoseEstimate} is true. The turret holds
-     * the last aim it was given while moving, so pose-estimator jitter while stopped cannot
-     * translate to turret jitter.
-     * <p>
-     * If not frozen, applies the deadzone ({@link #turretAimDeadzoneDegrees}): if the newly
-     * computed aim angle differs from the last commanded aim angle by less than the
-     * deadzone, the new command is suppressed.
      *
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
     private void aimTurretAtTarget(Translation2d targetTranslation2d) {
-        // Freeze the turret when the robot is stationary and we have a trusted pose.
-        // This prevents pose-estimator jitter from causing turret jitter while stopped.
-        double translationalSpeedMps = Math.hypot(
-            BaseRobotState.robotSpeeds.vxMetersPerSecond,
-            BaseRobotState.robotSpeeds.vyMetersPerSecond
-        );
-        double angularSpeedRadPerSec = Math.abs(
-            BaseRobotState.robotSpeeds.omegaRadiansPerSecond
-        );
-        boolean stationary = translationalSpeedMps < stationaryAimFreezeSpeedMps
-            && angularSpeedRadPerSec < stationaryAimFreezeAngularSpeedRadPerSec;
-
-        if (freezeAimWhenStationary
-            && stationary
-            && BaseRobotState.hasAccuratePoseEstimate) {
-            aimIsFrozen = true;
-            return;
-        }
-        aimIsFrozen = false;
-
         Rotation2d robotRelativeRotation2dToTarget = shooterTableCalculator.getTurretAngle(getCurrentTurretPose2d().getTranslation(),
             targetTranslation2d, useChassisSpeedForHoodAngleAndSpeed);
         double robotRelativeDegreesToTarget = robotRelativeRotation2dToTarget.getDegrees();
-
-        // Apply deadzone. Wrap the delta to [-180, 180] so wrap-around near ±180 is
-        // handled correctly.
-        double deltaDegrees = MathUtil.inputModulus(
-            robotRelativeDegreesToTarget - lastCommandedAimAngleDegrees,
-            -180.0,
-            180.0
-        );
-        if (Math.abs(deltaDegrees) < turretAimDeadzoneDegrees) {
-            return;
-        }
-
-        lastCommandedAimAngleDegrees = robotRelativeDegreesToTarget;
         setTurretAngle(robotRelativeDegreesToTarget);
-    }
-
-    /**
-     * @return True if auto-aim is currently frozen because the robot is stationary.
-     */
-    public boolean isAimFrozen() {
-        return aimIsFrozen;
-    }
-
-    /**
-     * @return Whether auto-aim will freeze when the robot is stationary and has a good
-     * pose estimate.
-     */
-    public boolean getFreezeAimWhenStationary() {
-        return freezeAimWhenStationary;
-    }
-
-    /**
-     * Controls whether auto-aim freezes when the robot is stationary and has an accurate
-     * pose estimate. When false, auto-aim always tracks the target regardless of robot
-     * speed.
-     *
-     * @param freeze True to enable freeze-when-stationary, false to always track.
-     */
-    public void setFreezeAimWhenStationary(boolean freeze) {
-        freezeAimWhenStationary = freeze;
-    }
-
-    /**
-     * Gets the current turret auto-aim deadzone (in degrees). See {@link
-     * #turretAimDeadzoneDegrees}.
-     *
-     * @return The current turret auto-aim deadzone, in degrees.
-     */
-    public double getTurretAimDeadzoneDegrees() {
-        return turretAimDeadzoneDegrees;
-    }
-
-    /**
-     * Sets the turret auto-aim deadzone (in degrees). Auto-aim commands that differ from
-     * the last commanded aim angle by less than this amount will be suppressed. Set to 0
-     * to disable the deadzone entirely. See {@link #turretAimDeadzoneDegrees}.
-     *
-     * @param deadzoneDegrees The new deadzone value, in degrees. Negative values are
-     *                        clamped to 0.
-     */
-    public void setTurretAimDeadzoneDegrees(double deadzoneDegrees) {
-        turretAimDeadzoneDegrees = Math.max(0.0, deadzoneDegrees);
     }
 
     /**
