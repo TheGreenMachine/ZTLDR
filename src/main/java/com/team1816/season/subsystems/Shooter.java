@@ -81,6 +81,18 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * An adjustment value added to all requests to the turret (in degrees).
      */
     private double turretAngleAdjustmentDegrees = 0;
+    /**
+     * The deadzone applied to auto-aim turret commands (in degrees). If a newly computed
+     * aim angle differs from the last commanded aim angle by less than this amount, the
+     * new command is suppressed. This prevents pose estimator jitter from causing turret
+     * jitter. Configurable at runtime via {@link #setTurretAimDeadzoneDegrees}.
+     */
+    private double turretAimDeadzoneDegrees = 5.0;
+    /**
+     * The last auto-aim angle actually commanded to the turret (in degrees). Used to
+     * apply the {@link #turretAimDeadzoneDegrees}.
+     */
+    private double lastCommandedAimAngleDegrees = 0;
 
     private boolean useChassisSpeedForHoodAngleAndSpeed = false;
 
@@ -248,6 +260,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         INCLINE_ANGLE_ADJUSTMENT_AMOUNT_DEGREES = factory.getConstant(NAME, "inclineAngleAdjustmentAmountDegrees", 0);
         TURRET_ANGLE_ADJUSTMENT_AMOUNT_DEGREES = factory.getConstant(NAME, "turretAngleAdjustmentAmountDegrees", 0);
 
+        turretAimDeadzoneDegrees = factory.getConstant(NAME, "turretAimDeadzoneDegrees", 5.0);
+
         TOP_LAUNCH_MOTOR_BACKSPIN_MULTIPLIER = factory.getConstant(NAME, "topLaunchMotorBackspinMultiplier", 1);
 
         GreenLogger.periodicLog(NAME + "/Wanted Distance State", () -> wantedDistanceState);
@@ -285,6 +299,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.periodicLog(NAME + "/turret/calc/Distance to Target", () -> turretPose.getTranslation().getDistance(turretTarget));
         GreenLogger.periodicLog(NAME + "/turret/calc/Wanted Angle Degrees", () -> wantedTurretAngleDegrees);
         GreenLogger.periodicLog(NAME + "/turret/calc/Current Angle Degrees", () -> getCurrentRobotRelativeTurretRotation2d().getDegrees());
+        GreenLogger.periodicLog(NAME + "/turret/calc/Aim Deadzone Degrees", () -> turretAimDeadzoneDegrees);
+        GreenLogger.periodicLog(NAME + "/turret/calc/Last Commanded Aim Degrees", () -> lastCommandedAimAngleDegrees);
     }
 
     @Override
@@ -505,6 +521,11 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     /**
      * Automatically points the turret at the passed in target.
+     * <p>
+     * Applies a deadzone ({@link #turretAimDeadzoneDegrees}): if the newly computed aim
+     * angle differs from the last commanded aim angle by less than the deadzone, the new
+     * command is suppressed. This prevents pose estimator jitter from causing turret
+     * jitter when the robot is effectively stationary.
      *
      * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
      */
@@ -512,7 +533,42 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         Rotation2d robotRelativeRotation2dToTarget = shooterTableCalculator.getTurretAngle(getCurrentTurretPose2d().getTranslation(),
             targetTranslation2d, useChassisSpeedForHoodAngleAndSpeed);
         double robotRelativeDegreesToTarget = robotRelativeRotation2dToTarget.getDegrees();
+
+        // Apply deadzone. Wrap the delta to [-180, 180] so wrap-around near ±180 is
+        // handled correctly.
+        double deltaDegrees = MathUtil.inputModulus(
+            robotRelativeDegreesToTarget - lastCommandedAimAngleDegrees,
+            -180.0,
+            180.0
+        );
+        if (Math.abs(deltaDegrees) < turretAimDeadzoneDegrees) {
+            return;
+        }
+
+        lastCommandedAimAngleDegrees = robotRelativeDegreesToTarget;
         setTurretAngle(robotRelativeDegreesToTarget);
+    }
+
+    /**
+     * Gets the current turret auto-aim deadzone (in degrees). See {@link
+     * #turretAimDeadzoneDegrees}.
+     *
+     * @return The current turret auto-aim deadzone, in degrees.
+     */
+    public double getTurretAimDeadzoneDegrees() {
+        return turretAimDeadzoneDegrees;
+    }
+
+    /**
+     * Sets the turret auto-aim deadzone (in degrees). Auto-aim commands that differ from
+     * the last commanded aim angle by less than this amount will be suppressed. Set to 0
+     * to disable the deadzone entirely. See {@link #turretAimDeadzoneDegrees}.
+     *
+     * @param deadzoneDegrees The new deadzone value, in degrees. Negative values are
+     *                        clamped to 0.
+     */
+    public void setTurretAimDeadzoneDegrees(double deadzoneDegrees) {
+        turretAimDeadzoneDegrees = Math.max(0.0, deadzoneDegrees);
     }
 
     /**
