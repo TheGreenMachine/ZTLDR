@@ -3,6 +3,7 @@ package com.team1816.lib.subsystems;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.sensor.Camera;
 import com.team1816.lib.util.GreenLogger;
+import com.team1816.lib.util.RectangularBoundingBox;
 import com.team1816.season.Robot;
 import com.team1816.season.RobotState;
 import edu.wpi.first.math.MathUtil;
@@ -11,9 +12,11 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonPoseEstimator;
@@ -26,6 +29,7 @@ import java.util.Optional;
 
 import static com.team1816.lib.BaseConstants.VisionConstants.*;
 import static com.team1816.lib.Singleton.factory;
+import static edu.wpi.first.units.Units.Inches;
 
 /**
  * This subsystem handles reading and interpreting data from cameras and simulating camera
@@ -68,6 +72,19 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      * from the combined pose estimate.
      */
     private int consecutiveDiscardedEstimates = 0;
+
+    public static final Distance fieldLength = Inches.of(651.2);
+    public static final Distance fieldWidth =  Inches.of(317.7);
+
+    private final RectangularBoundingBox acceptableFieldBox = new RectangularBoundingBox(
+        new Translation2d(
+
+        ),
+        new Translation2d(
+            fieldLength,
+            fieldWidth
+        )
+    );
 
     /**
      * Constructs a Vision subsystem.
@@ -120,16 +137,22 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
             for (EstimatedRobotPose estimatedRobotPose : results) {
                 Pose2d visionEstimatedPose2d = estimatedRobotPose.estimatedPose.toPose2d();
 
-                if (!isMultiTag(estimatedRobotPose.strategy)) {
-                    double headingError = Math.abs(MathUtil.angleModulus(
-                        visionEstimatedPose2d.getRotation()
-                            .minus(BaseRobotState.robotPose.getRotation())
-                            .getRadians()
-                    ));
-                    if (headingError > SINGLE_TAG_MAX_HEADING_ERROR_RADIANS) {
-                        continue; // Silently discard ambiguous reflection
-                    }
+                var inField = acceptableFieldBox.withinBounds(estimatedRobotPose.estimatedPose.toPose2d().getTranslation());
+
+                if (!inField){
+                    continue;
                 }
+
+//                if (!isMultiTag(estimatedRobotPose.strategy)) {
+//                    double headingError = Math.abs(MathUtil.angleModulus(
+//                        visionEstimatedPose2d.getRotation()
+//                            .minus(BaseRobotState.robotPose.getRotation())
+//                            .getRadians()
+//                    ));
+//                    if (headingError > SINGLE_TAG_MAX_HEADING_ERROR_RADIANS) {
+//                        continue; // Silently discard ambiguous reflection
+//                    }
+//                }
                 // Only add the vision measurement to the list to return if it is within the
                 // distance and angle thresholds from the current pose estimate. This is to filter
                 // out unreasonable estimates caused by pose ambiguity (see here:
@@ -181,7 +204,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                     consecutiveDiscardedEstimates ++;
                     // The number of estimates to allow to be discarded before determining that we
                     // have lost a good pose estimate.
-                    int discardsBeforePoseLoss = 3;
+                    int discardsBeforePoseLoss = 5;
                     if (consecutiveDiscardedEstimates >= discardsBeforePoseLoss) {
                         BaseRobotState.hasAccuratePoseEstimate = false;
                     }

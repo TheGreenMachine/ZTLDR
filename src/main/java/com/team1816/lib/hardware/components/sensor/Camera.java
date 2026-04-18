@@ -67,7 +67,6 @@ public class Camera {
      */
     private Pose3d latestPoseEstimate = Pose3d.kZero;
 
-    private List<PhotonPipelineResult> photonPipelineResults = List.of();
     /**
      * The latest vision standard deviations from this camera, for logging purposes.
      */

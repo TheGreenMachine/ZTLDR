@@ -169,7 +169,7 @@ public abstract class BaseSuperstructure extends SubsystemBase {
 
                 // The minimum number of good vision pose estimates to wait for until we decide we
                 // are confident in our pose estimate again.
-                final int minGoodPoseEstimatesUntilConfident = 5;
+                final int minGoodPoseEstimatesUntilConfident = 10;
 
                 // If we've gotten enough good vision pose estimates since losing pose, we know
                 // where we are again.
