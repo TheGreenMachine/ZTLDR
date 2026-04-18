@@ -32,18 +32,13 @@ public class GreenLogger {
     private static final NetworkTable netTable;
     private static final StringPublisher msg;
     private static Notifier mLogNotifier;
+    private static boolean mLogFirstStart = true;
+    static Notifier delay = null;
 
     static {
         if (Robot.isSimulation()) {
             DriverStation.silenceJoystickConnectionWarning(true);
         }
-
-        // Start DatalogManager first Default is to Log network tables then we can use advantage scope on a live robot
-        // and use the same layout for the logs
-        DataLogManager.start();
-        // now tell DS not to log joysticks
-        DriverStation.startDataLog(DataLogManager.getLog(), false);
-
         netTable = NetworkTableInstance.getDefault().getTable("");
         msg = netTable.getStringTopic("messages").publish();
     }
@@ -332,8 +327,22 @@ public class GreenLogger {
     }
 
     public static void startLogging(){
+        // don't log until DS is attached
         if(mLogNotifier != null || !DriverStation.isDSAttached()) return;
-        GreenLogger.log(periodicLogs.size() + " periodic logs registered");
+        // once we are attached, delay and then log to give WPI time to rename file
+        if(delay == null){
+            DataLogManager.logNetworkTables(true);
+            // this will trigger rename
+            DataLogManager.start();
+            delay = new Notifier(()->{
+                GreenLogger.log(periodicLogs.size() + " periodic logs registered");
+                DriverStation.startDataLog(DataLogManager.getLog(), false);
+                mLogFirstStart = false;
+            });
+            delay.startSingle(5);
+        }
+        // if log init is complete update periodic logs
+        if(mLogFirstStart) return;
         mLogNotifier = new Notifier(() -> {
             updatePeriodic();
         });
