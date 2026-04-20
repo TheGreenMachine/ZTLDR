@@ -22,6 +22,8 @@ public final class BaseConstants {
     }
 
     public static final class DrivetrainConstants {
+        // TODO: Adjust these values to determine how much to trust the current estimate over
+        //  vision estimates.
         /**
          * The default values to use as the state/odometry standard deviations for the drivetrain.
          * They represent the pose estimator's trust in the current state of the odometry estimate,
@@ -29,6 +31,6 @@ public final class BaseConstants {
          * used by the drivetrain can be set by using {@link
          * com.team1816.lib.subsystems.drivetrain.Swerve#setStateStdDevs(Matrix)}.
          */
-        public static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
+        public static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(0.01, 0.01, 0.001);
     }
 }

@@ -2,7 +2,6 @@ package com.team1816.lib.subsystems;
 
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.sensor.Camera;
-import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.RectangularBoundingBox;
 import com.team1816.season.Robot;
 import com.team1816.season.RobotState;
@@ -40,8 +39,6 @@ import static edu.wpi.first.units.Units.Inches;
  * We use <a href="https://docs.photonvision.org/">PhotonVision</a> for vision processing.
  */
 public class Vision extends SubsystemBase implements ITestableSubsystem {
-    private static final double SINGLE_TAG_MAX_HEADING_ERROR_RADIANS = Units.degreesToRadians(60.0);
-
     private static final String NAME = "vision";
     /**
      * All cameras in the Vision subsystem.
@@ -52,15 +49,28 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      */
     private final List<Camera> aprilTagCameras;
     private VisionSystemSim visionSim;
+    // TODO: Find and set values for singleTagStdDevs a and b. Currently just using the multi-tag
+    //  values and multiplying a by three.
     /**
-     * The base standard deviations to use for non-multi-tag estimates
+     * The initial value, a, for the standard deviation exponential growth formula (in the form a *
+     * b ^ distance) to use for non-multi-tag estimates. (x meters, y meters, theta radians)
      */
-    // Ignore single tag data. Previously set to 4, 4, 8.
-    private final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(0.5, 0.5, 999999);
+    private final Matrix<N3, N1> singleTagStdDevsA = VecBuilder.fill(0.00149636 * 3, 0.00149636 * 3, 0.00128821 * 3);
     /**
-     * The base standard deviations to use for multi-tag estimates
+     * The growth factor, b, for the standard deviation exponential growth formula (in the form a *
+     * b ^ distance) to use for non-multi-tag estimates. (x meters, y meters, theta radians)
      */
-    private final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.5);
+    private final Matrix<N3, N1> singleTagStdDevsB = VecBuilder.fill(2.08045, 2.08045, 1.59073);
+    /**
+     * The initial value, a, for the standard deviation exponential growth formula (in the form a *
+     * b ^ distance) to use for multi-tag estimates. (x meters, y meters, theta radians)
+     */
+    private final Matrix<N3, N1> multiTagStdDevsA = VecBuilder.fill(0.00149636, 0.00149636, 0.00128821);
+    /**
+     * The growth factor, b, for the standard deviation exponential growth formula (in the form a *
+     * b ^ distance) to use for multi-tag estimates. (x meters, y meters, theta radians)
+     */
+    private final Matrix<N3, N1> multiTagStdDevsB = VecBuilder.fill(2.08045, 2.08045, 1.59073);
     /**
      * The standard deviations to use for an estimate that we should just throw out
      */
@@ -102,8 +112,6 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 camera.addToSim(visionSim);
             }
         }
-
-        GreenLogger.periodicLog(NAME + "/HasAccuratePoseEstimate", () -> BaseRobotState.hasAccuratePoseEstimate, null);
     }
 
     /**
@@ -124,12 +132,9 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
     public List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> getVisionEstimatedPosesWithStdDevs() {
         List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> posesWithStdDevs = new ArrayList<>();
 
-        // The maximum distance a vision pose estimate can be from the current robot pose
-        // estimate to allow the vision estimate to be used.
-        double visionEstimateDistanceThresholdMeters = 1.5;
         // The maximum difference the angle of a vision pose estimate can be from the angle
         // of the current robot pose estimate to allow the vision estimate to be used.
-        double visionEstimateAngleThresholdRadians = Units.degreesToRadians(15.0);
+        double visionEstimateAngleThresholdRadians = Units.degreesToRadians(5.0);
 
         for (Camera camera : aprilTagCameras) {
             var results = camera.getEstimatedRobotPosesFromAllUnreadResults();
@@ -143,43 +148,27 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                     continue;
                 }
 
-//                if (!isMultiTag(estimatedRobotPose.strategy)) {
-//                    double headingError = Math.abs(MathUtil.angleModulus(
-//                        visionEstimatedPose2d.getRotation()
-//                            .minus(BaseRobotState.robotPose.getRotation())
-//                            .getRadians()
-//                    ));
-//                    if (headingError > SINGLE_TAG_MAX_HEADING_ERROR_RADIANS) {
-//                        continue; // Silently discard ambiguous reflection
-//                    }
-//                }
-                // Only add the vision measurement to the list to return if it is within the
-                // distance and angle thresholds from the current pose estimate. This is to filter
-                // out unreasonable estimates caused by pose ambiguity (see here:
+                // Only add the vision measurement to the list to return if it is within the angle
+                // threshold from the current pose estimate. This is to filter out unreasonable
+                // estimates caused by pose ambiguity (see here:
                 // https://docs.photonvision.org/en/latest/docs/apriltag-pipelines/3D-tracking.html#ambiguity
                 // ).
-                if (!BaseRobotState.hasAccuratePoseEstimate ||
+                if (
                     // If we don't currently have an accurate pose estimate, we can't use current
                     // pose estimate to throw out far off vision estimates, so we'll just add the
                     // vision estimate to the list no matter where it is.
-                    (
-                            // Check if the vision estimate is within the distance threshold of the
-                            // current pose estimate.
-                            visionEstimatedPose2d.getTranslation().getDistance(
-                                BaseRobotState.robotPose.getTranslation()
-                            ) < visionEstimateDistanceThresholdMeters
-                                // Check if the vision estimate is within the angle threshold of
-                                // the current pose estimate. Get the absolute value of the
-                                // difference between the angles constrained from -pi radians to pi
-                                // radians to find the positive shortest difference.
-                                && Math.abs(
-                                    MathUtil.angleModulus(
-                                        visionEstimatedPose2d.getRotation()
-                                            .minus(BaseRobotState.robotPose.getRotation())
-                                            .getRadians()
-                                    )
-                                ) < visionEstimateAngleThresholdRadians
-                        )
+                    !BaseRobotState.hasAccuratePoseEstimate
+                        // Check if the vision estimate is within the angle threshold of
+                        // the current pose estimate. Get the absolute value of the
+                        // difference between the angles constrained from -pi radians to pi
+                        // radians to find the positive shortest difference.
+                        || Math.abs(
+                            MathUtil.angleModulus(
+                                visionEstimatedPose2d.getRotation()
+                                    .minus(BaseRobotState.robotPose.getRotation())
+                                    .getRadians()
+                            )
+                        ) < visionEstimateAngleThresholdRadians
                 ) {
                     // We didn't discard this estimate for being too far off from the combined
                     // estimate, so reset the counter.
@@ -201,12 +190,16 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                 // this is the case, say that we don't trust the current estimate to allow vision
                 // to fully recorrect.
                 else {
-                    consecutiveDiscardedEstimates ++;
-                    // The number of estimates to allow to be discarded before determining that we
-                    // have lost a good pose estimate.
-                    int discardsBeforePoseLoss = 5;
-                    if (consecutiveDiscardedEstimates >= discardsBeforePoseLoss) {
-                        BaseRobotState.hasAccuratePoseEstimate = false;
+                    // Only use multi-tag estimates for incrementing if we don't trust the current
+                    // estimate, since single-tag estimates often have some normal flickering.
+                    if (isMultiTag(estimatedRobotPose.strategy)) {
+                        consecutiveDiscardedEstimates++;
+                        // The number of estimates to allow to be discarded before determining that we
+                        // have lost a good pose estimate.
+                        int discardsBeforePoseLoss = 5;
+                        if (consecutiveDiscardedEstimates >= discardsBeforePoseLoss) {
+                            BaseRobotState.hasAccuratePoseEstimate = false;
+                        }
                     }
                 }
             }
@@ -233,11 +226,6 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      * that are not accounted for by the algorithm. Some known flaws, some of which could
      * potentially be improved in the future, are listed below:
      * <ul>
-     *     <li>The base values used for {@link #singleTagStdDevs} and {@link #multiTagStdDevs}
-     *     could be adjusted if different values make more sense.</li>
-     *     <li>The formula of multiplying the standard deviations by one plus the square of the
-     *     distance over 30 could be changed if a different formula is found to be more accurate.
-     *     </li>
      *     <li>Estimates from camera frames captured while the robot is moving may be less
      *     trustworthy due to effects like
      *     <a href="https://docs.photonvision.org/en/latest/docs/quick-start/quick-configure.html#apriltags-and-motion-blur-and-rolling-shutter">
@@ -246,7 +234,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      *     place.</li>
      *     <li>For non-multi-tag estimates, we could somehow use the pose ambiguity to scale the
      *     standard deviations, not just as a hard cutoff.</li>
-     *     <li>For non-multi-tag estimates, four meters may or may not be a good distance cutoff
+     *     <li>For non-multi-tag estimates, six meters may or may not be a good distance cutoff
      *     value. We also could add a distance cutoff for multi-tag, but the value would likely be
      *     different from non-multi-tag, and could depend on closest tag distance, average of
      *     closest two distance, or something else.</li>
@@ -262,24 +250,25 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      *     <li>For the distance calculations, it would probably be slightly more accurate to use
      *     the position of the camera than that of the robot, but that probably isn't significant.
      *     </li>
+     *     <li>Because the calculations are based off of the distance between the tag in the layout
+     *     and the estimated robot position, it is biased to trust estimates that think they are
+     *     closer to the tag more than estimates from the same true position that think they are
+     *     farther from the tag. This has the effect of biasing the estimated position toward the
+     *     seen tags. This could be solved by using the combined position to determine the
+     *     distance, but that would be problematic when the combined position is not accurate, and
+     *     therefore is probably not worth it.</li>
      * </ul>
      *
      * @param estimatedRobotPose The {@link EstimatedRobotPose} from a {@link PhotonPoseEstimator}
      *                           to calculate standard deviations for.
      * @return The calculated standard deviations for the vision pose estimate (x position in
-     * meters, y position in meters, and heading in radians, although the units are somewhat
-     * ambiguous). Returns a matrix of {@link Double#NaN} if the estimate should be completely
-     * thrown out.
+     * meters, y position in meters, and heading in radians). Returns a matrix of {@link
+     * Double#NaN} if the estimate should be completely thrown out.
      */
     private Matrix<N3, N1> calculateEstimateStandardDeviations(EstimatedRobotPose estimatedRobotPose) {
-        PhotonPoseEstimator.PoseStrategy strategy = estimatedRobotPose.strategy;
-
         // If we didn't use a multi-tag strategy. This would happen if we only saw one tag, or
         // decided for some other reason not to use multi-tag.
-        if (
-            strategy != PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR
-                && strategy != PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_RIO
-        ) {
+        if (!isMultiTag(estimatedRobotPose.strategy)) {
             double closestDistance = Double.MAX_VALUE;
             double lowestAmbiguity = 1;
 
@@ -313,12 +302,9 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
 
             // If we trust the estimate enough to consider it, decrease our trust (increase the
             // standard deviations) with distance, because farther away tags give us less reliable
-            // readings. I couldn't tell you why we are using the square of the distance over 30,
-            // but that's the equation PhotonVision's example project uses, and it works well
-            // enough. Again, this is just a heuristic algorithm.
-            int numTags = estimatedRobotPose.targetsUsed.size();
-
-            return singleTagStdDevs.times(1 + (closestDistance * closestDistance / 30)).div(numTags);
+            // readings. We are using an exponential growth equation (a * b ^ distance) as that was
+            // a good fit for the data we found through empirical testing.
+            return singleTagStdDevsA.elementTimes(singleTagStdDevsB.elementPower(closestDistance));
         }
 
         // Otherwise, if we were able to use multi-tag:
@@ -355,9 +341,8 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
             double averageDistance = (closestDistance + secondClosestDistance) / 2;
 
             // Decrease trust (increase standard deviations) with average distance of the closest
-            // two tags. Use a higher base trust (lower standard deviations) for multi-tag, as it
-            // enables a more reliable estimate.
-            return multiTagStdDevs.times(1 + (averageDistance * averageDistance / 30));
+            // two tags using an exponential growth equation (a * b ^ distance).
+            return multiTagStdDevsA.elementTimes(multiTagStdDevsB.elementPower(averageDistance));
         }
     }
 

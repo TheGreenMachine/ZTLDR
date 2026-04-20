@@ -66,7 +66,6 @@ public class Camera {
      * vision estimates and odometry data.
      */
     private Pose3d latestPoseEstimate = Pose3d.kZero;
-
     /**
      * The latest vision standard deviations from this camera, for logging purposes.
      */
