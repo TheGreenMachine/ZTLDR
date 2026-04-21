@@ -239,7 +239,7 @@ subsystems:
                         kV: 0.081
         constants:
             topClosedVelocity: 0
-            topOpenVelocity: 60
+            topOpenVelocity: 30
     shooter:
         implemented: true
         canBusName: shootercanivore
