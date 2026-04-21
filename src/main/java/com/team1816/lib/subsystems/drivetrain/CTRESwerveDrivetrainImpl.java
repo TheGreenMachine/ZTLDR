@@ -13,7 +13,9 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.controllers.PathFollowingController;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.team1816.lib.BaseRobotState;
+import com.team1816.lib.commands.RecoverableFollowPathCommand;
 import com.team1816.lib.hardware.SubsystemConfig;
 import com.team1816.lib.hardware.components.motor.WpiMotorUtil;
 import com.team1816.lib.util.GreenLogger;
@@ -219,33 +221,37 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
         );
 
         GreenLogger.log(robotConfig);
-        AutoBuilder.configure(
-            () -> getState().Pose,   // Supplier of current robot pose
+        AutoBuilder.configureCustom(
+            (PathPlannerPath path) -> new RecoverableFollowPathCommand(
+                path,
+                () -> getState().Pose,   // Supplier of current robot pose
+                () -> getState().Speeds, // Supplier of current robot speeds
+                // Consumer of ChassisSpeeds and feedforwards to drive the robot
+                (speeds, feedforwards) -> setControl(
+                    pathApplyRobotSpeeds.withSpeeds(speeds)
+                        .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                        .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
+                ),
+                pathFollowingController,
+                robotConfig,
+                // Boolean supplier that controls when the path will be mirrored for the red alliance
+                // This will flip the path being followed to the red side of the field.
+                // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+                () -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red,
+                this // Subsystem for requirements
+            ),
+            // Supplier of current robot pose. Duplicated here because both the path following
+            // command and the auto builder need this.
+            () -> getState().Pose,
             (pose) -> { // Consumer for seeding pose against auto
                 GreenLogger.log("Setting " + pose);
                 resetPose(pose);
             },
-            () -> getState().Speeds, // Supplier of current robot speeds
-            // Consumer of ChassisSpeeds and feedforwards to drive the robot
-            (speeds, feedforwards) -> setControl(
-                pathApplyRobotSpeeds.withSpeeds(speeds)
-                    .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-                    .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
-            ),
-            pathFollowingController,
-            robotConfig,
-            () -> {
-                // Boolean supplier that controls when the path will be mirrored for the red alliance
-                // This will flip the path being followed to the red side of the field.
-                // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-                var alliance = DriverStation.getAlliance();
-                if (alliance.isPresent()) {
-                    return alliance.get() == DriverStation.Alliance.Red;
-                }
-                return false;
-            },
-            this // Subsystem for requirements
+            // Boolean supplier that controls when the path will be mirrored for the red alliance.
+            // Duplicated here because both the path following command and the auto builder need
+            // this.
+            () -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red,
+            true // Using a holonomic (includes swerve) drivetrain
         );
     }
 
