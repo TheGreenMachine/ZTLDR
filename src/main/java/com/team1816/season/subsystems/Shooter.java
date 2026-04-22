@@ -272,7 +272,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.periodicLog(NAME + "/turret/calc/Target Pose", () -> turretTarget, Translation2d.struct);
         GreenLogger.periodicLog(NAME + "/turret/calc/Robot Pose", () -> BaseRobotState.robotPose, Pose2d.struct);
         GreenLogger.periodicLog(NAME + "/turret/calc/Shooter Offset", () -> SHOOTER_OFFSET, Translation3d.struct);
-        GreenLogger.periodicLog(NAME + "/turret/calc/Distance to Target", () -> turretPose.getTranslation().getDistance(turretTarget));
+        GreenLogger.periodicLog(NAME + "/turret/calc/Distance to Target", () -> Units.metersToFeet(turretPose.getTranslation().getDistance(turretTarget)));
         GreenLogger.periodicLog(NAME + "/turret/calc/Wanted Angle Degrees", () -> wantedTurretAngleDegrees);
         GreenLogger.periodicLog(NAME + "/turret/calc/Current Angle Degrees", () -> getCurrentRobotRelativeTurretRotation2d().getDegrees());
     }

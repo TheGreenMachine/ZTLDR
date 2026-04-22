@@ -2,6 +2,7 @@ package com.team1816.lib.subsystems;
 
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.sensor.Camera;
+import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.RectangularBoundingBox;
 import com.team1816.season.Robot;
 import com.team1816.season.RobotState;
@@ -151,6 +152,17 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                     continue;
                 }
 
+                var pose =
+                    // Get the rotation of the robot at the timestamp when the
+                    // estimate was from. This will prevent us from discarding
+                    // estimates that are just behind from the current
+                    // position, since the Kalman filter correctly handles old
+                    // estimates using the timestamp.
+                    samplePoseAtTimestampFunction
+                        // Get the pose at the timestamp using the passed in
+                        // function.
+                        .apply(estimatedRobotPose.timestampSeconds);
+
                 // Only add the vision measurement to the list to return if it is within the angle
                 // threshold from the current pose estimate. This is to filter out unreasonable
                 // estimates caused by pose ambiguity (see here:
@@ -174,10 +186,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                                         // estimates that are just behind from the current
                                         // position, since the Kalman filter correctly handles old
                                         // estimates using the timestamp.
-                                        samplePoseAtTimestampFunction
-                                            // Get the pose at the timestamp using the passed in
-                                            // function.
-                                            .apply(estimatedRobotPose.timestampSeconds)
+                                            pose
                                             // If the pose was empty, default to the current pose.
                                             .orElse(BaseRobotState.robotPose)
                                             // Get the rotation of the pose.
@@ -211,6 +220,9 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                     // estimate, since single-tag estimates often have some normal flickering.
                     if (isMultiTag(estimatedRobotPose.strategy)) {
                         consecutiveDiscardedEstimates++;
+                        GreenLogger.log("Missed angle check " + consecutiveDiscardedEstimates + " vision degrees: " +
+                            visionEstimatedPose2d.getRotation().getDegrees() + " drive degrees: " +
+                            (pose.isEmpty() ? "no pose" : pose.get().getRotation().getDegrees()));
                         // The number of estimates to allow to be discarded before determining that we
                         // have lost a good pose estimate.
                         int discardsBeforePoseLoss = 5;
