@@ -743,6 +743,7 @@ public class RobotFactory {
         factory.WheelRadius = kinematics.wheelRadius;
         factory.DriveMotorGearRatio = kinematics.driveGearing;
         factory.SteerMotorGearRatio = kinematics.steerGearing;
+        factory.CouplingGearRatio = kinematics.couplingGearRatio;
         factory.SpeedAt12Volts = maxSpd;
 
         for (var module : config.modules.values()) {
@@ -760,6 +761,7 @@ public class RobotFactory {
                 GreenLogger.log(" WheelRadius: " + factory.WheelRadius);
                 GreenLogger.log(" DriveMotorGearRatio: " + factory.DriveMotorGearRatio);
                 GreenLogger.log(" SteerMotorGearRatio: " + factory.SteerMotorGearRatio);
+                GreenLogger.log(" CouplingGearRatio: " + factory.CouplingGearRatio);
                 GreenLogger.log(" SpeedAt12Volts: " + factory.SpeedAt12Volts);
             }
 
@@ -826,6 +828,9 @@ public class RobotFactory {
         }
         if (kinematics.maxAngularRate == null || kinematics.maxAngularRate == 0) {
             property = "maxAngularRate";
+        }
+        if (kinematics.couplingGearRatio == null || kinematics.couplingGearRatio == 0) {
+            property = "couplingGearRatio";
         }
         if (property != null) {
             var message = subsystemName + " kinematics " + property + " can't be null or 0";
