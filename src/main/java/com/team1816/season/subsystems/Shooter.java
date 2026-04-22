@@ -80,7 +80,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     /**
      * An adjustment value added to all requests to the turret (in degrees).
      */
-    private double turretAngleAdjustmentDegrees = 0;
+    private double turretAngleAdjustmentDegrees = -1.0;
 
     private boolean useChassisSpeedForHoodAngleAndSpeed = false;
 
@@ -95,7 +95,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private final VelocityVoltage topLaunchMotorVelocityRequest = new VelocityVoltage(0);
     private final VelocityVoltage bottomLaunchMotorVelocityRequest = new VelocityVoltage(0);
-    private final NeutralOut neutralModeRequest = new NeutralOut();
+    //private final NeutralOut neutralModeRequest = new NeutralOut();
+    private final VelocityVoltage neutralModeRequest = new VelocityVoltage(10);
+
     private final MotionMagicExpoVoltage inclineMotorPositionRequest = new MotionMagicExpoVoltage(0);
     private final MotionMagicExpoVoltage turretMotorPositionRequest = new MotionMagicExpoVoltage(0);
 
