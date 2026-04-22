@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
+import java.util.Optional;
+
 import static com.team1816.lib.Singleton.factory;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -154,6 +156,16 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
 
     public void resetPose(Pose2d pose) {
         drivetrain.resetPose(pose);
+    }
+
+    /**
+     * Return the pose at a given timestamp, if the buffer is not empty.
+     *
+     * @param timestampSeconds The pose's timestamp. This should be an FGPA timestamp.
+     * @return The pose at the given timestamp (or Optional.empty() if the buffer is empty).
+     */
+    public Optional<Pose2d> samplePoseAt(double timestampSeconds) {
+        return drivetrain.samplePoseAt(timestampSeconds);
     }
 
     /**

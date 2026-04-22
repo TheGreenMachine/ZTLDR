@@ -25,6 +25,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static com.team1816.lib.BaseConstants.VisionConstants.*;
 import static com.team1816.lib.Singleton.factory;
@@ -129,7 +130,9 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
      *
      * @return All unread vision pose estimates with corresponding standard deviations.
      */
-    public List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> getVisionEstimatedPosesWithStdDevs() {
+    public List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> getVisionEstimatedPosesWithStdDevs(
+        Function<Double, Optional<Pose2d>> samplePoseAtTimestampFunction
+    ) {
         List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> posesWithStdDevs = new ArrayList<>();
 
         // The maximum difference the angle of a vision pose estimate can be from the angle
@@ -165,7 +168,21 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                         || Math.abs(
                             MathUtil.angleModulus(
                                 visionEstimatedPose2d.getRotation()
-                                    .minus(BaseRobotState.robotPose.getRotation())
+                                    .minus(
+                                        // Get the rotation of the robot at the timestamp when the
+                                        // estimate was from. This will prevent us from discarding
+                                        // estimates that are just behind from the current
+                                        // position, since the Kalman filter correctly handles old
+                                        // estimates using the timestamp.
+                                        samplePoseAtTimestampFunction
+                                            // Get the pose at the timestamp using the passed in
+                                            // function.
+                                            .apply(estimatedRobotPose.timestampSeconds)
+                                            // If the pose was empty, default to the current pose.
+                                            .orElse(BaseRobotState.robotPose)
+                                            // Get the rotation of the pose.
+                                            .getRotation()
+                                    )
                                     .getRadians()
                             )
                         ) < visionEstimateAngleThresholdRadians
