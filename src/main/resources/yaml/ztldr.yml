@@ -18,14 +18,21 @@ shooterSettings:
         - 0.1113 # 264
         - 0.108 # 360
     launchVelocitiesRPS:
-        - 31 # 48
-        - 38 # 96
-        - 40 #120
-        - 42 # 156
-        - 45 # 204
-        - 47 #210
-        - 48 # 264
-        - 49 # 360
+        - 32 # 48
+        - 39 # 96
+        - 41 #120
+        - 43 # 156
+        - 46 # 204
+        - 48 #210
+        - 49 # 264
+        - 50 # 360
+linearMPSToLaunchRPS: # TODO: Actual tune this. For now we are just using the shooterSettings and doing some physics to convert.
+    linearVelocitiesMPS:
+        - 10
+        - 20
+    launchVelocitiesRPS:
+        - 20
+        - 40
 subsystems:
     drivetrain:
         implemented: true
@@ -135,8 +142,9 @@ subsystems:
                 kV: 2.66
                 kS: 0.1
         kinematics:
-            driveGearing: 6.03
-            steerGearing: 26.0909
+            driveGearing: 6.026785714285714
+            steerGearing: 26.09090909090909
+            couplingGearRatio: 3.857142857142857
             wheelbaseLength: .505 # meters
             wheelbaseWidth: .505 # meters
             robotMass: 74.088 # kg
@@ -218,7 +226,7 @@ subsystems:
                 id: 10
                 deviceType: CANcoder
         constants:
-            intakeOnSpeed: .35
+            intakeOnSpeed: .5
             intakeSlowSpeed: .1
             outtakeSpeed: -0.6
             flipperMotorOutPosition: 0.164 #0.166
