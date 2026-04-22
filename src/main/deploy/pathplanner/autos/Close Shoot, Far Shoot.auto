@@ -5,21 +5,33 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "StartIIfuelShoot"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "fixTurretAngle180"
+            "name": "shootWithIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "waitForDucking"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CenterstartBackup"
+            "pathName": "ShootIfuelShoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "shootWithIntake"
           }
         }
       ]

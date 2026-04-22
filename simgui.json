@@ -218,6 +218,15 @@
         },
         "right": 3942,
         "top": 118,
+        "topCenter/visionPoseEstimate": {
+          "arrowColor": [
+            0.0,
+            0.0,
+            1.0,
+            255.0
+          ],
+          "style": "Hidden"
+        },
         "visibleTargetPoses": {
           "image": "field_images\\visible-vision-target.png"
         },

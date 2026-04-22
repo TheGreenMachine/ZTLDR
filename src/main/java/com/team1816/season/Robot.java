@@ -31,7 +31,6 @@ public class Robot extends BaseRobot {
             // used to serve elastic dashboards must be port 5800
             WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
             GreenLogger.periodicLog("timings/RobotLoop (ms)", () -> periodicLoopTime);
-            SignalLogger.enableAutoLogging(false);
         } catch (Throwable t) {
             robotStatusEvent.Publish(LedManager.RobotLEDStatus.ERROR);
             GreenLogger.log(t);
@@ -57,6 +56,7 @@ public class Robot extends BaseRobot {
     public void autonomousInit() {
         try {
             super.autonomousInit();
+            RobotState.resetCameraQueue = true;
             robotContainer.autonomousInit();
             autonomousCommand = robotContainer.autoModeManager.getSelectedAuto();
             // schedule the autonomous command
@@ -104,7 +104,7 @@ public class Robot extends BaseRobot {
             double start = HALUtil.getFPGATime();
             CommandScheduler.getInstance().run();
             // update logs
-            GreenLogger.updatePeriodic();
+            GreenLogger.startLogging();
             double end = HALUtil.getFPGATime();
             periodicLoopTime = (end - start) / 1000;
         } catch (Throwable t) {

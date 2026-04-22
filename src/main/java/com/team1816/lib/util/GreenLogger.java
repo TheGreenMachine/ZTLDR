@@ -8,10 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.util.struct.Struct;
 import edu.wpi.first.util.struct.StructSerializable;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.IterativeRobotBase;
-import edu.wpi.first.wpilibj.Watchdog;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,19 +31,14 @@ public class GreenLogger {
     // using an empty string here to make the logs and live views consistent
     private static final NetworkTable netTable;
     private static final StringPublisher msg;
+    private static Notifier mLogNotifier;
+    private static boolean mLogFirstStart = true;
+    static Notifier delay = null;
 
     static {
         if (Robot.isSimulation()) {
             DriverStation.silenceJoystickConnectionWarning(true);
         }
-
-        // this will log the robot modes i.e., auto enabled estop
-        DriverStation.startDataLog(DataLogManager.getLog(), false);
-        // Log network tables then we can use advantage scope on a live robot
-        // and use the same layout for the logs
-        DataLogManager.logNetworkTables(true);
-        // don't log console since we output to network tables
-        DataLogManager.logConsoleOutput(false);
         netTable = NetworkTableInstance.getDefault().getTable("");
         msg = netTable.getStringTopic("messages").publish();
     }
@@ -334,9 +326,32 @@ public class GreenLogger {
         Elastic.sendNotification(new Elastic.Notification(elasticNotificationLevel, title, s, 15000, 450, -1));
     }
 
+    public static void startLogging(){
+        // don't log until DS is attached
+        if(mLogNotifier != null || !DriverStation.isDSAttached()) return;
+        // once we are attached, delay and then log to give WPI time to rename file
+        if(delay == null){
+            DataLogManager.logNetworkTables(true);
+            // this will trigger rename
+            DataLogManager.start();
+            delay = new Notifier(()->{
+                GreenLogger.log(periodicLogs.size() + " periodic logs registered");
+                DriverStation.startDataLog(DataLogManager.getLog(), false);
+                mLogFirstStart = false;
+            });
+            delay.startSingle(5);
+        }
+        // if log init is complete update periodic logs
+        if(mLogFirstStart) return;
+        mLogNotifier = new Notifier(() -> {
+            updatePeriodic();
+        });
+        mLogNotifier.startPeriodic(.05);
+    }
+
     // Will update all registered periodic loggers
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static void updatePeriodic() {
+    private static void updatePeriodic() {
         for (LogTopic entry : periodicLogs.keySet()) {
             var supplier = periodicLogs.get(entry);
             if (entry.Publisher instanceof DoublePublisher) {
@@ -415,4 +430,5 @@ public class GreenLogger {
             " kI:" + GetDisplay(pid.kI) +
             " kD:" + GetDisplay(pid.kD));
     }
+
 }

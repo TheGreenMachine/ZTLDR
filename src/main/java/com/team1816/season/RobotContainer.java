@@ -124,9 +124,10 @@ public class RobotContainer extends BaseRobotContainer {
     }
 
     public final void registerCommands() {
-        NamedCommands.registerCommand("shoot", Commands.sequence(
-            Commands.runOnce(() -> GreenLogger.log("Running named command: shoot")),
+        NamedCommands.registerCommand("shootWithIntake", Commands.sequence(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: shootWithIntake")),
             Commands.runOnce(() -> superstructure.setInclineDucking(false)),
+            Commands.runOnce(() -> Commands.waitSeconds(1)),
             Commands.runOnce(() -> superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)),
             Commands.race(
                 Commands.repeatingSequence(
@@ -135,7 +136,7 @@ public class RobotContainer extends BaseRobotContainer {
                     Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)),
                     Commands.waitSeconds(0.3)
                 ),
-                Commands.waitSeconds(5)
+                Commands.waitSeconds(4)
             ),
             Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)),
             Commands.runOnce(() -> superstructure.setInclineDucking(true)),
@@ -148,22 +149,29 @@ public class RobotContainer extends BaseRobotContainer {
             Commands.waitUntil(superstructure::isInclineDucked)
         ));
 
-        NamedCommands.registerCommand("duck", Commands.parallel(
-            Commands.runOnce(() -> GreenLogger.log("Running named command: duck")),
-            Commands.runOnce(() -> superstructure.setInclineDucking(true))
-        ));
-
-        NamedCommands.registerCommand("unduck", Commands.parallel(
-            Commands.runOnce(() -> GreenLogger.log("Running named command: unduck")),
-            Commands.runOnce(() -> superstructure.setInclineDucking(false))
-        ));
-
-        NamedCommands.registerCommand("gatekeeper/open", Commands.parallel(
-            Commands.runOnce(() -> GreenLogger.log("Running named command: gatekeeper/open")),
+        NamedCommands.registerCommand("startShooting", Commands.runOnce(() -> {
+            GreenLogger.log("Running named command: startShooting");
+            superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN);
+            superstructure.setInclineDucking(false);
+        }));
+        // Since it will let us shoot even if it is ducked if force allowing gatekeeper control,
+        // we have to add a manual wait to allow the incline to go up from ducking before opening
+        // the gatekeeper.
+        NamedCommands.registerCommand("startShootingForceAllowGatekeeper", Commands.sequence(
+            Commands.runOnce(() -> {
+                GreenLogger.log("Running named command: startShootingForceAllowGatekeeper");
+                superstructure.setInclineDucking(false);
+            }),
+            Commands.waitSeconds(0.25),
             Commands.runOnce(() ->
                 superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)
             )
         ));
+        NamedCommands.registerCommand("stopShooting", Commands.runOnce(() -> {
+            GreenLogger.log("Running named command: stopShooting");
+            superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE);
+            superstructure.setInclineDucking(true);
+        }));
 
         NamedCommands.registerCommand("fixTurretAngle180", Commands.parallel(
             Commands.runOnce(() -> GreenLogger.log("Running named command: fixTurretAngle180")),
@@ -171,31 +179,13 @@ public class RobotContainer extends BaseRobotContainer {
             Commands.runOnce(() -> superstructure.setTurretFixedAngle(180))
         ));
 
-        NamedCommands.registerCommand("distancePresetThree", Commands.parallel(
-            Commands.runOnce(() -> GreenLogger.log("Running named command: distancePresetThree")),
-            Commands.runOnce(() -> {
-                superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_FAR);
-            })
-        ));
-        NamedCommands.registerCommand("distancePresetAutoThing", Commands.parallel(
-            Commands.runOnce(() -> GreenLogger.log("Running named command: distancePresetAutoThing")),
-            Commands.runOnce(() -> {
-                superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_AUTO_THING);
-            })
+        NamedCommands.registerCommand("distancePresetBrokenInclineAuto", Commands.parallel(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: distancePresetBrokenInclineAuto")),
+            Commands.runOnce(() ->
+                superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_BROKEN_INCLINE_AUTO)
+            )
         ));
 
-        NamedCommands.registerCommand("intake/intake", Commands.parallel(
-            Commands.runOnce(() -> GreenLogger.log("Running named command: intake/intake")),
-            Commands.runOnce(() ->
-                superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)
-            )
-        ));
-        NamedCommands.registerCommand("intake/outtake", Commands.parallel(
-            Commands.runOnce(() -> GreenLogger.log("Running named command: intake/outtake")),
-            Commands.runOnce(() ->
-                superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.OUTTAKE)
-            )
-        ));
         NamedCommands.registerCommand("intake/stopOut", Commands.parallel(
             Commands.runOnce(() -> GreenLogger.log("Running named command: intake/stopOut")),
             Commands.runOnce(() ->

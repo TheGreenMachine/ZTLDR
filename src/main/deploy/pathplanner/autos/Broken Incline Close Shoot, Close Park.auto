@@ -7,31 +7,25 @@
         {
           "type": "named",
           "data": {
-            "name": "distancePresetAutoThing"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.5
+            "name": "distancePresetBrokenInclineAuto"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BumpCenterShoot"
+            "pathName": "StartIIfuelClosershoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "shoot"
+            "name": "shootWithIntake"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ShootGreedyPark"
+            "pathName": "CloserShootIIfuelPark"
           }
         }
       ]

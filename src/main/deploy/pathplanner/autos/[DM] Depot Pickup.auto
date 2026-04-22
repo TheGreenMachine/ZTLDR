@@ -7,25 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "StartCenterShoot"
+            "pathName": "CenterstartBackup"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "waitForDucking"
+            "name": "shootWithIntake"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ShootGreedyPark"
+            "pathName": "DepotPickup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shootWithIntake"
           }
         }
       ]
