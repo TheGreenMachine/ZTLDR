@@ -1,0 +1,55 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "StartIIfuelShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shootWithIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "waitForDucking"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ShootHubfuelShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shootWithIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "waitForDucking"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ShootPark"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": true
+}

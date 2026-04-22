@@ -27,13 +27,6 @@ public class Superstructure extends BaseSuperstructure {
      */
     private boolean forceAllowGatekeeperControl = false;
 
-    /**
-     * If the gatekeeper and feeder should reverse to try to unjam. This is separate from the main
-     * state for the gatekeeper because it should take priority over any other conflicting button
-     * presses telling the gatekeeper to do something.
-     */
-    private boolean gatekeeperAndFeederReversing = false;
-
     public Superstructure(Swerve swerve, Vision vision) {
         super(swerve, vision);
         this.shooter = Singleton.CreateSubSystem(Shooter.class);
@@ -44,7 +37,6 @@ public class Superstructure extends BaseSuperstructure {
         GreenLogger.periodicLog("superstructure/Wanted Super State", () -> wantedSuperState);
         GreenLogger.periodicLog("superstructure/Actual Super State", () -> actualSuperState);
         GreenLogger.periodicLog("superstructure/Force Allowing Gatekeeper Control", () -> forceAllowGatekeeperControl);
-        GreenLogger.periodicLog("superstructure/Gatekeeper and Feeder Reversing", () -> gatekeeperAndFeederReversing);
     }
 
     @Override
@@ -71,6 +63,10 @@ public class Superstructure extends BaseSuperstructure {
             case CLIMBING_L3 -> climbingL3();
         }
     }
+
+//    public void setRobotPose (){
+//        swerve.resetPose(new Pose2d(0.4318, 0.4318, new Rotation2d(0)));
+//    }
 
     public void setWantedSuperState(WantedSuperState superState) {
         this.wantedSuperState = superState;
@@ -176,17 +172,6 @@ public class Superstructure extends BaseSuperstructure {
     }
 
     /**
-     * Sets if the gatekeeper and feeder should reverse to try to unjam. This is separate from
-     * setting the main state for the gatekeeper because it should take priority over any other
-     * conflicting button presses telling the gatekeeper to do something.
-     *
-     * @param shouldGatekeeperAndFeederReverse If the gatekeeper and feeder should reverse.
-     */
-    public void setGatekeeperAndFeederReversing(boolean shouldGatekeeperAndFeederReverse) {
-        gatekeeperAndFeederReversing = shouldGatekeeperAndFeederReverse;
-    }
-
-    /**
      * Sets the turret back into calibration mode.
      */
     public void recalibrateTurret() {
@@ -217,27 +202,25 @@ public class Superstructure extends BaseSuperstructure {
                 case PRESET_CLOSE -> Shooter.ShooterDistanceState.PRESET_CLOSE;
                 case PRESET_MIDDLE -> Shooter.ShooterDistanceState.PRESET_MIDDLE;
                 case PRESET_FAR -> Shooter.ShooterDistanceState.PRESET_FAR;
-                case PRESET_AUTO_THING -> Shooter.ShooterDistanceState.PRESET_AUTO_THING;
+                case PRESET_BROKEN_INCLINE_AUTO -> Shooter.ShooterDistanceState.PRESET_BROKEN_INCLINE_AUTO;
             }
         );
-        gatekeeper.setWantedState(
-            gatekeeperAndFeederReversing
-                // If we are trying to reverse the gatekeeper to unjam, that request should always
-                // take priority.
-                ? Gatekeeper.GatekeeperState.REVERSING
-                : (
-                    // Only let fuel into the shooter if the shooter is ready, or if we are force
-                    // allowing control.
-                    shooter.isAimed() || forceAllowGatekeeperControl
-                        ? switch (wantedGatekeeperState) {
-                        case OPEN -> Gatekeeper.GatekeeperState.OPEN;
-                        case CLOSE -> Gatekeeper.GatekeeperState.CLOSED;
-                    }
-                        : Gatekeeper.GatekeeperState.CLOSED
-                )
-        );
+
+        if (shooter.isAimed() || forceAllowGatekeeperControl) {
+            // Only let fuel into the shooter if the shooter is ready, or if we are force
+            // allowing control.
+            gatekeeper.setWantedState(
+                switch (wantedGatekeeperState) {
+                    case OPEN -> Gatekeeper.GatekeeperState.OPEN;
+                    case CLOSE -> Gatekeeper.GatekeeperState.CLOSED;
+                }
+            );
+        } else {
+            gatekeeper.setWantedState(Gatekeeper.GatekeeperState.CLOSED);
+        }
+
         // Only spin up the launch motors if we are trying to shoot to save battery.
-        shooter.setSpinUpLaunchMotors(gatekeeper.getState() == Gatekeeper.GatekeeperState.OPEN);
+        shooter.setSpinUpLaunchMotors(wantedGatekeeperState == WantedGatekeeperState.OPEN);
         intake.setWantedState(
             switch (wantedIntakeState) {
                 case INTAKE -> Intake.IntakeState.INTAKE;
@@ -251,7 +234,6 @@ public class Superstructure extends BaseSuperstructure {
             switch (gatekeeper.getState()) {
                 case OPEN -> Feeder.FeederState.FEEDING;
                 case CLOSED -> Feeder.FeederState.STOPPED;
-                case REVERSING -> Feeder.FeederState.REVERSING;
             }
         );
     }
@@ -287,7 +269,7 @@ public class Superstructure extends BaseSuperstructure {
         PRESET_CLOSE,
         PRESET_MIDDLE,
         PRESET_FAR,
-        PRESET_AUTO_THING
+        PRESET_BROKEN_INCLINE_AUTO
     }
 
     public enum WantedGatekeeperState {

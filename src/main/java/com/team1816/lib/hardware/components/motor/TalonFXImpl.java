@@ -30,10 +30,6 @@ public class TalonFXImpl extends TalonFX implements ICTREDevice, IMotor {
             GreenLogger.periodicLog(logPath + "Actual Position (rotations)", this::getMotorPosition);
             GreenLogger.periodicLog(logPath + "Actual Velocity (rps)", this::getMotorVelocity);
         }
-        GreenLogger.periodicLog(logPath + "Reference", this::getDeviceReference);
-        GreenLogger.periodicLog(logPath + "Connected", this::isConnected);
-        GreenLogger.periodicLog(logPath + "Stator Current (amps)", ()-> getStatorCurrent().getValueAsDouble());
-        GreenLogger.periodicLog(logPath + "Supply Current (amps)", ()-> getSupplyCurrent().getValueAsDouble());
         if(Robot.isSimulation()){
             simState = getSimState();
             var clockwise = ((TalonFXConfiguration) config).MotorOutput.Inverted == InvertedValue.Clockwise_Positive;
@@ -49,19 +45,19 @@ public class TalonFXImpl extends TalonFX implements ICTREDevice, IMotor {
 
     @Override
     public double getDeviceReference() {
-        return getClosedLoopReference(false).getValueAsDouble();
+        return getClosedLoopReference(true).getValueAsDouble();
     }
 
     @Override
     public double getMotorVelocity() {
-        return getVelocity(false).getValueAsDouble();
+        return getVelocity(true).getValueAsDouble();
     }
 
     @Override
-    public double getMotorPosition() {  return getPosition(false).getValueAsDouble(); }
+    public double getMotorPosition() {  return getPosition(true).getValueAsDouble(); }
 
     @Override
-    public boolean hasDeviceCrashed() { return getStickyFault_BootDuringEnable(false).getValue(); }
+    public boolean hasDeviceCrashed() { return getStickyFault_BootDuringEnable(true).getValue(); }
 
     @Override
     public void zeroMotorPosition() {

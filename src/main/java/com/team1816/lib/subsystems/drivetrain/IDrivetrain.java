@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 
+import java.util.Optional;
+
 import static com.team1816.lib.Singleton.factory;
 
 public interface IDrivetrain extends ITestableSubsystem {
@@ -60,6 +62,14 @@ public interface IDrivetrain extends ITestableSubsystem {
     void setUpPeriodicLogging(String logPath);
 
     default void setSwerveState(SwerveRequest request) {}
+
+    /**
+     * Return the pose at a given timestamp, if the buffer is not empty.
+     *
+     * @param timestampSeconds The pose's timestamp. This should be an FGPA timestamp.
+     * @return The pose at the given timestamp (or Optional.empty() if the buffer is empty).
+     */
+    Optional<Pose2d> samplePoseAt(double timestampSeconds);
 
     /**
      * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
