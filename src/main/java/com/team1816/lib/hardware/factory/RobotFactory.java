@@ -541,6 +541,12 @@ public class RobotFactory {
             config.RotorToSensorRatio = deviceConfig.rotorToSensor;
             GreenLogger.log("  rotorToSensor: " + config.RotorToSensorRatio);
         }
+
+        if (deviceConfig.sensorToMechanismRatio != null) {
+            config.SensorToMechanismRatio = deviceConfig.sensorToMechanismRatio;
+            GreenLogger.log("  sensorToMechanismRatio: " + config.SensorToMechanismRatio);
+        }
+
         return config;
     }
 
@@ -563,6 +569,16 @@ public class RobotFactory {
         if (deviceConfig.remoteOffest != null) {
             config.AbsoluteSensorOffset = deviceConfig.remoteOffest;
             GreenLogger.log("  remoteOffest: " + config.AbsoluteSensorOffset);
+        }
+
+        if (deviceConfig.rotorToSensor != null) {
+            config.RotorToSensorRatio = deviceConfig.rotorToSensor;
+            GreenLogger.log("  rotorToSensor: " + config.RotorToSensorRatio);
+        }
+
+        if (deviceConfig.sensorToMechanismRatio != null) {
+            config.SensorToMechanismRatio = deviceConfig.sensorToMechanismRatio;
+            GreenLogger.log("  sensorToMechanismRatio: " + config.SensorToMechanismRatio);
         }
 
         return config;

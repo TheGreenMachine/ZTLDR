@@ -8,8 +8,6 @@ import com.team1816.lib.hardware.components.motor.IMotor;
 
 public class GhostDevice implements IMotor {
 
-    private int Id = 0;
-
     public GhostDevice(int deviceID, CANBus canbus) {
 
     }
@@ -45,8 +43,11 @@ public class GhostDevice implements IMotor {
     }
 
     @Override
-    public void zeroMotorPosition() {
+    public void zeroMotorPosition() {}
 
+    @Override
+    public StatusCode setPosition(double newValue) {
+        return StatusCode.OK;
     }
 
     @Override

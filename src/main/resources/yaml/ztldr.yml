@@ -291,14 +291,15 @@ subsystems:
                 deviceType: TalonFX
                 id: 28
                 motorRotation: Clockwise_Positive
+                sensorToMechanismRatio: 15.625 # 250/16 gear ratio
                 pidConfig:
                     slot0:
                         kS: 0.1 # static friction - increase if turret won't move at small errors
-                        kP: 4 # position error gain - increase if still lagging, decrease if oscillating at setpoint
-                        kD: 0.28 # damping - increase if oscillating, keep roughly kP/20
+                        kP: 62.5 # position error gain - increase if still lagging, decrease if oscillating at setpoint
+                        kD: 4.375 # damping - increase if oscillating, keep roughly kP/20
                 motionMagic:
-                    expoKV: 0.02 #0.10 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
-                    expoKA: 0.1 #0.2 # acceleration smoothness - increase if dead zone reversals are too violent, decrease if turret feels mushy
+                    expoKV: 0.3125 #0.10 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
+                    expoKA: 1.5625 #0.2 # acceleration smoothness - increase if dead zone reversals are too violent, decrease if turret feels mushy
             inclineCoder:
                 id: 29
                 deviceType: CANcoder
@@ -312,7 +313,6 @@ subsystems:
         constants:
             leftTurretSensorChannel: 0
             rightTurretSensorChannel: 1
-            motorRotationsPerTurretRotation: 15.625 # 250/16 gear ratio
             shooterOffsetXMeters: -0.111303
             shooterOffsetYMeters: -0.112268
             shooterOffsetZMeters: 0.508
@@ -324,9 +324,9 @@ subsystems:
             distanceThreeInclineAngleRotations: 0.1113
             distanceThreeLaunchVelocityRPS: 100
             brokenInclineAutoLaunchVelocityRPS: 55 # Set to the RPS required to score at a distance from shooter to hub of 101.283 inches.
-            closeDistanceBetweenBeamBreaks: 0.419
-            farDistanceBetweenBeamBreaks: 13.570
-            secondLowestBeamBreakToZero: 6.7769
+            closeDistanceBetweenBeamBreaks: 0.026816
+            farDistanceBetweenBeamBreaks: 0.86848
+            secondLowestBeamBreakToZero: 0.4337216
             turretRotationToleranceDegrees: 5
             inclineAngleToleranceDegrees: 4
             launcherVelocityToleranceRPS: 2

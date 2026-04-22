@@ -62,7 +62,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      */
     private double wantedTurretAngleDegrees = 0;
     private boolean isTurretCalibrated = false;
-    private boolean isTurretAimingInDeadZone = false;
     /**
      * The angle to point the turret at when {@link #autoAimTurret} is false (in degrees).
      */
@@ -114,7 +113,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private boolean previousSensorValuesKnown = false;
 
     //CONSTANTS
-    private final double MOTOR_ROTATIONS_PER_TURRET_ROTATION;
     private final Translation3d SHOOTER_OFFSET;
     /**
      * The tolerance for the turret rotation to consider it aimed at the target (in degrees).
@@ -134,29 +132,29 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      */
     private final double INCLINE_DUCKING_LIMIT_ROTATIONS;
     /**
-     * The turret position opposite the dead zone, in turret rotations.
+     * The turret position opposite the dead zone, (in rotations).
      */
-    private final double OPPOSITE_OF_DEAD_ZONE_TURRET_ROTATIONS;
+    private final double OPPOSITE_OF_DEAD_ZONE_POSITION_ROTATIONS;
     /**
      * The first (in the counterclockwise direction) of the four positions of the turret motor
-     * where we would see beam break values change, in motor rotations.
+     * where we would see beam break values change, (in rotations).
      */
-    private final double FIRST_BEAM_BREAK_POSITION_MOTOR_ROTATIONS;
+    private final double FIRST_BEAM_BREAK_POSITION_ROTATIONS;
     /**
      * The second (in the counterclockwise direction) of the four positions of the turret motor
-     * where we would see beam break values change, in motor rotations.
+     * where we would see beam break values change, (in rotations).
      */
-    private final double SECOND_BEAM_BREAK_POSITION_MOTOR_ROTATIONS;
+    private final double SECOND_BEAM_BREAK_POSITION_ROTATIONS;
     /**
      * The third (in the counterclockwise direction) of the four positions of the turret motor
-     * where we would see beam break values change, in motor rotations.
+     * where we would see beam break values change, (in rotations).
      */
-    private final double THIRD_BEAM_BREAK_POSITION_MOTOR_ROTATIONS;
+    private final double THIRD_BEAM_BREAK_POSITION_ROTATIONS;
     /**
      * The fourth (in the counterclockwise direction) of the four positions of the turret motor
-     * where we would see beam break values change, in motor rotations.
+     * where we would see beam break values change, (in rotations).
      */
-    private final double FOURTH_BEAM_BREAK_POSITION_MOTOR_ROTATIONS;
+    private final double FOURTH_BEAM_BREAK_POSITION_ROTATIONS;
     /**
      * The amount by which to increase or decrease the {@link #launchVelocityAdjustmentRPS} per
      * call to {@link #increaseLaunchVelocityAdjustment()} or {@link
@@ -182,11 +180,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final double TOP_LAUNCH_MOTOR_BACKSPIN_MULTIPLIER;
 
     //CALIBRATION
-    /**
-     * The offset in motor rotations of the turret motor from the reference frame where robot
-     * forward is zero to the positions read by the motor.
-     */
-    private double turretMotorOffsetRotations;
     private final double FAST_CALIBRATION_SPEED = 0.09;
     private final double SLOW_CALIBRATION_SPEED = 0.04;
     private final DutyCycleOut turretDutyCycleOutRequest = new DutyCycleOut(0);
@@ -218,7 +211,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         super();
         // if the turret is ghosted we can say we are calibrated because the motors will not move
         if(turretMotor.isGhost()) isTurretCalibrated = true;
-        MOTOR_ROTATIONS_PER_TURRET_ROTATION = factory.getConstant(NAME, "motorRotationsPerTurretRotation", 1);
         SHOOTER_OFFSET = new Translation3d(
             factory.getConstant(NAME, "shooterOffsetXMeters",0),
             factory.getConstant(NAME, "shooterOffsetYMeters",0),
@@ -227,20 +219,18 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         // Just change this line to use a new ShooterTableCalculator to switch the calculator type.
         shooterTableCalculator = new HenryShooterCalculator(HUB_TRANSLATION_3D.getZ() - SHOOTER_OFFSET.getZ());
 
-        // Find the turret positions of the four spots that we would see beam break values change,
-        // in motor rotations relative robot forward.
+        // Find the turret positions of the four spots that we would see beam break values change.
         double closeDistanceBetweenBeamBreaks = factory.getConstant(NAME, "closeDistanceBetweenBeamBreaks", 0);
         double farDistanceBetweenBeamBreaks = factory.getConstant(NAME, "farDistanceBetweenBeamBreaks", 0);
         double secondLowestBeamBreakToZero = factory.getConstant(NAME, "secondLowestBeamBreakToZero", 0);
-        FIRST_BEAM_BREAK_POSITION_MOTOR_ROTATIONS = -secondLowestBeamBreakToZero - closeDistanceBetweenBeamBreaks;
-        SECOND_BEAM_BREAK_POSITION_MOTOR_ROTATIONS = -secondLowestBeamBreakToZero;
-        THIRD_BEAM_BREAK_POSITION_MOTOR_ROTATIONS = -secondLowestBeamBreakToZero + farDistanceBetweenBeamBreaks;
-        FOURTH_BEAM_BREAK_POSITION_MOTOR_ROTATIONS = -secondLowestBeamBreakToZero + farDistanceBetweenBeamBreaks + closeDistanceBetweenBeamBreaks;
+        FIRST_BEAM_BREAK_POSITION_ROTATIONS = -secondLowestBeamBreakToZero - closeDistanceBetweenBeamBreaks;
+        SECOND_BEAM_BREAK_POSITION_ROTATIONS = -secondLowestBeamBreakToZero;
+        THIRD_BEAM_BREAK_POSITION_ROTATIONS = -secondLowestBeamBreakToZero + farDistanceBetweenBeamBreaks;
+        FOURTH_BEAM_BREAK_POSITION_ROTATIONS = -secondLowestBeamBreakToZero + farDistanceBetweenBeamBreaks + closeDistanceBetweenBeamBreaks;
         // Get the position opposite of the dead zone to use as the center of our wrapped range.
-        double oppositeOfDeadZoneMotorRotations = (
-            SECOND_BEAM_BREAK_POSITION_MOTOR_ROTATIONS + THIRD_BEAM_BREAK_POSITION_MOTOR_ROTATIONS
+        OPPOSITE_OF_DEAD_ZONE_POSITION_ROTATIONS = (
+            SECOND_BEAM_BREAK_POSITION_ROTATIONS + THIRD_BEAM_BREAK_POSITION_ROTATIONS
         ) / 2;
-        OPPOSITE_OF_DEAD_ZONE_TURRET_ROTATIONS = oppositeOfDeadZoneMotorRotations / MOTOR_ROTATIONS_PER_TURRET_ROTATION;
 
         TURRET_ROTATION_TOLERANCE_DEGREES = factory.getConstant(NAME, "turretRotationToleranceDegrees", 0);
         INCLINE_ANGLE_TOLERANCE_DEGREES = factory.getConstant(NAME, "inclineAngleToleranceDegrees", 0);
@@ -274,10 +264,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         GreenLogger.periodicLog(NAME + "/turret/Aimed", this::isTurretAimed);
         GreenLogger.periodicLog(NAME + "/turret/Calibrated", () -> isTurretCalibrated);
-        GreenLogger.periodicLog(NAME + "/turret/Aiming in Dead Zone", () -> isTurretAimingInDeadZone);
         GreenLogger.periodicLog(NAME + "/turret/Left Sensor Triggered", () -> leftSensorTriggered);
         GreenLogger.periodicLog(NAME + "/turret/Right Sensor Triggered", () -> rightSensorTriggered);
-        GreenLogger.periodicLog(NAME + "/turret/Motor Offset Rotations", () -> turretMotorOffsetRotations);
         GreenLogger.periodicLog(NAME + "/turret/Fixed Angle Degrees", () -> turretFixedAngleDegrees);
         GreenLogger.periodicLog(NAME + "/turret/Auto Aiming Turret", () -> autoAimTurret);
         GreenLogger.periodicLog(NAME + "/turret/Angle Adjustment Degrees", () -> turretAngleAdjustmentDegrees);
@@ -541,8 +529,8 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     /**
-     * Determines the offset of the {@link #turretMotor} based on where the beam break
-     * sensors change triggered values.
+     * Moves the turret until the beam break sensors change triggered values and uses this to zero
+     * the {@link #turretMotor}.
      */
     private void calibrateTurretMotor() {
         // We only want to run the motors to automatically calibrate if the robot is enabled, but the
@@ -582,28 +570,29 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             if (leftSensorTriggered != previousLeftSensorTriggered) { // Change in left sensor triggered value.
                 if (rightSensorTriggered) {
                     // Must be at the first of the four positions where sensor values change.
-                    finishCalibration(FIRST_BEAM_BREAK_POSITION_MOTOR_ROTATIONS);
+                    finishCalibration(FIRST_BEAM_BREAK_POSITION_ROTATIONS);
                 }
                 else {
                     // Must be at the third of the four positions where sensor values change.
-                    finishCalibration(THIRD_BEAM_BREAK_POSITION_MOTOR_ROTATIONS);
+                    finishCalibration(THIRD_BEAM_BREAK_POSITION_ROTATIONS);
                 }
             }
             else if (rightSensorTriggered != previousRightSensorTriggered) { // Change in the right sensor triggered value.
                 if (leftSensorTriggered) {
                     // Must be at the fourth of the four positions where sensor values change.
-                    finishCalibration(FOURTH_BEAM_BREAK_POSITION_MOTOR_ROTATIONS);
+                    finishCalibration(FOURTH_BEAM_BREAK_POSITION_ROTATIONS);
                 }
                 else {
                     // Must be at the second of the four positions where sensor values change.
-                    finishCalibration(SECOND_BEAM_BREAK_POSITION_MOTOR_ROTATIONS);
+                    finishCalibration(SECOND_BEAM_BREAK_POSITION_ROTATIONS);
                 }
             }
         }
     }
 
-    private void finishCalibration(double beamBreakPositionMotorRotations) {
-        turretMotorOffsetRotations = turretMotor.getMotorPosition() - beamBreakPositionMotorRotations;
+    private void finishCalibration(double beamBreakPositionRotations) {
+        // Tell the turret motor that it is now at the specific beam break position.
+        turretMotor.setPosition(beamBreakPositionRotations);
         turretMotor.setControl(turretDutyCycleOutRequest.withOutput(0));
         isTurretCalibrated = true;
     }
@@ -698,28 +687,15 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private void setTurretAngle(double wantedAngleDegrees) {
         wantedTurretAngleDegrees = wantedAngleDegrees + turretAngleAdjustmentDegrees;
         if (isTurretCalibrated) {
-            double wantedTurretRotations = Units.degreesToRotations(wantedTurretAngleDegrees);
+            double wantedRotations = Units.degreesToRotations(wantedTurretAngleDegrees);
 
-            double wrappedWantedTurretRotations = MathUtil.inputModulus(
-                wantedTurretRotations,
-                OPPOSITE_OF_DEAD_ZONE_TURRET_ROTATIONS - 0.5,
-                OPPOSITE_OF_DEAD_ZONE_TURRET_ROTATIONS + 0.5
-            );
-            double wantedMotorRotations = wrappedWantedTurretRotations * MOTOR_ROTATIONS_PER_TURRET_ROTATION;
-
-            // Clamp the position between the first and fourth beam break positions.
-            double lowerLimitMotorRotations = FIRST_BEAM_BREAK_POSITION_MOTOR_ROTATIONS;
-            double upperLimitMotorRotations = FOURTH_BEAM_BREAK_POSITION_MOTOR_ROTATIONS;
-            isTurretAimingInDeadZone = wantedMotorRotations < lowerLimitMotorRotations || wantedMotorRotations > upperLimitMotorRotations;
-            double clampedMotorRotations = MathUtil.clamp(
-                wantedMotorRotations,
-                lowerLimitMotorRotations,
-                upperLimitMotorRotations
+            double wrappedWantedRotations = MathUtil.inputModulus(
+                wantedRotations,
+                OPPOSITE_OF_DEAD_ZONE_POSITION_ROTATIONS - 0.5,
+                OPPOSITE_OF_DEAD_ZONE_POSITION_ROTATIONS + 0.5
             );
 
-            turretMotor.setControl(turretMotorPositionRequest.withPosition(
-                clampedMotorRotations + turretMotorOffsetRotations
-            ));
+            turretMotor.setControl(turretMotorPositionRequest.withPosition(wrappedWantedRotations));
         }
     }
 
@@ -749,9 +725,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @return The current robot-relative {@link Rotation2d} of the turret.
      */
     private Rotation2d getCurrentRobotRelativeTurretRotation2d() {
-        double motorRotations = turretMotor.getMotorPosition();
-        double offsetMotorRotations = motorRotations - turretMotorOffsetRotations;
-        double turretRotations = offsetMotorRotations / MOTOR_ROTATIONS_PER_TURRET_ROTATION;
+        double turretRotations = turretMotor.getMotorPosition();
         return Rotation2d.fromRotations(turretRotations);
     }
 
