@@ -13,13 +13,43 @@
         {
           "type": "named",
           "data": {
-            "name": "shootWithIntake"
+            "name": "startShooting"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stopShooting"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DepotPickup"
+            "pathName": "CentershootDepot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DepotShoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
