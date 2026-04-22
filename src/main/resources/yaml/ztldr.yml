@@ -323,9 +323,9 @@ subsystems:
             turretRotationToleranceDegrees: 5
             inclineAngleToleranceDegrees: 4
             launcherVelocityToleranceRPS: 2
-            launchVelocityAdjustmentAmountRPS: 0.01
-            inclineAngleAdjustmentAmountDegrees: 0.02
-            turretAngleAdjustmentAmountDegrees: 0.04
+            launchVelocityAdjustmentAmountRPS: .25
+            inclineAngleAdjustmentAmountDegrees: 0.01
+            turretAngleAdjustmentAmountDegrees: 1
             topLaunchMotorBackspinMultiplier: 1 # Less than one for backspin.
     vision:
         cameras:

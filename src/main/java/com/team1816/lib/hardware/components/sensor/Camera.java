@@ -150,6 +150,11 @@ public class Camera {
         for (PhotonPipelineResult pipelineResult : photonCamera.getAllUnreadResults()) {
             int targetsSize = pipelineResult.targets.size();
             if (targetsSize > 0) {
+                if (pipelineResult.metadata.getLatencyMillis() > 100) {
+                    GreenLogger.log("Throwing out result due to latency > 100ms");
+                    continue;
+                }
+
                 Optional<EstimatedRobotPose> poseEstimate = targetsSize > 1 ?
                     poseEstimator.estimateCoprocMultiTagPose(pipelineResult) :
                     poseEstimator.estimateLowestAmbiguityPose(pipelineResult);

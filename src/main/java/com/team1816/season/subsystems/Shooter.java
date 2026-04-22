@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import static com.team1816.lib.Singleton.factory;
 public class Shooter extends SubsystemBase implements ITestableSubsystem {
@@ -80,7 +81,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     /**
      * An adjustment value added to all requests to the turret (in degrees).
      */
-    private double turretAngleAdjustmentDegrees = -1.0;
+    private double turretAngleAdjustmentDegrees = -7.0;
 
     private boolean useChassisSpeedForHoodAngleAndSpeed = false;
 
@@ -214,8 +215,16 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private Pose2d turretPose = Pose2d.kZero;
     private boolean isBlueAlliance = false;
 
-    public Shooter() {
+    private double shootingAngleForManual;
+    private double shootingSpeedForManual;
+    private double hoodAngleForManual;
+    private boolean initialManualValuesCaptured;
+    private final CommandXboxController controller;
+
+    public Shooter(CommandXboxController controller) {
         super();
+
+        this.controller = controller;
         // if the turret is ghosted we can say we are calibrated because the motors will not move
         if(turretMotor.isGhost()) isTurretCalibrated = true;
         MOTOR_ROTATIONS_PER_TURRET_ROTATION = factory.getConstant(NAME, "motorRotationsPerTurretRotation", 1);
@@ -280,6 +289,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.periodicLog(NAME + "/turret/Auto Aiming Turret", () -> autoAimTurret);
         GreenLogger.periodicLog(NAME + "/turret/Angle Adjustment Degrees", () -> turretAngleAdjustmentDegrees);
         GreenLogger.periodicLog(NAME + "/turret/Is Blue Alliance", () -> isBlueAlliance);
+
         GreenLogger.periodicLog(NAME + "/turret/calc/Turret Pose", () -> turretPose, Pose2d.struct);
         GreenLogger.periodicLog(NAME + "/turret/calc/Target Pose", () -> turretTarget, Translation2d.struct);
         GreenLogger.periodicLog(NAME + "/turret/calc/Robot Pose", () -> BaseRobotState.robotPose, Pose2d.struct);
@@ -287,6 +297,12 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         GreenLogger.periodicLog(NAME + "/turret/calc/Distance to Target", () -> turretPose.getTranslation().getDistance(turretTarget));
         GreenLogger.periodicLog(NAME + "/turret/calc/Wanted Angle Degrees", () -> wantedTurretAngleDegrees);
         GreenLogger.periodicLog(NAME + "/turret/calc/Current Angle Degrees", () -> getCurrentRobotRelativeTurretRotation2d().getDegrees());
+
+        GreenLogger.periodicLog(NAME + "/turret/manual/Mode", () -> initialManualValuesCaptured);
+        GreenLogger.periodicLog(NAME + "/turret/manual/Shoot Angle", () -> shootingAngleForManual);
+        GreenLogger.periodicLog(NAME + "/turret/manual/Shoot Speed", () -> shootingSpeedForManual);
+        GreenLogger.periodicLog(NAME + "/turret/manual/Hood Angle", () -> hoodAngleForManual);
+
     }
 
     @Override
@@ -349,11 +365,16 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 setInclineAngle(wantedDistanceState.getInclineAngleDegrees());
                 setLaunchVelocities(wantedDistanceState.getLaunchVelocityRPS());
             }
+            case MANUAL -> handleOperatorJoystick();
             case AUTOMATIC -> aimInclineAndLaunchersAtTarget(turretTarget);
         }
     }
 
     public void setWantedDistanceState(ShooterDistanceState state) {
+        if (state != ShooterDistanceState.MANUAL) {
+            initialManualValuesCaptured = false;
+        }
+
         this.wantedDistanceState = state;
     }
 
@@ -399,15 +420,25 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     /**
      * Increases the adjustment value to all requests to the launch motors.
      */
-    public void increaseLaunchVelocityAdjustment() {
-        launchVelocityAdjustmentRPS += LAUNCH_VELOCITY_ADJUSTMENT_AMOUNT_RPS;
+    public void increaseLaunchVelocityAdjustment(boolean manualMode) {
+        if (manualMode) {
+            shootingSpeedForManual += LAUNCH_VELOCITY_ADJUSTMENT_AMOUNT_RPS;
+            shootingSpeedForManual = MathUtil.clamp(shootingSpeedForManual, 30, 60);
+        } else {
+            launchVelocityAdjustmentRPS += LAUNCH_VELOCITY_ADJUSTMENT_AMOUNT_RPS;
+        }
     }
 
     /**
      * Decreases the adjustment value to all requests to the launch motors.
      */
-    public void decreaseLaunchVelocityAdjustment() {
-        launchVelocityAdjustmentRPS -= LAUNCH_VELOCITY_ADJUSTMENT_AMOUNT_RPS;
+    public void decreaseLaunchVelocityAdjustment(boolean manualMode) {
+        if (manualMode) {
+            shootingSpeedForManual -= LAUNCH_VELOCITY_ADJUSTMENT_AMOUNT_RPS;
+            shootingSpeedForManual = MathUtil.clamp(shootingSpeedForManual, 30, 60);
+        } else {
+            launchVelocityAdjustmentRPS -= LAUNCH_VELOCITY_ADJUSTMENT_AMOUNT_RPS;
+        }
     }
 
     /**
@@ -454,6 +485,35 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         return getCurrentInclineAngleDegrees() <
             Units.rotationsToDegrees(INCLINE_DUCKING_LIMIT_ROTATIONS)
                 + INCLINE_ANGLE_TOLERANCE_DEGREES;
+    }
+
+    private void handleOperatorJoystick() {
+        var leftX = controller.getLeftX();
+        var leftY = controller.getLeftY();
+
+        leftX   = Math.abs(leftX)   < 0.1 ? 0 : leftX;
+        leftY   = Math.abs(leftY)   < 0.1 ? 0 : leftY;
+
+        leftX   = leftX   * leftX   * leftX;
+        leftY   = leftY   * leftY   * leftY;
+
+        if (!initialManualValuesCaptured) {
+            var target = getTargetTranslation2d();
+            aimTurretAtTarget(target);
+            aimInclineAndLaunchersAtTarget(target);
+            shootingAngleForManual = wantedTurretAngleDegrees;
+            hoodAngleForManual = wantedInclineAngleDegrees;
+            shootingSpeedForManual = wantedLaunchVelocityRPS;
+            initialManualValuesCaptured = true;
+        }
+
+//        hoodAngleForManual += -leftY * INCLINE_ANGLE_ADJUSTMENT_AMOUNT_DEGREES;
+//        hoodAngleForManual = MathUtil.clamp(hoodAngleForManual, .057, .1029);
+
+        shootingAngleForManual += leftX * TURRET_ANGLE_ADJUSTMENT_AMOUNT_DEGREES;
+        setInclineAngle(hoodAngleForManual);
+        setTurretAngle(shootingAngleForManual);
+        setLaunchVelocities(shootingSpeedForManual);
     }
 
     /**
@@ -791,6 +851,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             factory.getConstant(NAME,"brokenInclineAutoLaunchVelocityRPS",0)
         ),
         AUTOMATIC(-1, -1),
+        MANUAL(-1, -1),
         IDLE(0, 0);
 
         private final double inclineAngleDegrees, launchVelocityRPS;

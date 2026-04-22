@@ -2,6 +2,7 @@ package com.team1816.lib.subsystems;
 
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.hardware.components.sensor.Camera;
+import com.team1816.lib.util.GreenLogger;
 import com.team1816.lib.util.RectangularBoundingBox;
 import com.team1816.season.Robot;
 import com.team1816.season.RobotState;
@@ -148,6 +149,14 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                     continue;
                 }
 
+                var angle = Math.abs(
+                    MathUtil.angleModulus(
+                        visionEstimatedPose2d.getRotation()
+                            .minus(BaseRobotState.robotPose.getRotation())
+                            .getRadians()
+                    )
+                );
+
                 // Only add the vision measurement to the list to return if it is within the angle
                 // threshold from the current pose estimate. This is to filter out unreasonable
                 // estimates caused by pose ambiguity (see here:
@@ -162,13 +171,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                         // the current pose estimate. Get the absolute value of the
                         // difference between the angles constrained from -pi radians to pi
                         // radians to find the positive shortest difference.
-                        || Math.abs(
-                            MathUtil.angleModulus(
-                                visionEstimatedPose2d.getRotation()
-                                    .minus(BaseRobotState.robotPose.getRotation())
-                                    .getRadians()
-                            )
-                        ) < visionEstimateAngleThresholdRadians
+                        || angle < visionEstimateAngleThresholdRadians
                 ) {
                     // We didn't discard this estimate for being too far off from the combined
                     // estimate, so reset the counter.
@@ -198,6 +201,7 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                         // have lost a good pose estimate.
                         int discardsBeforePoseLoss = 5;
                         if (consecutiveDiscardedEstimates >= discardsBeforePoseLoss) {
+                            GreenLogger.log("Failing pose estimate " + angle);
                             BaseRobotState.hasAccuratePoseEstimate = false;
                         }
                     }

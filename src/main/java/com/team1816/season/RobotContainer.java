@@ -4,11 +4,13 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.util.GreenLogger;
+import com.team1816.season.subsystems.Shooter;
 import com.team1816.season.subsystems.Superstructure;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 public class RobotContainer extends BaseRobotContainer {
     private Superstructure superstructure;
+    private Shooter shooter;
 
     public RobotContainer() {
         NamedCommands.registerCommand("InTheZone", new InTheZoneCommand());
@@ -23,7 +25,8 @@ public class RobotContainer extends BaseRobotContainer {
 
     @Override
     protected Superstructure createSuperstructure() {
-        superstructure = new Superstructure(swerve, vision);
+        shooter = new Shooter(operatorController);
+        superstructure = new Superstructure(swerve, vision, shooter);
         return superstructure;
     }
 
@@ -112,11 +115,22 @@ public class RobotContainer extends BaseRobotContainer {
         // Shooter
         operatorController.povDown().onTrue(Commands.runOnce(() -> superstructure.recalibrateTurret()));
 
+        operatorController.a().onTrue(Commands.runOnce(() -> {
+            superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.MANUAL);
+            superstructure.setAutoAimTurret(false);
+        }));
+        operatorController.x().onTrue(Commands.runOnce(() -> {
+            superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.AUTOMATIC);
+            superstructure.setAutoAimTurret(true);
+        }));
+
+        operatorController.leftBumper().whileTrue(Commands.runOnce(() -> superstructure.decreaseLaunchVelocityAdjustment(true)));
+        operatorController.rightBumper().whileTrue(Commands.runOnce(() -> superstructure.increaseLaunchVelocityAdjustment(true)));
 
         // BUTTON BOARD
         // Shooter
-        buttonBoard.middleLeft().whileTrue(Commands.run(() -> superstructure.increaseLaunchVelocityAdjustment()));
-        buttonBoard.bottomLeft().whileTrue(Commands.run(() -> superstructure.decreaseLaunchVelocityAdjustment()));
+        buttonBoard.middleLeft().whileTrue(Commands.run(() -> superstructure.increaseLaunchVelocityAdjustment(false)));
+        buttonBoard.bottomLeft().whileTrue(Commands.run(() -> superstructure.decreaseLaunchVelocityAdjustment(false)));
         buttonBoard.middleCenter().whileTrue(Commands.run(() -> superstructure.increaseInclineAngleAdjustment()));
         buttonBoard.bottomCenter().whileTrue(Commands.run(() -> superstructure.decreaseInclineAngleAdjustment()));
         buttonBoard.middleRight().whileTrue(Commands.run(() -> superstructure.increaseTurretAngleAdjustment()));

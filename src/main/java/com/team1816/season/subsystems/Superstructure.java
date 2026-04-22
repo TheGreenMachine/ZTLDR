@@ -27,9 +27,9 @@ public class Superstructure extends BaseSuperstructure {
      */
     private boolean forceAllowGatekeeperControl = false;
 
-    public Superstructure(Swerve swerve, Vision vision) {
+    public Superstructure(Swerve swerve, Vision vision, Shooter shooter) {
         super(swerve, vision);
-        this.shooter = Singleton.CreateSubSystem(Shooter.class);
+        this.shooter = shooter;
         this.gatekeeper = Singleton.CreateSubSystem(Gatekeeper.class);
         this.intake = Singleton.CreateSubSystem(Intake.class);
         this.feeder = Singleton.CreateSubSystem(Feeder.class);
@@ -132,15 +132,15 @@ public class Superstructure extends BaseSuperstructure {
     /**
      * Increases the adjustment value to all requests to the launch motors.
      */
-    public void increaseLaunchVelocityAdjustment() {
-        shooter.increaseLaunchVelocityAdjustment();
+    public void increaseLaunchVelocityAdjustment(boolean manualMode) {
+        shooter.increaseLaunchVelocityAdjustment(manualMode);
     }
 
     /**
      * Decreases the adjustment value to all requests to the launch motors.
      */
-    public void decreaseLaunchVelocityAdjustment() {
-        shooter.decreaseLaunchVelocityAdjustment();
+    public void decreaseLaunchVelocityAdjustment(boolean manualMode) {
+        shooter.decreaseLaunchVelocityAdjustment(manualMode);
     }
 
     /**
@@ -202,6 +202,7 @@ public class Superstructure extends BaseSuperstructure {
                 case PRESET_CLOSE -> Shooter.ShooterDistanceState.PRESET_CLOSE;
                 case PRESET_MIDDLE -> Shooter.ShooterDistanceState.PRESET_MIDDLE;
                 case PRESET_FAR -> Shooter.ShooterDistanceState.PRESET_FAR;
+                case MANUAL -> Shooter.ShooterDistanceState.MANUAL;
                 case PRESET_BROKEN_INCLINE_AUTO -> Shooter.ShooterDistanceState.PRESET_BROKEN_INCLINE_AUTO;
             }
         );
@@ -269,6 +270,7 @@ public class Superstructure extends BaseSuperstructure {
         PRESET_CLOSE,
         PRESET_MIDDLE,
         PRESET_FAR,
+        MANUAL,
         PRESET_BROKEN_INCLINE_AUTO
     }
 
