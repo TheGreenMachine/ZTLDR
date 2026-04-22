@@ -51,7 +51,8 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     private final double SLOW_MODE_TRANSLATIONAL_MULTIPLIER;
     private final double SLOW_MODE_ROTATIONAL_MULTIPLIER;
 
-    private double speedLimitMPS = 0;
+    private double linearSpeedLimitMPS = 0;
+    private double angularSpeedLimitRadPerSec = 0;
     private boolean limitSpeed = false;
 
     public Swerve(CommandXboxController controller) {
@@ -126,13 +127,15 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
             double speedSquared = x * x + y * y;
             // Compare the speeds squared because it is slightly faster than using Math.sqrt() if
             // we don't need to
-            if (speedSquared > speedLimitMPS * speedLimitMPS) {
+            if (speedSquared > linearSpeedLimitMPS * linearSpeedLimitMPS) {
                 double speed = Math.sqrt(speedSquared);
-                double ratio = speedLimitMPS / speed;
+                double ratio = linearSpeedLimitMPS / speed;
                 // Scale down the x and y velocity components to limit the overall speed
                 x *= ratio;
                 y *= ratio;
             }
+            // Cap the angular speed
+            rot = Math.min(rot, angularSpeedLimitRadPerSec);
         }
 
         return drive.withVelocityX(x) // Drive forward with negative Y (forward)
@@ -186,18 +189,21 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
      * slowing down driving for more precise control, use the slow mode and normal mode multipliers
      * instead.
      *
-     * @param speedLimitMPS The speed to limit driving to, in meters per second.
+     * @param linearSpeedLimitMPS The linear speed to limit driving to, in meters per second.
+     * @param angularSpeedLimitRadPerSec The angular speed to limit turning to, in radians per
+     *                                   second.
      * @see #stopLimitingDriveSpeed()
      */
-    public void limitDriveSpeed(double speedLimitMPS) {
-        this.speedLimitMPS = speedLimitMPS;
+    public void limitDriveSpeed(double linearSpeedLimitMPS, double angularSpeedLimitRadPerSec) {
+        this.linearSpeedLimitMPS = linearSpeedLimitMPS;
+        this.angularSpeedLimitRadPerSec = angularSpeedLimitRadPerSec;
         limitSpeed = true;
     }
 
     /**
      * Stop applying the hard maximum to the drive speed.
      *
-     * @see #limitDriveSpeed(double)
+     * @see #limitDriveSpeed(double, double)
      */
     public void stopLimitingDriveSpeed() {
         limitSpeed = false;
