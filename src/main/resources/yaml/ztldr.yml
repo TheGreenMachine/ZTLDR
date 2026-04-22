@@ -18,14 +18,14 @@ shooterSettings:
         - 0.1113 # 264
         - 0.108 # 360
     launchVelocitiesRPS:
-        - 31 # 48
-        - 38 # 96
-        - 40 #120
-        - 42 # 156
-        - 45 # 204
-        - 47 #210
-        - 48 # 264
-        - 49 # 360
+        - 31.25 # 48
+        - 38.25 # 96
+        - 40.25 #120
+        - 42.25 # 156
+        - 45.25 # 204
+        - 47.25 #210
+        - 48.25 # 264
+        - 49.25 # 360
 linearMPSToLaunchRPS: # TODO: Actual tune this. For now we are just using the shooterSettings and doing some physics to convert.
     linearVelocitiesMPS:
         - 10
@@ -225,7 +225,7 @@ subsystems:
                 id: 10
                 deviceType: CANcoder
         constants:
-            intakeOnSpeed: .35
+            intakeOnSpeed: .45
             intakeSlowSpeed: .1
             outtakeSpeed: -0.6
             flipperMotorOutPosition: 0.164 #0.166

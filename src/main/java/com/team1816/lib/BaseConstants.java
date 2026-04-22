@@ -31,6 +31,6 @@ public final class BaseConstants {
          * used by the drivetrain can be set by using {@link
          * com.team1816.lib.subsystems.drivetrain.Swerve#setStateStdDevs(Matrix)}.
          */
-        public static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(0.01, 0.01, 0.001);
+        public static final Matrix<N3, N1> defaultStateStdDevs = VecBuilder.fill(0.003, 0.003, 0.0005);
     }
 }
