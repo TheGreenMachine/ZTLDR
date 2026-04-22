@@ -62,7 +62,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      */
     private double wantedTurretAngleDegrees = 0;
     private boolean isTurretCalibrated = false;
-    private boolean isTurretAimingInDeadZone = false;
     /**
      * The angle to point the turret at when {@link #autoAimTurret} is false (in degrees).
      */
@@ -263,7 +262,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         GreenLogger.periodicLog(NAME + "/turret/Aimed", this::isTurretAimed);
         GreenLogger.periodicLog(NAME + "/turret/Calibrated", () -> isTurretCalibrated);
-        GreenLogger.periodicLog(NAME + "/turret/Aiming in Dead Zone", () -> isTurretAimingInDeadZone);
         GreenLogger.periodicLog(NAME + "/turret/Left Sensor Triggered", () -> leftSensorTriggered);
         GreenLogger.periodicLog(NAME + "/turret/Right Sensor Triggered", () -> rightSensorTriggered);
         GreenLogger.periodicLog(NAME + "/turret/Fixed Angle Degrees", () -> turretFixedAngleDegrees);
@@ -688,17 +686,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 OPPOSITE_OF_DEAD_ZONE_POSITION_ROTATIONS + 0.5
             );
 
-            // Clamp the position between the first and fourth beam break positions.
-            double lowerLimitRotations = FIRST_BEAM_BREAK_POSITION_ROTATIONS;
-            double upperLimitRotations = FOURTH_BEAM_BREAK_POSITION_ROTATIONS;
-            isTurretAimingInDeadZone = wrappedWantedRotations < lowerLimitRotations || wrappedWantedRotations > upperLimitRotations;
-            double clampedMotorRotations = MathUtil.clamp(
-                wrappedWantedRotations,
-                lowerLimitRotations,
-                upperLimitRotations
-            );
-
-            turretMotor.setControl(turretMotorPositionRequest.withPosition(clampedMotorRotations));
+            turretMotor.setControl(turretMotorPositionRequest.withPosition(wrappedWantedRotations));
         }
     }
 
