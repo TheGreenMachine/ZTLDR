@@ -1,0 +1,21 @@
+{
+    "type": "object",
+    "title": "Linear MPS to Launcher RPS Config",
+    "additionalProperties": false,
+    "properties": {
+        "linearVelocitiesMPS": {
+            "type": "array",
+            "default": null,
+            "items": {
+                "type": "number"
+            }
+        },
+        "launchVelocitiesRPS": {
+            "type": "array",
+            "default": null,
+            "items": {
+                "type": "number"
+            }
+        }
+    }
+}

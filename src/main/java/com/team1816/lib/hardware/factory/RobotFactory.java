@@ -135,6 +135,52 @@ public class RobotFactory {
         return config.shooterSettings;
     }
 
+    public LinearMPSToLauncherRPSConfig getLinearMPSToLauncherRPSConfig() {
+        if (config.linearMPSToLaunchRPS == null) {
+            GreenLogger.log("Couldn't find the linear mps to launcher rps config");
+            return new LinearMPSToLauncherRPSConfig();
+        }
+        return config.linearMPSToLaunchRPS;
+    }
+
+    /**
+     * Uses the shooterSettings in YAML to create a {@link LinearMPSToLauncherRPSConfig} defining
+     * the relationship between launcher angular velocity and linear exit velocity.
+     *
+     * @param deltaZMeters The difference between the target height and shooter height used when
+     *                     calibrating the shooterSettings so we can use those settings to
+     *                     determine the relationship between launcher RPS and linear exit
+     *                     velocity, in meters.
+     * @return The calculated {@link LinearMPSToLauncherRPSConfig} based on the shooterSettings
+     * in YAML and the passed in deltaZMeters.
+     */
+    public LinearMPSToLauncherRPSConfig stealLinearMPSToLauncherRPSConfigFromShooterSettings(double deltaZMeters) {
+        LinearMPSToLauncherRPSConfig linearMPSToLauncherRPSConfig = new LinearMPSToLauncherRPSConfig();
+        if (config.shooterSettings == null) {
+            GreenLogger.log("Couldn't find the shooter settings config");
+            return linearMPSToLauncherRPSConfig;
+        }
+        linearMPSToLauncherRPSConfig.launchVelocitiesRPS = config.shooterSettings.launchVelocitiesRPS;
+        linearMPSToLauncherRPSConfig.linearVelocitiesMPS = new ArrayList<>();
+        for (int i = 0; i < config.shooterSettings.distancesInches.size(); i++) {
+            double distanceMeters = Units.inchesToMeters(config.shooterSettings.distancesInches.get(i));
+            double thetaRadians = Math.PI / 2 - Units.rotationsToRadians(config.shooterSettings.inclineAnglesRotations.get(i));
+            linearMPSToLauncherRPSConfig.linearVelocitiesMPS.add(
+                Math.sqrt(
+                    -0.5 * 9.80665 * distanceMeters * distanceMeters
+                    / (
+                        Math.cos(thetaRadians)
+                        * (
+                            (Math.cos(thetaRadians) * deltaZMeters)
+                            - (distanceMeters * Math.sin(thetaRadians))
+                        )
+                    )
+                )
+            );
+        }
+        return linearMPSToLauncherRPSConfig;
+    }
+
     /**
      * Retrieves the names of all the paths.
      */
@@ -697,6 +743,7 @@ public class RobotFactory {
         factory.WheelRadius = kinematics.wheelRadius;
         factory.DriveMotorGearRatio = kinematics.driveGearing;
         factory.SteerMotorGearRatio = kinematics.steerGearing;
+        factory.CouplingGearRatio = kinematics.couplingGearRatio;
         factory.SpeedAt12Volts = maxSpd;
 
         for (var module : config.modules.values()) {
@@ -714,6 +761,7 @@ public class RobotFactory {
                 GreenLogger.log(" WheelRadius: " + factory.WheelRadius);
                 GreenLogger.log(" DriveMotorGearRatio: " + factory.DriveMotorGearRatio);
                 GreenLogger.log(" SteerMotorGearRatio: " + factory.SteerMotorGearRatio);
+                GreenLogger.log(" CouplingGearRatio: " + factory.CouplingGearRatio);
                 GreenLogger.log(" SpeedAt12Volts: " + factory.SpeedAt12Volts);
             }
 
@@ -780,6 +828,9 @@ public class RobotFactory {
         }
         if (kinematics.maxAngularRate == null || kinematics.maxAngularRate == 0) {
             property = "maxAngularRate";
+        }
+        if (kinematics.couplingGearRatio == null || kinematics.couplingGearRatio == 0) {
+            property = "couplingGearRatio";
         }
         if (property != null) {
             var message = subsystemName + " kinematics " + property + " can't be null or 0";
