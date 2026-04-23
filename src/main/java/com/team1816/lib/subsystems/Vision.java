@@ -220,9 +220,6 @@ public class Vision extends SubsystemBase implements ITestableSubsystem {
                     // estimate, since single-tag estimates often have some normal flickering.
                     if (isMultiTag(estimatedRobotPose.strategy)) {
                         consecutiveDiscardedEstimates++;
-                        GreenLogger.log("Missed angle check " + consecutiveDiscardedEstimates + " vision degrees: " +
-                            visionEstimatedPose2d.getRotation().getDegrees() + " drive degrees: " +
-                            (pose.isEmpty() ? "no pose" : pose.get().getRotation().getDegrees()));
                         // The number of estimates to allow to be discarded before determining that we
                         // have lost a good pose estimate.
                         int discardsBeforePoseLoss = 5;
