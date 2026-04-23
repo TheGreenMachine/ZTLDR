@@ -41,7 +41,6 @@ subsystems:
                 id: 35
                 deviceType: TalonFX
                 neutralMode: Brake
-                statorCurrentLimit: 80
                 supplyCurrentLimit: 40
             flAz:
                 id: 30
@@ -60,7 +59,6 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
-                statorCurrentLimit: 80
                 supplyCurrentLimit: 40
             frAz:
                 id: 31
@@ -78,7 +76,6 @@ subsystems:
                 id: 37
                 deviceType: TalonFX
                 neutralMode: Brake
-                statorCurrentLimit: 80
                 supplyCurrentLimit: 40
             blAz:
                 id: 33
@@ -97,7 +94,6 @@ subsystems:
                 deviceType: TalonFX
                 neutralMode: Brake
                 motorRotation: Clockwise_Positive
-                statorCurrentLimit: 80
                 supplyCurrentLimit: 40
             brAz:
                 id: 32
@@ -152,6 +148,7 @@ subsystems:
             maxDriveRPS: 98 # measured motor max speed rps
             maxAngularRate: 8.285 # rad/sec
             wheelCOF: 1.7
+            slipCurrentAmps: 120
         constants:
             translationKp: 20
             translationKd: 0

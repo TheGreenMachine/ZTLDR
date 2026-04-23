@@ -50,6 +50,11 @@
             "type" : "number",
             "default": null,
             "description": "number of rotations of the drive motor caused by a rotation of the azimuth"
+        },
+        "slipCurrentAmps": {
+            "type" : "number",
+            "default": null,
+            "description": "maximum amount of stator current the drive motors can apply without slippage"
         }
     }
 }
