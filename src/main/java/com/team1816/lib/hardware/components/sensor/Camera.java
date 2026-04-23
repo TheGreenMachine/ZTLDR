@@ -148,40 +148,49 @@ public class Camera {
         // Get position estimates from all the unread PhotonPipelineResults on the PhotonCamera. A
         // PhotonPipelineResult can essentially be thought of as a frame from the camera.
         for (PhotonPipelineResult pipelineResult : photonCamera.getAllUnreadResults()) {
-            Optional<EstimatedRobotPose> poseEstimate = poseEstimator.estimateCoprocMultiTagPose(pipelineResult);
+            int targetsSize = pipelineResult.targets.size();
+            if (targetsSize > 0) {
+                Optional<EstimatedRobotPose> poseEstimate = targetsSize > 1 ?
+                    poseEstimator.estimateCoprocMultiTagPose(pipelineResult) :
+                    poseEstimator.estimateLowestAmbiguityPose(pipelineResult);
 
-            // If we weren't able to get a multi-tag estimate (this would happen if there weren't
-            // multiple tags visible), try to get a result using lowest ambiguity. (Technically, it
-            // doesn't matter that it is using the lowest ambiguity tag because at this point we
-            // know there is only one tag, but it has to be some estimation strategy that works
-            // with only one tag.)
-            if (poseEstimate.isEmpty()) {
-                poseEstimate = poseEstimator.estimateLowestAmbiguityPose(pipelineResult);
+
+                // If we weren't able to get a multi-tag estimate (this would happen if there weren't
+                // multiple tags visible), try to get a result using lowest ambiguity. (Technically, it
+                // doesn't matter that it is using the lowest ambiguity tag because at this point we
+                // know there is only one tag, but it has to be some estimation strategy that works
+                // with only one tag.)
+//            if (poseEstimate.isEmpty()) {
+//                poseEstimate = poseEstimator.estimateLowestAmbiguityPose(pipelineResult);
+//            }
+
+                // If we got an estimate, add it to the list to return and update the latest pose
+                // estimate.
+                poseEstimate.ifPresent(estimate -> {
+                    estimatedRobotPoses.add(estimate);
+                    latestPoseEstimate = estimate.estimatedPose;
+                });
+
+                // Set the seen AprilTag poses and IDs based on the tags from the latest pipeline
+                // result.
+                List<PhotonTrackedTarget> targets = pipelineResult.getTargets();
+                seenAprilTagPoses = targets.stream()
+                    .map(target ->
+                        // Find the AprilTag's pose on the field based on its position relative to the
+                        // camera, the position of the camera on the robot, and the current estimated
+                        // position of the robot on the field.
+                        new Pose3d(BaseRobotState.robotPose)
+                            .plus(robotToCamera)
+                            .plus(target.getBestCameraToTarget())
+                    )
+                    .collect(Collectors.toList());
+                seenAprilTagIDs = targets.stream()
+                    .map(PhotonTrackedTarget::getFiducialId)
+                    .collect(Collectors.toList());
+            } else {
+                seenAprilTagPoses = List.of();
+                seenAprilTagIDs = List.of();
             }
-
-            // If we got an estimate, add it to the list to return and update the latest pose
-            // estimate.
-            poseEstimate.ifPresent(estimate -> {
-                estimatedRobotPoses.add(estimate);
-                latestPoseEstimate = estimate.estimatedPose;
-            });
-
-            // Set the seen AprilTag poses and IDs based on the tags from the latest pipeline
-            // result.
-            List<PhotonTrackedTarget> targets = pipelineResult.getTargets();
-            seenAprilTagPoses = targets.stream()
-                .map(target ->
-                    // Find the AprilTag's pose on the field based on its position relative to the
-                    // camera, the position of the camera on the robot, and the current estimated
-                    // position of the robot on the field.
-                    new Pose3d(BaseRobotState.robotPose)
-                        .plus(robotToCamera)
-                        .plus(target.getBestCameraToTarget())
-                )
-                .collect(Collectors.toList());
-            seenAprilTagIDs = targets.stream()
-                .map(PhotonTrackedTarget::getFiducialId)
-                .collect(Collectors.toList());
         }
         return estimatedRobotPoses;
     }

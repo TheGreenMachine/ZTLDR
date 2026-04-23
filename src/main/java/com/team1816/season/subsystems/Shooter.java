@@ -8,8 +8,8 @@ import com.team1816.lib.hardware.components.motor.IMotor;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.FieldContainer;
 import com.team1816.lib.util.GreenLogger;
-import com.team1816.lib.util.IShooterCalculator;
-import com.team1816.lib.util.ShooterTableCalculator;
+import com.team1816.lib.util.ShooterCalculator.HenryShooterCalculator;
+import com.team1816.lib.util.ShooterCalculator.IShooterCalculator;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
@@ -62,7 +62,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      */
     private double wantedTurretAngleDegrees = 0;
     private boolean isTurretCalibrated = false;
-    private boolean isTurretAimingInDeadZone = false;
     /**
      * The angle to point the turret at when {@link #autoAimTurret} is false (in degrees).
      */
@@ -80,7 +79,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     /**
      * An adjustment value added to all requests to the turret (in degrees).
      */
-    private double turretAngleAdjustmentDegrees = 0;
+    private double turretAngleAdjustmentDegrees = -1.0;
 
     private boolean useChassisSpeedForHoodAngleAndSpeed = false;
 
@@ -95,7 +94,9 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
     private final VelocityVoltage topLaunchMotorVelocityRequest = new VelocityVoltage(0);
     private final VelocityVoltage bottomLaunchMotorVelocityRequest = new VelocityVoltage(0);
-    private final NeutralOut neutralModeRequest = new NeutralOut();
+    //private final NeutralOut neutralModeRequest = new NeutralOut();
+    private final VelocityVoltage neutralModeRequest = new VelocityVoltage(10);
+
     private final MotionMagicExpoVoltage inclineMotorPositionRequest = new MotionMagicExpoVoltage(0);
     private final MotionMagicExpoVoltage turretMotorPositionRequest = new MotionMagicExpoVoltage(0);
 
@@ -112,7 +113,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private boolean previousSensorValuesKnown = false;
 
     //CONSTANTS
-    private final double MOTOR_ROTATIONS_PER_TURRET_ROTATION;
     private final Translation3d SHOOTER_OFFSET;
     /**
      * The tolerance for the turret rotation to consider it aimed at the target (in degrees).
@@ -132,29 +132,29 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      */
     private final double INCLINE_DUCKING_LIMIT_ROTATIONS;
     /**
-     * The turret position opposite the dead zone, in turret rotations.
+     * The turret position opposite the dead zone, (in rotations).
      */
-    private final double OPPOSITE_OF_DEAD_ZONE_TURRET_ROTATIONS;
+    private final double OPPOSITE_OF_DEAD_ZONE_POSITION_ROTATIONS;
     /**
      * The first (in the counterclockwise direction) of the four positions of the turret motor
-     * where we would see beam break values change, in motor rotations.
+     * where we would see beam break values change, (in rotations).
      */
-    private final double FIRST_BEAM_BREAK_POSITION_MOTOR_ROTATIONS;
+    private final double FIRST_BEAM_BREAK_POSITION_ROTATIONS;
     /**
      * The second (in the counterclockwise direction) of the four positions of the turret motor
-     * where we would see beam break values change, in motor rotations.
+     * where we would see beam break values change, (in rotations).
      */
-    private final double SECOND_BEAM_BREAK_POSITION_MOTOR_ROTATIONS;
+    private final double SECOND_BEAM_BREAK_POSITION_ROTATIONS;
     /**
      * The third (in the counterclockwise direction) of the four positions of the turret motor
-     * where we would see beam break values change, in motor rotations.
+     * where we would see beam break values change, (in rotations).
      */
-    private final double THIRD_BEAM_BREAK_POSITION_MOTOR_ROTATIONS;
+    private final double THIRD_BEAM_BREAK_POSITION_ROTATIONS;
     /**
      * The fourth (in the counterclockwise direction) of the four positions of the turret motor
-     * where we would see beam break values change, in motor rotations.
+     * where we would see beam break values change, (in rotations).
      */
-    private final double FOURTH_BEAM_BREAK_POSITION_MOTOR_ROTATIONS;
+    private final double FOURTH_BEAM_BREAK_POSITION_ROTATIONS;
     /**
      * The amount by which to increase or decrease the {@link #launchVelocityAdjustmentRPS} per
      * call to {@link #increaseLaunchVelocityAdjustment()} or {@link
@@ -180,11 +180,6 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private final double TOP_LAUNCH_MOTOR_BACKSPIN_MULTIPLIER;
 
     //CALIBRATION
-    /**
-     * The offset in motor rotations of the turret motor from the reference frame where robot
-     * forward is zero to the positions read by the motor.
-     */
-    private double turretMotorOffsetRotations;
     private final double FAST_CALIBRATION_SPEED = 0.09;
     private final double SLOW_CALIBRATION_SPEED = 0.04;
     private final DutyCycleOut turretDutyCycleOutRequest = new DutyCycleOut(0);
@@ -200,43 +195,42 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     //TARGET TRANSLATION2DS
     // These are all on the blue side, and will be flipped based on alliance. Left and right are
     // from the driver station perspective.
-    private final Translation2d HUB_TRANSLATION_2D = new Translation2d(Units.inchesToMeters(182.11), Units.inchesToMeters(158.84));
-    private final Translation2d LEFT_CORNER_TRANSLATION_2D = new Translation2d(2, 5.07);
-    private final Translation2d RIGHT_CORNER_TRANSLATION_2D = new Translation2d(2, 3);
+    private final Translation3d HUB_TRANSLATION_3D = new Translation3d(Units.inchesToMeters(182.11), Units.inchesToMeters(158.84), Units.inchesToMeters(72));
+    private final Translation3d LEFT_CORNER_TRANSLATION_3D = new Translation3d(2, 5.07, 0);
+    private final Translation3d RIGHT_CORNER_TRANSLATION_3D = new Translation3d(2, 3, 0);
 //    private final double ROBOT_STARTING_LINE = Units.inchesToMeters(156.61); True position.
     private final double ROBOT_STARTING_LINE = 4.2684; // Fudged position to shoot into the hub from only partially over the line.
 
-    private final ShooterTableCalculator shooterTableCalculator = new ShooterTableCalculator();
+    private final IShooterCalculator shooterTableCalculator;
 
-    private Translation2d turretTarget = Translation2d.kZero;
-    private Pose2d turretPose = Pose2d.kZero;
+    private Translation3d target = Translation3d.kZero;
+    private Pose3d turretPose = Pose3d.kZero;
     private boolean isBlueAlliance = false;
 
     public Shooter() {
         super();
         // if the turret is ghosted we can say we are calibrated because the motors will not move
         if(turretMotor.isGhost()) isTurretCalibrated = true;
-        MOTOR_ROTATIONS_PER_TURRET_ROTATION = factory.getConstant(NAME, "motorRotationsPerTurretRotation", 1);
         SHOOTER_OFFSET = new Translation3d(
             factory.getConstant(NAME, "shooterOffsetXMeters",0),
             factory.getConstant(NAME, "shooterOffsetYMeters",0),
             factory.getConstant(NAME, "shooterOffsetZMeters",0)
         );
+        // Just change this line to use a new ShooterTableCalculator to switch the calculator type.
+        shooterTableCalculator = new HenryShooterCalculator(HUB_TRANSLATION_3D.getZ() - SHOOTER_OFFSET.getZ());
 
-        // Find the turret positions of the four spots that we would see beam break values change,
-        // in motor rotations relative robot forward.
+        // Find the turret positions of the four spots that we would see beam break values change.
         double closeDistanceBetweenBeamBreaks = factory.getConstant(NAME, "closeDistanceBetweenBeamBreaks", 0);
         double farDistanceBetweenBeamBreaks = factory.getConstant(NAME, "farDistanceBetweenBeamBreaks", 0);
         double secondLowestBeamBreakToZero = factory.getConstant(NAME, "secondLowestBeamBreakToZero", 0);
-        FIRST_BEAM_BREAK_POSITION_MOTOR_ROTATIONS = -secondLowestBeamBreakToZero - closeDistanceBetweenBeamBreaks;
-        SECOND_BEAM_BREAK_POSITION_MOTOR_ROTATIONS = -secondLowestBeamBreakToZero;
-        THIRD_BEAM_BREAK_POSITION_MOTOR_ROTATIONS = -secondLowestBeamBreakToZero + farDistanceBetweenBeamBreaks;
-        FOURTH_BEAM_BREAK_POSITION_MOTOR_ROTATIONS = -secondLowestBeamBreakToZero + farDistanceBetweenBeamBreaks + closeDistanceBetweenBeamBreaks;
+        FIRST_BEAM_BREAK_POSITION_ROTATIONS = -secondLowestBeamBreakToZero - closeDistanceBetweenBeamBreaks;
+        SECOND_BEAM_BREAK_POSITION_ROTATIONS = -secondLowestBeamBreakToZero;
+        THIRD_BEAM_BREAK_POSITION_ROTATIONS = -secondLowestBeamBreakToZero + farDistanceBetweenBeamBreaks;
+        FOURTH_BEAM_BREAK_POSITION_ROTATIONS = -secondLowestBeamBreakToZero + farDistanceBetweenBeamBreaks + closeDistanceBetweenBeamBreaks;
         // Get the position opposite of the dead zone to use as the center of our wrapped range.
-        double oppositeOfDeadZoneMotorRotations = (
-            SECOND_BEAM_BREAK_POSITION_MOTOR_ROTATIONS + THIRD_BEAM_BREAK_POSITION_MOTOR_ROTATIONS
+        OPPOSITE_OF_DEAD_ZONE_POSITION_ROTATIONS = (
+            SECOND_BEAM_BREAK_POSITION_ROTATIONS + THIRD_BEAM_BREAK_POSITION_ROTATIONS
         ) / 2;
-        OPPOSITE_OF_DEAD_ZONE_TURRET_ROTATIONS = oppositeOfDeadZoneMotorRotations / MOTOR_ROTATIONS_PER_TURRET_ROTATION;
 
         TURRET_ROTATION_TOLERANCE_DEGREES = factory.getConstant(NAME, "turretRotationToleranceDegrees", 0);
         INCLINE_ANGLE_TOLERANCE_DEGREES = factory.getConstant(NAME, "inclineAngleToleranceDegrees", 0);
@@ -270,21 +264,26 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
 
         GreenLogger.periodicLog(NAME + "/turret/Aimed", this::isTurretAimed);
         GreenLogger.periodicLog(NAME + "/turret/Calibrated", () -> isTurretCalibrated);
-        GreenLogger.periodicLog(NAME + "/turret/Aiming in Dead Zone", () -> isTurretAimingInDeadZone);
         GreenLogger.periodicLog(NAME + "/turret/Left Sensor Triggered", () -> leftSensorTriggered);
         GreenLogger.periodicLog(NAME + "/turret/Right Sensor Triggered", () -> rightSensorTriggered);
-        GreenLogger.periodicLog(NAME + "/turret/Motor Offset Rotations", () -> turretMotorOffsetRotations);
         GreenLogger.periodicLog(NAME + "/turret/Fixed Angle Degrees", () -> turretFixedAngleDegrees);
         GreenLogger.periodicLog(NAME + "/turret/Auto Aiming Turret", () -> autoAimTurret);
         GreenLogger.periodicLog(NAME + "/turret/Angle Adjustment Degrees", () -> turretAngleAdjustmentDegrees);
         GreenLogger.periodicLog(NAME + "/turret/Is Blue Alliance", () -> isBlueAlliance);
-        GreenLogger.periodicLog(NAME + "/turret/calc/Turret Pose", () -> turretPose, Pose2d.struct);
-        GreenLogger.periodicLog(NAME + "/turret/calc/Target Pose", () -> turretTarget, Translation2d.struct);
+        GreenLogger.periodicLog(NAME + "/turret/calc/Turret Pose", () -> turretPose, Pose3d.struct);
+        GreenLogger.periodicLog(NAME + "/turret/calc/Target Translation", () -> target, Translation3d.struct);
         GreenLogger.periodicLog(NAME + "/turret/calc/Robot Pose", () -> BaseRobotState.robotPose, Pose2d.struct);
         GreenLogger.periodicLog(NAME + "/turret/calc/Shooter Offset", () -> SHOOTER_OFFSET, Translation3d.struct);
-        GreenLogger.periodicLog(NAME + "/turret/calc/Distance to Target", () -> turretPose.getTranslation().getDistance(turretTarget));
+        GreenLogger.periodicLog(
+            NAME + "/turret/calc/Distance to Target",
+            // Get the 2d distance between the turret and the target.
+            () -> turretPose.getTranslation().toTranslation2d().getDistance(target.toTranslation2d())
+        );
         GreenLogger.periodicLog(NAME + "/turret/calc/Wanted Angle Degrees", () -> wantedTurretAngleDegrees);
-        GreenLogger.periodicLog(NAME + "/turret/calc/Current Angle Degrees", () -> getCurrentRobotRelativeTurretRotation2d().getDegrees());
+        GreenLogger.periodicLog(
+            NAME + "/turret/calc/Current Angle Degrees",
+            () -> getCurrentRobotRelativeTurretRotation2d().getDegrees()
+        );
     }
 
     @Override
@@ -320,23 +319,27 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         // Now the sensor triggered values have been set at least once.
         sensorValuesHaveBeenSet = true;
 
-        FieldContainer.field.getObject("Turret").setPose(getCurrentTurretPose2d());
+        FieldContainer.field.getObject("Turret").setPose(getCurrentTurretPose3d().toPose2d());
 
         inclineMotorML.setAngle(getCurrentInclineAngleDegrees());
     }
 
     private void applyState() {
-        turretTarget = Translation2d.kZero;
-        if (autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC) {
-            isAutoAiming = true;
-            turretTarget = getTargetTranslation2d();
-        }
-        else {
-            isAutoAiming = false;
-        }
+        target = getTargetTranslation3d();
+        final double calculatorAngleOfEntryDegrees = 45;
+
+        isAutoAiming = autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC;
 
         if (autoAimTurret) {
-            aimTurretAtTarget(turretTarget);
+            double turretLookAheadTimeSeconds = 0.5;
+            IShooterCalculator.ShooterCalculatorResponse calculatorResponse = shooterTableCalculator.calculate(
+                getCurrentTurretPose3d().getTranslation(),
+                target,
+                calculatorAngleOfEntryDegrees,
+                useChassisSpeedForHoodAngleAndSpeed,
+                turretLookAheadTimeSeconds
+            );
+            setTurretAngle(calculatorResponse.turretAngleDegrees());
         }
         else {
             setTurretAngle(turretFixedAngleDegrees);
@@ -347,7 +350,17 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 setInclineAngle(wantedDistanceState.getInclineAngleDegrees());
                 setLaunchVelocities(wantedDistanceState.getLaunchVelocityRPS());
             }
-            case AUTOMATIC -> aimInclineAndLaunchersAtTarget(turretTarget);
+            case AUTOMATIC -> {
+                IShooterCalculator.ShooterCalculatorResponse calculatorResponse = shooterTableCalculator.calculate(
+                    getCurrentTurretPose3d().getTranslation(),
+                    target,
+                    calculatorAngleOfEntryDegrees,
+                    useChassisSpeedForHoodAngleAndSpeed,
+                    0
+                );
+                setInclineAngle(calculatorResponse.inclineAngleDegrees());
+                setLaunchVelocities(calculatorResponse.launchVelocityRPS());
+            }
         }
     }
 
@@ -455,14 +468,14 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     }
 
     /**
-     * Gets the {@link Translation2d} of the target that we should aim at, based on the location of
+     * Gets the {@link Translation3d} of the target that we should aim at, based on the location of
      * the robot on the field. Specifically, determines if we should aim at the hub or the corner
      * of the alliance zone, determines which corner to aim at if aiming at the corner, and gets
-     * the correct {@link Translation2d} of this target based on the alliance.
+     * the correct {@link Translation3d} of this target based on the alliance.
      *
-     * @return The {@link Translation2d} of the target we should aim at.
+     * @return The {@link Translation3d} of the target we should aim at.
      */
-    private Translation2d getTargetTranslation2d() {
+    private Translation3d getTargetTranslation3d() {
         Pose2d robotPose = BaseRobotState.robotPose;
         double robotXMeters = robotPose.getX();
         double robotYMeters = robotPose.getY();
@@ -472,7 +485,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             : robotXMeters > FlippingUtil.fieldSizeX - ROBOT_STARTING_LINE;
         if (isInAllianceZone) {
             // Aim at hub
-            return flipTranslation2dBasedOnAlliance(HUB_TRANSLATION_2D);
+            return flipTranslation3dBasedOnAlliance(HUB_TRANSLATION_3D);
         }
         else {
             // Aim at corner on alliance side. Determine left or right based on which half of the
@@ -481,57 +494,43 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             // are on the left if y is greater than the middle, and if we are red alliance, we are
             // on the left if y is less than the middle.
             if (isBlueAlliance == robotYMeters > (FlippingUtil.fieldSizeY / 2)) {
-                return flipTranslation2dBasedOnAlliance(LEFT_CORNER_TRANSLATION_2D);
+                return flipTranslation3dBasedOnAlliance(LEFT_CORNER_TRANSLATION_3D);
             }
             else {
-                return flipTranslation2dBasedOnAlliance(RIGHT_CORNER_TRANSLATION_2D);
+                return flipTranslation3dBasedOnAlliance(RIGHT_CORNER_TRANSLATION_3D);
             }
         }
     }
 
     /**
-     * Flips the passed in {@link Translation2d} based on the alliance.
+     * Flips the passed in {@link Translation3d} based on the alliance.
      *
-     * @param blueTranslation2d The {@link Translation2d} to flip. This should be the {@link
-     * Translation2d} for the blue alliance side.
-     * @return The original {@link Translation2d} if the alliance is blue, or the flipped {@link
-     * Translation2d} if the alliance is red.
+     * @param blueTranslation3d The {@link Translation3d} to flip. This should be the {@link
+     * Translation3d} for the blue alliance side.
+     * @return The original {@link Translation3d} if the alliance is blue, or the flipped {@link
+     * Translation3d} if the alliance is red.
      */
-    private Translation2d flipTranslation2dBasedOnAlliance(Translation2d blueTranslation2d) {
-        return DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue
-            ? blueTranslation2d
-            : FlippingUtil.flipFieldPosition(blueTranslation2d);
+    private Translation3d flipTranslation3dBasedOnAlliance(Translation3d blueTranslation3d) {
+        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue) {
+            return blueTranslation3d;
+        }
+        else {
+            // Flip the 2d part with PathPlanner's FlippingUtil.
+            Translation2d flippedTranslation2d = FlippingUtil.flipFieldPosition(
+                blueTranslation3d.toTranslation2d()
+            );
+            // Reassemble the Translation3d with the flipped Translation2d and the original height.
+            return new Translation3d(
+                flippedTranslation2d.getX(),
+                flippedTranslation2d.getY(),
+                blueTranslation3d.getZ()
+            );
+        }
     }
 
     /**
-     * Automatically points the turret at the passed in target.
-     *
-     * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
-     */
-    private void aimTurretAtTarget(Translation2d targetTranslation2d) {
-        Rotation2d robotRelativeRotation2dToTarget = shooterTableCalculator.getTurretAngle(getCurrentTurretPose2d().getTranslation(),
-            targetTranslation2d, useChassisSpeedForHoodAngleAndSpeed);
-        double robotRelativeDegreesToTarget = robotRelativeRotation2dToTarget.getDegrees();
-        setTurretAngle(robotRelativeDegreesToTarget);
-    }
-
-    /**
-     * Automatically points the incline and spins up the launchers to shoot at the passed in target
-     * at hub height using the shooter lookup table.
-     *
-     * @param targetTranslation2d The {@link Translation2d} of the target to aim at.
-     */
-    private void aimInclineAndLaunchersAtTarget(Translation2d targetTranslation2d) {
-        IShooterCalculator.ShooterCalculatorResponse response = shooterTableCalculator.getShooterSettings(getCurrentTurretPose2d().getTranslation(),
-            targetTranslation2d, useChassisSpeedForHoodAngleAndSpeed);
-
-        setInclineAngle(response.inclineAngleDegrees());
-        setLaunchVelocities(response.launchVelocityRPS());
-    }
-
-    /**
-     * Determines the offset of the {@link #turretMotor} based on where the beam break
-     * sensors change triggered values.
+     * Moves the turret until the beam break sensors change triggered values and uses this to zero
+     * the {@link #turretMotor}.
      */
     private void calibrateTurretMotor() {
         // We only want to run the motors to automatically calibrate if the robot is enabled, but the
@@ -571,28 +570,29 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
             if (leftSensorTriggered != previousLeftSensorTriggered) { // Change in left sensor triggered value.
                 if (rightSensorTriggered) {
                     // Must be at the first of the four positions where sensor values change.
-                    finishCalibration(FIRST_BEAM_BREAK_POSITION_MOTOR_ROTATIONS);
+                    finishCalibration(FIRST_BEAM_BREAK_POSITION_ROTATIONS);
                 }
                 else {
                     // Must be at the third of the four positions where sensor values change.
-                    finishCalibration(THIRD_BEAM_BREAK_POSITION_MOTOR_ROTATIONS);
+                    finishCalibration(THIRD_BEAM_BREAK_POSITION_ROTATIONS);
                 }
             }
             else if (rightSensorTriggered != previousRightSensorTriggered) { // Change in the right sensor triggered value.
                 if (leftSensorTriggered) {
                     // Must be at the fourth of the four positions where sensor values change.
-                    finishCalibration(FOURTH_BEAM_BREAK_POSITION_MOTOR_ROTATIONS);
+                    finishCalibration(FOURTH_BEAM_BREAK_POSITION_ROTATIONS);
                 }
                 else {
                     // Must be at the second of the four positions where sensor values change.
-                    finishCalibration(SECOND_BEAM_BREAK_POSITION_MOTOR_ROTATIONS);
+                    finishCalibration(SECOND_BEAM_BREAK_POSITION_ROTATIONS);
                 }
             }
         }
     }
 
-    private void finishCalibration(double beamBreakPositionMotorRotations) {
-        turretMotorOffsetRotations = turretMotor.getMotorPosition() - beamBreakPositionMotorRotations;
+    private void finishCalibration(double beamBreakPositionRotations) {
+        // Tell the turret motor that it is now at the specific beam break position.
+        turretMotor.setPosition(beamBreakPositionRotations);
         turretMotor.setControl(turretDutyCycleOutRequest.withOutput(0));
         isTurretCalibrated = true;
     }
@@ -687,48 +687,34 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     private void setTurretAngle(double wantedAngleDegrees) {
         wantedTurretAngleDegrees = wantedAngleDegrees + turretAngleAdjustmentDegrees;
         if (isTurretCalibrated) {
-            double wantedTurretRotations = Units.degreesToRotations(wantedTurretAngleDegrees);
+            double wantedRotations = Units.degreesToRotations(wantedTurretAngleDegrees);
 
-            double wrappedWantedTurretRotations = MathUtil.inputModulus(
-                wantedTurretRotations,
-                OPPOSITE_OF_DEAD_ZONE_TURRET_ROTATIONS - 0.5,
-                OPPOSITE_OF_DEAD_ZONE_TURRET_ROTATIONS + 0.5
-            );
-            double wantedMotorRotations = wrappedWantedTurretRotations * MOTOR_ROTATIONS_PER_TURRET_ROTATION;
-
-            // Clamp the position between the first and fourth beam break positions.
-            double lowerLimitMotorRotations = FIRST_BEAM_BREAK_POSITION_MOTOR_ROTATIONS;
-            double upperLimitMotorRotations = FOURTH_BEAM_BREAK_POSITION_MOTOR_ROTATIONS;
-            isTurretAimingInDeadZone = wantedMotorRotations < lowerLimitMotorRotations || wantedMotorRotations > upperLimitMotorRotations;
-            double clampedMotorRotations = MathUtil.clamp(
-                wantedMotorRotations,
-                lowerLimitMotorRotations,
-                upperLimitMotorRotations
+            double wrappedWantedRotations = MathUtil.inputModulus(
+                wantedRotations,
+                OPPOSITE_OF_DEAD_ZONE_POSITION_ROTATIONS - 0.5,
+                OPPOSITE_OF_DEAD_ZONE_POSITION_ROTATIONS + 0.5
             );
 
-            turretMotor.setControl(turretMotorPositionRequest.withPosition(
-                clampedMotorRotations + turretMotorOffsetRotations
-            ));
+            turretMotor.setControl(turretMotorPositionRequest.withPosition(wrappedWantedRotations));
         }
     }
 
     /**
-     * Gets the {@link Pose2d} representing the turret's current pose on the field.
+     * Gets the {@link Pose3d} representing the turret's current pose on the field.
      *
-     * @return The current field-relative {@link Pose2d} of the turret.
+     * @return The current field-relative {@link Pose3d} of the turret.
      */
-    private Pose2d getCurrentTurretPose2d() {
-        Translation2d robotToTurretTranslation2d = SHOOTER_OFFSET.toTranslation2d();
+    private Pose3d getCurrentTurretPose3d() {
         Rotation2d robotToTurretRotation2d = getCurrentRobotRelativeTurretRotation2d();
 
-        Transform2d robotToTurretTransform2d = new Transform2d(
-            robotToTurretTranslation2d,
-            robotToTurretRotation2d
+        Transform3d robotToTurretTransform3d = new Transform3d(
+            SHOOTER_OFFSET,
+            new Rotation3d(robotToTurretRotation2d)
         );
 
-        Pose2d robotPose2d = BaseRobotState.robotPose;
+        Pose3d robotPose3d = new Pose3d(BaseRobotState.robotPose);
 
-        turretPose = robotPose2d.transformBy(robotToTurretTransform2d);
+        turretPose = robotPose3d.transformBy(robotToTurretTransform3d);
 
         return turretPose;
     }
@@ -739,9 +725,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
      * @return The current robot-relative {@link Rotation2d} of the turret.
      */
     private Rotation2d getCurrentRobotRelativeTurretRotation2d() {
-        double motorRotations = turretMotor.getMotorPosition();
-        double offsetMotorRotations = motorRotations - turretMotorOffsetRotations;
-        double turretRotations = offsetMotorRotations / MOTOR_ROTATIONS_PER_TURRET_ROTATION;
+        double turretRotations = turretMotor.getMotorPosition();
         return Rotation2d.fromRotations(turretRotations);
     }
 

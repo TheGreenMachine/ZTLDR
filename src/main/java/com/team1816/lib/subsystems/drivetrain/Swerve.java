@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
+import java.util.Optional;
+
 import static com.team1816.lib.Singleton.factory;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -48,6 +50,10 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     private final double NORMAL_MODE_ROTATIONAL_MULTIPLIER;
     private final double SLOW_MODE_TRANSLATIONAL_MULTIPLIER;
     private final double SLOW_MODE_ROTATIONAL_MULTIPLIER;
+
+    private double linearSpeedLimitMPS = 0;
+    private double angularSpeedLimitRadPerSec = 0;
+    private boolean limitSpeed = false;
 
     public Swerve(CommandXboxController controller) {
         // TODO: This Singleton.get stuff is a temporary workaround until I fix a bug with the
@@ -111,9 +117,30 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
             rot *= NORMAL_MODE_ROTATIONAL_MULTIPLIER;
         }
 
-        return drive.withVelocityX(x * drivetrain.maxSpd) // Drive forward with negative Y (forward)
-            .withVelocityY(y * drivetrain.maxSpd) // Drive left with negative X (left)
-            .withRotationalRate(rot * maxAngularRate); // Drive counterclockwise with negative X (left)
+        // 6. Scale up the velocities out of the physical maximums
+        x *= IDrivetrain.maxSpd;
+        y *= IDrivetrain.maxSpd;
+        rot *= maxAngularRate;
+
+        // 7. Apply the speed limit hard cutoff.
+        if (limitSpeed) {
+            double speedSquared = x * x + y * y;
+            // Compare the speeds squared because it is slightly faster than using Math.sqrt() if
+            // we don't need to
+            if (speedSquared > linearSpeedLimitMPS * linearSpeedLimitMPS) {
+                double speed = Math.sqrt(speedSquared);
+                double ratio = linearSpeedLimitMPS / speed;
+                // Scale down the x and y velocity components to limit the overall speed
+                x *= ratio;
+                y *= ratio;
+            }
+            // Cap the angular speed
+            rot = Math.min(rot, angularSpeedLimitRadPerSec);
+        }
+
+        return drive.withVelocityX(x) // Drive forward with negative Y (forward)
+            .withVelocityY(y) // Drive left with negative X (left)
+            .withRotationalRate(rot); // Drive counterclockwise with negative X (left)
     }
 
     private void setForwardPerspective() {
@@ -154,6 +181,42 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
 
     public void resetPose(Pose2d pose) {
         drivetrain.resetPose(pose);
+    }
+
+    /**
+     * Apply a hard maximum to the drive speed. This should be used for tasks that require a strict
+     * cutoff, such as shooting while moving with a turret that cannot keep up at full speed. For
+     * slowing down driving for more precise control, use the slow mode and normal mode multipliers
+     * instead.
+     *
+     * @param linearSpeedLimitMPS The linear speed to limit driving to, in meters per second.
+     * @param angularSpeedLimitRadPerSec The angular speed to limit turning to, in radians per
+     *                                   second.
+     * @see #stopLimitingDriveSpeed()
+     */
+    public void limitDriveSpeed(double linearSpeedLimitMPS, double angularSpeedLimitRadPerSec) {
+        this.linearSpeedLimitMPS = linearSpeedLimitMPS;
+        this.angularSpeedLimitRadPerSec = angularSpeedLimitRadPerSec;
+        limitSpeed = true;
+    }
+
+    /**
+     * Stop applying the hard maximum to the drive speed.
+     *
+     * @see #limitDriveSpeed(double, double)
+     */
+    public void stopLimitingDriveSpeed() {
+        limitSpeed = false;
+    }
+
+    /**
+     * Return the pose at a given timestamp, if the buffer is not empty.
+     *
+     * @param timestampSeconds The pose's timestamp. This should be an FGPA timestamp.
+     * @return The pose at the given timestamp (or Optional.empty() if the buffer is empty).
+     */
+    public Optional<Pose2d> samplePoseAt(double timestampSeconds) {
+        return drivetrain.samplePoseAt(timestampSeconds);
     }
 
     /**

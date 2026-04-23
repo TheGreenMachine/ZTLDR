@@ -38,7 +38,8 @@ public abstract class BaseSuperstructure extends SubsystemBase {
 
     @Override
     public void periodic() {
-        handlePoseLossFromTilting();
+        // TODO: Add this back if it is decided to be necessary, or remove it fully if it isn't.
+//        handlePoseLossFromTilting();
     }
 
     /**
@@ -77,7 +78,7 @@ public abstract class BaseSuperstructure extends SubsystemBase {
      */
     public void addVisionMeasurementsToDrivetrain() {
         List<Pair<EstimatedRobotPose, Matrix<N3, N1>>> visionMeasurements = vision
-            .getVisionEstimatedPosesWithStdDevs();
+            .getVisionEstimatedPosesWithStdDevs(swerve::samplePoseAt);
 
         for (Pair<EstimatedRobotPose, Matrix<N3, N1>> visionMeasurement : visionMeasurements) {
             Matrix<N3, N1> visionStdDevs = visionMeasurement.getSecond();
@@ -108,10 +109,10 @@ public abstract class BaseSuperstructure extends SubsystemBase {
 
             // The maximum x and y standard deviations to allow for a vision estimate to count it
             // as trustworthy enough to work toward reestablishing our pose estimate.
-            final double maxTrustworthyTranslationStdDev = 2.0;
+            final double maxTrustworthyTranslationStdDev = 1.0;
             // The maximum rotation standard deviations to allow for a vision estimate to count it
             // as trustworthy enough to work toward reestablishing our pose estimate.
-            final double maxTrustworthyRotationStdDev = 4.0;
+            final double maxTrustworthyRotationStdDev = Units.degreesToRadians(5);
 
             if (
                 !BaseRobotState.hasAccuratePoseEstimate
@@ -123,7 +124,7 @@ public abstract class BaseSuperstructure extends SubsystemBase {
 
                 // The minimum number of good vision pose estimates to wait for until we decide we
                 // are confident in our pose estimate again.
-                final int minGoodPoseEstimatesUntilConfident = 10;
+                final int minGoodPoseEstimatesUntilConfident = 8;
 
                 // If we've gotten enough good vision pose estimates since losing pose, we know
                 // where we are again.

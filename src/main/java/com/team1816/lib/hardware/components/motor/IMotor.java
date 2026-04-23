@@ -11,6 +11,7 @@ public interface IMotor extends IPhoenix6 {
     double getMotorPosition();
     // used to zero the motor position
     void zeroMotorPosition();
+    StatusCode setPosition(double newValue);
     StatusCode setSimRotorVelocity(double rps);
     StatusCode setSimRotorPosition(double rotations);
     double getSimMotorVoltage();

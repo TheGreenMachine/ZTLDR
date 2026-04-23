@@ -30,6 +30,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 
+import java.util.Optional;
+
 import static com.team1816.lib.BaseConstants.DrivetrainConstants;
 import static com.team1816.lib.Singleton.factory;
 import static com.team1816.lib.util.FormatUtils.GetDisplay;
@@ -247,6 +249,17 @@ public class CTRESwerveDrivetrainImpl extends SwerveDrivetrain<CommonTalon, Comm
             },
             this // Subsystem for requirements
         );
+    }
+
+    /**
+     * Return the pose at a given timestamp, if the buffer is not empty.
+     *
+     * @param timestampSeconds The pose's timestamp. This should be an FGPA timestamp.
+     * @return The pose at the given timestamp (or Optional.empty() if the buffer is empty).
+     */
+    @Override
+    public Optional<Pose2d> samplePoseAt(double timestampSeconds) {
+        return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
     }
 
     /**

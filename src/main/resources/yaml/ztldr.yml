@@ -15,17 +15,24 @@ shooterSettings:
         - 0.08 # 156
         - 0.09 # 204
         - 0.09 #210
-        - 0.1027 # 264
-        - 0.1027 # 360
+        - 0.1113 # 264
+        - 0.108 # 360
     launchVelocitiesRPS:
-        - 30.25 # 48
-        - 37.25 # 96
-        - 39.25 #120
-        - 41.25 # 156
-        - 44.25 # 204
-        - 47 #210
-        - 48 # 264
-        - 49 # 360
+        - 32 # 48
+        - 39 # 96
+        - 41 #120
+        - 43 # 156
+        - 46 # 204
+        - 48 #210
+        - 49 # 264
+        - 50 # 360
+linearMPSToLaunchRPS: # TODO: Actual tune this. For now we are just using the shooterSettings and doing some physics to convert.
+    linearVelocitiesMPS:
+        - 10
+        - 20
+    launchVelocitiesRPS:
+        - 20
+        - 40
 subsystems:
     drivetrain:
         implemented: true
@@ -135,8 +142,9 @@ subsystems:
                 kV: 2.66
                 kS: 0.1
         kinematics:
-            driveGearing: 6.03
-            steerGearing: 26.0909
+            driveGearing: 6.026785714285714
+            steerGearing: 26.09090909090909
+            couplingGearRatio: 3.857142857142857
             wheelbaseLength: .505 # meters
             wheelbaseWidth: .505 # meters
             robotMass: 74.088 # kg
@@ -218,7 +226,7 @@ subsystems:
                 id: 10
                 deviceType: CANcoder
         constants:
-            intakeOnSpeed: .52
+            intakeOnSpeed: .5
             intakeSlowSpeed: .1
             outtakeSpeed: -0.6
             flipperMotorOutPosition: 0.164 #0.166
@@ -239,7 +247,7 @@ subsystems:
                         kV: 0.081
         constants:
             topClosedVelocity: 0
-            topOpenVelocity: 60
+            topOpenVelocity: 30
     shooter:
         implemented: true
         canBusName: shootercanivore
@@ -284,14 +292,15 @@ subsystems:
                 deviceType: TalonFX
                 id: 28
                 motorRotation: Clockwise_Positive
+                sensorToMechanismRatio: 15.625 # 250/16 gear ratio
                 pidConfig:
                     slot0:
                         kS: 0.1 # static friction - increase if turret won't move at small errors
-                        kP: 4 # position error gain - increase if still lagging, decrease if oscillating at setpoint
-                        kD: 0.28 # damping - increase if oscillating, keep roughly kP/20
+                        kP: 62.5 # position error gain - increase if still lagging, decrease if oscillating at setpoint
+                        kD: 4.375 # damping - increase if oscillating, keep roughly kP/20
                 motionMagic:
-                    expoKV: 0.02 #0.10 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
-                    expoKA: 0.1 #0.2 # acceleration smoothness - increase if dead zone reversals are too violent, decrease if turret feels mushy
+                    expoKV: 0.3125 #0.10 # cruise speed - lower = faster moves, higher = slower. Start here, decrease if turret feels sluggish
+                    expoKA: 1.5625 #0.2 # acceleration smoothness - increase if dead zone reversals are too violent, decrease if turret feels mushy
             inclineCoder:
                 id: 29
                 deviceType: CANcoder
@@ -305,7 +314,6 @@ subsystems:
         constants:
             leftTurretSensorChannel: 0
             rightTurretSensorChannel: 1
-            motorRotationsPerTurretRotation: 15.625 # 250/16 gear ratio
             shooterOffsetXMeters: -0.111303
             shooterOffsetYMeters: -0.112268
             shooterOffsetZMeters: 0.508
@@ -317,9 +325,9 @@ subsystems:
             distanceThreeInclineAngleRotations: 0.1113
             distanceThreeLaunchVelocityRPS: 100
             brokenInclineAutoLaunchVelocityRPS: 55 # Set to the RPS required to score at a distance from shooter to hub of 101.283 inches.
-            closeDistanceBetweenBeamBreaks: 0.419
-            farDistanceBetweenBeamBreaks: 13.570
-            secondLowestBeamBreakToZero: 6.7769
+            closeDistanceBetweenBeamBreaks: 0.026816
+            farDistanceBetweenBeamBreaks: 0.86848
+            secondLowestBeamBreakToZero: 0.4337216
             turretRotationToleranceDegrees: 5
             inclineAngleToleranceDegrees: 4
             launcherVelocityToleranceRPS: 2
@@ -331,6 +339,16 @@ subsystems:
         cameras:
             forwardLeft: # Pi IP: 10.18.16.11
                 photonVisionUIName: Forward_Left
+                robotToCamera:
+                    xInches: -12.66
+                    yInches: 12.1
+                    zInches: 16
+                    rollDegrees: 0
+                    pitchDegrees: -8
+                    yawDegrees: 55
+                detectionType: APRIL_TAG
+            topCenter: #Pi IP: 10.18.16.13
+                photonVisionUIName: Top_Center
                 robotToCamera:
                     xInches: -10.114
                     yInches: 3.587
