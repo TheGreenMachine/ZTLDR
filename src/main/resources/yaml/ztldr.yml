@@ -226,10 +226,10 @@ subsystems:
                 id: 10
                 deviceType: CANcoder
         constants:
-            intakeOnSpeed: .5
+            intakeOnSpeed: .35
             intakeSlowSpeed: .1
             outtakeSpeed: -0.6
-            flipperMotorOutPosition: 0.164 #0.166
+            flipperMotorOutPosition: 0.184 #0.166
             flipperMotorPullInOnePosition: 0.1
             flipperMotorPullInTwoPosition: 0.05
             flipperMotorInPosition: 0.025
