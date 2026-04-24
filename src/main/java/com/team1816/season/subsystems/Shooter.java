@@ -79,7 +79,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
     /**
      * An adjustment value added to all requests to the turret (in degrees).
      */
-    private double turretAngleAdjustmentDegrees = -1.0;
+    private double turretAngleAdjustmentDegrees = 0;
 
     private boolean useChassisSpeedForHoodAngleAndSpeed = false;
 
@@ -331,7 +331,7 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         isAutoAiming = autoAimTurret || wantedDistanceState == ShooterDistanceState.AUTOMATIC;
 
         if (autoAimTurret) {
-            double turretLookAheadTimeSeconds = 0.5;
+            double turretLookAheadTimeSeconds = 0;
             IShooterCalculator.ShooterCalculatorResponse calculatorResponse = shooterTableCalculator.calculate(
                 getCurrentTurretPose3d().getTranslation(),
                 target,
