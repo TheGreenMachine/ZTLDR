@@ -21,10 +21,10 @@
  "params":{
   "waypoints":[
     {"x":{"exp":"SideStart.x", "val":4.425225734710693}, "y":{"exp":"SideStart.y", "val":7.51403624535}, "heading":{"exp":"SideStart.heading", "val":3.141592653589793}, "intervals":24, "split":true, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"6.03 m", "val":6.03}, "y":{"exp":"SideShoot.y", "val":7.41730172157}, "heading":{"exp":"180 deg", "val":3.141592653589793}, "intervals":39, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"NeutralClearTrench.x", "val":6.03}, "y":{"exp":"NeutralClearTrench.y", "val":7.41730172157}, "heading":{"exp":"NeutralClearTrench.heading", "val":3.141592653589793}, "intervals":39, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"IIOuterFuel.x", "val":7.924712657928467}, "y":{"exp":"IIOuterFuel.y", "val":6.82694191456}, "heading":{"exp":"IIOuterFuel.heading", "val":4.363323129985824}, "intervals":32, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"IIInnerFuel.x", "val":7.74509859085083}, "y":{"exp":"IIInnerFuel.y", "val":4.726553554534912}, "heading":{"exp":"IIInnerFuel.heading", "val":4.1887902047863905}, "intervals":45, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"6.03 m", "val":6.03}, "y":{"exp":"SideShoot.y", "val":7.41730172157}, "heading":{"exp":"180 deg", "val":3.141592653589793}, "intervals":27, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"NeutralClearTrench.x", "val":6.03}, "y":{"exp":"NeutralClearTrench.y", "val":7.41730172157}, "heading":{"exp":"NeutralClearTrench.heading", "val":3.141592653589793}, "intervals":27, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"SideShoot.x", "val":4.002538681030273}, "y":{"exp":"SideShoot.y", "val":7.41730172157}, "heading":{"exp":"SideShoot.heading", "val":3.141592653589793}, "intervals":90, "split":true, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},

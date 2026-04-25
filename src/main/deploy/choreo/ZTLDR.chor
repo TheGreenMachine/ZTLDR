@@ -5,21 +5,35 @@
  "variables":{
   "expressions":{},
   "poses":{
-   "BumpStart":{
+   "AllianceClearTrench":{
     "x":{
-     "exp":"CenterStart.x",
-     "val":3.6
+     "exp":"3.221188 m",
+     "val":3.221188
     },
     "y":{
-     "exp":"5.06 m",
-     "val":5.06
+     "exp":"SideShoot.y",
+     "val":7.41730172157
     },
     "heading":{
      "exp":"180 deg",
      "val":3.141592653589793
     }
    },
-   "CSMT":{
+   "BumpStart":{
+    "x":{
+     "exp":"CenterStart.x",
+     "val":3.6
+    },
+    "y":{
+     "exp":"6.054 m",
+     "val":6.054
+    },
+    "heading":{
+     "exp":"180 deg",
+     "val":3.141592653589793
+    }
+   },
+   "CenterShoot":{
     "x":{
      "exp":"2.4 m",
      "val":2.4
@@ -43,22 +57,22 @@
      "val":4.035
     },
     "heading":{
-     "exp":"180 deg",
-     "val":3.141592653589793
+     "exp":"90 deg",
+     "val":1.5707963267948966
     }
    },
-   "CenterStop":{
+   "ClearDepot":{
     "x":{
-     "exp":"2.4 m",
-     "val":2.4
+     "exp":"2 m",
+     "val":2.0
     },
     "y":{
-     "exp":"CenterStart.y",
-     "val":4.035
+     "exp":"Depot.y",
+     "val":5.96
     },
     "heading":{
-     "exp":"-90 deg",
-     "val":-1.5707963267948966
+     "exp":"Depot.heading",
+     "val":3.141592653589793
     }
    },
    "CloserShoot":{
@@ -75,7 +89,7 @@
      "val":3.141592653589793
     }
    },
-   "DepotPickup":{
+   "Depot":{
     "x":{
      "exp":"0.52 m",
      "val":0.52
@@ -89,20 +103,6 @@
      "val":3.141592653589793
     }
    },
-   "GreedyEnterFuel":{
-    "x":{
-     "exp":"8.65 m",
-     "val":8.65
-    },
-    "y":{
-     "exp":"6.8 m",
-     "val":6.8
-    },
-    "heading":{
-     "exp":"250 deg",
-     "val":4.363323129985824
-    }
-   },
    "HubInnerFuel":{
     "x":{
      "exp":"5.9 m",
@@ -113,7 +113,7 @@
      "val":5.0
     },
     "heading":{
-     "exp":"250 deg",
+     "exp":"HubOuterFuel.heading",
      "val":4.363323129985824
     }
    },
@@ -123,11 +123,11 @@
      "val":5.9
     },
     "y":{
-     "exp":"IIOuterFuel.y",
-     "val":6.82694191456
+     "exp":"6.42 m",
+     "val":6.42
     },
     "heading":{
-     "exp":"IIOuterFuel.heading",
+     "exp":"IOuterFuel.heading",
      "val":4.363323129985824
     }
    },
@@ -137,11 +137,11 @@
      "val":7.74509859085083
     },
     "y":{
-     "exp":"4.726553554534912 m",
+     "exp":"IInnerFuel.y",
      "val":4.726553554534912
     },
     "heading":{
-     "exp":"4.1887902047863905 rad",
+     "exp":"IInnerFuel.heading",
      "val":4.1887902047863905
     }
    },
@@ -151,11 +151,39 @@
      "val":7.924712657928467
     },
     "y":{
+     "exp":"IOuterFuel.y",
+     "val":6.82694191456
+    },
+    "heading":{
+     "exp":"IOuterFuel.heading",
+     "val":4.363323129985824
+    }
+   },
+   "IInnerFuel":{
+    "x":{
+     "exp":"IOuterFuel.x",
+     "val":8.6
+    },
+    "y":{
+     "exp":"4.726553554534912 m",
+     "val":4.726553554534912
+    },
+    "heading":{
+     "exp":"240 deg",
+     "val":4.1887902047863905
+    }
+   },
+   "IOuterFuel":{
+    "x":{
+     "exp":"8.6 m",
+     "val":8.6
+    },
+    "y":{
      "exp":"6.82694191456 m",
      "val":6.82694191456
     },
     "heading":{
-     "exp":"4.363323129985824 rad",
+     "exp":"250 deg",
      "val":4.363323129985824
     }
    },
@@ -187,32 +215,18 @@
      "val":-0.7853981633974483
     }
    },
-   "ReenterTrench":{
+   "PreIOuterFuel":{
     "x":{
-     "exp":"6.536667346954346 m",
-     "val":6.536667346954346
+     "exp":"7.81 m",
+     "val":7.81
     },
     "y":{
-     "exp":"7.103303797245026 m",
-     "val":7.103303797245026
+     "exp":"7.11 m",
+     "val":7.11
     },
     "heading":{
-     "exp":"3.141592653589793 rad",
-     "val":3.141592653589793
-    }
-   },
-   "ShootExitTrench":{
-    "x":{
-     "exp":"5.829519748687744 m",
-     "val":5.829519748687744
-    },
-    "y":{
-     "exp":"7.337780857086182 m",
-     "val":7.337780857086182
-    },
-    "heading":{
-     "exp":"3.141592653589793 rad",
-     "val":3.141592653589793
+     "exp":"IOuterFuel.heading",
+     "val":4.363323129985824
     }
    },
    "SideShoot":{
