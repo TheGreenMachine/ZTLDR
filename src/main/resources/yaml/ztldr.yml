@@ -148,7 +148,7 @@ subsystems:
             maxDriveRPS: 98 # measured motor max speed rps
             maxAngularRate: 8.285 # rad/sec
             wheelCOF: 1.7
-            slipCurrentAmps: 42
+            slipCurrentAmps: 120
         constants:
             translationKp: 20
             translationKd: 0
