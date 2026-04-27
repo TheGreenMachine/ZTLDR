@@ -5,6 +5,20 @@
  "variables":{
   "expressions":{},
   "poses":{
+   "AllianceBump":{
+    "x":{
+     "exp":"AllianceClearTrench.x",
+     "val":3.221188
+    },
+    "y":{
+     "exp":"NeutralBump.y",
+     "val":5.55
+    },
+    "heading":{
+     "exp":"NeutralBump.heading",
+     "val":2.356194490192345
+    }
+   },
    "AllianceClearTrench":{
     "x":{
      "exp":"3.221188 m",
@@ -187,6 +201,20 @@
      "val":4.363323129985824
     }
    },
+   "NeutralBump":{
+    "x":{
+     "exp":"NeutralClearTrench.x",
+     "val":6.03
+    },
+    "y":{
+     "exp":"5.55 m",
+     "val":5.55
+    },
+    "heading":{
+     "exp":"135 deg",
+     "val":2.356194490192345
+    }
+   },
    "NeutralClearTrench":{
     "x":{
      "exp":"6.03 m",
@@ -201,6 +229,20 @@
      "val":3.141592653589793
     }
    },
+   "NeutralTrench":{
+    "x":{
+     "exp":"AllianceClearTrench.x",
+     "val":3.221188
+    },
+    "y":{
+     "exp":"NeutralBump.y",
+     "val":5.55
+    },
+    "heading":{
+     "exp":"135 deg",
+     "val":2.356194490192345
+    }
+   },
    "Park":{
     "x":{
      "exp":"6.595874309539795 m",
@@ -213,6 +255,20 @@
     "heading":{
      "exp":"-0.7853981633974483 rad",
      "val":-0.7853981633974483
+    }
+   },
+   "PreHubOuterFuel":{
+    "x":{
+     "exp":"NeutralClearTrench.x",
+     "val":6.03
+    },
+    "y":{
+     "exp":"IOuterFuel.y",
+     "val":6.82694191456
+    },
+    "heading":{
+     "exp":"HubOuterFuel.heading",
+     "val":4.363323129985824
     }
    },
    "PreIOuterFuel":{
