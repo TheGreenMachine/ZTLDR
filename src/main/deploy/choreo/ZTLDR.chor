@@ -16,7 +16,7 @@
     },
     "heading":{
      "exp":"NeutralBump.heading",
-     "val":2.356194490192345
+     "val":3.9269908169872414
     }
    },
    "AllianceClearTrench":{
@@ -77,8 +77,8 @@
    },
    "ClearDepot":{
     "x":{
-     "exp":"2 m",
-     "val":2.0
+     "exp":"1.6 m",
+     "val":1.6
     },
     "y":{
      "exp":"Depot.y",
@@ -176,7 +176,7 @@
    "IInnerFuel":{
     "x":{
      "exp":"IOuterFuel.x",
-     "val":8.6
+     "val":8.5
     },
     "y":{
      "exp":"4.726553554534912 m",
@@ -189,8 +189,8 @@
    },
    "IOuterFuel":{
     "x":{
-     "exp":"8.6 m",
-     "val":8.6
+     "exp":"8.5 m",
+     "val":8.5
     },
     "y":{
      "exp":"6.82694191456 m",
@@ -211,8 +211,8 @@
      "val":5.55
     },
     "heading":{
-     "exp":"135 deg",
-     "val":2.356194490192345
+     "exp":"225 deg",
+     "val":3.9269908169872414
     }
    },
    "NeutralClearTrench":{
@@ -273,8 +273,8 @@
    },
    "PreIOuterFuel":{
     "x":{
-     "exp":"7.81 m",
-     "val":7.81
+     "exp":"7.71 m",
+     "val":7.71
     },
     "y":{
      "exp":"7.11 m",
