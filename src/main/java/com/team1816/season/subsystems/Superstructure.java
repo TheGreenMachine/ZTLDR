@@ -239,6 +239,7 @@ public class Superstructure extends BaseSuperstructure {
                 case OUTTAKE -> Intake.IntakeState.OUTTAKE;
                 case STOP_OUT -> Intake.IntakeState.STOP_OUT;
                 case STOW -> Intake.IntakeState.STOW;
+                case HALF_IN -> Intake.IntakeState.HALF_IN;
             }
         );
         feeder.setWantedState(
@@ -294,5 +295,6 @@ public class Superstructure extends BaseSuperstructure {
         STOW,
         OUTTAKE,
         STOP_OUT,
+        HALF_IN
     }
 }

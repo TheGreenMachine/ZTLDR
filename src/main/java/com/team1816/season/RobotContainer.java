@@ -133,7 +133,7 @@ public class RobotContainer extends BaseRobotContainer {
                 Commands.repeatingSequence(
                     Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)),
                     Commands.waitSeconds(0.3),
-                    Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)),
+                    Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.HALF_IN)),
                     Commands.waitSeconds(0.3)
                 ),
                 Commands.waitSeconds(4)
@@ -151,7 +151,7 @@ public class RobotContainer extends BaseRobotContainer {
                 Commands.repeatingSequence(
                     Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)),
                     Commands.waitSeconds(0.3),
-                    Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)),
+                    Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.HALF_IN)),
                     Commands.waitSeconds(0.3)
                 ),
                 Commands.waitSeconds(3)
@@ -169,7 +169,7 @@ public class RobotContainer extends BaseRobotContainer {
                 Commands.repeatingSequence(
                     Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)),
                     Commands.waitSeconds(0.3),
-                    Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)),
+                    Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.HALF_IN)),
                     Commands.waitSeconds(0.3)
                 ),
                 Commands.waitSeconds(2)

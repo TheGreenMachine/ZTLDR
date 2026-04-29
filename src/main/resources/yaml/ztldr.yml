@@ -230,6 +230,7 @@ subsystems:
             flipperMotorPullInOnePosition: 0.1
             flipperMotorPullInTwoPosition: 0.05
             flipperMotorInPosition: 0.025
+            flipperMotorHalfInPosition: 0.1045
     gatekeeper:
         canBusName: shootercanivore
         devices:
