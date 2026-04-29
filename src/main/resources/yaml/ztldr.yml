@@ -20,9 +20,9 @@ shooterSettings:
     launchVelocitiesRPS:
         - 38 # 48.5
         - 40 # 60
-        - 42 # 96
-        - 43 #120
-        - 44 # 156
+        - 41.5 # 96
+        - 42.5 #120
+        - 43.5 # 156
         - 49 # 210
         - 54 # 272
         - 58 # 272
@@ -148,9 +148,9 @@ subsystems:
             maxDriveRPS: 98 # measured motor max speed rps
             maxAngularRate: 8.285 # rad/sec
             wheelCOF: 1.7
-            slipCurrentAmps: 42
+            slipCurrentAmps: 120
         constants:
-            translationKp: 20
+            translationKp: 10
             translationKd: 0
             rotationKp: 10
             rotationKi: 0
@@ -244,7 +244,7 @@ subsystems:
                         kV: 0.081
         constants:
             topClosedVelocity: 0
-            topOpenVelocity: 30
+            topOpenVelocity: 45
     shooter:
         implemented: true
         canBusName: shootercanivore

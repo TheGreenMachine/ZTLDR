@@ -5,9 +5,15 @@
     "data": {
       "commands": [
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "StartIIfuelShoot"
+            "pathName": "BumpstartHubfuelBumpshoot"
           }
         },
         {
@@ -17,33 +23,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "waitForDucking"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "ShootHubfuelShoot"
+            "pathName": "BumpshootIfuelShoot"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "shootWithIntake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "waitForDucking"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ShootPark"
           }
         }
       ]

@@ -142,6 +142,42 @@ public class RobotContainer extends BaseRobotContainer {
             Commands.runOnce(() -> superstructure.setInclineDucking(true)),
             Commands.runOnce(() -> superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE))
         ));
+        NamedCommands.registerCommand("shootWithIntake4s", Commands.sequence(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: shootWithIntake4s")),
+            Commands.runOnce(() -> superstructure.setInclineDucking(false)),
+            Commands.runOnce(() -> Commands.waitSeconds(1)),
+            Commands.runOnce(() -> superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)),
+            Commands.race(
+                Commands.repeatingSequence(
+                    Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)),
+                    Commands.waitSeconds(0.3),
+                    Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)),
+                    Commands.waitSeconds(0.3)
+                ),
+                Commands.waitSeconds(3)
+            ),
+            Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)),
+            Commands.runOnce(() -> superstructure.setInclineDucking(true)),
+            Commands.runOnce(() -> superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE))
+        ));
+        NamedCommands.registerCommand("shootWithIntake3s", Commands.sequence(
+            Commands.runOnce(() -> GreenLogger.log("Running named command: shootWithIntake3s")),
+            Commands.runOnce(() -> superstructure.setInclineDucking(false)),
+            Commands.runOnce(() -> Commands.waitSeconds(1)),
+            Commands.runOnce(() -> superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.OPEN)),
+            Commands.race(
+                Commands.repeatingSequence(
+                    Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)),
+                    Commands.waitSeconds(0.3),
+                    Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)),
+                    Commands.waitSeconds(0.3)
+                ),
+                Commands.waitSeconds(2)
+            ),
+            Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)),
+            Commands.runOnce(() -> superstructure.setInclineDucking(true)),
+            Commands.runOnce(() -> superstructure.setSuperstructureWantedGatekeeperState(Superstructure.WantedGatekeeperState.CLOSE))
+        ));
 
         NamedCommands.registerCommand("waitForDucking", Commands.parallel(
             Commands.runOnce(() -> GreenLogger.log("Running named command: waitForDucking")),
