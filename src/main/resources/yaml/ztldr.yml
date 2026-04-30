@@ -18,14 +18,14 @@ shooterSettings:
         - 0.095 # 272
         - 0.085 # 272
     launchVelocitiesRPS:
-        - 35.75 # 48.5
-        - 37.75 # 60
-        - 39.75 # 96
-        - 40.75 #120
-        - 41.75 # 156
-        - 46.75 # 210
-        - 51.75 # 272
-        - 55.75 # 272
+        - 35.25 # 48.5
+        - 37.25 # 60
+        - 39.25 # 96
+        - 40.25 #120
+        - 41.25 # 156
+        - 46.25 # 210
+        - 51.25 # 272
+        - 55.25 # 272
 linearMPSToLaunchRPS: # TODO: Actual tune this. For now we are just using the shooterSettings and doing some physics to convert.
     linearVelocitiesMPS:
         - 10
