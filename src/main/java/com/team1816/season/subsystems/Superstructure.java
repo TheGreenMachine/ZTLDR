@@ -225,7 +225,7 @@ public class Superstructure extends BaseSuperstructure {
 
         // Limit the drive speed if we are trying to shoot and in teleop. In auto, the speed should
         // be handled by the path.
-        double shootingLinearSpeedLimitMPS = 0.45;
+        double shootingLinearSpeedLimitMPS = 0.55;
         double shootingAngularSpeedLimitRadPerSec = 1.5;
         if (wantedGatekeeperState == WantedGatekeeperState.OPEN && DriverStation.isTeleop() && isInAllianceZone()) {
             swerve.limitDriveSpeed(shootingLinearSpeedLimitMPS, shootingAngularSpeedLimitRadPerSec);
