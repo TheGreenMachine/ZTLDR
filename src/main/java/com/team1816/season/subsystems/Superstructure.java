@@ -1,10 +1,13 @@
 package com.team1816.season.subsystems;
 
+import com.pathplanner.lib.util.FlippingUtil;
+import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.BaseSuperstructure;
 import com.team1816.lib.subsystems.Vision;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class Superstructure extends BaseSuperstructure {
@@ -222,9 +225,9 @@ public class Superstructure extends BaseSuperstructure {
 
         // Limit the drive speed if we are trying to shoot and in teleop. In auto, the speed should
         // be handled by the path.
-        double shootingLinearSpeedLimitMPS = 3;
+        double shootingLinearSpeedLimitMPS = 0.45;
         double shootingAngularSpeedLimitRadPerSec = 1.5;
-        if (wantedGatekeeperState == WantedGatekeeperState.OPEN && DriverStation.isTeleop()) {
+        if (wantedGatekeeperState == WantedGatekeeperState.OPEN && DriverStation.isTeleop() && isInAllianceZone()) {
             swerve.limitDriveSpeed(shootingLinearSpeedLimitMPS, shootingAngularSpeedLimitRadPerSec);
         }
         else {
@@ -257,6 +260,17 @@ public class Superstructure extends BaseSuperstructure {
 
     private void climbingL3() {
         // TODO: Handle Superstructure climbing behavior.
+    }
+
+    private boolean isInAllianceZone() {
+        // This is really not clean code half copied from the shooter, but I don't have time right now to fix it
+        double ROBOT_STARTING_LINE = 4.2684;
+        Pose2d robotPose = BaseRobotState.robotPose;
+        double robotXMeters = robotPose.getX();
+        boolean isBlueAlliance = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
+        return isBlueAlliance
+            ? robotXMeters < ROBOT_STARTING_LINE
+            : robotXMeters > FlippingUtil.fieldSizeX - ROBOT_STARTING_LINE;
     }
 
     public enum WantedSuperState {
