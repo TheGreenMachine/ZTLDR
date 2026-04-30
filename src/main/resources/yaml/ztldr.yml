@@ -18,14 +18,14 @@ shooterSettings:
         - 0.095 # 272
         - 0.085 # 272
     launchVelocitiesRPS:
-        - 37.25 # 48.5
-        - 39.25 # 60
-        - 41.25 # 96
-        - 42.25 #120
-        - 43.25 # 156
-        - 48.25 # 210
-        - 53.25 # 272
-        - 57.25 # 272
+        - 35.75 # 48.5
+        - 37.75 # 60
+        - 39.75 # 96
+        - 40.75 #120
+        - 41.75 # 156
+        - 46.75 # 210
+        - 51.75 # 272
+        - 55.75 # 272
 linearMPSToLaunchRPS: # TODO: Actual tune this. For now we are just using the shooterSettings and doing some physics to convert.
     linearVelocitiesMPS:
         - 10
@@ -321,7 +321,7 @@ subsystems:
             distanceTwoInclineAngleRotations: 0.08
             distanceTwoLaunchVelocityRPS: 47
             distanceThreeInclineAngleRotations: 0.1113
-            distanceThreeLaunchVelocityRPS: 100
+            distanceThreeLaunchVelocityRPS: 90
             brokenInclineAutoLaunchVelocityRPS: 55 # Set to the RPS required to score at a distance from shooter to hub of 101.283 inches.
             closeDistanceBetweenBeamBreaks: 0.026816
             farDistanceBetweenBeamBreaks: 0.86848
