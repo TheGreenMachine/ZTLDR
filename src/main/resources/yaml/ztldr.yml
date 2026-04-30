@@ -323,6 +323,8 @@ subsystems:
             distanceThreeInclineAngleRotations: 0.1113
             distanceThreeLaunchVelocityRPS: 90
             brokenInclineAutoLaunchVelocityRPS: 55 # Set to the RPS required to score at a distance from shooter to hub of 101.283 inches.
+            farSnowblowInclineAngleRotations: 0.1029
+            farSnowblowLaunchVelocityRPS: 95
             closeDistanceBetweenBeamBreaks: 0.026816
             farDistanceBetweenBeamBreaks: 0.86848
             secondLowestBeamBreakToZero: 0.4337216

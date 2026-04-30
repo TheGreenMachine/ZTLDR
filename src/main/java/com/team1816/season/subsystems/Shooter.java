@@ -351,15 +351,25 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
                 setLaunchVelocities(wantedDistanceState.getLaunchVelocityRPS());
             }
             case AUTOMATIC -> {
-                IShooterCalculator.ShooterCalculatorResponse calculatorResponse = shooterTableCalculator.calculate(
-                    getCurrentTurretPose3d().getTranslation(),
-                    target,
-                    calculatorAngleOfEntryDegrees,
-                    useChassisSpeedForHoodAngleAndSpeed,
-                    0
-                );
-                setInclineAngle(calculatorResponse.inclineAngleDegrees());
-                setLaunchVelocities(calculatorResponse.launchVelocityRPS());
+                if (
+                    DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue
+                        ? BaseRobotState.robotPose.getX() > FlippingUtil.fieldSizeX - ROBOT_STARTING_LINE
+                        : BaseRobotState.robotPose.getX() < ROBOT_STARTING_LINE
+                ) {
+                    setInclineAngle(ShooterDistanceState.PRESET_FAR_SNOWBLOW.getInclineAngleDegrees());
+                    setLaunchVelocities(ShooterDistanceState.PRESET_FAR_SNOWBLOW.getLaunchVelocityRPS());
+                }
+                else {
+                    IShooterCalculator.ShooterCalculatorResponse calculatorResponse = shooterTableCalculator.calculate(
+                        getCurrentTurretPose3d().getTranslation(),
+                        target,
+                        calculatorAngleOfEntryDegrees,
+                        useChassisSpeedForHoodAngleAndSpeed,
+                        0
+                    );
+                    setInclineAngle(calculatorResponse.inclineAngleDegrees());
+                    setLaunchVelocities(calculatorResponse.launchVelocityRPS());
+                }
             }
         }
     }
@@ -771,6 +781,10 @@ public class Shooter extends SubsystemBase implements ITestableSubsystem {
         PRESET_BROKEN_INCLINE_AUTO(
             Units.rotationsToDegrees(factory.getConstant(NAME,"distanceThreeInclineAngleRotations",0)),
             factory.getConstant(NAME,"brokenInclineAutoLaunchVelocityRPS",0)
+        ),
+        PRESET_FAR_SNOWBLOW(
+            Units.rotationsToDegrees(factory.getConstant(NAME,"farSnowblowInclineAngleRotations",0)),
+            factory.getConstant(NAME,"farSnowblowLaunchVelocityRPS",0)
         ),
         AUTOMATIC(-1, -1),
         IDLE(0, 0);
