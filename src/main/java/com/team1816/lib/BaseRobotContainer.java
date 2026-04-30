@@ -5,7 +5,7 @@ import com.team1816.lib.auto.PathfindManager;
 import com.team1816.lib.inputs.CommandButtonBoard;
 import com.team1816.lib.subsystems.BaseSuperstructure;
 import com.team1816.lib.subsystems.LedManager;
-import com.team1816.lib.subsystems.Vision;
+import com.team1816.lib.subsystems.VisionRedux;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -16,7 +16,7 @@ public abstract class BaseRobotContainer {
     protected CommandButtonBoard buttonBoard = new CommandButtonBoard(2);
 
     protected final Swerve swerve = new Swerve(driverController);
-    protected final Vision vision = new Vision();
+    protected final VisionRedux vision = new VisionRedux();
 
     protected PathfindManager pathfindManager;
     public AutoModeManager autoModeManager;

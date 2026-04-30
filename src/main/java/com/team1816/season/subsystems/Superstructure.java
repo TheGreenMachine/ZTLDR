@@ -2,7 +2,7 @@ package com.team1816.season.subsystems;
 
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.BaseSuperstructure;
-import com.team1816.lib.subsystems.Vision;
+import com.team1816.lib.subsystems.VisionRedux;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
 
@@ -27,7 +27,7 @@ public class Superstructure extends BaseSuperstructure {
      */
     private boolean forceAllowGatekeeperControl = false;
 
-    public Superstructure(Swerve swerve, Vision vision) {
+    public Superstructure(Swerve swerve, VisionRedux vision) {
         super(swerve, vision);
         this.shooter = Singleton.CreateSubSystem(Shooter.class);
         this.gatekeeper = Singleton.CreateSubSystem(Gatekeeper.class);

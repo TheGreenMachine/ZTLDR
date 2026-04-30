@@ -34,7 +34,8 @@
       "/SmartDashboard/Pathfind Target": "String Chooser",
       "/SmartDashboard/PhotonAlerts": "Alerts",
       "/SmartDashboard/Shooter Incline": "Mechanism2d",
-      "/SmartDashboard/VisionSystemSim-VisionSim/Sim Field": "Field2d"
+      "/SmartDashboard/VisionSystemSim-VisionSim/Sim Field": "Field2d",
+      "/SmartDashboard/VisionSystemSim-VisionSimRedux/Sim Field": "Field2d"
     },
     "windows": {
       "/SmartDashboard/Auto Mode": {
@@ -278,8 +279,7 @@
           "string[]##v_/CameraPublisher/UI Name-processed/streams": {
             "open": true
           }
-        },
-        "open": true
+        }
       },
       "Elastic": {
         "open": true
@@ -293,9 +293,6 @@
         "open": true
       },
       "SmartDashboard": {
-        "Shooter Incline": {
-          "open": true
-        },
         "open": true
       },
       "drivetrain": {
@@ -312,19 +309,30 @@
         "open": true
       },
       "photonvision": {
+        "Backward_Left": {
+          "open": true
+        },
         "HD Pro Webcam C920": {
           "open": true
         },
         "HD_Pro_Webcam_C920": {
           "open": true
-        },
-        "open": true
+        }
       },
       "turret": {
         "open": true,
         "spiny": {
           "open": true
         }
+      },
+      "vision": {
+        "backwardLeft": {
+          "Pose3d[]##v_/vision/backwardLeft/Seen AprilTag Poses": {
+            "open": true
+          },
+          "open": true
+        },
+        "open": true
       }
     }
   },
