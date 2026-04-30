@@ -18,14 +18,14 @@ shooterSettings:
         - 0.095 # 272
         - 0.085 # 272
     launchVelocitiesRPS:
-        - 38 # 48.5
-        - 40 # 60
-        - 41.5 # 96
-        - 42.5 #120
-        - 43.5 # 156
-        - 49 # 210
-        - 54 # 272
-        - 58 # 272
+        - 37.25 # 48.5
+        - 39.25 # 60
+        - 41.25 # 96
+        - 42.25 #120
+        - 43.25 # 156
+        - 48.25 # 210
+        - 53.25 # 272
+        - 57.25 # 272
 linearMPSToLaunchRPS: # TODO: Actual tune this. For now we are just using the shooterSettings and doing some physics to convert.
     linearVelocitiesMPS:
         - 10
@@ -275,7 +275,7 @@ subsystems:
                 remoteSensorId: 29
                 id: 27
                 motorRotation: Clockwise_Positive
-                reverseSoftLimit: 0.057
+                reverseSoftLimit: 0.056
                 forwardSoftLimit: 0.1029
                 statorCurrentLimit: 35
                 pidConfig:
@@ -315,7 +315,7 @@ subsystems:
             shooterOffsetXMeters: -0.111303
             shooterOffsetYMeters: -0.112268
             shooterOffsetZMeters: 0.508
-            inclineDuckingLimitRotations: 0.057
+            inclineDuckingLimitRotations: 0.056
             distanceOneInclineAngleRotations: 0.064
             distanceOneLaunchVelocityRPS: 35
             distanceTwoInclineAngleRotations: 0.08
