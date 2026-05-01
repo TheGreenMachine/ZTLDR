@@ -277,7 +277,7 @@ subsystems:
                 motorRotation: Clockwise_Positive
                 reverseSoftLimit: 0.056
                 forwardSoftLimit: 0.1029
-                statorCurrentLimit: 35
+                statorCurrentLimit: 20
                 pidConfig:
                     slot0:
                         kS: 0.01
