@@ -263,7 +263,8 @@ public class Superstructure extends BaseSuperstructure {
     }
 
     private boolean isInAllianceZone() {
-        // This is really not clean code half copied from the shooter, but I don't have time right now to fix it
+        // This has a lot of overlap with part of the getTargetTranslation3d method in the shooter
+        // and should probably be a single method used in both places.
         double ROBOT_STARTING_LINE = 4.2684;
         Pose2d robotPose = BaseRobotState.robotPose;
         double robotXMeters = robotPose.getX();
