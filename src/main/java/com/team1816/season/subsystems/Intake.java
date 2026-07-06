@@ -32,6 +32,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     private final double FLIPPER_MOTOR_OUT_POSITION;
     private final double FLIPPER_MOTOR_IN_POSITION;
+    private final double FLIPPER_MOTOR_HALF_IN_POSITION;
 
     //MECHANISMS
     private double currentPosition = 0;
@@ -46,6 +47,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         SmartDashboard.putData("Intake", intakeMech);
         FLIPPER_MOTOR_OUT_POSITION = factory.getConstant(NAME, "flipperMotorOutPosition", 0);
         FLIPPER_MOTOR_IN_POSITION = factory.getConstant(NAME, "flipperMotorInPosition", 0);
+        FLIPPER_MOTOR_HALF_IN_POSITION = factory.getConstant(NAME, "flipperMotorHalfInPosition", 0);
 
         GreenLogger.periodicLog(NAME + "/Wanted State", () -> wantedState);
         GreenLogger.periodicLog(NAME + "/Wanted Flipper Position", () -> wantedFlipperPosition);
@@ -81,6 +83,7 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         switch (position) {
             case IN -> flipperMotor.setControl(flipperMotorPositionRequest.withPosition(FLIPPER_MOTOR_IN_POSITION));
             case OUT -> flipperMotor.setControl(flipperMotorPositionRequest.withPosition(FLIPPER_MOTOR_OUT_POSITION));
+            case HALF_IN -> flipperMotor.setControl(flipperMotorPositionRequest.withPosition(FLIPPER_MOTOR_HALF_IN_POSITION));
         }
     }
 
@@ -90,7 +93,8 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
 
     public enum FlipperPosition {
         IN,
-        OUT
+        OUT,
+        HALF_IN
     }
 
     public enum IntakeState {
@@ -109,6 +113,10 @@ public class Intake extends SubsystemBase implements ITestableSubsystem {
         STOP_OUT(
             0,
             FlipperPosition.OUT
+        ),
+        HALF_IN(
+            factory.getConstant(NAME, "intakeOnSpeed", .5, true),
+            FlipperPosition.HALF_IN
         );
 
         private double intakeMotorValue;

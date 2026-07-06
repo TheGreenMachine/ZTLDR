@@ -1,10 +1,13 @@
 package com.team1816.season.subsystems;
 
+import com.pathplanner.lib.util.FlippingUtil;
+import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.subsystems.BaseSuperstructure;
 import com.team1816.lib.subsystems.Vision;
 import com.team1816.lib.subsystems.drivetrain.Swerve;
 import com.team1816.lib.util.GreenLogger;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class Superstructure extends BaseSuperstructure {
@@ -222,9 +225,9 @@ public class Superstructure extends BaseSuperstructure {
 
         // Limit the drive speed if we are trying to shoot and in teleop. In auto, the speed should
         // be handled by the path.
-        double shootingLinearSpeedLimitMPS = 3;
+        double shootingLinearSpeedLimitMPS = 0.55;
         double shootingAngularSpeedLimitRadPerSec = 1.5;
-        if (wantedGatekeeperState == WantedGatekeeperState.OPEN && DriverStation.isTeleop()) {
+        if (wantedGatekeeperState == WantedGatekeeperState.OPEN && DriverStation.isTeleop() && isInAllianceZone()) {
             swerve.limitDriveSpeed(shootingLinearSpeedLimitMPS, shootingAngularSpeedLimitRadPerSec);
         }
         else {
@@ -239,6 +242,7 @@ public class Superstructure extends BaseSuperstructure {
                 case OUTTAKE -> Intake.IntakeState.OUTTAKE;
                 case STOP_OUT -> Intake.IntakeState.STOP_OUT;
                 case STOW -> Intake.IntakeState.STOW;
+                case HALF_IN -> Intake.IntakeState.HALF_IN;
             }
         );
         feeder.setWantedState(
@@ -256,6 +260,18 @@ public class Superstructure extends BaseSuperstructure {
 
     private void climbingL3() {
         // TODO: Handle Superstructure climbing behavior.
+    }
+
+    private boolean isInAllianceZone() {
+        // This has a lot of overlap with part of the getTargetTranslation3d method in the shooter
+        // and should probably be a single method used in both places.
+        double ROBOT_STARTING_LINE = 4.2684;
+        Pose2d robotPose = BaseRobotState.robotPose;
+        double robotXMeters = robotPose.getX();
+        boolean isBlueAlliance = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Blue;
+        return isBlueAlliance
+            ? robotXMeters < ROBOT_STARTING_LINE
+            : robotXMeters > FlippingUtil.fieldSizeX - ROBOT_STARTING_LINE;
     }
 
     public enum WantedSuperState {
@@ -294,5 +310,6 @@ public class Superstructure extends BaseSuperstructure {
         STOW,
         OUTTAKE,
         STOP_OUT,
+        HALF_IN
     }
 }

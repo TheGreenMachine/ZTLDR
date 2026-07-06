@@ -18,21 +18,14 @@ shooterSettings:
         - 0.095 # 272
         - 0.085 # 272
     launchVelocitiesRPS:
-        - 38 # 48.5
-        - 40 # 60
-        - 42 # 96
-        - 43 #120
-        - 44 # 156
-        - 49 # 210
-        - 54 # 272
-        - 58 # 272
-linearMPSToLaunchRPS: # TODO: Actual tune this. For now we are just using the shooterSettings and doing some physics to convert.
-    linearVelocitiesMPS:
-        - 10
-        - 20
-    launchVelocitiesRPS:
-        - 20
-        - 40
+        - 35.25 # 48.5
+        - 37.25 # 60
+        - 39.25 # 96
+        - 40.25 #120
+        - 41.25 # 156
+        - 46.25 # 210
+        - 51.25 # 272
+        - 55.25 # 272
 subsystems:
     drivetrain:
         implemented: true
@@ -150,7 +143,7 @@ subsystems:
             wheelCOF: 1.7
             slipCurrentAmps: 120
         constants:
-            translationKp: 20
+            translationKp: 10
             translationKd: 0
             rotationKp: 10
             rotationKi: 0
@@ -230,6 +223,7 @@ subsystems:
             flipperMotorPullInOnePosition: 0.1
             flipperMotorPullInTwoPosition: 0.05
             flipperMotorInPosition: 0.025
+            flipperMotorHalfInPosition: 0.1045
     gatekeeper:
         canBusName: shootercanivore
         devices:
@@ -244,7 +238,7 @@ subsystems:
                         kV: 0.081
         constants:
             topClosedVelocity: 0
-            topOpenVelocity: 30
+            topOpenVelocity: 45
     shooter:
         implemented: true
         canBusName: shootercanivore
@@ -274,9 +268,9 @@ subsystems:
                 remoteSensorId: 29
                 id: 27
                 motorRotation: Clockwise_Positive
-                reverseSoftLimit: 0.057
+                reverseSoftLimit: 0.056
                 forwardSoftLimit: 0.1029
-                statorCurrentLimit: 35
+                statorCurrentLimit: 20
                 pidConfig:
                     slot0:
                         kS: 0.01
@@ -314,14 +308,16 @@ subsystems:
             shooterOffsetXMeters: -0.111303
             shooterOffsetYMeters: -0.112268
             shooterOffsetZMeters: 0.508
-            inclineDuckingLimitRotations: 0.057
+            inclineDuckingLimitRotations: 0.056
             distanceOneInclineAngleRotations: 0.064
             distanceOneLaunchVelocityRPS: 35
             distanceTwoInclineAngleRotations: 0.08
             distanceTwoLaunchVelocityRPS: 47
             distanceThreeInclineAngleRotations: 0.1113
-            distanceThreeLaunchVelocityRPS: 100
+            distanceThreeLaunchVelocityRPS: 90
             brokenInclineAutoLaunchVelocityRPS: 55 # Set to the RPS required to score at a distance from shooter to hub of 101.283 inches.
+            farSnowblowInclineAngleRotations: 0.1029
+            farSnowblowLaunchVelocityRPS: 95
             closeDistanceBetweenBeamBreaks: 0.026816
             farDistanceBetweenBeamBreaks: 0.86848
             secondLowestBeamBreakToZero: 0.4337216

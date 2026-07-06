@@ -23,8 +23,8 @@ public class LinearMPSToLauncherRPSLookup {
      *                     velocity, in meters.
      */
     public LinearMPSToLauncherRPSLookup(double deltaZMeters) {
-        // TODO: If we calibrate this using the linearMPSToLaunchRPS YAML, we can use the line below.
-        //  For now we are just trying to use some physics to get data from the shooterSettings table.
+        // If we calibrated this using the linearMPSToLaunchRPS YAML, we could use the line below.
+        // Currently, we are using physics to get this data based on the shooterSettings table.
 //        LinearMPSToLauncherRPSConfig table = factory.getLinearMPSToLauncherRPSConfig();
         LinearMPSToLauncherRPSConfig table = factory.stealLinearMPSToLauncherRPSConfigFromShooterSettings(deltaZMeters);
 
