@@ -2,16 +2,20 @@ package com.team1816.lib.subsystems.drivetrain;
 
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.team1816.lib.BaseRobot;
+import com.team1816.lib.BaseRobotState;
 import com.team1816.lib.Singleton;
 import com.team1816.lib.hardware.factory.RobotFactory;
 import com.team1816.lib.subsystems.ITestableSubsystem;
 import com.team1816.lib.util.GreenLogger;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -54,6 +58,28 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
     private double linearSpeedLimitMPS = 0;
     private double angularSpeedLimitRadPerSec = 0;
     private boolean limitSpeed = false;
+
+    // Target pose for drive-to-point mode.
+    private Pose2d desiredPoseForDriveToPoint = new Pose2d();
+
+    // Static friction compensation for drive-to-point (2% of max velocity).
+    public static final double DRIVE_TO_POINT_STATIC_FRICTION_CONSTANT = 0.02;
+
+    // Maximum translational velocity (m/s).
+    private final double maxVelocity = 4.083;
+
+    // PID controller for autonomous drive-to-point (kP=3.0, kD=0.1).
+    private final PIDController autoDriveToPointController = new PIDController(3.0, 0, 0.1);
+
+    // PID controller for teleop drive-to-point (kP=3.6, kD=0.1).
+    private final PIDController teleopDriveToPointController = new PIDController(3.6, 0, 0.1);
+
+    // Maximum velocity output for drive-to-point (default 10 ft/s).
+    public double maxVelocityOutputForDriveToPoint = Units.feetToMeters(10.0);
+
+    // Maximum angular velocity override for drive-to-point (NaN = no limit).
+    private final double maximumAngularVelocityForDriveToPoint = 5.0;
+
 
     public Swerve(CommandXboxController controller) {
         // TODO: This Singleton.get stuff is a temporary workaround until I fix a bug with the
@@ -171,6 +197,57 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
             }
             case BRAKE -> drivetrain.setSwerveState(brakeRequest);
             case IDLING -> {}
+            case DRIVING_TO_POINT:
+                /// Calculate distance and direction to target point
+                var translationToDesiredPoint =
+                    desiredPoseForDriveToPoint.getTranslation().minus(BaseRobotState.robotPose.getTranslation());
+                var linearDistance = translationToDesiredPoint.getNorm();
+
+                /// Add static friction compensation when close to target
+                var frictionConstant = 0.0;
+                if (linearDistance >= Units.inchesToMeters(0.5)) {
+                    frictionConstant = DRIVE_TO_POINT_STATIC_FRICTION_CONSTANT * maxVelocity;
+                }
+
+                /// Calculate velocity output using PID (auto vs teleop gains)
+                var directionOfTravel = translationToDesiredPoint.getAngle();
+                var velocityOutput = 0.0;
+                if (DriverStation.isAutonomous()) {
+                    velocityOutput = Math.min(
+                        Math.abs(autoDriveToPointController.calculate(linearDistance, 0)) + frictionConstant,
+                        maxVelocityOutputForDriveToPoint);
+                } else {
+                    velocityOutput = Math.min(
+                        Math.abs(teleopDriveToPointController.calculate(linearDistance, 0)) + frictionConstant,
+                        maxVelocityOutputForDriveToPoint);
+                }
+
+                /// Decompose velocity into X/Y components
+                var xComponent = velocityOutput * directionOfTravel.getCos();
+                var yComponent = velocityOutput * directionOfTravel.getSin();
+
+//                /// Log drive-to-point diagnostics
+//                Logger.recordOutput("Drive/DriveToPoint/xVelocitySetpoint", xComponent);
+//                Logger.recordOutput("Drive/DriveToPoint/yVelocitySetpoint", yComponent);
+//                Logger.recordOutput("Drive/DriveToPoint/velocityOutput", velocityOutput);
+//                Logger.recordOutput("Drive/DriveToPoint/linearDistance", linearDistance);
+//                Logger.recordOutput("Drive/DriveToPoint/directionOfTravel", directionOfTravel);
+//                Logger.recordOutput("Drive/DriveToPoint/desiredPoint", desiredPoseForDriveToPoint);
+
+                /// Apply translation + rotation control (with optional angular rate limit)
+                if (Double.isNaN(maximumAngularVelocityForDriveToPoint)) {
+                    drivetrain.setSwerveState(driveAtAngle
+                        .withVelocityX(xComponent)
+                        .withVelocityY(yComponent)
+                        .withTargetDirection(desiredPoseForDriveToPoint.getRotation()));
+                } else {
+                    drivetrain.setSwerveState(driveAtAngle
+                        .withVelocityX(xComponent)
+                        .withVelocityY(yComponent)
+                        .withTargetDirection(desiredPoseForDriveToPoint.getRotation())
+                        .withMaxAbsRotationalRate(maximumAngularVelocityForDriveToPoint));
+                }
+                break;
             default -> drivetrain.setSwerveState(new SwerveRequest.Idle());
         }
     }
@@ -272,6 +349,7 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
          * Sends a {@link com.ctre.phoenix6.swerve.SwerveRequest.SwerveDriveBrake} request to the
          * drivetrain ("X-mode").
          */
+        DRIVING_TO_POINT,
         BRAKE,
         IDLING
     }
