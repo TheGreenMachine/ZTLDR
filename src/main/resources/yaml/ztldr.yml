@@ -266,7 +266,8 @@ subsystems:
                 motorType: NEO550_JST
                 remoteSensor: RemoteCANcoder
                 remoteSensorId: 29
-                id: 27
+                #id: 27
+                id: -1
                 motorRotation: Clockwise_Positive
                 reverseSoftLimit: 0.056
                 forwardSoftLimit: 0.1029
@@ -298,7 +299,7 @@ subsystems:
                 magneticSensor:
                     sensorDirection: Clockwise_Positive
                     absoluteSensorDiscontinuityPoint: 0.625
-                    magnetOffset: -0.35748674479
+                    magnetOffset: 0.397483
             candi:
                 id: 6
                 deviceType: CANdi
