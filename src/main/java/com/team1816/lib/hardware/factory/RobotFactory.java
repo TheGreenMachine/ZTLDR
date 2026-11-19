@@ -419,7 +419,8 @@ public class RobotFactory {
         }
         var parentConfig = getCTREConfig(subsystemConfig, deviceConfig);
         if (parentConfig != null) {
-            var logPath = subsystemConfig.name + "/" + deviceConfig.name + "/";
+            // Match SignalLogger device names, for example Phoenix6/CANdi-6/.
+            var logPath = "Phoenix6/" + deviceConfig.deviceType.name() + "-" + deviceConfig.id + "/";
             // apply the configuration
             devInst.applyConfiguration(parentConfig, logPath, logDetails);
         }

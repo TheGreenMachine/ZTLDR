@@ -25,8 +25,9 @@ public class CANdiImpl extends CANdi implements IPhoenix6 {
     @Override
     public StatusCode applyConfiguration(ParentConfiguration config, String logPath, boolean logging) {
         GreenLogger.periodicLog(logPath + "Connected", this::isConnected);
-        GreenLogger.periodicLog(logPath + "S1", this::getS1Closed);
-        GreenLogger.periodicLog(logPath + "S2", this::getS2Closed);
+        // S1 and S2 are already in the SignalLogger hoot log.
+        GreenLogger.periodicLiveLog(logPath + "S1", this::getS1Closed);
+        GreenLogger.periodicLiveLog(logPath + "S2", this::getS2Closed);
         return this.getConfigurator().apply((CANdiConfiguration) config);
     }
 

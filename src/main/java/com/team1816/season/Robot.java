@@ -1,6 +1,5 @@
 package com.team1816.season;
 
-import com.ctre.phoenix6.SignalLogger;
 import com.team1816.lib.BaseRobot;
 import com.team1816.lib.BaseRobotContainer;
 import com.team1816.lib.Singleton;

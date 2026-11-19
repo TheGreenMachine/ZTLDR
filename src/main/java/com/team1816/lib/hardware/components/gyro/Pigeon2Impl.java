@@ -27,7 +27,8 @@ public class Pigeon2Impl extends Pigeon2 implements IPhoenix6, IGyro {
     @Override
     public StatusCode applyConfiguration(ParentConfiguration config, String logPath, boolean logging) {
         GreenLogger.periodicLog(logPath + "Connected", this::isConnected);
-        GreenLogger.periodicLog(logPath + "Yaw", this::getGyroYaw);
+        // Yaw is already in the SignalLogger hoot log.
+        GreenLogger.periodicLiveLog(logPath + "Yaw", this::getGyroYaw);
         return this.getConfigurator().apply((Pigeon2Configuration) config);
     }
 

@@ -25,10 +25,10 @@ public class TalonFXImpl extends TalonFX implements ICTREDevice, IMotor {
     @Override
     public StatusCode applyConfiguration(ParentConfiguration config, String logPath, boolean logDetails) {
         this.config = (TalonFXConfiguration) config;
-        // add default logging for target and actual position/velocities
+        // Position and velocity are already in the SignalLogger hoot log.
         if (logDetails) {
-            GreenLogger.periodicLog(logPath + "Actual Position (rotations)", this::getMotorPosition);
-            GreenLogger.periodicLog(logPath + "Actual Velocity (rps)", this::getMotorVelocity);
+            GreenLogger.periodicLiveLog(logPath + "Actual Position (rotations)", this::getMotorPosition);
+            GreenLogger.periodicLiveLog(logPath + "Actual Velocity (rps)", this::getMotorVelocity);
         }
         if(Robot.isSimulation()){
             simState = getSimState();

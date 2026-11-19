@@ -1,5 +1,6 @@
 package com.team1816.lib.util;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,17 +30,21 @@ import static com.team1816.lib.util.FormatUtils.GetDisplay;
 public class GreenLogger {
 
     private static final Map<LogTopic, Supplier<?>> periodicLogs = new HashMap<>();
+    // Messages logged before SignalLogger.start() are flushed once the log opens.
+    private static final List<String> pendingMessages = new ArrayList<>();
+    private static boolean signalLoggerStarted = false;
+    private static boolean reportedStartFailure = false;
     // using an empty string here to make the logs and live views consistent
     private static final NetworkTable netTable;
     private static final StringPublisher msg;
     private static Notifier mLogNotifier;
-    private static boolean mLogFirstStart = true;
-    static Notifier delay = null;
 
     static {
         if (Robot.isSimulation()) {
             DriverStation.silenceJoystickConnectionWarning(true);
         }
+        // Own the log start so a match file is not opened before the DS is attached.
+        SignalLogger.enableAutoLogging(false);
         netTable = NetworkTableInstance.getDefault().getTable("");
         msg = netTable.getStringTopic("messages").publish();
     }
@@ -63,6 +69,11 @@ public class GreenLogger {
      * {@link String}s, {@link StructSerializable} classes (if the {@link Struct} is passed in, see
      * below), and {@link NTSendable}s. Anything else passed in will be logged as a {@link String}.
      * <p>
+     * Values are published to NetworkTables for live view and written to the CTRE
+     * {@link SignalLogger} hoot log. Device signals that SignalLogger already records, such as
+     * position, velocity, current, yaw, and CANdi pin state, should use
+     * {@link #periodicLiveLog(String, Supplier)} so they are not stored twice.
+     * <p>
      * If you are logging something that is {@link StructSerializable} (for example, a
      * {@link Pose2d}, or various other WPILib classes), please use {@link #periodicLog(String,
      * Supplier, Struct)} to specify the {@link Struct} type.
@@ -80,7 +91,24 @@ public class GreenLogger {
      * @param <T> The type returned by the supplier.
      */
     public static <T> void periodicLog(String name, Supplier<T> supplier) {
-        periodicLog(name, supplier, null);
+        periodicLog(name, supplier, null, true);
+    }
+
+    /**
+     * Publishes a periodic value to NetworkTables for live view, without writing it to
+     * {@link SignalLogger}.
+     * <p>
+     * Use this for CTRE device signals that SignalLogger already records, such as position,
+     * velocity, current, yaw, and CANdi S1/S2. Writing them again would store a second copy
+     * in the hoot log. The supplier is still called, so the device signal stays refreshed and
+     * Phoenix can capture it on its own timebase.
+     *
+     * @param name The topic name to publish under.
+     * @param supplier A supplier of the values to publish.
+     * @param <T> The type returned by the supplier.
+     */
+    public static <T> void periodicLiveLog(String name, Supplier<T> supplier) {
+        periodicLog(name, supplier, null, false);
     }
 
     /**
@@ -111,6 +139,12 @@ public class GreenLogger {
      * @param <T> The type returned by the supplier.
      */
     public static <T> void periodicLog(String name, Supplier<T> supplier, Struct<T> struct) {
+        periodicLog(name, supplier, struct, true);
+    }
+
+    private static <T> void periodicLog(
+        String name, Supplier<T> supplier, Struct<T> struct, boolean writeToSignalLog
+    ) {
         T result = supplier.get();
 
         if (
@@ -168,11 +202,13 @@ public class GreenLogger {
             SmartDashboard.putData(name, (NTSendable) result);
             // The publisher is null for NTSendables, since we use the SmartDashboard instead.
             pub = null;
+            // SignalLogger has no NTSendable writer. SmartDashboard keeps the live view.
+            writeToSignalLog = false;
         } else {
             pub = netTable.getStringTopic(name).publish();
         }
 
-        periodicLogs.put(new LogTopic(pub), supplier);
+        periodicLogs.put(new LogTopic(name, pub, struct, writeToSignalLog), supplier);
     }
 
     /**
@@ -285,7 +321,7 @@ public class GreenLogger {
             pub = netTable.getStringArrayTopic(name).publish();
         }
 
-        periodicLogs.put(new LogTopic(pub), supplier);
+        periodicLogs.put(new LogTopic(name, pub, struct, true), supplier);
     }
 
     public static void log(Object s) {
@@ -298,8 +334,7 @@ public class GreenLogger {
             PrintWriter printWriter = new PrintWriter(stringWriter);
             throwable.printStackTrace(printWriter);
             var value = stringWriter.toString().replace("\r", "");
-            msg.set(value);
-            DataLogManager.log(value);
+            writeMessage(value);
             logToElastic(throwable.getClass().getName(), throwable.getMessage(), Elastic.Notification.NotificationLevel.ERROR);
         } else if (s instanceof RobotConfig config) {
             log("Pathplanner config:");
@@ -315,8 +350,18 @@ public class GreenLogger {
             log(String.format("  freeSpeedRadPerSec: %f", config.moduleConfig.driveMotor.freeSpeedRadPerSec));
         } else {
             var value = String.valueOf(s);
-            msg.set(value);
-            DataLogManager.log(value);
+            writeMessage(value);
+        }
+    }
+
+    private static void writeMessage(String value) {
+        msg.set(value);
+        synchronized (pendingMessages) {
+            if (signalLoggerStarted) {
+                SignalLogger.writeString("NT:/messages", value);
+            } else {
+                pendingMessages.add(value);
+            }
         }
     }
 
@@ -326,26 +371,28 @@ public class GreenLogger {
         Elastic.sendNotification(new Elastic.Notification(elasticNotificationLevel, title, s, 15000, 450, -1));
     }
 
-    public static void startLogging(){
-        // don't log until DS is attached
-        if(mLogNotifier != null || !DriverStation.isDSAttached()) return;
-        // once we are attached, delay and then log to give WPI time to rename file
-        if(delay == null){
-            DataLogManager.logNetworkTables(true);
-            // this will trigger rename
-            DataLogManager.start();
-            delay = new Notifier(()->{
-                GreenLogger.log(periodicLogs.size() + " periodic logs registered");
-                DriverStation.startDataLog(DataLogManager.getLog(), false);
-                mLogFirstStart = false;
-            });
-            delay.startSingle(5);
+    public static void startLogging() {
+        // Don't log until the DS is attached. SignalLogger renames the file for the match.
+        if (mLogNotifier != null || !DriverStation.isDSAttached()) {
+            return;
         }
-        // if log init is complete update periodic logs
-        if(mLogFirstStart) return;
-        mLogNotifier = new Notifier(() -> {
-            updatePeriodic();
-        });
+        var status = SignalLogger.start();
+        if (!status.isOK()) {
+            if (!reportedStartFailure) {
+                reportedStartFailure = true;
+                writeMessage("SignalLogger failed to start: " + status.getDescription());
+            }
+            return;
+        }
+        synchronized (pendingMessages) {
+            signalLoggerStarted = true;
+            for (String pending : pendingMessages) {
+                SignalLogger.writeString("NT:/messages", pending);
+            }
+            pendingMessages.clear();
+        }
+        GreenLogger.log(periodicLogs.size() + " periodic logs registered");
+        mLogNotifier = new Notifier(GreenLogger::updatePeriodic);
         mLogNotifier.startPeriodic(.05);
     }
 
@@ -357,30 +404,51 @@ public class GreenLogger {
             if (entry.Publisher instanceof DoublePublisher) {
                 var value = (Double) supplier.get();
                 ((DoublePublisher) entry.Publisher).set(value);
+                if (entry.writeToSignalLog) {
+                    SignalLogger.writeDouble(signalName(entry.name), value);
+                }
             } else if (entry.Publisher instanceof IntegerPublisher) {
                 var value = (Integer) supplier.get();
                 ((IntegerPublisher) entry.Publisher).set(value);
+                if (entry.writeToSignalLog) {
+                    SignalLogger.writeInteger(signalName(entry.name), value);
+                }
             } else if (entry.Publisher instanceof BooleanPublisher) {
                 var value = (Boolean) supplier.get();
                 ((BooleanPublisher) entry.Publisher).set(value);
+                if (entry.writeToSignalLog) {
+                    SignalLogger.writeBoolean(signalName(entry.name), value);
+                }
             } else if (entry.Publisher instanceof FloatPublisher) {
                 var value = (Float) supplier.get();
                 ((FloatPublisher) entry.Publisher).set(value);
+                if (entry.writeToSignalLog) {
+                    SignalLogger.writeFloat(signalName(entry.name), value);
+                }
             } else if (entry.Publisher instanceof StructPublisher) {
                 var value = supplier.get();
                 ((StructPublisher) entry.Publisher).set(value);
+                if (entry.writeToSignalLog) {
+                    writeStructSignal(signalName(entry.name), entry.struct, value);
+                }
             } else if (entry.Publisher instanceof DoubleArrayPublisher) {
                 // Convert the result of the supplier from a List<Double> to a double[].
                 var value = ((List<Double>) supplier.get()).stream()
                     .mapToDouble(Double::doubleValue)
                     .toArray();
                 ((DoubleArrayPublisher) entry.Publisher).set(value);
+                if (entry.writeToSignalLog) {
+                    SignalLogger.writeDoubleArray(signalName(entry.name), value);
+                }
             } else if (entry.Publisher instanceof IntegerArrayPublisher) {
-                // Convert the result of the supplier from a List<Integer> to an int[].
+                // Convert the result of the supplier from a List<Integer> to a long[].
                 var value = ((List<Integer>) supplier.get()).stream()
                     .mapToLong(Integer::longValue)
                     .toArray();
                 ((IntegerArrayPublisher) entry.Publisher).set(value);
+                if (entry.writeToSignalLog) {
+                    SignalLogger.writeIntegerArray(signalName(entry.name), value);
+                }
             } else if (entry.Publisher instanceof BooleanArrayPublisher) {
                 List<Boolean> booleanList = (List<Boolean>) supplier.get();
                 // Convert the result of the supplier from a List<Boolean> to a boolean[].
@@ -391,6 +459,9 @@ public class GreenLogger {
                     value[i] = Objects.requireNonNullElse(booleanList.get(i), false);
                 }
                 ((BooleanArrayPublisher) entry.Publisher).set(value);
+                if (entry.writeToSignalLog) {
+                    SignalLogger.writeBooleanArray(signalName(entry.name), value);
+                }
             } else if (entry.Publisher instanceof FloatArrayPublisher) {
                 List<Float> floatList = (List<Float>) supplier.get();
                 // Convert the result of the supplier from a List<Float> to a float[].
@@ -401,6 +472,9 @@ public class GreenLogger {
                     value[i] = Objects.requireNonNullElse(floatList.get(i), Float.NaN);
                 }
                 ((FloatArrayPublisher) entry.Publisher).set(value);
+                if (entry.writeToSignalLog) {
+                    SignalLogger.writeFloatArray(signalName(entry.name), value);
+                }
             } else if (entry.Publisher instanceof StringArrayPublisher) {
                 // We are using a StringArrayPublisher for a List of any type that is not covered
                 // by the other array publishers (not just for Strings), so we need to get the
@@ -409,9 +483,15 @@ public class GreenLogger {
                     .map(String::valueOf)
                     .toArray(String[]::new);
                 ((StringArrayPublisher) entry.Publisher).set(value);
+                if (entry.writeToSignalLog) {
+                    SignalLogger.writeStringArray(signalName(entry.name), value);
+                }
             } else if (entry.Publisher instanceof StructArrayPublisher) {
                 var value = ((List) supplier.get()).toArray();
                 ((StructArrayPublisher) entry.Publisher).set(value);
+                if (entry.writeToSignalLog) {
+                    writeStructArraySignal(signalName(entry.name), entry.struct, value);
+                }
             } else if (
                 // Would be null if this was logging an NTSendable, which handle their own periodic
                 // updating, so we don't need to do anything.
@@ -420,8 +500,26 @@ public class GreenLogger {
                 // Default to logging as a string
                 var value = String.valueOf(supplier.get());
                 ((StringPublisher) entry.Publisher).set(value);
+                if (entry.writeToSignalLog) {
+                    SignalLogger.writeString(signalName(entry.name), value);
+                }
             }
         }
+    }
+
+    /** SignalLogger name for a NetworkTables topic, matching {@code NT:/messages}. */
+    private static String signalName(String networkTableName) {
+        return "NT:/" + networkTableName;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void writeStructSignal(String name, Struct struct, Object value) {
+        SignalLogger.writeStruct(name, struct, value);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static void writeStructArraySignal(String name, Struct struct, Object[] values) {
+        SignalLogger.writeStructArray(name, struct, values);
     }
 
     public static void log(String key, PIDConstants pid) {
