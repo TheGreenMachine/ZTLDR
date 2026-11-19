@@ -80,7 +80,7 @@ public class RobotContainer extends BaseRobotContainer {
             superstructure.setTurretFixedAngle(0);
             superstructure.setAutoAimTurret(false);
         }));
-        driverController.b().onTrue(Commands.runOnce(() -> {
+        driverController.leftBumper().onTrue(Commands.runOnce(() -> {
             superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_MIDDLE);
             superstructure.setTurretFixedAngle(0);
             superstructure.setAutoAimTurret(false);

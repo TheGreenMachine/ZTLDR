@@ -106,7 +106,7 @@ public class Swerve extends SubsystemBase implements ITestableSubsystem {
         rot = rotLimiter.calculate(rot);
 
         // 5. Multipliers to slow down movement based on driver preference. Slow mode and normal mode.
-        if (controller.leftBumper().getAsBoolean()) {
+        if (controller.b().getAsBoolean()) {
             x   *= SLOW_MODE_TRANSLATIONAL_MULTIPLIER;
             y   *= SLOW_MODE_TRANSLATIONAL_MULTIPLIER;
             rot *= SLOW_MODE_ROTATIONAL_MULTIPLIER;
