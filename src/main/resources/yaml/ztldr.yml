@@ -298,7 +298,7 @@ subsystems:
                 magneticSensor:
                     sensorDirection: Clockwise_Positive
                     absoluteSensorDiscontinuityPoint: 0.625
-                    magnetOffset: -0.35748674479
+                    magnetOffset: 0.397483
             candi:
                 id: 6
                 deviceType: CANdi
