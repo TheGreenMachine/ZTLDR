@@ -55,7 +55,7 @@ public class RobotContainer extends BaseRobotContainer {
     private void configureBindings() {
         // DRIVER CONTROLLER
         // Swerve
-        driverController.povDown().onTrue(Commands.runOnce(() ->
+        driverController.rightBumper().onTrue(Commands.runOnce(() ->
             superstructure.setSuperstructureWantedSwerveState(Superstructure.WantedSwerveState.BRAKE)
         ))
             .onFalse(Commands.runOnce(() ->
@@ -80,7 +80,7 @@ public class RobotContainer extends BaseRobotContainer {
             superstructure.setTurretFixedAngle(0);
             superstructure.setAutoAimTurret(false);
         }));
-        driverController.b().onTrue(Commands.runOnce(() -> {
+        driverController.leftBumper().onTrue(Commands.runOnce(() -> {
             superstructure.setSuperstructureWantedShooterDistanceState(Superstructure.WantedShooterDistanceState.PRESET_MIDDLE);
             superstructure.setTurretFixedAngle(0);
             superstructure.setAutoAimTurret(false);
@@ -96,8 +96,16 @@ public class RobotContainer extends BaseRobotContainer {
         }));
 
         // Intake
-        driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)));
-        driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)));
+        driverController.leftTrigger().onTrue(Commands.runOnce(() ->
+                superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)
+            ))
+            .onFalse(Commands.runOnce(() ->
+                superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)
+            ));
+
+
+        //driverController.leftBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.INTAKE)));
+        //driverController.rightBumper().onTrue(Commands.runOnce(() -> superstructure.setSuperstructureWantedIntakeState(Superstructure.WantedIntakeState.STOW)));
 
 
         // OPERATOR CONTROLLER
